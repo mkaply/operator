@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!DOCTYPE operator_options_action SYSTEM "chrome://operator/locale/operator_options.dtd">
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<dialog
+  title=""
+	orient="vertical"
+	autostretch="always"
+  buttons="accept"
+  onload="Operator_Debug.onPageLoad(window.arguments);sizeToContent();"
+  xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <script type="application/x-javascript" src="chrome://operator/content/operator_debug.js"/>
+
+
+
+  <tabbox id="debug.tabs">
+	  <tabs>
+		  <tab id="error.tab" label="Error"/>
+      <tab id="dump.tab" label="Structure"/>
+		  <tab id="source.tab" label="Source"/>
+      <tab id="vcfical.tab" label="vCard/iCalendar"/>
+      <tab id="x2v.tab" label="X2V"/>
+	  </tabs>
+	  <tabpanels>
+      <tabpanel id="error.tabpanel">
+        <textbox id="error" height="480" width="640" multiline="true" readonly="true"/> 
+      </tabpanel>
+      <tabpanel id="dump.tabpanel">
+        <textbox id="dump" height="480" width="640" multiline="true" readonly="true"/> 
+      </tabpanel>
+      <tabpanel id="source.tabpanel">
+        <textbox id="source" height="480" width="640" multiline="true" readonly="true"/> 
+      </tabpanel>
+      <tabpanel id="vcfical.tabpanel">
+        <textbox id="vcfical" height="480" width="640" multiline="true" readonly="true"/> 
+      </tabpanel>
+      <tabpanel id="x2v.tabpanel">
+        <textbox id="x2v" height="480" width="640" multiline="true" readonly="true"/> 
+      </tabpanel>
+    </tabpanels>
+  </tabbox>
+</dialog>

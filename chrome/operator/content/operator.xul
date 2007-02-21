@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+
+<?xml-stylesheet href="chrome://operator/content/operator.css" type="text/css"?>
+
+<!DOCTYPE operator SYSTEM "chrome://operator/locale/operator.dtd">
+
+<overlay id="microformats" 
+         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+  <script type="application/x-javascript" src="chrome://operator/content/operator.js"/>
+
+  <toolbox id="navigator-toolbox">
+    <toolbar accesskey="&operatorToolbar.accesskey;" class="chromeclass-toolbar" collapsed="false"
+     context="toolbar-context-menu;"
+     grippytooltiptext="&operatorToolbar.name;" hidden="false" iconsize="small"
+     id="operator-toolbar" inherits="collapsed,hidden" mode="full"
+     persist="collapsed,hidden" toolbarname="&operatorToolbar.name;">
+     <spring id="operator-spring" flex="1"/>
+     <toolbarbutton label="&operatorOptions.label;" id="operator-options"
+     oncommand="window.openDialog('chrome://operator/content/operator_options.xul','options','chrome,centerscreen,modal');"
+     />
+     </toolbar>
+
+</toolbox>
+ <statusbar id="status-bar">
+   <statusbarpanel class="statusbarpanel-menu-iconic" disabled="true"
+     id="operator-statusbar"
+     src="chrome://operator/content/operator_small_disabled.png"
+     tooltiptext="&operator.name;"
+   />
+ </statusbar>
+ 	<toolbarpalette id="BrowserToolbarPalette">
+			<toolbarbutton id="operator-toolbar-button" label="&operator.name;"
+      disabled="true"
+      type="menu"
+      />
+	</toolbarpalette>
+<popup id="contentAreaContextMenu">
+  <menuseparator id="operator-separator"/>
+  <menu id="operator-menu-0"/>
+  <menu id="operator-menu-1"/>
+  <menu id="operator-menu-2"/>
+</popup>
+
+<!--
+<broadcasterset id="mainBroadcasterSet">
+  <broadcaster id="operator-sidebar"
+               autoCheck="false"
+               label="&operator.name;"
+               type="checkbox" 
+               group="sidebar"
+               sidebarurl="chrome://operator/content/operator_sidebar.xul"
+               sidebartitle="&operatorSidebar.name;"
+               oncommand="toggleSidebar('operator-sidebar');"/>
+ </broadcasterset>
+<menupopup id="viewSidebarMenu">
+  <menuitem key="operator-sidebar"
+            accesskey="&operatorSidebar.accesskey;"
+            observes="operator-sidebar"/>
+</menupopup>
+
+-->
+
+</overlay>

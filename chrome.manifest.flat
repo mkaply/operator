@@ -1,0 +1,6 @@
+overlay	chrome://browser/content/browser.xul	chrome://operator/content/operator.xul
+style   chrome://browser/content/browser.xul    chrome://operator/content/operator.css
+style   chrome://global/content/customizeToolbar.xul    chrome://operator/content/operator.css
+content	operator chrome/operator/content/
+locale  operator en-US chrome/operator/locale/en-US/
+

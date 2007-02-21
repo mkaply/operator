@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type"text/css" ?>
+<?xml-stylesheet href="chrome://browser/skin/browser.css" type="text/css" ?>
+<!DOCTYPE page SYSTEM "chrome://operator/locale/operator.dtd">
+<window id="operator-sidebar-window"
+        onload="var event = window.content.document.createEvent('Event');event.initEvent('operator-sidebar-load', true, true);window.content.document.dispatchEvent(event);"
+        onunload=""
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+</window>
+

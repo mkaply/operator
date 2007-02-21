@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE operator_options SYSTEM "chrome://operator/locale/operator_options.dtd">
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://operator/content/ccklist.css" type="text/css"?>
+<dialog 
+  title="&operatorOptions.label;"
+	orient="vertical"
+	autostretch="always"
+	buttons="accept,cancel"
+  xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+  onload="sizeToContent();Operator_Options.onPageLoad();"
+	ondialogaccept="Operator_Options.saveOptions()">
+  <script type="application/x-javascript" src="chrome://operator/content/operator.js"/>
+  <script type="application/x-javascript" src="chrome://operator/content/operator_options.js"/>
+
+  <tabbox>
+	  <tabs>
+		  <tab label="&general.label;"/>
+		  <tab label="&microformats.label;"/>
+      <tab label="&actions.label;"/>
+	  </tabs>
+	  <tabpanels>
+      <tabpanel>
+        <vbox>
+          <groupbox>
+            <caption label="&displayStyle.label;"/>
+            <vbox>
+              <radiogroup id="view" onselect="Operator_Options.doMicroformatEnabling();">
+                <radio label="&actions.label;" value="1"/>
+                <radio label="&microformats.label;" value="0"/>
+                 <checkbox id="useDescriptiveNames" class="indent" label="&useDescriptiveNames.label;"/>
+              </radiogroup>
+            </vbox>
+          </groupbox>
+        <checkbox id="debug" label="&debug.label;"/>
+        <checkbox id="statusbar" label="&statusbar.label;"/>
+        <checkbox id="highlightMicroformats" label="&highlightMicroformats.label;"/>
+        <checkbox id="removeDuplicates" label="&removeDuplicates.label;"/>
+        </vbox>
+      </tabpanel>
+      <tabpanel>
+      <box class="ccklist" id="microformats" disablenew="Operator_Options.disableNewMicroformat();" new="Operator_Options.onNewMicroformat();" edit="Operator_Options.onEditMicroformat();"/>
+      </tabpanel>
+      <tabpanel>
+      <box class="ccklist" id="actions" new="Operator_Options.onNewAction();" edit="Operator_Options.onEditAction();"/>
+      </tabpanel>
+    </tabpanels>
+  </tabbox>
+</dialog>
