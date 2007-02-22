@@ -76,7 +76,7 @@ ufJSParser.microformats.hAtom = {
           } else {
             docforxpath = mfnode.ownerDocument;
           }
-          for (i in tags) {
+          for (i = 0; i < tags.length; i++) {
             var xpathResult = docforxpath.evaluate(xpathExpression, tags[i], null,  XPathResult.FIRST_ORDERED_NODE_TYPE, null);
             if (xpathResult.singleNodeValue) {
               continue;
