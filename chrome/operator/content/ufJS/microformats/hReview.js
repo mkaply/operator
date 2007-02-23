@@ -114,7 +114,7 @@ ufJSParser.microformats.hReview = {
         types: ["product", "business", "event", "person", "place", "website", "url"]
       },
       "tag" : {
-        value: "",
+        value: [],
         rel: true,
         getter: function(propnode, mfnode, definition) {
           return ufJSParser.createMicroformat(propnode, "tag");
