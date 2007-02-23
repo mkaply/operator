@@ -28,6 +28,13 @@ ufJSParser.microformats.xFolk = {
           }
           return {"title" : title, "link" : link};
         }
+      },
+      "tag" : {
+        value: [],
+        rel: true,
+        getter: function(propnode, mfnode, definition) {
+          return ufJSParser.createMicroformat(propnode, "tag");
+        }
       }
     },
     ufjs: {
