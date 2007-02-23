@@ -27,12 +27,14 @@ ufJSActions.actions.bookmark = {
     var action = ufJSActions.actions.goto_url;
     for (var i in microformatNames) {
       var name;
+      var description;
       if (microformatNames[i] == "xFolk") {
         var taggedlink = ufJSParser.getMicroformatProperty(node, "xFolk", "taggedlink");
         if (taggedlink) {
           url = taggedlink.link;
           name = taggedlink.title;
         }
+        description = ufJSParser.getMicroformatProperty(node, "xFolk", "description");
       } else if (microformatNames[i] == "hAtom") {
         var name = ufJSParser.getMicroformatProperty(node, "hAtom", "entry-title");
         var bookmark = ufJSParser.getMicroformatProperty(node, "hAtom", "bookmark");
@@ -48,7 +50,7 @@ ufJSActions.actions.bookmark = {
         url: url,
         charset: "",
         bWebPanel: false,
-        description: ""
+        description: description
       };
       var ADD_BM_DIALOG_FEATURES = "centerscreen,chrome,dialog,resizable,";
         
