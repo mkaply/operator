@@ -116,7 +116,7 @@ var ufJS = {
       xpathExpression = ".//*[";
     }
     var i;
-    for (i in attributeList) {
+    for (i = 0; i < attributeList.length; i++) {
       if (i != 0) {
         xpathExpression += " or ";
       }
