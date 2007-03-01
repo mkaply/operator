@@ -47,6 +47,16 @@ Operator.microformatList.species = {
   icon: "chrome://operator/content/other.png"
 };
 
+Operator.microformatList["hAtom-hEntry"] = {
+  description: "Atom Entry",
+  icon: "chrome://operator/content/other.png"
+};
+
+Operator.microformatList["hAtom-hFeed"] = {
+  description: "Atom Feed",
+  icon: "chrome://operator/content/other.png"
+};
+
 Operator.microformatList["GRDDL"] = {
   description: "GRDDL",
   icon: "chrome://operator/content/other.png"
