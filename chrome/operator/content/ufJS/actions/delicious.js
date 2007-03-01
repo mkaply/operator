@@ -58,9 +58,20 @@ ufJSActions.actions.delicious_bookmark = {
             url += ';title=' + encodeURIComponent(xfolk.taggedlink.title);
           }
           if (xfolk.description) {
-            url += '&notes=' + encodeURIComponent(xfolk.description);
+            url += ';notes=' + encodeURIComponent(xfolk.description);
           }
+/*
+          if (xfolk.tag) {
+            url += ';tags=';
+            var j;
+            for (j = 0; j < xfolk.tag.length; j++) {
+              url += encodeURIComponent(xfolk.tag[j].tag);
+              url += "+";
+            }
+          }
+*/
         }
+        break;
       }
     }
     if (url) {
