@@ -409,10 +409,11 @@ var Operator = {
           if ((sorted_items[j].displayname == sorted_items[j-1].displayname) && (sorted_items[j].error === false)) {
             if (this.dump_microformat(sorted_items[j].node, microformat) ==
               this.dump_microformat(sorted_items[j-1].node, microformat)) {
-              for (m in items) {
+              for (m = 0; m < items.length; m++) {
                 if (items[m].node == sorted_items[j].node) {
                   items[m].duplicate = true;
                 }
+//                break;
               }
               sorted_items.splice(j,1);
             } else {
@@ -798,12 +799,16 @@ var Operator = {
     var useActions = (Operator.view == 1);
 
     var microformatsArrays = ufJS.getElementsByMicroformat(content.document, Operator.microformatList);
+    var i;
+
+    for (i = 0; i < content.frames.length; i++) {
+      microformatsArrays = ufJS.getElementsByMicroformat(content.frames[i].document, Operator.microformatList, microformatsArrays);
+    }
 
     var popup;
 
     var microformat;
     var tempItem;
-    var i;
     var submenu;
     if (useActions) {
       i=1;
@@ -849,7 +854,7 @@ var Operator = {
         } catch (ex) {
           break;
         }
-        if (microformat && microformatsArrays[microformat].length > 0) {
+        if (microformat && microformatsArrays[microformat] && microformatsArrays[microformat].length > 0) {
           submenu = Operator.buildMenu(microformat, microformatsArrays[microformat]);
           if (submenu) {
             if (!popup) {
