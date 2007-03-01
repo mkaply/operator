@@ -14,7 +14,7 @@ var ufJS = {
       ufJSActions.init(ojl, baseurl);
     }
   },
-  getElementsByMicroformat: function(rootElement, in_microformatList) {
+  getElementsByMicroformat: function(rootElement, in_microformatList, in_microformatsArrays) {
     var i;
     var microformatList;
     if (in_microformatList) {
@@ -34,29 +34,38 @@ var ufJS = {
         microformatList.push(i);
       }
     }
-    var microformats = [];
+    var microformats;
+    if (in_microformatsArrays) {
+      microformats = in_microformatsArrays;
+    } else {
+      microformats = [];
+    }
     var mfname;
+    var mfs;
     for (i in microformatList) {
       mfname = microformatList[i];
       if (ufJSParser.microformats[mfname]) {
         if (ufJSParser.microformats[mfname].className) {
-          microformats[mfname] = ufJS.getElementsByClassName(rootElement,
-                                                             ufJSParser.microformats[mfname].className);
-          /* If we didn't find anything, maybe the document is the microformat - check for alternateClass */
-          if ((microformats[mfname].length == 0) && (ufJSParser.microformats[mfname].alternateClass)) {
+          mfs = ufJS.getElementsByClassName(rootElement,
+                                            ufJSParser.microformats[mfname].className);
+          if ((mfs.length == 0) && (ufJSParser.microformats[mfname].alternateClass)) {
             var temp = ufJS.getElementsByClassName(rootElement, ufJSParser.microformats[mfname].alternateClass);
             if (temp.length > 0) {
-              microformats[mfname].push(rootElement); 
+              mfs.push(rootElement); 
             }
           }
         } else if (ufJSParser.microformats[mfname].attributeValues) {
-          microformats[mfname] = ufJS.getElementsByAttribute(rootElement,
-                                                             ufJSParser.microformats[mfname].attributeName,
-                                                             ufJSParser.microformats[mfname].attributeValues);
+          mfs = ufJS.getElementsByAttribute(rootElement,
+                                            ufJSParser.microformats[mfname].attributeName,
+                                            ufJSParser.microformats[mfname].attributeValues);
         }
       } else {
+        mfs = [];
+      }
+      if (!microformats[mfname]) {
         microformats[mfname] = [];
       }
+      microformats[mfname] = microformats[mfname].concat(mfs);
     }
     return microformats;
   },
