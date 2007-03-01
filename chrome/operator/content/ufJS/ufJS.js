@@ -48,8 +48,10 @@ var ufJS = {
         if (ufJSParser.microformats[mfname].className) {
           mfs = ufJS.getElementsByClassName(rootElement,
                                             ufJSParser.microformats[mfname].className);
-          if ((mfs.length == 0) && (ufJSParser.microformats[mfname].alternateClass)) {
-            var temp = ufJS.getElementsByClassName(rootElement, ufJSParser.microformats[mfname].alternateClass);
+          /* alternateClassName is for cases where a parent microformat is inferred by the children */
+          /* IF we find alternateClassName, the entire document becomes the microformat */
+          if ((mfs.length == 0) && (ufJSParser.microformats[mfname].alternateClassName)) {
+            var temp = ufJS.getElementsByClassName(rootElement, ufJSParser.microformats[mfname].alternateClassName);
             if (temp.length > 0) {
               mfs.push(rootElement); 
             }
