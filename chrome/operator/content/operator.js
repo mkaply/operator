@@ -679,7 +679,7 @@ var Operator = {
     var i;
     var toreturn = "";
     var testArray = [];
-    alert(item);
+    
     for (i in item)
     {
       if (testArray[i]) {
