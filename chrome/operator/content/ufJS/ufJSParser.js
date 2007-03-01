@@ -21,6 +21,7 @@ var ufJSParser = {
       ojl.loadSubScript(baseurl + "microformats/species.js");
       ojl.loadSubScript(baseurl + "microformats/hAtom.js");
       ojl.loadSubScript(baseurl + "microformats/bookmark.js");
+      ojl.loadSubScript(baseurl + "microformats/GRDDL.js");
     }
   },
   createMicroformat: function(in_mfnode, mfname)  {
