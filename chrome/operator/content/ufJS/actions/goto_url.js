@@ -7,7 +7,7 @@ ufJSActions.actions.goto_url = {
       "hCard" : "url",
       "hCalendar" : "url",
       "XFN" : "XFN",
-      "hAtom" : "hAtom"
+      "hAtom-hEntry" : "hAtom-hEntry"
     }
   },
   doAction: function(node, microformatName, event) {
@@ -22,8 +22,8 @@ ufJSActions.actions.goto_url = {
     var action = ufJSActions.actions.goto_url;
     var i;
     for (i = 0; i< microformatNames.length; i++) {
-      if (microformatNames[i] == "hAtom") {
-        var bookmark = ufJSParser.getMicroformatProperty(node, "hAtom", "bookmark");
+      if (microformatNames[i] == "hAtom-hEntry") {
+        var bookmark = ufJSParser.getMicroformatProperty(node, "hAtom-hEntry", "bookmark");
         url = bookmark.link;
       } else if (microformatNames[i] == "XFN") {
         url = ufJSParser.getMicroformatProperty(node, "XFN", "link");
@@ -39,5 +39,5 @@ ufJSActions.actions.goto_url = {
         break;
       }
     }
-  }
+  } 
 };
