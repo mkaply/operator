@@ -454,37 +454,7 @@ var Operator = {
             tempItem.style.fontWeight = "bold";
             menu.error = true;
           } else {
-/* if we have children, enumerate through the children to call the following code */
-            if (ufJSParser.microformats[microformat].children) {
-              var children = ufJS.getElementsByClassName(items[j].node, ufJSParser.microformats[microformat].children);
-              var k;
-              var submenu = document.createElement("menupopup");
-              var testArray = [];
-              for (k in children) {
-                if (testArray[k]) {
-                  continue;
-                }
-                menuitem = document.createElement("menu");
-                menuitem.label = ufJSParser.getMicroformatProperty(children[k], microformat, "ufjsChildDisplayName");
-                menuitem.setAttribute("label", menuitem.label);
-                this.buildActionMenu(menuitem, microformat, children[k], handler, true);
-                submenu.appendChild(menuitem);
-              }
-              if (this.debug) {
-                menuitem = document.createElement("menuseparator");
-                submenu.appendChild(menuitem);
-                menuitem = document.createElement("menuitem");
-                menuitem.label = "Debug";
-                menuitem.setAttribute("label", menuitem.label);
-                menuitem.store_oncommand = this.errorCallbackGenerator(microformat, items[j].node);
-                menuitem.addEventListener("command", menuitem.store_oncommand, true);
-                submenu.appendChild(menuitem);
-              }
-              tempItem.appendChild(submenu);
-/* @MAK */
-            } else {
-              this.buildActionMenu(tempItem, microformat, items[j].node, handler);
-            }
+            this.buildActionMenu(tempItem, microformat, items[j].node, handler);
           }
           menu.appendChild(tempItem);
           itemsadded++;
@@ -501,7 +471,7 @@ var Operator = {
     }
     return menu;
   },
-  buildActionMenu: function(parentmenu, microformat, node, handler, children)
+  buildActionMenu: function(parentmenu, microformat, node, handler)
   {
     var required;
     var menuitem;
@@ -527,7 +497,7 @@ var Operator = {
         menuitem.addEventListener("click", menuitem.store_onclick, true);
         submenu.appendChild(menuitem);
       }
-      if (this.debug && !children) {
+      if (this.debug) {
         menuitem = document.createElement("menuseparator");
         submenu.appendChild(menuitem);
         menuitem = document.createElement("menuitem");
@@ -677,8 +647,10 @@ var Operator = {
     var instance;
     if (microformat) {
       instance = ufJSParser.createMicroformat(item, microformat);
-    } 
-    if (!instance) {
+      if (!instance) {
+        return "Unable to create microformat";
+      }
+    } else { 
       instance = item;
     }
     var todisplay = "";
@@ -707,6 +679,7 @@ var Operator = {
     var i;
     var toreturn = "";
     var testArray = [];
+    alert(item);
     for (i in item)
     {
       if (testArray[i]) {
