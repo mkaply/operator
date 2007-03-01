@@ -42,15 +42,13 @@ Operator.microformatList.XFN = {
   sort: true
 };
 
-
-
 Operator.microformatList.species = {
   description: "Species",
   icon: "chrome://operator/content/other.png"
 };
 
-Operator.microformatList.hAtom = {
-  description: "hAtom",
+Operator.microformatList["GRDDL"] = {
+  description: "GRDDL",
   icon: "chrome://operator/content/other.png"
 };
 
