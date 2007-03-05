@@ -16,8 +16,20 @@ ufJSParser.microformats["hAtom-hEntry"] = {
     properties: {
       "author" : {
         value: [],
+        virtual: true,
         getter: function(propnode, mfnode, definition) {
-          return ufJSParser.createMicroformat(propnode, "hCard");
+          if (propnode == mfnode) {
+            /* Virtual case */
+            /* FIXME - THIS IS FIREFOX SPECIFIC */
+            /* check if ancestor is an address with author  */
+            var xpathExpression = "ancestor::*//address[contains(concat(' ', @class, ' '), ' author ') and contains(concat(' ', @class, ' '), ' vcard ')]";
+            var xpathResult = mfnode.ownerDocument.evaluate(xpathExpression, mfnode, null,  XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+            if (xpathResult.singleNodeValue) {
+              return ufJSParser.createMicroformat(xpathResult.singleNodeValue, "hCard");
+            }
+          } else {
+            return ufJSParser.createMicroformat(propnode, "hCard");
+          }
         }
       },
       "bookmark" : {
@@ -29,18 +41,42 @@ ufJSParser.microformats["hAtom-hEntry"] = {
       },
       "entry-title" : {
         value: "",
+        virtual: true,
+        getter: function(propnode, mfnode, definition) {
+          if (propnode == mfnode) {
+            /*
+    *  the first <h#> element in the Entry, or
+    * the <title> of the page, if there is no enclosing Feed element, or
+    * assume it is the empty string
+    */
+          } else {
+            return definition.defaultGetter(propnode);
+          }
+         
+        }
       },
       "entry-content" : {
-        value: [],
+        value: []
       },
       "entry-summary" : {
-        value: [],
+        value: []
       },
       "published" : {
         value: "",
+        getter: function(propnode, mfnode, definition) {
+          return definition.dateGetter(propnode);
+        }
       },
       "updated" : {
         value: "",
+        virtual: true,
+        getter: function(propnode, mfnode, definition) {
+          if (propnode == mfnode) {
+            return ufJSParser.getMicroformatProperty(mfnode, "hAtom-Entry", "published");
+          } else {
+            return definition.dateGetter(propnode);
+          }
+        }
       },
       "tag" : {
         value: "",
@@ -86,6 +122,24 @@ ufJSParser.microformats["hAtom-hEntry"] = {
           return ufJSParser.trim(s);
         }
       }
+    },
+    dateGetter: function(propnode) {
+      var date = this.defaultGetter(propnode);
+      if (date.indexOf('-') == -1) {
+        var newdate = "";
+        var i;
+        for (i=0;i<date.length;i++) {
+          newdate += date.charAt(i);
+          if ((i == 3) || (i == 5)) {
+            newdate += "-";
+          }
+          if ((i == 10) || (i == 12)) {
+            newdate += ":";
+          }
+        }
+        date = newdate;
+      }
+      return date;
     }
   }
 };
