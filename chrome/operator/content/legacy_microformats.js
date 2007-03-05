@@ -18,7 +18,7 @@ var Microformats = {
             ufJSActions.actions[j].scope.microformats[i] = i;
           }
           ufJSActions.actions[j].doAction = function(node, microformatName, event) {
-                                              Microformats[i].handlers[j].action(node, event);
+                                              Microformats[microformatName].handlers[j].action(node, event);
                                             };
         }
       }
