@@ -264,6 +264,8 @@ var ufJS = {
     s = s.replace(/\=/g, '%3D');
     s = s.replace(/\'/g, '%27');
     s = s.replace(/\,/g, '%2C');
+//    s = s.replace(/\r/g, '%0D');
+//    s = s.replace(/\n/g, '%0A');
     s = s.replace(/ /g, '+');
     return s;
   },
