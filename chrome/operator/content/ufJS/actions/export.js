@@ -19,7 +19,26 @@ ufJSActions.actions.export_vcard = {
     for (var i in microformatNames) {
       if (microformatNames[i] == "hCard") {
         var vcf = ufJS.vCard(node);
-        url = "data:text/x-vcard ;charset=utf8," + escape(vcf);
+        url = "data:text/x-vcard;charset=utf8," + vcf.replace(/\r/g, '%0D').replace(/\n/g, '%0A');
+/* The old way here for comparison purposes 
+        var file = Components.classes["@mozilla.org/file/directory_service;1"].
+                              getService(Components.interfaces.nsIProperties).
+                              get("TmpD", Components.interfaces.nsIFile);
+    
+        file.append("hCard.vcf");
+    
+        var fos = Components.classes["@mozilla.org/network/file-output-stream;1"].
+                             createInstance(Components.interfaces.nsIFileOutputStream);
+    
+        fos.init(file, -1, -1, false);
+        fos.write(vcf, vcf.length);                                                   
+        fos.close();                                                                  
+    
+        var f = Components.classes["@mozilla.org/file/local;1"].
+                           createInstance(Components.interfaces.nsILocalFile);
+        f.initWithPath(file.path);
+        f.launch();
+*/
         break;
       }
     }
