@@ -411,10 +411,11 @@ ufJSActions.actions.yahoo_contact = {
           url += "pu=" + hcard.url[0] + "&";
         }
         url += "A=C";
+        break;
       }
-      if (url) {
-        openUILink(url, event);
-      }
+    }
+    if (url) {
+      openUILink(url, event);
     }
   }
 };
