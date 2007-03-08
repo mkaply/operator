@@ -35,7 +35,6 @@ var Operator_Toolbar = {
             button.label = action;
             button.setAttribute("label", button.label);
             button.setAttribute("origlabel", action);
-            button.setAttribute("tooltiptext", action);
             button.setAttribute("type", "menu");
             button.addEventListener("mouseover", Operator_Toolbar.mouseOver, false);
 
@@ -69,12 +68,10 @@ var Operator_Toolbar = {
               button.label = Operator.microformatList[microformat].description;
               button.setAttribute("label", button.label);
               button.setAttribute("origlabel", button.label);
-              button.setAttribute("tooltiptext", button.label);
             } else {
               button.label =  microformat;
               button.setAttribute("label", button.label);
               button.setAttribute("origlabel", button.label);
-              button.setAttribute("tooltiptext", button.label);
             }
 
             button.setAttribute("type", "menu");
