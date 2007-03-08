@@ -9,7 +9,7 @@
 <!ENTITY  displayStyle.label               "Display style">
 <!ENTITY  useDescriptiveNames.label        "Use descriptive names">
 <!ENTITY  highlightMicroformats.label      "Highlight Microformats (test feature)">
-<!ENTITY  removeDuplicates.label           "Remove duplicate microformats">
+<!ENTITY  removeDuplicates.label           "Remove duplicate microformats (might impact performance)">
 <!ENTITY  debug.label                      "Debug mode">
 <!ENTITY  statusbar.label                  "Display icon in status bar">
 
