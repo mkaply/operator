@@ -133,14 +133,30 @@ ufJSActions.actions.google_calendar = {
         url = "http://www.google.com/calendar/event?action=TEMPLATE";
         if (hcalendar.dtstart) {
           url += "&";
-          url += "dates=";
-          url += hcalendar.dtstart.replace(/-/g,"").replace(/:/g,"");
-    
+          url += "dates="
+          var dt = hcalendar.dtstart;
+          var T = dt.charAt("T");
+          if (T) {
+            var offset = dt.lastIndexOf("-");
+            if (offset > T) {
+              dt = dt.substr(0, offset);
+            }
+          }
+          dt = dt.replace(/-/g,"").replace(/:/g,"");
+          url += dt;
           url += "/";
           if (hcalendar.dtend) {
-            url += hcalendar.dtend.replace(/-/g,"").replace(/:/g,"");
+            var dt = hcalendar.dtend;
+            var T = dt.charAt("T");
+            if (T) {
+              var offset = dt.lastIndexOf("-");
+              if (offset > T) {
+                dt = dt.substr(0, offset);
+              }
+            }
+            url += dt.replace(/-/g,"").replace(/:/g,"");;
           } else {
-            url += hcalendar.dtstart.replace(/-/g,"").replace(/:/g,"");
+            url += dt;
           }
         }
         url += "&";
