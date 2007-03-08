@@ -22,6 +22,13 @@ var Operator_ToolbarButton = {
               newmenuitems[i].addEventListener("DOMMenuItemActive", menuitems[i].store_onDOMMenuItemActive, true);
             }
           }
+          var menus = menu.getElementsByTagName("menu");
+          var newmenus = newmenu.getElementsByTagName("menu");
+          for(var i=0; i < menus.length; i++) {
+            if (menus[i].store_onpopupshowing) {
+              newmenus[i].addEventListener("popupshowing", menus[i].store_onpopupshowing, true);
+            }
+          }
           document.getElementById("operator-toolbar-button").appendChild(newmenu);
         } else {
           document.getElementById("operator-toolbar-button").appendChild(menu);

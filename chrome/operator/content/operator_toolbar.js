@@ -116,6 +116,9 @@ var Operator_Toolbar = {
       if (menus[i].store_onDOMMenuItemActive) {
         newmenus[i].addEventListener("DOMMenuItemActive", menus[i].store_onDOMMenuItemActive, true);
       }
+      if (menus[i].store_onpopupshowing) {
+        newmenus[i].addEventListener("popupshowing", menus[i].store_onpopupshowing, true);
+      }
     }
 
     if (handler) {

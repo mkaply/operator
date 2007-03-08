@@ -454,7 +454,15 @@ var Operator = {
             tempItem.style.fontWeight = "bold";
             menu.error = true;
           } else {
-            this.buildActionMenu(tempItem, microformat, items[j].node, handler);
+            /* NOT ACTIONS */
+            if (this.view === 0) {
+              var submenu = document.createElement("menupopup");
+              tempItem.appendChild(submenu);
+              tempItem.store_onpopupshowing = this.popupShowing(microformat, items[j].node, handler);
+              tempItem.addEventListener("popupshowing", tempItem.store_onpopupshowing, false);
+            } else {
+              this.buildActionMenu(tempItem, microformat, items[j].node, handler);
+            }
           }
           menu.appendChild(tempItem);
           itemsadded++;
@@ -471,12 +479,21 @@ var Operator = {
     }
     return menu;
   },
+  popupShowing: function(microformat, node, handler)
+  {
+    return function(event) {
+      if (event.target.childNodes.length == 0) {
+        Operator.buildActionMenu(event.target, microformat, node, handler);
+      }
+    }
+  },
   buildActionMenu: function(parentmenu, microformat, node, handler)
   {
     var required;
     var menuitem;
     if (this.view === 0) {
-      var submenu = document.createElement("menupopup");
+      
+      var submenu = parentmenu;
       var k;
       for (k in ufJSActions.actions) {
         if (!ufJSActions.actions[k].scope.microformats[microformat]) {
@@ -507,7 +524,6 @@ var Operator = {
         menuitem.addEventListener("command", menuitem.store_oncommand, true);
         submenu.appendChild(menuitem);
       }
-      parentmenu.appendChild(submenu);
     } else {
       parentmenu.store_oncommand = this.actionCallbackGenerator(microformat, node, handler);
       parentmenu.addEventListener("command", parentmenu.store_oncommand, true);
