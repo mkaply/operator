@@ -135,7 +135,7 @@ ufJSActions.actions.google_calendar = {
           url += "&";
           url += "dates="
           var dt = hcalendar.dtstart;
-          var T = dt.charAt("T");
+          var T = dt.indexOf("T");
           if (T) {
             var offset = dt.lastIndexOf("-");
             if (offset > T) {
@@ -147,7 +147,7 @@ ufJSActions.actions.google_calendar = {
           url += "/";
           if (hcalendar.dtend) {
             var dt = hcalendar.dtend;
-            var T = dt.charAt("T");
+            var T = dt.indexOf("T");
             if (T) {
               var offset = dt.lastIndexOf("-");
               if (offset > T) {
