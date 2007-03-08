@@ -54,7 +54,12 @@ ufJSParser.microformats.hCard = {
               if (propnode == mfnode) {
                 return definition.emailGetter(mfnode);
               } else {
-                return definition.emailGetter(propnode);
+                var values = ufJSParser.getElementsByClassName(mfnode, "value");
+                if (values.length > 1) {
+                  return definition.emailGetter(mfnode);
+                } else {
+                  return definition.emailGetter(propnode);
+                }
               }
             }
           }
@@ -216,7 +221,11 @@ ufJSParser.microformats.hCard = {
               var values = ufJSParser.getElementsByClassName(propnode, "value");
               var value = "";
               for (var i=0;i<values.length;i++) {
-                value += values[i].textContent;
+                if (values[i].innerText) {
+                  value += values[i].innerText;
+                } else {
+                  value += values[i].textContent;
+                }
               }
               return value;
             }
@@ -322,7 +331,11 @@ ufJSParser.microformats.hCard = {
         if (values.length > 0) {
           var value = "";
           for (var j=0;j<values.length;j++) {
-            value += values[j].textContent;
+            if (values[j].innerText) {
+              value += values[j].innerText;
+            } else {
+              value += values[j].textContent;
+            }
           }
           return value;
         } else {
