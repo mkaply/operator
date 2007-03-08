@@ -33,6 +33,7 @@
 			<toolbarbutton id="operator-toolbar-button" label="&operator.name;"
       disabled="true"
       type="menu"
+      tooltiptext="&operator.name;"
       />
 	</toolbarpalette>
 <popup id="contentAreaContextMenu">
