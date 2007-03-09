@@ -72,7 +72,7 @@ ufJSParser.microformats["hAtom-hEntry"] = {
         virtual: true,
         getter: function(propnode, mfnode, definition) {
           if (propnode == mfnode) {
-            return ufJSParser.getMicroformatProperty(mfnode, "hAtom-Entry", "published");
+            return ufJSParser.getMicroformatProperty(mfnode, "hAtom-hEntry", "published");
           } else {
             return definition.dateGetter(propnode);
           }
