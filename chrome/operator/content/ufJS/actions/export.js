@@ -19,8 +19,6 @@ ufJSActions.actions.export_vcard = {
     for (var i in microformatNames) {
       if (microformatNames[i] == "hCard") {
         var vcf = ufJS.vCard(node);
-        url = "data:text/x-vcard;charset=utf8," + vcf.replace(/\r/g, '%0D').replace(/\n/g, '%0A');
-/* The old way here for comparison purposes 
         var file = Components.classes["@mozilla.org/file/directory_service;1"].
                               getService(Components.interfaces.nsIProperties).
                               get("TmpD", Components.interfaces.nsIFile);
@@ -37,8 +35,10 @@ ufJSActions.actions.export_vcard = {
         var f = Components.classes["@mozilla.org/file/local;1"].
                            createInstance(Components.interfaces.nsILocalFile);
         f.initWithPath(file.path);
-        f.launch();
-*/
+        url = Components.classes["@mozilla.org/network/io-service;1"].
+                         getService(Components.interfaces.nsIIOService).
+                         newFileURI(f).
+                         spec;
         break;
       }
     }
@@ -67,7 +67,26 @@ ufJSActions.actions.export_icalendar = {
     for (var i in microformatNames) {
       if (microformatNames[i] == "hCalendar") {
         var ics = ufJS.iCalendar(node);
-        url = "data:text/calendar;charset=utf8," + escape(ics);
+        var file = Components.classes["@mozilla.org/file/directory_service;1"].
+                              getService(Components.interfaces.nsIProperties).
+                              get("TmpD", Components.interfaces.nsIFile);
+    
+        file.append("hCalendar.ics");
+    
+        var fos = Components.classes["@mozilla.org/network/file-output-stream;1"].
+                             createInstance(Components.interfaces.nsIFileOutputStream);
+    
+        fos.init(file, -1, -1, false);
+        fos.write(ics, ics.length);                                                   
+        fos.close();                                                                  
+    
+        var f = Components.classes["@mozilla.org/file/local;1"].
+                           createInstance(Components.interfaces.nsILocalFile);
+        f.initWithPath(file.path);
+        url = Components.classes["@mozilla.org/network/io-service;1"].
+                         getService(Components.interfaces.nsIIOService).
+                         newFileURI(f).
+                         spec;
         break;
       }
     }
