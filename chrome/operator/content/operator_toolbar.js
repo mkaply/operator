@@ -96,6 +96,7 @@ var Operator_Toolbar = {
     var newmenu = menu.cloneNode(true);
     var menuitems = menu.getElementsByTagName("menuitem");
     var newmenuitems = newmenu.getElementsByTagName("menuitem");
+    var numitems = 0;
     for(var i=0; i < menuitems.length; i++) {
       if (menuitems[i].store_oncommand) {
         newmenuitems[i].addEventListener("command", menuitems[i].store_oncommand, true);
@@ -105,6 +106,7 @@ var Operator_Toolbar = {
       }
       if (menuitems[i].store_onDOMMenuItemActive) {
         newmenuitems[i].addEventListener("DOMMenuItemActive", menuitems[i].store_onDOMMenuItemActive, true);
+        numitems++;
       }
     }
     var menus = menu.getElementsByTagName("menu");
@@ -112,6 +114,7 @@ var Operator_Toolbar = {
     for(var i=0; i < menus.length; i++) {
       if (menus[i].store_onDOMMenuItemActive) {
         newmenus[i].addEventListener("DOMMenuItemActive", menus[i].store_onDOMMenuItemActive, true);
+        numitems++;
       }
       if (menus[i].store_onpopupshowing) {
         newmenus[i].addEventListener("popupshowing", menus[i].store_onpopupshowing, true);
@@ -134,7 +137,8 @@ var Operator_Toolbar = {
   
     button.appendChild(newmenu);
     if (newmenu.childNodes.length > 0) {
-      button.label = button.getAttribute("origlabel") + " (" + newmenu.childNodes.length + ")";
+//      button.label = button.getAttribute("origlabel") + " (" + newmenu.childNodes.length + ")";
+      button.label = button.getAttribute("origlabel") + " (" + numitems + ")";
       button.setAttribute("label", button.label);
     }
   },
