@@ -263,9 +263,9 @@ ufJSParser.microformats.hCard = {
               var displayName = ufJSParser.getMicroformatProperty(mfnode, "hCard", "fn");
               if (displayName) {
                 var org = ufJSParser.getMicroformatProperty(mfnode, "hCard", "org");
-                if (org && org["organization-name"]) {
+                if (org && org[0]["organization-name"]) {
                   displayName += " (";
-                  displayName += org["organization-name"];
+                  displayName += org[0]["organization-name"];
                   displayName += ")";
                 }  
                 return displayName;
