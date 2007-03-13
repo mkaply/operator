@@ -340,6 +340,13 @@ var Operator = {
       ufJSActions.actions[handler].doAction(item, formatname, event);
     };
   },
+  actionAllCallbackGenerator: function(formatname, doc, handler)
+  {
+    return function(event) {
+//      handler.action(item, event);
+      ufJSActions.actions[handler].doActionAll(doc, formatname, event);
+    };
+  },
   clickCallbackGenerator: function(formatname, item, handler)
   {
     return function(event) {
@@ -347,6 +354,20 @@ var Operator = {
       if (event.button == 1) {
         if (event.target.getAttribute("disabled") != "true") {
             ufJSActions.actions[handler].doAction(item, formatname, event);
+
+//          handler.action(item, event);
+          closeMenus(event.target);
+        }
+      }
+    };
+  },
+  clickAllCallbackGenerator: function(formatname, doc, handler)
+  {
+    return function(event) {
+      /* This is for middle click only */
+      if (event.button == 1) {
+        if (event.target.getAttribute("disabled") != "true") {
+            ufJSActions.actions[handler].doActionAll(doc, formatname, event);
 
 //          handler.action(item, event);
           closeMenus(event.target);
@@ -431,7 +452,6 @@ var Operator = {
 
     var itemsadded = 0;
     var tempItem;
-    var required;
     var menuitem;
     for (j=0; j < items.length; j++) {
       if (!items[j].duplicate) {
@@ -477,6 +497,24 @@ var Operator = {
         }
       }
     }
+    
+    if (this.view === 0) {
+    } else {
+      if (ufJSActions.actions[handler].scope.microformats[microformat]) {
+        if (ufJSActions.actions[handler].doActionAll) {
+          var sep = document.createElement("menuseparator");
+          menu.appendChild(sep);
+          tempItem = document.createElement("menuitem");
+          tempItem.label = ufJSActions.actions[handler].descriptionAll;
+          tempItem.setAttribute("label", tempItem.label);
+          tempItem.store_oncommand = this.actionAllCallbackGenerator(microformat, content.document, handler);
+          tempItem.addEventListener("command", tempItem.store_oncommand, true);
+          tempItem.store_onclick = this.clickAllCallbackGenerator(microformat, content.document, handler);
+          tempItem.addEventListener("click", tempItem.store_onclick, true);
+          menu.appendChild(tempItem);
+        }
+      }
+    }
     return menu;
   },
   popupShowing: function(microformat, node, handler)
@@ -485,7 +523,7 @@ var Operator = {
       if (event.target.childNodes.length == 0) {
         Operator.buildActionMenu(event.target, microformat, node, handler);
       }
-    }
+    };
   },
   buildActionMenu: function(parentmenu, microformat, node, handler)
   {
@@ -495,6 +533,7 @@ var Operator = {
       
       var submenu = parentmenu;
       var k;
+      var addedAction = false;
       for (k in ufJSActions.actions) {
         if (!ufJSActions.actions[k].scope.microformats[microformat]) {
           continue;
@@ -513,10 +552,13 @@ var Operator = {
         menuitem.store_onclick = this.clickCallbackGenerator(microformat, node, k);
         menuitem.addEventListener("click", menuitem.store_onclick, true);
         submenu.appendChild(menuitem);
+        addedAction = true;
       }
       if (this.debug) {
-        menuitem = document.createElement("menuseparator");
-        submenu.appendChild(menuitem);
+        if (addedAction) {
+          menuitem = document.createElement("menuseparator");
+          submenu.appendChild(menuitem);
+        }
         menuitem = document.createElement("menuitem");
         menuitem.label = "Debug";
         menuitem.setAttribute("label", menuitem.label);
