@@ -15,10 +15,12 @@ ufJSParser.microformats.tag = {
         value: "",
         virtual: true,
         getter: function(propnode, mfnode, definition) {
-          var url_array = mfnode.getAttribute("href").split("/");
-          for(var i=url_array.length-1; i > 0; i--) {
-            if (url_array[i] !== "") {
-              return unescape(definition.validTagName(url_array[i]));
+          if (mfnode.href) {
+            var url_array = mfnode.getAttribute("href").split("/");
+            for(var i=url_array.length-1; i > 0; i--) {
+              if (url_array[i] !== "") {
+                return unescape(definition.validTagName(url_array[i]));
+              }
             }
           }
         }
@@ -29,7 +31,9 @@ ufJSParser.microformats.tag = {
         value: "",
         virtual: true,
         getter: function(propnode, mfnode, definition) {
-          return mfnode.href;
+          if (mfnode.href) {
+            return mfnode.href;
+          }
         }
       },
       "text" : {
@@ -83,14 +87,21 @@ ufJSParser.microformats.tag = {
   validate: function(node, error) {
     var tag = ufJSParser.getMicroformatProperty(node, "tag", "tag");
     if (!tag) {
-      var url_array = node.getAttribute("href").split("/");
-      for(var i=url_array.length-1; i > 0; i--) {
-        if (url_array[i] !== "") {
-          if (error) {
-            error.message = "Invalid tag name (" + url_array[i] + ")";
+      if (node.href) {
+        var url_array = node.getAttribute("href").split("/");
+        for(var i=url_array.length-1; i > 0; i--) {
+          if (url_array[i] !== "") {
+            if (error) {
+              error.message = "Invalid tag name (" + url_array[i] + ")";
+            }
+            return false;
           }
-          return false;
         }
+      } else {
+        if (error) {
+          error.message = "No href specified on tag";
+        }
+        return false;
       }
     }
     return true;
