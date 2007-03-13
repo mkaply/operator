@@ -12,10 +12,40 @@ ufJSParser.microformats.geo = {
   definition: {
     properties: {
       "latitude" : {
-        value: ""
+        value: "",
+        virtual: true,
+        getter: function(propnode, mfnode, definition) {
+          if (propnode == mfnode) {
+            var value = definition.defaultGetter(mfnode);
+            var latlong;
+            if (value.match(';')) {
+              latlong = value.split(';');
+              if (latlong[0]) {
+                return latlong[0];
+              }
+            }
+          } else {
+            return definition.defaultGetter(propnode);
+          }
+        },
       },
       "longitude" : {
-        value: ""
+        value: "",
+        virtual: true,
+        getter: function(propnode, mfnode, definition) {
+          if (propnode == mfnode) {
+            var value = definition.defaultGetter(mfnode);
+            var latlong;
+            if (value.match(';')) {
+              latlong = value.split(';');
+              if (latlong[1]) {
+                return latlong[1];
+              }
+            }
+          } else {
+            return definition.defaultGetter(propnode);
+          }
+        }
       }
     },
     ufjs: {
@@ -58,17 +88,6 @@ ufJSParser.microformats.geo = {
           }
         }
       }
-    },
-    getter: function(mfnode) {
-      var value = this.defaultGetter(mfnode);
-      var latlong;
-      if (value.match(';')) {
-        latlong = value.split(';');
-        if (latlong[0] && latlong[1]) {
-          return { "latitude" : latlong[0], "longitude" : latlong[1] };
-        }
-      }
-      return;
     },
     defaultGetter: function(propnode) {
       if ((propnode.nodeName.toLowerCase() == "abbr") && (propnode.getAttribute("title"))) {
