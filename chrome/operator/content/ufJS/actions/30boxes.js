@@ -25,6 +25,20 @@ ufJSActions.actions["30boxes_calendar"] = {
     //      url += encodeURIComponent(hcalendar.summary);
           url += ufJS.simpleEscape(hcalendar.summary);
         }
+/* This is what 30 boxes said to do but it breaks most stuff */
+        if (hcalendar.description && 0) {
+          url += " (";
+          var s = hcalendar.description;
+          /* This should be an HTML only path */
+          s	= s.replace(/[\n\r\t]/gi, ' ');
+          s = s.replace(/\<br\s*\>\s*/gi, '\r\n');
+          s = s.replace(/\<\/p>/gi, '\r\n\r\n');
+          s	= s.replace(/\<.*?\>/gi, '');
+          s	= s.replace(/^\s+/, '');
+          s	= s.replace(/[\n\r\t\s]+$/gi, '');
+          url += encodeURIComponent(s.substr(0,1024));
+          url += ")";
+        }
         if (hcalendar.dtstart) {
           url += " ";
           url += ufJS.dateFromISO8601(hcalendar.dtstart).toLocaleString();
