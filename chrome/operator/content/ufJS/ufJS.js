@@ -78,15 +78,8 @@ var ufJS = {
 
     if (document.evaluate) {
       var xpathExpression;
-      var docforxpath;
-      if (!rootElement.ownerDocument) {
-        docforxpath = rootElement;
-        xpathExpression = "//*[contains(concat(' ', @class, ' '), ' " + className + " ')]";
-      } else {
-        docforxpath = rootElement.ownerDocument;
-        xpathExpression = ".//*[contains(concat(' ', @class, ' '), ' " + className + " ')]";
-      }
-      var xpathResult = docforxpath.evaluate(xpathExpression, rootElement, null, 0, null);
+      xpathExpression = ".//*[contains(concat(' ', @class, ' '), ' " + className + " ')]";
+      var xpathResult = (rootElement.ownerDocument || rootElement).evaluate(xpathExpression, rootElement, null, 0, null);
 
       var node = xpathResult.iterateNext();
 
@@ -117,15 +110,7 @@ var ufJS = {
 
     var returnElements = [];
 
-    var xpathExpression;
-    var docforxpath;
-    if (!rootElement.ownerDocument) {
-      docforxpath = rootElement;
-      xpathExpression = "//*[";
-    } else {
-      docforxpath = rootElement.ownerDocument;
-      xpathExpression = ".//*[";
-    }
+    var xpathExpression = ".//*[";
     var i;
     for (i = 0; i < attributeList.length; i++) {
       if (i != 0) {
@@ -135,7 +120,7 @@ var ufJS = {
     }
     xpathExpression += "]"; 
 
-    var xpathResult = docforxpath.evaluate(xpathExpression, rootElement, null, 0, null);
+    var xpathResult = (rootElement.ownerDocument || rootElement).evaluate(xpathExpression, rootElement, null, 0, null);
 
     var node = xpathResult.iterateNext();
 
