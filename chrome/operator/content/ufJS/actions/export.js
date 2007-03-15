@@ -39,6 +39,12 @@ ufJSActions.actions.export_vcard = {
         var f = Components.classes["@mozilla.org/file/local;1"].
                            createInstance(Components.interfaces.nsILocalFile);
         f.initWithPath(file.path);
+        if (Components.classes["@mozilla.org/xre/app-info;1"]
+                      .getService(Components.interfaces.nsIXULRuntime)
+                      .OS == "Darwin") {
+          f.launch();
+          return;
+        }
         url = Components.classes["@mozilla.org/network/io-service;1"].
                          getService(Components.interfaces.nsIIOService).
                          newFileURI(f).
@@ -78,6 +84,12 @@ ufJSActions.actions.export_vcard = {
         var f = Components.classes["@mozilla.org/file/local;1"].
                            createInstance(Components.interfaces.nsILocalFile);
         f.initWithPath(file.path);
+        if (Components.classes["@mozilla.org/xre/app-info;1"]
+                      .getService(Components.interfaces.nsIXULRuntime)
+                      .OS == "Darwin") {
+          f.launch();
+          return;
+        }
         url = Components.classes["@mozilla.org/network/io-service;1"].
                          getService(Components.interfaces.nsIIOService).
                          newFileURI(f).
@@ -126,6 +138,12 @@ ufJSActions.actions.export_icalendar = {
         var f = Components.classes["@mozilla.org/file/local;1"].
                            createInstance(Components.interfaces.nsILocalFile);
         f.initWithPath(file.path);
+        if (Components.classes["@mozilla.org/xre/app-info;1"]
+                      .getService(Components.interfaces.nsIXULRuntime)
+                      .OS == "Darwin") {
+          f.launch();
+          return;
+        }
         url = Components.classes["@mozilla.org/network/io-service;1"].
                          getService(Components.interfaces.nsIIOService).
                          newFileURI(f).
