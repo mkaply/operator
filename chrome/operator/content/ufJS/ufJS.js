@@ -605,19 +605,34 @@ var ufJS = {
     if (hcalendar.url) {
       ics += "URL:" + hcalendar.url + "\n";
     }
+    var dt;
     if (hcalendar.dtstart) {
+      dt = hcalendar.dtstart;
       ics += "DTSTART;VALUE=DATE";
       if (hcalendar.dtstart.match("T")) {
         ics += "-TIME";
+        var T = dt.indexOf("T");
+        var offset = dt.lastIndexOf("-");
+        if (offset > T) {
+          dt = dt.substr(0, offset);
+        }
       }
-      ics += ":" + hcalendar.dtstart + "\n";
+      dt = dt.replace(/-/g,"").replace(/:/g,"");
+      ics += ":" + dt + "\n";
     }
     if (hcalendar.dtend) {
+      dt = hcalendar.dtend;
       ics += "DTEND;VALUE=DATE";
-      if (hcalendar.dtend.match("T")) {
+      if (hcalendar.dtstart.match("T")) {
         ics += "-TIME";
+        var T = dt.indexOf("T");
+        var offset = dt.lastIndexOf("-");
+        if (offset > T) {
+          dt = dt.substr(0, offset);
+        }
       }
-      ics += ":" + hcalendar.dtend + "\n";
+      dt = dt.replace(/-/g,"").replace(/:/g,"");
+      ics += ":" + dt + "\n";
     }
     /* OUTLOOK REQUIRES DTSTAMP */
     ics += "DTSTAMP:";
