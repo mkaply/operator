@@ -22,7 +22,8 @@ ufJSParser.microformats["hAtom-hEntry"] = {
             /* Virtual case */
             /* FIXME - THIS IS FIREFOX SPECIFIC */
             /* check if ancestor is an address with author  */
-            var xpathExpression = "ancestor::*//address[contains(concat(' ', @class, ' '), ' author ') and contains(concat(' ', @class, ' '), ' vcard ')]";
+//            var xpathExpression = "ancestor::*//address[contains(concat(' ', @class, ' '), ' author ') and contains(concat(' ', @class, ' '), ' vcard ')]";
+              var xpathExpression = "ancestor::*[.//address[contains(concat(' ', @class, ' '), ' author ') and contains(concat(' ', @class, ' '), ' vcard ')]][1]//address[contains(concat(' ', @class, ' '), ' author ') and contains(concat(' ', @class, ' '), ' vcard ')]";
             var xpathResult = mfnode.ownerDocument.evaluate(xpathExpression, mfnode, null,  XPathResult.FIRST_ORDERED_NODE_TYPE, null);
             if (xpathResult.singleNodeValue) {
               return ufJSParser.createMicroformat(xpathResult.singleNodeValue, "hCard");
