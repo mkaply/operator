@@ -12,4 +12,5 @@
 <!ENTITY  removeDuplicates.label           "Remove duplicate microformats (might impact performance)">
 <!ENTITY  debug.label                      "Debug mode">
 <!ENTITY  statusbar.label                  "Display icon in status bar">
+<!ENTITY  userscripts.label                "User Scripts">
 
