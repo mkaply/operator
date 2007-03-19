@@ -34,11 +34,30 @@ ufJSParser.microformats["hAtom-hEntry"] = {
         }
       },
       "bookmark" : {
+        subproperties: {
+          "link" : {
+            value: "",
+            virtual: true,
+            getter: function(propnode, mfnode, definition) {
+              return mfnode.href;
+            }
+          },
+          "text" : {
+            value: "",
+            virtual: true,
+            getter: function(propnode, mfnode, definition) {
+              var s;
+              if (propnode.innerText) {
+                s = propnode.innerText;
+              } else {
+                s = propnode.textContent;
+              }
+              return ufJSParser.trim(s);
+            }
+          }
+        },
         value: "",
-        rel: true,
-        getter: function(propnode, mfnode, definition) {
-          return ufJSParser.createMicroformat(propnode, "bookmark");
-        }
+        rel: true
       },
       "entry-title" : {
         value: "",
@@ -87,7 +106,6 @@ ufJSParser.microformats["hAtom-hEntry"] = {
         }
       }
     },
-    value: [],
     ufjs: {
       "ufjsDisplayName" : {
         value: "",
