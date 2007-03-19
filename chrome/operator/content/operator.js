@@ -539,8 +539,8 @@ var Operator = {
           continue;
         }
         if (ufJSActions.actions[k].scope.microformats[microformat] != microformat) {
-          required = ufJS.getElementsByClassName(node, ufJSActions.actions[k].scope.microformats[microformat]);
-          if (required.length === 0) {
+          required = ufJSParser.getMicroformatProperty(node, microformat, ufJSActions.actions[k].scope.microformats[microformat]);
+          if (!required) {
             continue;
           }
         }
@@ -572,8 +572,8 @@ var Operator = {
       parentmenu.store_onclick = this.clickCallbackGenerator(microformat, node, handler);
       parentmenu.addEventListener("click", parentmenu.store_onclick, true);
       if (ufJSActions.actions[handler].scope.microformats[microformat] != microformat) {
-        required = ufJS.getElementsByClassName(node, ufJSActions.actions[handler].scope.microformats[microformat]);
-        if (required.length === 0) {
+        required = ufJSParser.getMicroformatProperty(node, microformat, ufJSActions.actions[k].scope.microformats[microformat]);
+        if (!required) {
           parentmenu.setAttribute("disabled", "true");    
         }
       }
@@ -590,8 +590,8 @@ var Operator = {
         continue;
       }
       if (ufJSActions.actions[k].scope.microformats[microformat] != microformat) {
-        required = ufJS.getElementsByClassName(node, ufJSActions.actions[k].scope.microformats[microformat]);
-        if (required.length === 0) {
+        required = ufJSParser.getMicroformatProperty(node, microformat, ufJSActions.actions[k].scope.microformats[microformat]);
+        if (!required) {
           continue;
         }
       }
