@@ -6,7 +6,6 @@ ufJSActions.actions.goto_url = {
     microformats: {
       "hCard" : "url",
       "hCalendar" : "url",
-      "XFN" : "XFN",
       "hAtom-hEntry" : "hAtom-hEntry"
     }
   },
@@ -25,8 +24,6 @@ ufJSActions.actions.goto_url = {
       if (microformatNames[i] == "hAtom-hEntry") {
         var bookmark = ufJSParser.getMicroformatProperty(node, "hAtom-hEntry", "bookmark");
         url = bookmark.link;
-      } else if (microformatNames[i] == "XFN") {
-        url = ufJSParser.getMicroformatProperty(node, "XFN", "link");
       } else {
         url = ufJSParser.getMicroformatProperty(node, microformatNames[i], action.scope.microformats[microformatNames[i]]);
       }
