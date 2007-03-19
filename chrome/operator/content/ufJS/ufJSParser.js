@@ -18,7 +18,6 @@ var ufJSParser = {
       ojl.loadSubScript(baseurl + "microformats/xFolk.js");
       ojl.loadSubScript(baseurl + "microformats/tag.js");
       ojl.loadSubScript(baseurl + "microformats/hAtom.js");
-      ojl.loadSubScript(baseurl + "microformats/bookmark.js");
     }
   },
   createMicroformat: function(in_mfnode, mfname)  {
@@ -305,6 +304,9 @@ var ufJSParser = {
       }
     }
     /* propname contains a . - dereference it */
+    /* this needs to be way more robust */
+    /* check if property is an array and if so only return 1st element */
+    /* handle multuiple nestings */
     if (propname.indexOf(".") != -1) {
       var props = propname.split(".");
       return property[props[1]];
