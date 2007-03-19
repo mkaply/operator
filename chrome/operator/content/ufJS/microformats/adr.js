@@ -37,7 +37,7 @@ ufJSParser.microformats.Address = {
       }
     },
     defaultGetter: function(propnode) {
-      if ((propnode.nodeName.toLowerCase() == "abbr") && (propnode.getAttribute("title"))) {
+      if (((propnode.nodeName.toLowerCase() == "abbr") || (propnode.nodeName.toLowerCase() == "html:abbr")) && (propnode.getAttribute("title"))) {
         return propnode.getAttribute("title");
       } else if ((propnode.nodeName.toLowerCase() == "img") && (propnode.getAttribute("alt"))) {
         return propnode.getAttribute("alt");

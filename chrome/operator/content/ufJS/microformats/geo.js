@@ -90,7 +90,7 @@ ufJSParser.microformats.geo = {
       }
     },
     defaultGetter: function(propnode) {
-      if ((propnode.nodeName.toLowerCase() == "abbr") && (propnode.getAttribute("title"))) {
+      if (((propnode.nodeName.toLowerCase() == "abbr") || (propnode.nodeName.toLowerCase() == "html:abbr")) && (propnode.getAttribute("title"))) {
         return propnode.getAttribute("title");
       } else {
         var s;
