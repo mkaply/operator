@@ -105,6 +105,7 @@
       </handler>
       <handler event="command">
         if (event.originalTarget.type == "delete") {
+            eval(this.getAttribute("on" + event.originalTarget.type));	
             var listbox=document.getAnonymousNodes(this)[0].childNodes[0].childNodes[0];
             listbox.removeItemAt(listbox.selectedIndex);
         } else if ((event.originalTarget.type == "moveup") || (event.originalTarget.type == "movedown")) {
@@ -128,10 +129,11 @@
           }
           listbox.removeItemAt(listbox.selectedIndex);
           listbox.selectItem(newlistitem);
+          eval(this.getAttribute("on" + event.originalTarget.type));	
         } else {
           eval(this.getAttribute(event.originalTarget.type));
+          eval(this.getAttribute("on" + event.originalTarget.type));	
         }
-        eval(this.getAttribute("on" + event.originalTarget.type));	
         this._enableDisableButtons();
       </handler>
       <handler event="keypress" keycode="VK_DELETE">

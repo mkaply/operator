@@ -197,6 +197,27 @@ var Operator_Options = {
       }
       i++;
     } while (1);
+
+    var userscripts = document.getElementById("userscripts");
+    var file = Components.classes["@mozilla.org/file/directory_service;1"].
+                          getService(Components.interfaces.nsIProperties).
+                          get("ProfD", Components.interfaces.nsILocalFile);
+    file.append("microformats");
+    
+    if (file.exists() && file.isDirectory()) {
+      var e = file.directoryEntries;
+      while (e.hasMoreElements()) {
+        var f = e.getNext().QueryInterface(Components.interfaces.nsIFile);
+        var splitpath = f.path.split(".");
+        if ((splitpath[splitpath.length-1] == "js") || (splitpath[splitpath.length-1] == "xsl")) {
+          var fileHandler = Components.classes["@mozilla.org/network/io-service;1"].
+                                       getService(Components.interfaces.nsIIOService).
+                                       getProtocolHandler("file").
+                                       QueryInterface(Components.interfaces.nsIFileProtocolHandler);
+          listitem = userscripts.appendItem(f.leafName, "");
+        }
+      }
+    }
   },
   
   doMicroformatEnabling: function()
@@ -436,6 +457,81 @@ var Operator_Options = {
       document.documentElement.getButton("accept").setAttribute( "disabled", "false" );
     } else {
       document.documentElement.getButton("accept").setAttribute( "disabled", "true" );  
+    }
+  },
+  onNewUserScript: function()
+  {
+    try {
+      var nsIFilePicker = Components.interfaces.nsIFilePicker;
+      var fp = Components.classes["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
+      fp.init(window, "Choose File...", nsIFilePicker.modeOpen);
+      fp.appendFilters(nsIFilePicker.filterHTML | nsIFilePicker.filterText |
+                       nsIFilePicker.filterAll | nsIFilePicker.filterImages | nsIFilePicker.filterXML);
+  
+      if (fp.show() == nsIFilePicker.returnOK && fp.fileURL.spec && fp.fileURL.spec.length > 0) {
+        var dest = Components.classes["@mozilla.org/file/directory_service;1"].
+                              getService(Components.interfaces.nsIProperties).
+                              get("ProfD", Components.interfaces.nsILocalFile);
+        dest.append("microformats");
+        /* check if microformats exists and if not, create it */
+        try {
+          var destfile = dest.clone();
+          destfile.append(fp.file.leafName);
+          try {
+            destfile.remove(false);
+          } catch (ex) {}
+          fp.file.copyTo(dest, "");
+          var listbox = document.getElementById('userscripts');
+          var listitem = listbox.appendItem(fp.file.leafName, "");
+        } catch (ex) {
+        }
+      }
+    }
+    catch(ex) {
+    }
+  },
+  
+  onEditUserScript: function()
+  {
+    var listbox = document.getElementById('userscripts');
+    var filename = listbox.selectedItem.label;
+    var sourcefile = Components.classes["@mozilla.org/file/local;1"]
+                         .createInstance(Components.interfaces.nsILocalFile);
+    try {
+      sourcefile.initWithPath(filename);
+      var ioServ = Components.classes["@mozilla.org/network/io-service;1"]
+                             .getService(Components.interfaces.nsIIOService);
+                             
+    } catch (ex) {
+    }
+  
+    try {
+      var nsIFilePicker = Components.interfaces.nsIFilePicker;
+      var fp = Components.classes["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
+//      var bundle = document.getElementById("bundle_cckwizard");
+      fp.init(window, "Choose File...", nsIFilePicker.modeOpen);
+      fp.displayDirectory = sourcefile.parent;
+      fp.defaultString = sourcefile.leafName;
+      fp.appendFilters(nsIFilePicker.filterAll);
+      if (fp.show() == nsIFilePicker.returnOK && fp.fileURL.spec && fp.fileURL.spec.length > 0) {
+        listbox.selectedItem.label = fp.file.path;
+      }
+    }
+    catch(ex) {
+    }
+  },
+  onDeleteUserScript: function()
+  {
+    var dest = Components.classes["@mozilla.org/file/directory_service;1"].
+                          getService(Components.interfaces.nsIProperties).
+                          get("ProfD", Components.interfaces.nsILocalFile);
+    dest.append("microformats");
+    var listbox = document.getElementById('userscripts');
+    dest.append(listbox.selectedItem.label);
+    try {
+      dest.remove(true);
+    }
+    catch(ex) {
     }
   }
 };

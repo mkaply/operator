@@ -18,6 +18,7 @@
 		  <tab label="&general.label;"/>
 		  <tab label="&microformats.label;"/>
       <tab label="&actions.label;"/>
+      <tab label="&userscripts.label;"/>
 	  </tabs>
 	  <tabpanels>
       <tabpanel>
@@ -43,6 +44,9 @@
       </tabpanel>
       <tabpanel>
       <box class="ccklist" id="actions" new="Operator_Options.onNewAction();" edit="Operator_Options.onEditAction();"/>
+      </tabpanel>
+      <tabpanel>
+      <box class="ccklist" id="userscripts" new="Operator_Options.onNewUserScript();" edit="Operator_Options.onEditUserScript();" ondelete="Operator_Options.onDeleteUserScript();"/>
       </tabpanel>
     </tabpanels>
   </tabbox>
