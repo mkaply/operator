@@ -100,3 +100,9 @@ ufJSActions.actions.wikispecies_search = {
   }
 };
 
+Operator.microformatList.species = {
+  description: "Species",
+  icon: "chrome://operator/content/other.png"
+};
+
+

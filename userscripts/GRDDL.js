@@ -69,3 +69,9 @@ ufJSActions.actions.extract_rdf = {
     }
   }
 };
+
+Operator.microformatList["GRDDL"] = {
+  description: "GRDDL",
+  icon: "chrome://operator/content/other.png"
+};
+

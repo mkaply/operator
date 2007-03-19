@@ -36,17 +36,6 @@ Operator.microformatList.hResume = {
   icon: "chrome://operator/content/other.png"
 };
 
-Operator.microformatList.XFN = {
-  description: "XFN Relationship(s)",
-  icon: "chrome://operator/content/other.png",
-  sort: true
-};
-
-Operator.microformatList.species = {
-  description: "Species",
-  icon: "chrome://operator/content/other.png"
-};
-
 Operator.microformatList["hAtom-hEntry"] = {
   description: "Atom Entry",
   icon: "chrome://operator/content/other.png"
@@ -57,8 +46,4 @@ Operator.microformatList["hAtom-hFeed"] = {
   icon: "chrome://operator/content/other.png"
 };
 
-Operator.microformatList["GRDDL"] = {
-  description: "GRDDL",
-  icon: "chrome://operator/content/other.png"
-};
 

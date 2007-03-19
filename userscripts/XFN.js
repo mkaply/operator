@@ -201,3 +201,11 @@ ufJSParser.microformats.XFN = {
 };
 
 ufJSActions.actions.goto_url.scope.microformats.XFN = "link";
+
+Operator.microformatList.XFN = {
+  description: "XFN Relationship(s)",
+  icon: "chrome://operator/content/other.png",
+  sort: true
+};
+
+
