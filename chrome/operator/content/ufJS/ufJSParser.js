@@ -90,7 +90,7 @@ var ufJSParser = {
               tp = definition.properties[i].subproperties[propname];
               break;
             }
-          } else if (definition.properties[i].ufjs[propname]) {
+          } else if ((definition.properties[i].ufjs) && (definition.properties[i].ufjs[propname])) {
             if (mfnode.className &&  mfnode.className.match("(^|\\s)" + i + "(\\s|$)")) {
               tp = definition.properties[i].ufjs[propname];
               break;
@@ -99,14 +99,25 @@ var ufJSParser = {
         }
       }
     }
-    
     var propnodes;
-    if (tp && tp.rel == true) {
-      propnodes = ufJSParser.getElementsByAttribute(mfnode, "rel", propname);
+    if (!tp) {
+      /* propname contains a . - dereference it */
+      if (propname.indexOf(".") != -1) {
+        var props = propname.split(".");
+        tp = definition.properties[props[0]];
+        if (tp && tp.rel == true) {
+          propnodes = ufJSParser.getElementsByAttribute(mfnode, "rel", props[0]);
+        } else {
+          propnodes = ufJSParser.getElementsByClassName(mfnode, props[0]);
+        }
+      }
     } else {
-      propnodes = ufJSParser.getElementsByClassName(mfnode, propname);
+      if (tp && tp.rel == true) {
+        propnodes = ufJSParser.getElementsByAttribute(mfnode, "rel", propname);
+      } else {
+        propnodes = ufJSParser.getElementsByClassName(mfnode, propname);
+      }
     }
-    
 
     var property;
     if (!tp) {
@@ -190,6 +201,7 @@ var ufJSParser = {
               if (tp.subproperties[subprop].getter) {
                 result = tp.subproperties[subprop].getter(propnodes[j], propnodes[j], definition);
                 if (result) {
+                  callPropertyGetter = false;
                   if (tp.value instanceof Array) {
                     if (!property) {
                       property = [];
@@ -291,7 +303,12 @@ var ufJSParser = {
       } else {
         return;
       }
-    } 
+    }
+    /* propname contains a . - dereference it */
+    if (propname.indexOf(".") != -1) {
+      var props = propname.split(".");
+      return property[props[1]];
+    }
     return property;
   },
   /* This function takes care of includes and headers */
