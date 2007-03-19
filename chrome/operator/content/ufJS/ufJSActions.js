@@ -21,8 +21,6 @@ var ufJSActions = {
       ojl.loadSubScript(baseurl + "actions/technorati.js");
       ojl.loadSubScript(baseurl + "actions/yedda.js");
       ojl.loadSubScript(baseurl + "actions/magnolia.js");
-      ojl.loadSubScript(baseurl + "actions/wikispecies.js");
-      ojl.loadSubScript(baseurl + "actions/extractRDF.js");
       ojl.loadSubScript(baseurl + "actions/youtube.js");
     }
   }
