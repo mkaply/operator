@@ -39,14 +39,16 @@ ufJSActions.actions.export_vcard = {
         if (Components.classes["@mozilla.org/xre/app-info;1"]
                       .getService(Components.interfaces.nsIXULRuntime)
                       .OS == "Darwin") {
-          var bluetooth = Components.classes["@mozilla.org/file/local;1"].
+          var open = Components.classes["@mozilla.org/file/local;1"].
                                      createInstance(Components.interfaces.nsILocalFile);
-          bluetooth.initWithPath("/Applications/Utilities/Bluetooth File Exchange.app");
+          open.initWithPath("/usr/bin/open");
           var process = Components.classes["@mozilla.org/process/util;1"]
                            .createInstance(Components.interfaces.nsIProcess);
                             
-          process.init(bluetooth);
+          process.init(open);
           var args = [];
+          args.push("-a");
+          args.push("/Applications/Utilities/Bluetooth File Exchange.app");
           args.push(file.path);
           process.run(false, args, args.length);
           return;
@@ -82,14 +84,16 @@ ufJSActions.actions.export_vcard = {
         if (Components.classes["@mozilla.org/xre/app-info;1"]
                       .getService(Components.interfaces.nsIXULRuntime)
                       .OS == "Darwin") {
-          var bluetooth = Components.classes["@mozilla.org/file/local;1"].
+          var open = Components.classes["@mozilla.org/file/local;1"].
                                      createInstance(Components.interfaces.nsILocalFile);
-          bluetooth.initWithPath("/Applications/Utilities/Bluetooth File Exchange.app");
+          open.initWithPath("/usr/bin/open");
           var process = Components.classes["@mozilla.org/process/util;1"]
                            .createInstance(Components.interfaces.nsIProcess);
                             
-          process.init(bluetooth);
+          process.init(open);
           var args = [];
+          args.push("-a");
+          args.push("/Applications/Utilities/Bluetooth File Exchange.app");
           args.push(file.path);
           process.run(false, args, args.length);
           return;
@@ -121,27 +125,29 @@ ufJSActions.actions.export_icalendar = {
         var file = Components.classes["@mozilla.org/file/directory_service;1"].
                               getService(Components.interfaces.nsIProperties).
                               get("TmpD", Components.interfaces.nsIFile);
-    
+
         file.append("hCalendar.ics");
-    
+
         var fos = Components.classes["@mozilla.org/network/file-output-stream;1"].
                              createInstance(Components.interfaces.nsIFileOutputStream);
-    
+
         fos.init(file, -1, -1, false);
         fos.write(ics, ics.length);                                                   
         fos.close();                                                                  
-    
+
         if (Components.classes["@mozilla.org/xre/app-info;1"]
                       .getService(Components.interfaces.nsIXULRuntime)
                       .OS == "Darwin") {
-          var bluetooth = Components.classes["@mozilla.org/file/local;1"].
+          var open = Components.classes["@mozilla.org/file/local;1"].
                                      createInstance(Components.interfaces.nsILocalFile);
-          bluetooth.initWithPath("/Applications/Utilities/Bluetooth File Exchange.app");
+          open.initWithPath("/usr/bin/open");
           var process = Components.classes["@mozilla.org/process/util;1"]
                            .createInstance(Components.interfaces.nsIProcess);
                             
-          process.init(bluetooth);
+          process.init(open);
           var args = [];
+          args.push("-a");
+          args.push("/Applications/Utilities/Bluetooth File Exchange.app");
           args.push(file.path);
           process.run(false, args, args.length);
           return;
