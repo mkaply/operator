@@ -25,8 +25,7 @@ ufJSActions.actions["30boxes_calendar"] = {
     //      url += encodeURIComponent(hcalendar.summary);
           url += ufJS.simpleEscape(hcalendar.summary);
         }
-/* This is what 30 boxes said to do but it breaks most stuff */
-        if (hcalendar.description && 0) {
+        if (hcalendar.description) {
           url += " (";
           var s = hcalendar.description;
           /* This should be an HTML only path */
