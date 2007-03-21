@@ -39,8 +39,27 @@ ufJSActions.actions["30boxes_calendar"] = {
           url += ")";
         }
         if (hcalendar.dtstart) {
-          url += " ";
-          url += ufJS.dateFromISO8601(hcalendar.dtstart).toLocaleString();
+          var dtStartDate = ufJS.dateFromISO8601(hcalendar.dtstart);
+          url += (dtStartDate.getMonth()+1) + "/" + dtStartDate.getDate() + "/" + dtStartDate.getFullYear();
+          if (dtStartDate.time) {
+            url += " " + dtStartDate.getHours() + ":";
+            if (dtStartDate.getMinutes() < 10) {
+              url += "0";
+            }
+            url += dtStartDate.getMinutes();
+          }
+          if (hcalendar.dtend) {
+            url += " - ";
+            var dtEndDate = ufJS.dateFromISO8601(hcalendar.dtend);
+            url += (dtEndDate.getMonth()+1) + "/" + dtEndDate.getDate() + "/" + dtEndDate.getFullYear();
+            if (dtEndDate.time) {
+              url += " " + dtEndDate.getHours() + ":";
+              if (dtEndDate.getMinutes() < 10) {
+                url += "0";
+              }
+              url += dtEndDate.getMinutes();
+            }
+          }
         }
         if (hcalendar.location) {
           url += "[";
@@ -74,6 +93,7 @@ ufJSActions.actions["30boxes_calendar"] = {
       }
     }
     if (url) {
+      Operator.debug_alert(url);
       openUILink(url, event);
     }
   }
