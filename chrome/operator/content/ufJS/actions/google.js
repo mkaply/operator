@@ -84,18 +84,12 @@ ufJSActions.actions.google_search = {
     for (var i in microformatNames) {
       if (microformatNames[i] == "hReview") {
         var hreview = ufJSParser.createMicroformat(node, "hReview");
-        if (typeof hreview.item == "string") {
-          searchstring = hreview.item;
-        } else {
-          if (hreview.item.summary) {
-            searchstring = hreview.item.summary;
-          } else if (hreview.item.fn) {
-            searchstring = hreview.item.fn;
-          }
+        if (hreview.item.summary) {
+          searchstring = hreview.item.summary;
+        } else if (hreview.item.fn) {
+          searchstring = hreview.item.fn;
         }
-        if (searchstring) {
-          break;
-        }
+        break;
       } else {
         searchstring = ufJSParser.getMicroformatProperty(node, microformatNames[i], action.scope.microformats[microformatNames[i]]);
         if (searchstring) {
