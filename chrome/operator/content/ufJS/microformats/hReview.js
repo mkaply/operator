@@ -43,36 +43,24 @@ ufJSParser.microformats.hReview = {
           if (propnode.className.match("(^|\\s)" + "vcard" + "(\\s|$)")) {
             item = ufJSParser.createMicroformat(propnode, "hCard");
           } else if (propnode.className.match("(^|\\s)" + "vevent" + "(\\s|$)")) {
-            item = ufJSParser.createMicroformat(propnode, "hCard");
+            item = ufJSParser.createMicroformat(propnode, "hCalendar");
           } else {
             item = {};
-          }
-          if (!item.fn) {
             var fns = ufJSParser.getElementsByClassName(propnode, "fn");
             if (fns.length > 0) {
               item.fn = definition.defaultGetter(fns[0]);
-            } else {
-              /* If it is an hcalendar, get the summary */
-              if (item.summary) {
-                item.fn = item.summary;
-              }
             }
-          }
-          if (!item.url) {
             var urls = ufJSParser.getElementsByClassName(propnode, "url");
             if (urls.length > 0) {
               item.url = definition.urlGetter(urls[0]);
             }
-          }
-          if (!item.photo) {
             var photos = ufJSParser.getElementsByClassName(propnode, "photo");
             if (photos.length > 0) {
               item.photo = definition.urlGetter(photos[0]);
             }
           }
-          var i;
           /* Only return item if it has stuff in it */
-          for (i in item) {
+          for (var i in item) {
             return item;
           }
           return;
@@ -131,16 +119,21 @@ ufJSParser.microformats.hReview = {
         getter: function(propnode, mfnode, definition) {
           var item = ufJSParser.getMicroformatProperty(mfnode, "hReview", "item");
           var reviewer = ufJSParser.getMicroformatProperty(mfnode, "hReview", "reviewer");
-
-          if (item && item.fn) {
+          if (item) {
+            var fn;
+            if (item.summary) {
+              fn = item.summary
+            } else if (item.fn) {
+              fn = item.fn;
+            }
             if (reviewer) {
               if (reviewer.fn) {
-                return item.fn + " (" + reviewer.fn + ")";
+                return fn + " (" + reviewer.fn + ")";
               } else {
-                return item.fn + " (" + reviewer + ")";
+                return fn + " (" + reviewer + ")";
               }
             } else {
-              return item.fn;
+              return fn;
             }
           }
         }
@@ -212,16 +205,27 @@ ufJSParser.microformats.hReview = {
         if (!item.fn) {
           errormsg =  "No fn specified on the hCard for the item";
         }
-      } else if (!item.fn) {
-        /* This is a common error case, so I'd like to report it */
-        var items = ufJSParser.getElementsByClassName(node, "item");
-        if (items[0].className.match("fn")) {
-          errormsg = "fn should be a child of item";
+      } else if (!(item instanceof hCalendar)) {
+        if (!item.fn) {
+          /* This is a common error case, so I'd like to report it */
+          var items = ufJSParser.getElementsByClassName(node, "item");
+          if (items[0].className.match("fn")) {
+            errormsg = "fn should be a child of item";
+          }
+          errormsg = "No fn specified on the item";
         }
-        errormsg = "No fn specified on the item";
       }
     } else {
-      errormsg = "No item specified";
+      var items = ufJSParser.getElementsByClassName(node, "item");
+      if (items.length > 0) {
+        if (items[0].className.match("fn")) {
+          errormsg = "fn should be a child of item";
+        } else {
+          errormsg = "No fn specified on the item";
+        }
+      } else {
+        errormsg = "No item specified";
+      }
     }
     if (errormsg) {
       if (error) {
