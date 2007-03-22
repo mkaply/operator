@@ -346,13 +346,18 @@ var ufJSParser = {
     }
     return mfnode;
   },
-  getElementsByClassName: function(rootElement, className)
+  getElementsByClassName: function(rootNode, className)
   {
     var returnElements = [];
 
-    if (document.evaluate) {
+    if (document.getElementsByClassName) {
+      var col = rootNode.getElementsByClassName(className);
+      for (i = 0; i < col.length; i++) {
+        returnElements[i] = col[i];
+      }
+    } else if (document.evaluate) {
       var xpathExpression = ".//*[contains(concat(' ', @class, ' '), ' " + className + " ')]";
-      var xpathResult = (rootElement.ownerDocument || rootElement).evaluate(xpathExpression, rootElement, null, 0, null);
+      var xpathResult = (rootNode.ownerDocument || rootNode).evaluate(xpathExpression, rootNode, null, 0, null);
 
       var node = xpathResult.iterateNext();
   
@@ -362,7 +367,7 @@ var ufJSParser = {
       }
     } else {
       className = className.replace(/\-/g, "\\-");
-      var elements = rootElement.getElementsByTagName("*");
+      var elements = rootNode.getElementsByTagName("*");
       for (var i=0;i<elements.length;i++) {
         if (elements[i].className.match("(^|\\s)" + className + "(\\s|$)")) {
           returnElements.push(elements[i]);
@@ -372,7 +377,7 @@ var ufJSParser = {
     return returnElements;
   },
   /* Needs to be ported to work in Internet Explorer/Opera */
-  getElementsByAttribute: function(rootElement, attributeName, in_attributeList)
+  getElementsByAttribute: function(rootNode, attributeName, in_attributeList)
   {
     var attributeList;
     if (in_attributeList instanceof Array) {
@@ -393,7 +398,7 @@ var ufJSParser = {
     }
     xpathExpression += "]"; 
 
-    var xpathResult = (rootElement.ownerDocument || rootElement).evaluate(xpathExpression, rootElement, null, 0, null);
+    var xpathResult = (rootNode.ownerDocument || rootNode).evaluate(xpathExpression, rootNode, null, 0, null);
 
     var node = xpathResult.iterateNext();
 
