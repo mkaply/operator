@@ -12,12 +12,9 @@ var ufJSParser = {
       ojl.loadSubScript(baseurl + "microformats/adr.js");
       ojl.loadSubScript(baseurl + "microformats/hCard.js");
       ojl.loadSubScript(baseurl + "microformats/hCalendar.js");
-      ojl.loadSubScript(baseurl + "microformats/hResume.js");
-      ojl.loadSubScript(baseurl + "microformats/hReview.js");
+      ojl.loadSubScript(baseurl + "microformats/tag.js");
       ojl.loadSubScript(baseurl + "microformats/geo.js");
       ojl.loadSubScript(baseurl + "microformats/xFolk.js");
-      ojl.loadSubScript(baseurl + "microformats/tag.js");
-      ojl.loadSubScript(baseurl + "microformats/hAtom.js");
     }
   },
   createMicroformat: function(in_mfnode, mfname)  {
