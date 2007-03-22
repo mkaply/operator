@@ -26,24 +26,3 @@ Operator.microformatList.xFolk = {
   icon: "chrome://operator/content/other.png"
 };
 
-Operator.microformatList.hReview = {
-  description:  "Review(s)",
-  icon: "chrome://operator/content/other.png"
-};
-
-Operator.microformatList.hResume = {
-  description: "Resume(s)",
-  icon: "chrome://operator/content/other.png"
-};
-
-Operator.microformatList["hAtom-hEntry"] = {
-  description: "Atom Entry",
-  icon: "chrome://operator/content/other.png"
-};
-
-Operator.microformatList["hAtom-hFeed"] = {
-  description: "Atom Feed",
-  icon: "chrome://operator/content/other.png"
-};
-
-
