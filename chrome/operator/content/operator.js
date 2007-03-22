@@ -573,7 +573,7 @@ var Operator = {
       parentmenu.store_onclick = this.clickCallbackGenerator(microformat, node, handler);
       parentmenu.addEventListener("click", parentmenu.store_onclick, true);
       if (ufJSActions.actions[handler].scope.microformats[microformat] != microformat) {
-        required = ufJSParser.getMicroformatProperty(node, microformat, ufJSActions.actions[k].scope.microformats[microformat]);
+        required = ufJSParser.getMicroformatProperty(node, microformat, ufJSActions.actions[handler].scope.microformats[microformat]);
         if (!required) {
           parentmenu.setAttribute("disabled", "true");    
         }
