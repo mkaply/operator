@@ -15,6 +15,7 @@ var Operator = {
   languageBundle: null,
   highlightedElement: null,
   highlightedElementOutlineStyle: null,
+  timerID: null,
   init: function()
   {
     var options = false;
@@ -667,14 +668,27 @@ var Operator = {
     var mfNode = ufJS.isMicroformatNode(element, Operator.microformatList);
     Operator.highlightDOMNode(mfNode);
   },
+  processMicroformatsDelayed: function(event)
+  {
+    if (Operator.timerID) {
+      window.clearTimeout(Operator.timerID);
+    }
+    Operator.timerID = window.setTimeout(Operator.processMicroformats, 500);
+  },
+  
   onPageShow: function(event) 
   {
     if (event.originalTarget instanceof HTMLDocument)
     {
-      if (event.originalTarget == content.document) {
-        Operator.processMicroformats();
-        Operator_Sidebar.processMicroformats();
-        content.document.addEventListener("mouseover", Operator.mouseOver, false);
+      Operator.processMicroformats();
+      content.document.addEventListener("mouseover", Operator.mouseOver, false);
+      content.document.getElementsByTagName("body")[0].addEventListener("DOMNodeInserted", Operator.processMicroformatsDelayed, false);
+      content.document.getElementsByTagName("body")[0].addEventListener("DOMNodeRemoved", Operator.processMicroformatsDelayed, false);
+      content.document.getElementsByTagName("body")[0].addEventListener("DOMAttrModified", Operator.processMicroformatsDelayed, false);
+      for (var i = 0; i < content.frames.length; i++) {
+        content.frames[i].document.addEventListener("mouseover", Operator.mouseOver, false);
+        content.frames[i].document.getElementsByTagName("body")[0].addEventListener("DOMNodeInserted", Operator.processMicroformatsDelayed, false);
+        content.frames[i].document.getElementsByTagName("body")[0].addEventListener("DOMNodeRemoved", Operator.processMicroformatsDelayed, false);
       }
     }
   },
@@ -683,14 +697,14 @@ var Operator = {
   {
     if (event.originalTarget instanceof HTMLDocument)
     {
-      if (event.originalTarget == getBrowser().selectedBrowser.contentDocument) {
-        Operator_Toolbar.disable();
-        Operator_Toolbar.clearPopups();
-        Operator_Statusbar.disable();
-        Operator_ToolbarButton.disable();
-        Operator_Sidebar.clear();
+      content.document.removeEventListener("mouseover", Operator.mouseOver, false);
+      content.document.removeEventListener("DOMNodeInserted", Operator.processMicroformatsDelayed, false);
+      content.document.removeEventListener("DOMNodeRemoved", Operator.processMicroformatsDelayed, false);
+      for (var i = 0; i < content.frames.length; i++) {
+        content.frames[i].document.removeEventListener("mouseover", Operator.mouseOver, false);
+        content.frames[i].document.removeEventListener("DOMNodeInserted", Operator.processMicroformatsDelayed, false);
+        content.frames[i].document.removeEventListener("DOMNodeRemoved", Operator.processMicroformatsDelayed, false);
       }
-      event.originalTarget.removeEventListener("mouseover", Operator.mouseOver, false);
     }
   },
 
@@ -698,7 +712,6 @@ var Operator = {
   onTabChanged: function(event) 
   {
     Operator.processMicroformats();
-    Operator_Sidebar.processMicroformats();
   },
   dump_microformat: function(item, microformat)
   {
@@ -820,6 +833,7 @@ var Operator = {
   },
   processMicroformats: function()
   {
+    Operator.timerID = null;
     Operator_Toolbar.clearPopups();
     Operator_Statusbar.clearPopup();
     Operator_ToolbarButton.clearPopup();
