@@ -477,12 +477,19 @@ var Operator_Options = {
         try {
           var destfile = dest.clone();
           destfile.append(fp.file.leafName);
-          try {
-            destfile.remove(false);
-          } catch (ex) {}
+          if (destfile.exists()) {
+            var promptService = Components.classes["@mozilla.org/embedcomp/prompt-service;1"].
+                                           getService(Components.interfaces.nsIPromptService);
+            var sure = promptService.confirm(window, "", fp.file.leafName + " already exists. Do you want to replace it?");
+            if (sure) {
+              destfile.remove(false);
+            } else {
+              return;
+            }
+          } else {
+            document.getElementById('userscripts').appendItem(fp.file.leafName, "");
+          }
           fp.file.copyTo(dest, "");
-          var listbox = document.getElementById('userscripts');
-          var listitem = listbox.appendItem(fp.file.leafName, "");
         } catch (ex) {
         }
       }
@@ -491,47 +498,23 @@ var Operator_Options = {
     }
   },
   
-  onEditUserScript: function()
-  {
-    var listbox = document.getElementById('userscripts');
-    var filename = listbox.selectedItem.label;
-    var sourcefile = Components.classes["@mozilla.org/file/local;1"]
-                         .createInstance(Components.interfaces.nsILocalFile);
-    try {
-      sourcefile.initWithPath(filename);
-      var ioServ = Components.classes["@mozilla.org/network/io-service;1"]
-                             .getService(Components.interfaces.nsIIOService);
-                             
-    } catch (ex) {
-    }
-  
-    try {
-      var nsIFilePicker = Components.interfaces.nsIFilePicker;
-      var fp = Components.classes["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
-//      var bundle = document.getElementById("bundle_cckwizard");
-      fp.init(window, "Choose File...", nsIFilePicker.modeOpen);
-      fp.displayDirectory = sourcefile.parent;
-      fp.defaultString = sourcefile.leafName;
-      fp.appendFilters(nsIFilePicker.filterAll);
-      if (fp.show() == nsIFilePicker.returnOK && fp.fileURL.spec && fp.fileURL.spec.length > 0) {
-        listbox.selectedItem.label = fp.file.path;
-      }
-    }
-    catch(ex) {
-    }
-  },
   onDeleteUserScript: function()
   {
-    var dest = Components.classes["@mozilla.org/file/directory_service;1"].
-                          getService(Components.interfaces.nsIProperties).
-                          get("ProfD", Components.interfaces.nsILocalFile);
-    dest.append("microformats");
     var listbox = document.getElementById('userscripts');
-    dest.append(listbox.selectedItem.label);
-    try {
-      dest.remove(true);
+    var promptService = Components.classes["@mozilla.org/embedcomp/prompt-service;1"].
+                                   getService(Components.interfaces.nsIPromptService);
+    var sure = promptService.confirm(window, "", "This will remove " + listbox.selectedItem.label);
+    if (sure) {
+      var dest = Components.classes["@mozilla.org/file/directory_service;1"].
+                            getService(Components.interfaces.nsIProperties).
+                            get("ProfD", Components.interfaces.nsILocalFile);
+      dest.append("microformats");
+      dest.append(listbox.selectedItem.label);
+      try {
+        dest.remove(true);
+      } catch(ex) {}
+      return true;
     }
-    catch(ex) {
-    }
+    return false;
   }
 };
