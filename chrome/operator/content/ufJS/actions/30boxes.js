@@ -93,7 +93,6 @@ ufJSActions.actions["30boxes_calendar"] = {
       }
     }
     if (url) {
-      Operator.debug_alert(url);
       openUILink(url, event);
     }
   }
