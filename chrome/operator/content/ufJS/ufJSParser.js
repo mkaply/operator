@@ -424,7 +424,9 @@ var ufJSParser = {
     s	= s.replace(/^\s+/, '');
     /* Remove any spaces at the end */
     s	= s.replace(/\s+$/, '');
-    return s;
+    if (s.length > 0) {
+      return s;
+    }
   },
   validate: function(mfnode, mfname, error) {
     if (ufJSParser.microformats[mfname].validate) {

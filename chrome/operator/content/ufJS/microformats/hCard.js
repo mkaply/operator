@@ -179,7 +179,10 @@ ufJSParser.microformats.hCard = {
         },
         value: [],
         getter: function(propnode, mfnode, definition) {
-          return {"organization-name" : definition.defaultGetter(propnode)};
+          var orgname = definition.defaultGetter(propnode);
+          if (orgname) {
+            return {"organization-name" : orgname};
+          }
         }
       },
       "photo" : {
