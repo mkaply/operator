@@ -11,7 +11,6 @@ var ufJSActions = {
     if (ojl) {
       ojl.loadSubScript(baseurl + "actions/export.js");
       ojl.loadSubScript(baseurl + "actions/firefox.js");
-      ojl.loadSubScript(baseurl + "actions/goto_url.js");
       ojl.loadSubScript(baseurl + "actions/yahoo.js");
       ojl.loadSubScript(baseurl + "actions/google.js");
       ojl.loadSubScript(baseurl + "actions/30boxes.js");
