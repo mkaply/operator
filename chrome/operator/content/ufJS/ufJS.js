@@ -505,19 +505,21 @@ var ufJS = {
     vcf += "END:VCARD\n";
     return vcf;
   },
-  iCalendar: function(item)
+  iCalendar: function(item, header, footer)
   {
     var hcalendar = ufJSParser.createMicroformat(item, "hCalendar");
     if (!hcalendar) {
       return;
     }
-    var ics;
-    ics  = "BEGIN:VCALENDAR\n";
-    ics += "PRODID:\n";
-    ics += "X-ORIGINAL-URL:" + content.document.location.href + "\n";
-    ics += "X-WR-CALNAME:\n";
-    ics += "VERSION:2.0\n";
-    ics += "METHOD:PUBLISH\n";
+    var ics = "";
+    if (header) {
+      ics += "BEGIN:VCALENDAR\n";
+      ics += "PRODID:\n";
+      ics += "X-ORIGINAL-URL:" + content.document.location.href + "\n";
+      ics += "X-WR-CALNAME:\n";
+      ics += "VERSION:2.0\n";
+      ics += "METHOD:PUBLISH\n";
+    }
     ics += "BEGIN:VEVENT\n";
     if (hcalendar["class"]) {
       ics += "CLASS:" + hcalendar["class"] + "\n";
@@ -644,7 +646,9 @@ var ufJS = {
       }
     }
     ics += "END:VEVENT\n";
-    ics += "END:VCALENDAR\n";
+    if (footer) {
+      ics += "END:VCALENDAR\n";
+    }
 
     return ics;
   }

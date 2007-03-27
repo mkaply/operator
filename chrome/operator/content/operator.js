@@ -846,7 +846,7 @@ var Operator = {
     }
     if (microformat == "hCalendar") {
       try {
-        vcfical = ufJS.iCalendar(item);
+        vcfical = ufJS.iCalendar(item, true, true);
       } catch (ex) {}
       try {
         X2V = Operator.iCalendarXSLT(item);
