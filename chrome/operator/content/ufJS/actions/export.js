@@ -124,7 +124,7 @@ ufJSActions.actions.export_icalendar = {
     var url;
     for (var i in microformatNames) {
       if (microformatNames[i] == "hCalendar") {
-        var ics = ufJS.iCalendar(node);
+        var ics = ufJS.iCalendar(node, true, true);
         var file = Components.classes["@mozilla.org/file/directory_service;1"].
                               getService(Components.interfaces.nsIProperties).
                               get("TmpD", Components.interfaces.nsIFile);
