@@ -12,6 +12,7 @@ var Operator_Options = {
     this.checkAndSetBoolPref("statusbar", document.getElementById("statusbar").checked);
     this.checkAndSetBoolPref("highlightMicroformats", document.getElementById("highlightMicroformats").checked);
     this.checkAndSetBoolPref("removeDuplicates", document.getElementById("removeDuplicates").checked);
+    this.checkAndSetBoolPref("observeDOMAttrModified", document.getElementById("observeDOMAttrModified").checked);
     var microformats = document.getElementById("microformats");
     for (i=0; i < microformats.getRowCount(); i++) {
       var label = microformats.getItemAtIndex(i).label;
@@ -161,7 +162,7 @@ var Operator_Options = {
     }
 
     try {
-      document.getElementById("removeDuplicates").checked = this.prefBranch.getBoolPref("removeDuplicates");
+      document.getElementById("observeDOMAttrModified").checked = this.prefBranch.getBoolPref("observeDOMAttrModified");
     } catch (ex) {
     }
   

@@ -37,6 +37,7 @@
         <checkbox id="statusbar" label="&statusbar.label;"/>
         <checkbox id="highlightMicroformats" label="&highlightMicroformats.label;"/>
         <checkbox id="removeDuplicates" label="&removeDuplicates.label;"/>
+        <checkbox id="observeDOMAttrModified" label="&observeDOMAttrModified.label;"/>
         </vbox>
       </tabpanel>
       <tabpanel>

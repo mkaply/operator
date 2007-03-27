@@ -10,6 +10,7 @@ var Operator = {
   highlightMicroformats: false,
   useDescriptiveNames: false,
   removeDuplicates: true,
+  observeDOMAttrModified: false,
   batchPrefChanges: false,
   customizeDone: false,
   languageBundle: null,
@@ -135,6 +136,7 @@ var Operator = {
         this.prefBranch.setBoolPref("statusbar", false);
         this.prefBranch.setBoolPref("highlightMicroformats", false);
         this.prefBranch.setBoolPref("removeDuplicates", true);
+        this.prefBranch.setBoolPref("observeDOMAttrModified", false);
         j = 1;
         for (i in Operator.microformatList)
         {
@@ -244,6 +246,9 @@ var Operator = {
       this.removeDuplicates = this.prefBranch.getBoolPref("removeDuplicates");
     } catch (ex) {}
     try {
+      this.observeDOMAttrModified = this.prefBranch.getBoolPref("observeDOMAttrModified");
+    } catch (ex) {}
+    try {
       this.view = this.prefBranch.getIntPref("view");
     } catch (ex) {}
     try {
@@ -298,6 +303,9 @@ var Operator = {
     }
     if (data == "removeDuplicates") {
       this.removeDuplicates = this.prefBranch.getBoolPref("removeDuplicates");
+    }
+    if (data == "observeDOMAttrModified") {
+      this.observeDOMAttrModified = this.prefBranch.getBoolPref("observeDOMAttrModified");
     }
     if (data == "highlightMicroformats") {
       this.highlightMicroformats = this.prefBranch.getBoolPref("highlightMicroformats");
@@ -684,11 +692,16 @@ var Operator = {
       content.document.addEventListener("mouseover", Operator.mouseOver, false);
       content.document.getElementsByTagName("body")[0].addEventListener("DOMNodeInserted", Operator.processMicroformatsDelayed, false);
       content.document.getElementsByTagName("body")[0].addEventListener("DOMNodeRemoved", Operator.processMicroformatsDelayed, false);
-      content.document.getElementsByTagName("body")[0].addEventListener("DOMAttrModified", Operator.processMicroformatsDelayed, false);
+      if (Operator.observeDOMAttrModified) {
+        content.document.getElementsByTagName("body")[0].addEventListener("DOMAttrModified", Operator.processMicroformatsDelayed, false);
+      }
       for (var i = 0; i < content.frames.length; i++) {
         content.frames[i].document.addEventListener("mouseover", Operator.mouseOver, false);
         content.frames[i].document.getElementsByTagName("body")[0].addEventListener("DOMNodeInserted", Operator.processMicroformatsDelayed, false);
         content.frames[i].document.getElementsByTagName("body")[0].addEventListener("DOMNodeRemoved", Operator.processMicroformatsDelayed, false);
+        if (Operator.observeDOMAttrModified) {
+          content.frames[i].document.getElementsByTagName("body")[0].addEventListener("DOMAttrModified", Operator.processMicroformatsDelayed, false);
+        }
       }
     }
   },
@@ -700,10 +713,16 @@ var Operator = {
       content.document.removeEventListener("mouseover", Operator.mouseOver, false);
       content.document.removeEventListener("DOMNodeInserted", Operator.processMicroformatsDelayed, false);
       content.document.removeEventListener("DOMNodeRemoved", Operator.processMicroformatsDelayed, false);
+      if (Operator.observeDOMAttrModified) {
+        content.document.removeEventListener("DOMAttrModified", Operator.processMicroformatsDelayed, false);
+      }
       for (var i = 0; i < content.frames.length; i++) {
         content.frames[i].document.removeEventListener("mouseover", Operator.mouseOver, false);
         content.frames[i].document.removeEventListener("DOMNodeInserted", Operator.processMicroformatsDelayed, false);
         content.frames[i].document.removeEventListener("DOMNodeRemoved", Operator.processMicroformatsDelayed, false);
+        if (Operator.observeDOMAttrModified) {
+          content.frames[i].document.removeEventListener("DOMAttrModified", Operator.processMicroformatsDelayed, false);
+        }
       }
     }
   },

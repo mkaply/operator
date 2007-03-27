@@ -13,4 +13,4 @@
 <!ENTITY  debug.label                      "Debug mode">
 <!ENTITY  statusbar.label                  "Display icon in status bar">
 <!ENTITY  userscripts.label                "User Scripts">
-
+<!ENTITY  observeDOMAttrModified.label     "Observe all page changes (will impact performance)">
