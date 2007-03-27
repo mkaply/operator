@@ -688,19 +688,23 @@ var Operator = {
   {
     if (event.originalTarget instanceof HTMLDocument)
     {
-      Operator.processMicroformats();
-      content.document.addEventListener("mouseover", Operator.mouseOver, false);
-      content.document.getElementsByTagName("body")[0].addEventListener("DOMNodeInserted", Operator.processMicroformatsDelayed, false);
-      content.document.getElementsByTagName("body")[0].addEventListener("DOMNodeRemoved", Operator.processMicroformatsDelayed, false);
-      if (Operator.observeDOMAttrModified) {
-        content.document.getElementsByTagName("body")[0].addEventListener("DOMAttrModified", Operator.processMicroformatsDelayed, false);
-      }
-      for (var i = 0; i < content.frames.length; i++) {
-        content.frames[i].document.addEventListener("mouseover", Operator.mouseOver, false);
-        content.frames[i].document.getElementsByTagName("body")[0].addEventListener("DOMNodeInserted", Operator.processMicroformatsDelayed, false);
-        content.frames[i].document.getElementsByTagName("body")[0].addEventListener("DOMNodeRemoved", Operator.processMicroformatsDelayed, false);
+      /* This is required so that things work properly when pages are opened */
+      /* in background tabs */
+      if (content && (event.originalTarget == content.document)) {
+        Operator.processMicroformats();
+        content.document.addEventListener("mouseover", Operator.mouseOver, false);
+        content.document.getElementsByTagName("body")[0].addEventListener("DOMNodeInserted", Operator.processMicroformatsDelayed, false);
+        content.document.getElementsByTagName("body")[0].addEventListener("DOMNodeRemoved", Operator.processMicroformatsDelayed, false);
         if (Operator.observeDOMAttrModified) {
-          content.frames[i].document.getElementsByTagName("body")[0].addEventListener("DOMAttrModified", Operator.processMicroformatsDelayed, false);
+          content.document.getElementsByTagName("body")[0].addEventListener("DOMAttrModified", Operator.processMicroformatsDelayed, false);
+        }
+        for (var i = 0; i < content.frames.length; i++) {
+          content.frames[i].document.addEventListener("mouseover", Operator.mouseOver, false);
+          content.frames[i].document.getElementsByTagName("body")[0].addEventListener("DOMNodeInserted", Operator.processMicroformatsDelayed, false);
+          content.frames[i].document.getElementsByTagName("body")[0].addEventListener("DOMNodeRemoved", Operator.processMicroformatsDelayed, false);
+          if (Operator.observeDOMAttrModified) {
+            content.frames[i].document.getElementsByTagName("body")[0].addEventListener("DOMAttrModified", Operator.processMicroformatsDelayed, false);
+          }
         }
       }
     }
@@ -710,6 +714,16 @@ var Operator = {
   {
     if (event.originalTarget instanceof HTMLDocument)
     {
+      /* This is required so that things work properly when pages are opened */
+      /* in background tabs */
+      if (content && (event.originalTarget == content.document)) {
+        /* These are required in case we go to a page that doesn't invoke our */
+        /* onPageShow, like a non HTML document or an error page */
+        Operator_Toolbar.disable();
+        Operator_Toolbar.clearPopups();
+        Operator_Statusbar.disable();
+        Operator_ToolbarButton.disable();
+      }
       content.document.removeEventListener("mouseover", Operator.mouseOver, false);
       content.document.removeEventListener("DOMNodeInserted", Operator.processMicroformatsDelayed, false);
       content.document.removeEventListener("DOMNodeRemoved", Operator.processMicroformatsDelayed, false);
