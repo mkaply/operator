@@ -1,5 +1,3 @@
-/*extern ufJSParser */
-
 function hCalendar() {
 }
 
@@ -13,15 +11,9 @@ ufJSParser.microformats.hCalendar = {
     properties: {
       "category" : {
         value: [],
-        getter: function(propnode, mfnode, definition) {
-          if ((propnode.nodeName.toLowerCase() == "a") && (propnode.getAttribute("rel"))) {
-            var tagname = ufJSParser.getMicroformatProperty(propnode, "tag", "tag");
-            if (tagname) {
-              return tagname;
-            }
-          }
-          return definition.defaultGetter(propnode);
-        }
+        datatype: "microformat",
+        microformat: "tag",
+        microformat_property: "tag"
       },
       "class" : {
         value: "",
@@ -29,46 +21,27 @@ ufJSParser.microformats.hCalendar = {
       },
       "description" : {
         value: "",
-        getter: function(propnode, mfnode, definition) {
-          return propnode.innerHTML;
-        }
+        datatype: "HTML"
       },
       "dtend" : {
         value: "",
-        getter: function(propnode, mfnode, definition) {
-          return definition.dateGetter(propnode);
-        }
+        datatype: "dateTime"
       },
       "dtstamp" : {
         value: "",
-        getter: function(propnode, mfnode, definition) {
-          return definition.defaultGetter(propnode).replace(/-/g,"");
-        }
+        datatype: "dateTime"
       },
       "dtstart" : {
         value: "",
-        getter: function(propnode, mfnode, definition) {
-          return definition.dateGetter(propnode);
-        }
+        datatype: "dateTime"
       },
       "duration" : {
-        value: "",
-        getter: function(propnode, mfnode, definition) {
-          var duration = definition.defaultGetter(propnode);
-          if (duration) {
-            return duration;
-          }
-        }
+        value: ""
       },
       "location" : {
         value: "",
-        getter: function(propnode, mfnode, definition) {
-          if (propnode.className.match("(^|\\s)" + "vcard" + "(\\s|$)")) {
-            return ufJSParser.createMicroformat(propnode, "hCard");
-          } else {
-            return definition.defaultGetter(propnode);
-          }
-        }
+        datatype: "microformat",
+        microformat: "hCard"
       },
       "status" : {
         value: "",
@@ -83,29 +56,26 @@ ufJSParser.microformats.hCalendar = {
       },
       "uid" : {
         value: "",
-        getter: function(propnode, mfnode, definition) {
-          return definition.urlGetter(propnode);
-        }
+        datatype: "anyURI"
       },
       "url" : {
         value: "",
-        getter: function(propnode, mfnode, definition) {
-          return definition.urlGetter(propnode);
-        }
+        datatype: "anyURI"
       },
       "last-modified" : {
         value: "",
-        getter: function(propnode, mfnode, definition) {
-          return definition.dateGetter(propnode);
-        }
+        datatype: "dateTime"
       }
     },
     ufjs: {
       "ufjsDisplayName" : {
         value: "",
         virtual: true,
-        getter: function(propnode, mfnode, definition) {
+        getter: function(mfnode) {
           if (mfnode.origNode) {
+            /* If this microformat has an include pattern, put the */
+            /* dtstart in parenthesis after the summary to differentiate */
+            /* them. */
             var summaries = ufJSParser.getElementsByClassName(mfnode.origNode, "summary");
             if (summaries.length === 0) {
               var displayName = ufJSParser.getMicroformatProperty(mfnode, "hCalendar", "summary");
@@ -113,9 +83,9 @@ ufJSParser.microformats.hCalendar = {
                 var dtstart = ufJSParser.getMicroformatProperty(mfnode, "hCalendar", "dtstart");
                 if (dtstart) {
                   displayName += " (";
-                  displayName += definition.dateFromISO8601(dtstart).toLocaleString();
+                  displayName += ufJSParser.microformats.hCalendar.dateFromISO8601(dtstart).toLocaleString();
                   displayName += ")";
-                }  
+                }
                 return displayName;
               }
             }
@@ -152,74 +122,15 @@ ufJSParser.microformats.hCalendar = {
       }
       return date;
     },
-    descriptionGetter: function(propnode) {
-    },
-    dateGetter: function(propnode) {
-      var date = this.defaultGetter(propnode);
-      if (date.indexOf('-') == -1) {
-        var newdate = "";
-        var i;
-        for (i=0;i<date.length;i++) {
-          newdate += date.charAt(i);
-          if ((i == 3) || (i == 5)) {
-            newdate += "-";
-          }
-          if ((i == 10) || (i == 12)) {
-            newdate += ":";
-          }
+    validate: function(node, error) {
+      var summary = ufJSParser.getMicroformatProperty(node, "hCalendar", "summary");
+      if (!summary) {
+        if (error) {
+          error.message = "No summary specified";
         }
-        date = newdate;
+        return false;
       }
-      return date;
-    },
-    urlGetter: function(propnode) {
-      if (propnode.nodeName.toLowerCase() == "a") {
-        return propnode.href;
-      } else if (propnode.nodeName.toLowerCase() == "img") {
-        return propnode.src;
-      } else if (propnode.nodeName.toLowerCase() == "object") {
-        return propnode.data;
-      } else if (propnode.nodeName.toLowerCase() == "area") {
-        return propnode.href;
-      } else {
-        return this.defaultGetter(propnode);
-      }
-    },
-    defaultGetter: function(propnode) {
-      if (((propnode.nodeName.toLowerCase() == "abbr") || (propnode.nodeName.toLowerCase() == "html:abbr")) && (propnode.getAttribute("title"))) {
-        return propnode.getAttribute("title");
-      } else if ((propnode.nodeName.toLowerCase() == "img") && (propnode.getAttribute("alt"))) {
-        return propnode.getAttribute("alt");
-      } else if ((propnode.nodeName.toLowerCase() == "area") && (propnode.getAttribute("alt"))) {
-        return propnode.getAttribute("alt");
-      } else {
-        var values = ufJSParser.getElementsByClassName(propnode, "value");
-        if (values.length > 0) {
-          var value = "";
-          for (var j=0;j<values.length;j++) {
-            value += values[j].textContent;
-          }
-          return value;
-        } else {
-          var s;
-          if (propnode.innerText) {
-            s = propnode.innerText;
-          } else {
-            s = propnode.textContent;
-          }
-          return ufJSParser.trim(s);
-        }
-      }
+      return true;
     }
-  },
-  validate: function(node, error) {
-    var summary = ufJSParser.getMicroformatProperty(node, "hCalendar", "summary");
-    if (!summary) {
-      if (error) {
-        error.message = "No summary specified";
-      }
-      return false;
-    }
-    return true;
   }
 };

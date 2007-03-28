@@ -1,5 +1,3 @@
-/*extern ufJSParser */
-
 function hCard() {
 }
 
@@ -12,34 +10,25 @@ ufJSParser.microformats.hCard = {
   definition: {
     properties: {
       "adr" : {
-        value: ["adr"],
-        getter: function(propnode, mfnode, definition) {
-          return ufJSParser.createMicroformat(propnode, "Address");
-        }
+        value: [],
+        datatype: "microformat",
+        microformat: "Address"
       },
       "agent" : {
         value: []
       },
       "bday" : {
         value: "",
-        getter: function(propnode, mfnode, definition) {
-          return definition.dateGetter(propnode);
-        }
+        datatype: "dateTime"
       },
       "class" : {
         value: ""
       },
       "category" : {
         value: [],
-        getter: function(propnode, mfnode, definition) {
-          if ((propnode.nodeName.toLowerCase() == "a") && (propnode.getAttribute("rel"))) {
-            var tagname = ufJSParser.getMicroformatProperty(propnode, "tag", "tag");
-            if (tagname) {
-              return tagname;
-            }
-          }
-          return definition.defaultGetter(propnode);
-        }
+        datatype: "microformat",
+        microformat: "tag",
+        microformat_property: "tag"
       },
       "email" : {
         subproperties: {
@@ -49,26 +38,11 @@ ufJSParser.microformats.hCard = {
           },
           "value" : {
             value: "",
-            virtual: true,
-            getter: function(propnode, mfnode, definition) {
-              if (propnode == mfnode) {
-                return definition.emailGetter(mfnode);
-              } else {
-                var values = ufJSParser.getElementsByClassName(mfnode, "value");
-                if (values.length > 1) {
-                  return definition.emailGetter(mfnode);
-                } else {
-                  return definition.emailGetter(propnode);
-                }
-              }
-            }
+            datatype: "email",
+            virtual: true
           }
         },
-        value: [],
-        getter: function(propnode, mfnode, definition) {
-          var value = definition.emailGetter(propnode);
-          return {"value" : value};
-        }
+        value: []   
       },
       "fn" : {
         value: "",
@@ -76,9 +50,8 @@ ufJSParser.microformats.hCard = {
       },
       "geo" : {
         value: "geo",
-        getter: function(propnode, mfnode, definition) {
-          return ufJSParser.createMicroformat(propnode, "geo");
-        }
+        datatype: "microformat",
+        microformat: "geo"
       },
       "key" : {
         value: []
@@ -88,9 +61,7 @@ ufJSParser.microformats.hCard = {
       },
       "logo" : {
         value: [],
-        getter: function(propnode, mfnode, definition) {
-          return definition.urlGetter(propnode);
-        }
+        datatype: "anyURI"
       },
       "mailer" : {
         value: []
@@ -115,7 +86,9 @@ ufJSParser.microformats.hCard = {
         },
         value: "",
         virtual: true,
-        getter: function(propnode, mfnode, definition) {
+        /*  Implied "n" Optimization */
+        /* http://microformats.org/wiki/hcard#Implied_.22n.22_Optimization */
+        getter: function(mfnode) {
           var fn = ufJSParser.getMicroformatProperty(mfnode, "hCard", "fn");
           var orgs = ufJSParser.getMicroformatProperty(mfnode, "hCard", "org");
           var given_name;
@@ -144,29 +117,25 @@ ufJSParser.microformats.hCard = {
       "nickname" : {
         value: [],
         virtual: true,
-        getter: function(propnode, mfnode, definition) {
-          if (propnode == mfnode ) {
-            var fn = ufJSParser.getMicroformatProperty(mfnode, "hCard", "fn");
-            var orgs = ufJSParser.getMicroformatProperty(mfnode, "hCard", "org");
-            var given_name;
-            var family_name;
-            if (fn && (!orgs || (orgs.length) > 1 || (fn != orgs[0]["organization-name"]))) {
-              var fns = fn.split(" ");
-              if (fns.length === 1) {
-                return [fns[0]];
-              }
+        /* Implied "nickname" Optimization */
+        /* http://microformats.org/wiki/hcard#Implied_.22nickname.22_Optimization */
+        getter: function(mfnode) {
+          var fn = ufJSParser.getMicroformatProperty(mfnode, "hCard", "fn");
+          var orgs = ufJSParser.getMicroformatProperty(mfnode, "hCard", "org");
+          var given_name;
+          var family_name;
+          if (fn && (!orgs || (orgs.length) > 1 || (fn != orgs[0]["organization-name"]))) {
+            var fns = fn.split(" ");
+            if (fns.length === 1) {
+              return [fns[0]];
             }
-            return;
-          } else {
-            return definition.defaultGetter(propnode);
           }
+          return;
         }
       },
       "note" : {
         value: [],
-        getter: function(propnode, mfnode, definition) {
-          return propnode.innerHTML;
-        }
+        datatype: "HTML"
       },
       "org" : {
         subproperties: {
@@ -178,24 +147,15 @@ ufJSParser.microformats.hCard = {
           }
         },
         value: [],
-        getter: function(propnode, mfnode, definition) {
-          var orgname = definition.defaultGetter(propnode);
-          if (orgname) {
-            return {"organization-name" : orgname};
-          }
-        }
+        implied: "organization-name"
       },
       "photo" : {
         value: [],
-        getter: function(propnode, mfnode, definition) {
-          return definition.urlGetter(propnode);
-        }
+        datatype: "anyURI"
       },
       "rev" : {
         value: "",
-        getter: function(propnode, mfnode, definition) {
-          return definition.dateGetter(propnode);
-        }
+        datatype: "dateTime"
       },
       "role" : {
         value: []
@@ -219,48 +179,33 @@ ufJSParser.microformats.hCard = {
             types: ["msg", "home", "work", "pref", "voice", "fax", "cell", "video", "pager", "bbs", "car", "isdn", "pcs"]
           },
           "value" : {
-            value: "",
-            getter: function(subpropnode, propnode, definition) {
-              var values = ufJSParser.getElementsByClassName(propnode, "value");
-              var value = "";
-              for (var i=0;i<values.length;i++) {
-                if (values[i].innerText) {
-                  value += values[i].innerText;
-                } else {
-                  value += values[i].textContent;
-                }
-              }
-              return value;
-            }
+            value: ""
           }
         },
         value: [],
-        getter: function(propnode, mfnode, definition) {
-          return {"value" : definition.defaultGetter(propnode)};
-        }
+        implied: "value"
       },
       "tz" : {
         value: ""
       },
       "uid" : {
         value: "",
-        getter: function(propnode, mfnode, definition) {
-          return definition.urlGetter(propnode);
-        }
+        datatype: "anyURI"
       },
       "url" : {
         value: [],
-        getter: function(propnode, mfnode, definition) {
-          return definition.urlGetter(propnode);
-        }
+        datatype: "anyURI"
       }
     },
     ufjs: {
       "ufjsDisplayName" : {
         value: "",
         virtual: true,
-        getter: function(propnode, mfnode, definition) {
+        getter: function(mfnode) {
           if (mfnode.origNode) {
+            /* If this microformat has an include pattern, put the */
+            /* organization-name in parenthesis after the fn to differentiate */
+            /* them. */
             var fns = ufJSParser.getElementsByClassName(mfnode.origNode, "fn");
             if (fns.length === 0) {
               var displayName = ufJSParser.getMicroformatProperty(mfnode, "hCard", "fn");
@@ -276,79 +221,6 @@ ufJSParser.microformats.hCard = {
             }
           }
           return ufJSParser.getMicroformatProperty(mfnode, "hCard", "fn");
-        }
-      }
-    },
-    dateGetter: function(propnode) {
-      var date = this.defaultGetter(propnode);
-      if (date.indexOf('-') == -1) {
-        var newdate = "";
-        var i;
-        for (i=0;i<date.length;i++) {
-          newdate += date.charAt(i);
-          if ((i == 3) || (i == 5)) {
-            newdate += "-";
-          }
-          if ((i == 10) || (i == 12)) {
-            newdate += ":";
-          }
-        }
-        date = newdate;
-      }
-      return date;
-    },
-    urlGetter: function(propnode) {
-      if (propnode.nodeName.toLowerCase() == "a") {
-        return propnode.href;
-      } else if (propnode.nodeName.toLowerCase() == "img") {
-        return propnode.src;
-      } else if (propnode.nodeName.toLowerCase() == "object") {
-        return propnode.data;
-      } else if (propnode.nodeName.toLowerCase() == "area") {
-        return propnode.href;
-      } else {
-        return this.defaultGetter(propnode);
-      }
-    },
-    emailGetter: function(propnode) {
-      if ((propnode.nodeName.toLowerCase() == "a") || (propnode.nodeName.toLowerCase() == "area")) {
-        var mailto = propnode.href;
-        if (mailto.indexOf('?') > 0) {
-          return mailto.substring("mailto:".length, mailto.indexOf('?'));
-        } else {
-          return mailto.substring("mailto:".length);
-        }
-      } else {
-        return this.defaultGetter(propnode);
-      }
-    },
-    defaultGetter: function(propnode) {
-      if (((propnode.nodeName.toLowerCase() == "abbr") || (propnode.nodeName.toLowerCase() == "html:abbr")) && (propnode.getAttribute("title"))) {
-        return propnode.getAttribute("title");
-      } else if ((propnode.nodeName.toLowerCase() == "img") && (propnode.getAttribute("alt"))) {
-        return propnode.getAttribute("alt");
-      } else if ((propnode.nodeName.toLowerCase() == "area") && (propnode.getAttribute("alt"))) {
-        return propnode.getAttribute("alt");
-      } else {
-        var values = ufJSParser.getElementsByClassName(propnode, "value");
-        if (values.length > 0) {
-          var value = "";
-          for (var j=0;j<values.length;j++) {
-            if (values[j].innerText) {
-              value += values[j].innerText;
-            } else {
-              value += values[j].textContent;
-            }
-          }
-          return value;
-        } else {
-          var s;
-          if (propnode.innerText) {
-            s = propnode.innerText;
-          } else {
-            s = propnode.textContent;
-          }
-          return ufJSParser.trim(s);
         }
       }
     }

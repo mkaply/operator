@@ -1,5 +1,3 @@
-/*extern ufJSParser */
-
 function geo() {
 }
 
@@ -14,36 +12,30 @@ ufJSParser.microformats.geo = {
       "latitude" : {
         value: "",
         virtual: true,
-        getter: function(propnode, mfnode, definition) {
-          if (propnode == mfnode) {
-            var value = definition.defaultGetter(mfnode);
-            var latlong;
-            if (value.match(';')) {
-              latlong = value.split(';');
-              if (latlong[0]) {
-                return latlong[0];
-              }
+        /* This will only be called in the virtual case */
+        getter: function(mfnode) {
+          var value = ufJSParser.defaultGetter(mfnode);
+          var latlong;
+          if (value.match(';')) {
+            latlong = value.split(';');
+            if (latlong[0]) {
+              return latlong[0];
             }
-          } else {
-            return definition.defaultGetter(propnode);
           }
         },
       },
       "longitude" : {
         value: "",
         virtual: true,
-        getter: function(propnode, mfnode, definition) {
-          if (propnode == mfnode) {
-            var value = definition.defaultGetter(mfnode);
-            var latlong;
-            if (value.match(';')) {
-              latlong = value.split(';');
-              if (latlong[1]) {
-                return latlong[1];
-              }
+        /* This will only be called in the virtual case */
+        getter: function(mfnode) {
+          var value = ufJSParser.defaultGetter(mfnode);
+          var latlong;
+          if (value.match(';')) {
+            latlong = value.split(';');
+            if (latlong[1]) {
+              return latlong[1];
             }
-          } else {
-            return definition.defaultGetter(propnode);
           }
         }
       }
@@ -52,7 +44,7 @@ ufJSParser.microformats.geo = {
       "ufjsDisplayName" : {
         value: "",
         virtual: true,
-        getter: function(propnode, mfnode, definition) {
+        getter: function(propnode, mfnode) {
           if (ufJSParser.getMicroformatProperty(mfnode, "geo", "latitude") &&
             ufJSParser.getMicroformatProperty(mfnode, "geo", "longitude")) {
   
@@ -87,24 +79,6 @@ ufJSParser.microformats.geo = {
             return s;
           }
         }
-      }
-    },
-    defaultGetter: function(propnode) {
-      if (((propnode.nodeName.toLowerCase() == "abbr") || (propnode.nodeName.toLowerCase() == "html:abbr")) && (propnode.getAttribute("title"))) {
-        return propnode.getAttribute("title");
-      } else {
-        var s;
-        if (propnode.innerText) {
-          s = propnode.innerText;
-        } else {
-          s = propnode.textContent;
-        }
-        s	= s.replace(/\<.*?\>/gi, ' ');
-        s	= s.replace(/[\n\r\t]/gi, ' ');
-        s	= s.replace(/\s{2,}/gi, ' ');
-        s	= s.replace(/\s{2,}/gi, '');
-        s	= s.replace(/^\s+/, '');
-        return s;
       }
     }
   },

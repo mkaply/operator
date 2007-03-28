@@ -1,5 +1,3 @@
-/*extern ufJSParser */
-
 function xFolk() {
 }
 
@@ -15,48 +13,41 @@ ufJSParser.microformats.xFolk = {
       },
       "taggedlink" : {
         value: "",
-        getter: function(propnode, mfnode, definition) {
-          var title = "";
-          var link = "";
-          if (propnode.nodeName.toLowerCase() == "a") {
-            link = propnode.href;
-            if (propnode.getAttribute("title")) {
-              title = propnode.getAttribute("title");
-            } else {
-              title = definition.defaultGetter(propnode);
+        subproperties: {
+          "title" : {
+            value: "",
+            virtual: true,
+            getter: function(parentnode) {
+              if (parentnode.getAttribute("title")) {
+                return parentnode.getAttribute("title");
+              } else {
+                return ufJSParser.defaultGetter(parentnode);
+              }
             }
+          },
+          "link" : {
+            value: "",
+            datatype: "anyURI",
+            virtual: true
           }
-          return {"title" : title, "link" : link};
-        }
+        },
       },
       "tag" : {
         value: [],
         rel: true,
-        getter: function(propnode, mfnode, definition) {
-          return ufJSParser.createMicroformat(propnode, "tag");
-        }
+        datatype: "microformat",
+        microformat: "tag",
+        microformat_property: "tag"
       }
     },
     ufjs: {
       "ufjsDisplayName" : {
         value: "",
         virtual: true,
-        getter: function(propnode, mfnode, definition) {
-          var taggedlink = ufJSParser.getMicroformatProperty(mfnode, "xFolk", "taggedlink");
-          if (taggedlink && taggedlink.title) {
-            return taggedlink.title;
-          }
+        getter: function(mfnode) {
+          return ufJSParser.getMicroformatProperty(mfnode, "xFolk", "taggedlink.title");
         }
       }
-    },
-    defaultGetter: function(propnode) {
-      var s;
-      if (propnode.innerText) {
-        s = propnode.innerText;
-      } else {
-        s = propnode.textContent;
-      }
-      return ufJSParser.trim(s);
     }
   },
   validate: function(node, error) {

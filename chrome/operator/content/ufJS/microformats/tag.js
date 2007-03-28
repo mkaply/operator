@@ -1,5 +1,3 @@
-/*extern ufJSParser */
-
 function tag() {
 }
 
@@ -14,75 +12,60 @@ ufJSParser.microformats.tag = {
       "tag" : {
         value: "",
         virtual: true,
-        getter: function(propnode, mfnode, definition) {
+        getter: function(mfnode) {
           if (mfnode.href) {
             var url_array = mfnode.getAttribute("href").split("/");
             for(var i=url_array.length-1; i > 0; i--) {
               if (url_array[i] !== "") {
-                return unescape(definition.validTagName(url_array[i]));
+                return unescape(ufJSParser.microformats.tag.validTagName(url_array[i]));
               }
             }
           }
         }
-      }
-    },
-    values: {
+      },
       "link" : {
         value: "",
         virtual: true,
-        getter: function(propnode, mfnode, definition) {
-          if (mfnode.href) {
-            return mfnode.href;
-          }
-        }
+        datatype: "anyURI"
       },
       "text" : {
         value: "",
-        virtual: true,
-        getter: function(propnode, mfnode, definition) {
-          var s;
-          if (propnode.innerText) {
-            s = propnode.innerText;
-          } else {
-            s = propnode.textContent;
-          }
-          return ufJSParser.trim(s);
-        }
+        virtual: true
       }
     },
     ufjs: {
       "ufjsDisplayName" : {
         value: "",
         virtual: true,
-        getter: function(propnode, mfnode, definition) {
+        getter: function(mfnode) {
           return ufJSParser.getMicroformatProperty(mfnode, "tag", "tag");
         }
       }
     },
-    validTagName: function(tag)
-    {
-      var returnTag = tag;
-      if (tag.indexOf('?') != -1) {
-        if (tag.indexOf('?') === 0) {
-          return false;
-        } else {
-          returnTag = tag.substr(0, tag.indexOf('?'));
-        }
+  },
+  validTagName: function(tag)
+  {
+    var returnTag = tag;
+    if (tag.indexOf('?') != -1) {
+      if (tag.indexOf('?') === 0) {
+        return false;
+      } else {
+        returnTag = tag.substr(0, tag.indexOf('?'));
       }
-      if (tag.indexOf('#') != -1) {
-        if (tag.indexOf('#') === 0) {
-          return false;
-        } else {
-          returnTag = tag.substr(0, tag.indexOf('#'));
-        }
-      }
-      if (tag.indexOf('.html') != -1) {
-        if (tag.indexOf('.html') == tag.length - 5) {
-          return false;
-        }
-      }
-      return returnTag;
     }
+    if (tag.indexOf('#') != -1) {
+      if (tag.indexOf('#') === 0) {
+        return false;
+      } else {
+        returnTag = tag.substr(0, tag.indexOf('#'));
+      }
+    }
+    if (tag.indexOf('.html') != -1) {
+      if (tag.indexOf('.html') == tag.length - 5) {
+        return false;
+      }
+    }
+    return returnTag;
   },
   validate: function(node, error) {
     var tag = ufJSParser.getMicroformatProperty(node, "tag", "tag");

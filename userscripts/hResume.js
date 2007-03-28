@@ -13,33 +13,18 @@ ufJSParser.microformats.hResume = {
     properties: {
       "affiliation" : {
         value: [],
-        getter: function(propnode, mfnode, definition) {
-          if (propnode.className.match("(^|\\s)" + "vcard" + "(\\s|$)")) {
-            return ufJSParser.createMicroformat(propnode, "hCard");
-          } else {
-            return definition.defaultGetter(propnode);
-          }
-        }
+        datatype: "microformat",
+        microformat: "hCard"
       },
       "education" : {
         value: [],
-        getter: function(propnode, mfnode, definition) {
-          if (propnode.className.match("(^|\\s)" + "vevent" + "(\\s|$)")) {
-            return ufJSParser.createMicroformat(propnode, "hCalendar");
-          } else {
-            return definition.defaultGetter(propnode);
-          }
-        }
+        datatype: "microformat",
+        microformat: "hCalendar"
       },
       "experience" : {
         value: [],
-        getter: function(propnode, mfnode, definition) {
-          if (propnode.className.match("(^|\\s)" + "vevent" + "(\\s|$)")) {
-            return ufJSParser.createMicroformat(propnode, "hCalendar");
-          } else {
-            return definition.defaultGetter(propnode);
-          }
-        }
+        datatype: "microformat",
+        microformat: "hCalendar"
       },
       "summary" : {
         value: ""
@@ -48,30 +33,28 @@ ufJSParser.microformats.hResume = {
       "contact" : {
         value: "",
         virtual: true,
-        getter: function(propnode, mfnode, definition) {
-          if (propnode == mfnode) {
-            /* We didn't find a contact, so use the first vcard */
-            var vcards = ufJSParser.getElementsByClassName(mfnode, "vcard");
-            if (vcards.length > 0) {
-              var i;
-              var noAffiliation = -1;
-              for (i in vcards) {
-                if (vcards[i].nodeName.toLowerCase() == "address") {
-                  return ufJSParser.createMicroformat(vcards[i], "hCard");
-                } else {
-                  if (noAffiliation < 0) {
-                    if (!vcards[i].className.match("(^|\\s)" + "affiliation" + "(\\s|$)")) {
-                      noAffiliation = i;
-                    }
+        datatype: "microformat",
+        microformat: "hCard",
+        getter: function(mfnode) {
+          /* We didn't find a contact, so use the first vcard */
+          var vcards = ufJSParser.getElementsByClassName(mfnode, "vcard");
+          if (vcards.length > 0) {
+            var i;
+            var noAffiliation = -1;
+            for (i in vcards) {
+              if (vcards[i].nodeName.toLowerCase() == "address") {
+                return ufJSParser.createMicroformat(vcards[i], "hCard");
+              } else {
+                if (noAffiliation < 0) {
+                  if (!vcards[i].className.match("(^|\\s)" + "affiliation" + "(\\s|$)")) {
+                    noAffiliation = i;
                   }
                 }
               }
-              if (noAffiliation >= 0) {
-                return ufJSParser.createMicroformat(vcards[noAffiliation], "hCard");
-              }
             }
-          } else {
-            return ufJSParser.createMicroformat(propnode, "hCard");
+            if (noAffiliation >= 0) {
+              return ufJSParser.createMicroformat(vcards[noAffiliation], "hCard");
+            }
           }
         }
       }
@@ -80,37 +63,8 @@ ufJSParser.microformats.hResume = {
       "ufjsDisplayName" : {
         value: "",
         virtual: true,
-        getter: function(propnode, mfnode, definition) {
-          var contact = ufJSParser.getMicroformatProperty(mfnode, "hResume", "contact");
-          if (contact) {
-            return contact.fn;
-          }
-        }
-      }
-    },
-    defaultGetter: function(propnode) {
-      if (((propnode.nodeName.toLowerCase() == "abbr") || (propnode.nodeName.toLowerCase() == "html:abbr")) && (propnode.getAttribute("title"))) {
-        return propnode.getAttribute("title");
-      } else if ((propnode.nodeName.toLowerCase() == "img") && (propnode.getAttribute("alt"))) {
-        return propnode.getAttribute("alt");
-      } else if ((propnode.nodeName.toLowerCase() == "area") && (propnode.getAttribute("alt"))) {
-        return propnode.getAttribute("alt");
-      } else {
-        var values = ufJSParser.getElementsByClassName(propnode, "value");
-        if (values.length > 0) {
-          var value = "";
-          for (var j=0;j<values.length;j++) {
-            value += values[j].textContent;
-          }
-          return value;
-        } else {
-          var s;
-          if (propnode.innerText) {
-            s = propnode.innerText;
-          } else {
-            s = propnode.textContent;
-          }
-          return ufJSParser.trim(s);
+        getter: function(mfnode) {
+          return ufJSParser.getMicroformatProperty(mfnode, "hResume", "contact.fn");
         }
       }
     }

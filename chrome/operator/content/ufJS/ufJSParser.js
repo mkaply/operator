@@ -18,6 +18,16 @@ var ufJSParser = {
     }
   },
   createMicroformat: function(in_mfnode, mfname)  {
+    /* check to see if we are even valid */
+    if (ufJSParser.microformats[mfname].attributeName) {
+      if (!(in_mfnode.getAttribute(ufJSParser.microformats[mfname].attributeName))) {
+        return;
+      }
+    } else {
+      if (!(in_mfnode.className.match("(^|\\s)" + ufJSParser.microformats[mfname].className + "(\\s|$)"))) {
+        return;
+      }
+    }
     var mfnode = in_mfnode;
     var microformat = new ufJSParser.microformats[mfname].mfObject();
     var definition = ufJSParser.microformats[mfname].definition;
@@ -45,12 +55,6 @@ var ufJSParser = {
       }
     }
     if (!foundProps && !foundValues) {
-      if (definition.getter) {
-        var result = definition.getter(mfnode, mfnode, definition);
-        if (result) {
-          return result;
-        }
-      }
       return;
     }
 
@@ -137,21 +141,26 @@ var ufJSParser = {
           var subpropnodes = ufJSParser.getElementsByClassName(propnodes[j], subprop);
           var cursubprop = 0;
           for (k = 0; k < subpropnodes.length; k++) {
-            if (tp.subproperties[subprop].getter) {
-              result = tp.subproperties[subprop].getter(subpropnodes[k], propnodes[j], definition);
+            if (tp.subproperties[subprop].datatype) {
+              result = ufJSParser.datatypeHelper(tp.subproperties[subprop], subpropnodes[k], propnodes[j]);
             } else {
-              result = definition.defaultGetter(subpropnodes[k]);
-              if (tp.subproperties[subprop].types) {
-                validType = false;
-                for (type in tp.subproperties[subprop].types) {
-                  if (result.toLowerCase() == tp.subproperties[subprop].types[type]) {
-                    validType = true;
-                    break;
-                  }
+              result = ufJSParser.defaultGetter(subpropnodes[k], propnodes[j]);
+              if ((tp.subproperties[subprop].implied) && (result)) {
+                var temp = result;
+                result = {};
+                result[tp.subproperties[subprop].implied] = temp;
+              }
+            }
+            if (tp.subproperties[subprop].types) {
+              validType = false;
+              for (type in tp.subproperties[subprop].types) {
+                if (result.toLowerCase() == tp.subproperties[subprop].types[type]) {
+                  validType = true;
+                  break;
                 }
-                if (!validType) {
-                  continue;
-                }
+              }
+              if (!validType) {
+                continue;
               }
             }
             if (result) {
@@ -196,35 +205,37 @@ var ufJSParser = {
             if (tp.subproperties[subprop].virtual) {
               if (tp.subproperties[subprop].getter) {
                 result = tp.subproperties[subprop].getter(propnodes[j], propnodes[j], definition);
-                if (result) {
-                  callPropertyGetter = false;
-                  if (tp.value instanceof Array) {
-                    if (!property) {
-                      property = [];
+              } else {
+                result = ufJSParser.datatypeHelper(tp.subproperties[subprop], propnodes[j]);
+              }
+              if (result) {
+                callPropertyGetter = false;
+                if (tp.value instanceof Array) {
+                  if (!property) {
+                    property = [];
+                  }
+                  if (!property[curprop]) {
+                    property[curprop] = [];
+                  }
+                  if (tp.subproperties[subprop].value instanceof Array) {
+                    if (!property[curprop][subprop]) {
+                      property[curprop][subprop] = [];
                     }
-                    if (!property[curprop]) {
-                      property[curprop] = [];
-                    }
-                    if (tp.subproperties[subprop].value instanceof Array) {
-                      if (!property[curprop][subprop]) {
-                        property[curprop][subprop] = [];
-                      }
-                      property[curprop][subprop][cursubprop] = result;
-                    } else {
-                      property[curprop][subprop] = result;
-                    }
+                    property[curprop][subprop][cursubprop] = result;
                   } else {
-                    if (!property) {
-                      property = {};
+                    property[curprop][subprop] = result;
+                  }
+                } else {
+                  if (!property) {
+                    property = {};
+                  }
+                  if (tp.subproperties[subprop].value instanceof Array) {
+                    if (!property[subprop]) {
+                      property[subprop] = [];
                     }
-                    if (tp.subproperties[subprop].value instanceof Array) {
-                      if (!property[subprop]) {
-                        property[subprop] = [];
-                      }
-                      property[subprop][cursubprop] = result;
-                    } else {
-                      property[subprop] = result;
-                    }
+                    property[subprop][cursubprop] = result;
+                  } else {
+                    property[subprop] = result;
                   }
                 }
               }
@@ -237,21 +248,26 @@ var ufJSParser = {
          is to handle cases where the property sets up the subproperty
          (org->organization-name) */
       if (callPropertyGetter) {
-        if (tp.getter) {
-          result = tp.getter(propnodes[j], mfnode, definition);
+        if (tp.datatype) {
+          result = ufJSParser.datatypeHelper(tp, propnodes[j]);
         } else {
-          result = definition.defaultGetter(propnodes[j]);
-          if (tp.types) {
-            validType = false;
-            for (type in tp.types) {
-              if (result.toLowerCase() == tp.types[type]) {
-                validType = true;
-                break;
-              }
+          result = ufJSParser.defaultGetter(propnodes[j]);
+          if ((tp.implied) && (result)) {
+            var temp = result;
+            result = {};
+            result[tp.implied] = temp;
+          }
+        }
+        if (tp.types) {
+          validType = false;
+          for (type in tp.types) {
+            if (result.toLowerCase() == tp.types[type]) {
+              validType = true;
+              break;
             }
-            if (!validType) {
-              continue;
-            }
+          }
+          if (!validType) {
+            continue;
           }
         }
         if (result) {
@@ -279,21 +295,23 @@ var ufJSParser = {
       if (tp.virtual) {
         if (tp.getter) {
           result = tp.getter(mfnode, mfnode, definition);
-          if (tp.value instanceof Array) {
-            if (result) {
-              if (!property) {
-                property = [];
-              }
-              property[0] = result;
-            } else {
-              return;
+        } else {
+          result = ufJSParser.datatypeHelper(tp, mfnode);
+        }
+        if (tp.value instanceof Array) {
+          if (result) {
+            if (!property) {
+              property = [];
             }
+            property[0] = result;
           } else {
-            if (result) {
-              property = result;
-            } else {
-              return;
-            }
+            return;
+          }
+        } else {
+          if (result) {
+            property = result;
+          } else {
+            return;
           }
         }
       } else {
@@ -434,6 +452,133 @@ var ufJSParser = {
     } else {
       return true;
     }
+  },
+  defaultGetter: function(propnode, parentnode) {
+    if (((propnode.nodeName.toLowerCase() == "abbr") || (propnode.nodeName.toLowerCase() == "html:abbr")) && (propnode.getAttribute("title"))) {
+      return propnode.getAttribute("title");
+    } else if ((propnode.nodeName.toLowerCase() == "img") && (propnode.getAttribute("alt"))) {
+      return propnode.getAttribute("alt");
+    } else if ((propnode.nodeName.toLowerCase() == "area") && (propnode.getAttribute("alt"))) {
+      return propnode.getAttribute("alt");
+    } else {
+      var values;
+      /* This is ugly. Some cases (email and tel for hCard) are called value */
+      /* but can also use value-excerpting. This handles that */
+      if (parentnode && propnode.className.match("(^|\\s)" + "value" + "(\\s|$)")) {
+        var parent_values = ufJSParser.getElementsByClassName(parentnode, "value");
+        if (parent_values.length > 1) {
+          values = parent_values;
+        }
+      }
+      if (!values) {
+        values = ufJSParser.getElementsByClassName(propnode, "value");
+      }
+      if (values.length > 0) {
+        var value = "";
+        for (var j=0;j<values.length;j++) {
+          if (values[j].innerText) {
+            value += values[j].innerText;
+          } else {
+            value += values[j].textContent;
+          }
+        }
+        return value;
+      } else {
+        var s;
+        if (propnode.innerText) {
+          s = propnode.innerText;
+        } else {
+          s = propnode.textContent;
+        }
+        return ufJSParser.trim(s);
+      }
+    }
+  },
+  dateTimeGetter: function(propnode, parentnode) {
+    var date = ufJSParser.defaultGetter(propnode, parentnode);
+    if (date.indexOf('-') == -1) {
+      var newdate = "";
+      var i;
+      for (i=0;i<date.length;i++) {
+        newdate += date.charAt(i);
+        if ((i == 3) || (i == 5)) {
+          newdate += "-";
+        }
+        if ((i == 10) || (i == 12)) {
+          newdate += ":";
+        }
+      }
+      date = newdate;
+    }
+    return date;
+  },
+  uriGetter: function(propnode, parentnode) {
+    if (propnode.nodeName.toLowerCase() == "a") {
+      return propnode.href;
+    } else if (propnode.nodeName.toLowerCase() == "img") {
+      return propnode.src;
+    } else if (propnode.nodeName.toLowerCase() == "object") {
+      return propnode.data;
+    } else if (propnode.nodeName.toLowerCase() == "area") {
+      return propnode.href;
+    } else {
+      return ufJSParser.defaultGetter(propnode, parentnode);
+    }
+  },
+  emailGetter: function(propnode, parentnode) {
+    if ((propnode.nodeName.toLowerCase() == "a") || (propnode.nodeName.toLowerCase() == "area")) {
+      var mailto = propnode.href;
+      if (mailto.indexOf('?') > 0) {
+        return mailto.substring("mailto:".length, mailto.indexOf('?'));
+      } else {
+        return mailto.substring("mailto:".length);
+      }
+    } else {
+      return ufJSParser.defaultGetter(propnode, parentnode);
+    }
+  },
+  HTMLGetter: function(propnode, parentnode) {
+    return propnode.innerHTML;
+  },
+  datatypeHelper: function(prop, node, parentnode) {
+    var result;
+    switch (prop.datatype) {
+      case "dateTime":
+        result = ufJSParser.dateTimeGetter(node, parentnode);
+        break;
+      case "anyURI":
+        result = ufJSParser.uriGetter(node, parentnode);
+        break;
+      case "email":
+        result = ufJSParser.emailGetter(node, parentnode);
+        break;
+      case "HTML":
+        result = ufJSParser.HTMLGetter(node, parentnode);
+        break;
+      case "float":
+        result = parseFloat(ufJSParser.defaultGetter(node, parentnode));
+        break;
+      case "custom":
+        result = prop.customGetter(node, parentnode);
+        break;
+      case "microformat":
+        result = ufJSParser.createMicroformat(node, prop.microformat);
+        if (result) {
+          if (prop.microformat_property) {
+            result = result[prop.microformat_property];
+          }
+          break;
+        }
+      default:
+        result = ufJSParser.defaultGetter(node, parentnode);
+        if ((prop.implied) && (result)) {
+          var temp = result;
+          result = {};
+          result[prop.implied] = temp;
+        }
+        break;
+    }
+    return result;
   }
 };
 

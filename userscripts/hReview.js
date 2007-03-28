@@ -13,9 +13,7 @@ ufJSParser.microformats.hReview = {
     properties: {
       "dtreviewed" : {
         value: "",
-        getter: function(propnode, mfnode, definition) {
-          return definition.dateGetter(propnode);
-        }
+        datatype: "dateTime"
       },
       "description" : {
         value: ""
@@ -38,7 +36,8 @@ ufJSParser.microformats.hReview = {
         },
   */
         value: "",
-        getter: function(propnode, mfnode, definition) {
+        datatype: "custom",
+        customGetter: function(propnode) {
           var item;
           if (propnode.className.match("(^|\\s)" + "vcard" + "(\\s|$)")) {
             item = ufJSParser.createMicroformat(propnode, "hCard");
@@ -48,15 +47,15 @@ ufJSParser.microformats.hReview = {
             item = {};
             var fns = ufJSParser.getElementsByClassName(propnode, "fn");
             if (fns.length > 0) {
-              item.fn = definition.defaultGetter(fns[0]);
+              item.fn = ufJSParser.defaultGetter(fns[0]);
             }
             var urls = ufJSParser.getElementsByClassName(propnode, "url");
             if (urls.length > 0) {
-              item.url = definition.urlGetter(urls[0]);
+              item.url = ufJSParser.urlGetter(urls[0]);
             }
             var photos = ufJSParser.getElementsByClassName(propnode, "photo");
             if (photos.length > 0) {
-              item.photo = definition.urlGetter(photos[0]);
+              item.photo = ufJSParser.urlGetter(photos[0]);
             }
           }
           /* Only return item if it has stuff in it */
@@ -68,31 +67,20 @@ ufJSParser.microformats.hReview = {
       },
       "rating" : {
         value: "",
-        getter: function(propnode, mfnode, definition) {
-          return parseFloat(definition.defaultGetter(propnode));
-        }
+        datatype: "float"
       },
       "best" : {
         value: "",
-        getter: function(propnode, mfnode, definition) {
-          return parseFloat(definition.defaultGetter(propnode));
-        }
+        datatype: "float"
       },
       "worst" : {
         value: "",
-        getter: function(propnode, mfnode, definition) {
-          return parseFloat(definition.defaultGetter(propnode));
-        }
+        datatype: "float"
       },
       "reviewer" : {
         value: "",
-        getter: function(propnode, mfnode, definition) {
-          if (propnode.className.match("(^|\\s)" + "vcard" + "(\\s|$)")) {
-            return ufJSParser.createMicroformat(propnode, "hCard");
-          } else {
-            return definition.defaultGetter(propnode);
-          }
-        }
+        datatype: "microformat",
+        microformat: "hCard"
       },
       "summary" : {
         value: ""
@@ -104,9 +92,8 @@ ufJSParser.microformats.hReview = {
       "tag" : {
         value: [],
         rel: true,
-        getter: function(propnode, mfnode, definition) {
-          return ufJSParser.createMicroformat(propnode, "tag");
-        }
+        datatype: "microformat",
+        microformat: "tag"
       },
       "version" : {
         value: ""
@@ -136,63 +123,6 @@ ufJSParser.microformats.hReview = {
               return fn;
             }
           }
-        }
-      }
-    },
-    dateGetter: function(propnode) {
-      var date = this.defaultGetter(propnode);
-      if (date.indexOf('-') == -1) {
-        var newdate = "";
-        var i;
-        for (i=0;i<date.length;i++) {
-          newdate += date.charAt(i);
-          if ((i == 3) || (i == 5)) {
-            newdate += "-";
-          }
-          if ((i == 10) || (i == 12)) {
-            newdate += ":";
-          }
-        }
-        date = newdate;
-      }
-      return date;
-    },
-    urlGetter: function(propnode) {
-      if (propnode.nodeName.toLowerCase() == "a") {
-        return propnode.href;
-      } else if (propnode.nodeName.toLowerCase() == "img") {
-        return propnode.src;
-      } else if (propnode.nodeName.toLowerCase() == "object") {
-        return propnode.data;
-      } else if (propnode.nodeName.toLowerCase() == "area") {
-        return propnode.href;
-      } else {
-        return this.defaultGetter(propnode);
-      }
-    },
-    defaultGetter: function(propnode) {
-      if (((propnode.nodeName.toLowerCase() == "abbr") || (propnode.nodeName.toLowerCase() == "html:abbr")) && (propnode.getAttribute("title"))) {
-        return propnode.getAttribute("title");
-      } else if ((propnode.nodeName.toLowerCase() == "img") && (propnode.getAttribute("alt"))) {
-        return propnode.getAttribute("alt");
-      } else if ((propnode.nodeName.toLowerCase() == "area") && (propnode.getAttribute("alt"))) {
-        return propnode.getAttribute("alt");
-      } else {
-        var values = ufJSParser.getElementsByClassName(propnode, "value");
-        if (values.length > 0) {
-          var value = "";
-          for (var j=0;j<values.length;j++) {
-            value += values[j].textContent;
-          }
-          return value;
-        } else {
-          var s;
-          if (propnode.innerText) {
-            s = propnode.innerText;
-          } else {
-            s = propnode.textContent;
-          }
-          return ufJSParser.trim(s);
         }
       }
     }

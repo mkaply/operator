@@ -1,5 +1,3 @@
-/*extern ufJSParser */
-
 function Address() {
 }
 
@@ -34,32 +32,6 @@ ufJSParser.microformats.Address = {
       },
       "country-name" : {
         value: ""
-      }
-    },
-    defaultGetter: function(propnode) {
-      if (((propnode.nodeName.toLowerCase() == "abbr") || (propnode.nodeName.toLowerCase() == "html:abbr")) && (propnode.getAttribute("title"))) {
-        return propnode.getAttribute("title");
-      } else if ((propnode.nodeName.toLowerCase() == "img") && (propnode.getAttribute("alt"))) {
-        return propnode.getAttribute("alt");
-      } else if ((propnode.nodeName.toLowerCase() == "area") && (propnode.getAttribute("alt"))) {
-        return propnode.getAttribute("alt");
-      } else {
-        var values = ufJSParser.getElementsByClassName(propnode, "value");
-        if (values.length > 0) {
-          var value = "";
-          for (var j=0;j<values.length;j++) {
-            value += values[j].textContent;
-          }
-          return value;
-        } else {
-          var s;
-          if (propnode.innerText) {
-            s = propnode.innerText;
-          } else {
-            s = propnode.textContent;
-          }
-          return ufJSParser.trim(s);
-        }
       }
     }
   }

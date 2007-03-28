@@ -38,22 +38,11 @@ ufJSParser.microformats["hAtom-hEntry"] = {
           "link" : {
             value: "",
             virtual: true,
-            getter: function(propnode, mfnode, definition) {
-              return mfnode.href;
-            }
+            datatype: "anyURI"
           },
           "text" : {
             value: "",
-            virtual: true,
-            getter: function(propnode, mfnode, definition) {
-              var s;
-              if (propnode.innerText) {
-                s = propnode.innerText;
-              } else {
-                s = propnode.textContent;
-              }
-              return ufJSParser.trim(s);
-            }
+            virtual: true
           }
         },
         value: "",
@@ -63,16 +52,11 @@ ufJSParser.microformats["hAtom-hEntry"] = {
         value: "",
         virtual: true,
         getter: function(propnode, mfnode, definition) {
-          if (propnode == mfnode) {
             /*
     *  the first <h#> element in the Entry, or
     * the <title> of the page, if there is no enclosing Feed element, or
     * assume it is the empty string
     */
-          } else {
-            return definition.defaultGetter(propnode);
-          }
-         
         }
       },
       "entry-content" : {
@@ -83,27 +67,21 @@ ufJSParser.microformats["hAtom-hEntry"] = {
       },
       "published" : {
         value: "",
-        getter: function(propnode, mfnode, definition) {
-          return definition.dateGetter(propnode);
-        }
+        datatype: "dateTime"
       },
       "updated" : {
         value: "",
         virtual: true,
+        datatype: "dateTime",
         getter: function(propnode, mfnode, definition) {
-          if (propnode == mfnode) {
-            return ufJSParser.getMicroformatProperty(mfnode, "hAtom-hEntry", "published");
-          } else {
-            return definition.dateGetter(propnode);
-          }
+          return ufJSParser.getMicroformatProperty(mfnode, "hAtom-hEntry", "published");
         }
       },
       "tag" : {
         value: "",
         rel: true,
-        getter: function(propnode, mfnode, definition) {
-          return ufJSParser.createMicroformat(propnode, "tag");
-        }
+        datatype: "microformat",
+        microformat: "tag"
       }
     },
     ufjs: {
@@ -115,50 +93,6 @@ ufJSParser.microformats["hAtom-hEntry"] = {
           return ufJSParser.getMicroformatProperty(mfnode, "hAtom-hEntry", "entry-title");
         }
       }
-    },
-    defaultGetter: function(propnode) {
-      if (((propnode.nodeName.toLowerCase() == "abbr") || (propnode.nodeName.toLowerCase() == "html:abbr")) && (propnode.getAttribute("title"))) {
-        return propnode.getAttribute("title");
-      } else if ((propnode.nodeName.toLowerCase() == "img") && (propnode.getAttribute("alt"))) {
-        return propnode.getAttribute("alt");
-      } else if ((propnode.nodeName.toLowerCase() == "area") && (propnode.getAttribute("alt"))) {
-        return propnode.getAttribute("alt");
-      } else {
-        var values = ufJSParser.getElementsByClassName(propnode, "value");
-        if (values.length > 0) {
-          var value = "";
-          for (var j=0;j<values.length;j++) {
-            value += values[j].textContent;
-          }
-          return value;
-        } else {
-          var s;
-          if (propnode.innerText) {
-            s = propnode.innerText;
-          } else {
-            s = propnode.textContent;
-          }
-          return ufJSParser.trim(s);
-        }
-      }
-    },
-    dateGetter: function(propnode) {
-      var date = this.defaultGetter(propnode);
-      if (date.indexOf('-') == -1) {
-        var newdate = "";
-        var i;
-        for (i=0;i<date.length;i++) {
-          newdate += date.charAt(i);
-          if ((i == 3) || (i == 5)) {
-            newdate += "-";
-          }
-          if ((i == 10) || (i == 12)) {
-            newdate += ":";
-          }
-        }
-        date = newdate;
-      }
-      return date;
     }
   }
 };
@@ -173,26 +107,21 @@ ufJSParser.microformats["hAtom-hFeed"] = {
     properties: {
       "author" : {
         value: [],
-        getter: function(propnode, mfnode, definition) {
-          return ufJSParser.createMicroformat(propnode, "hCard");
-        }
+        datatype: "microformat",
+        microformat: "hCard"
       },
+
       "tag" : {
         value: [],
         rel: true,
-        getter: function(propnode, mfnode, definition) {
+        datatype: "custom",
+        customGetter: function(propnode, mfnode, definition) {
           var tags = ufJSParser.getElementsByAttribute(mfnode, "rel", "tag");
           var tagArray = [];
           var i;
           var xpathExpression = "ancestor::*[contains(concat(' ', @class, ' '), ' hentry ')]";
-          var docforxpath;
-          if (!mfnode.ownerDocument) {
-            docforxpath = mfnode;
-          } else {
-            docforxpath = mfnode.ownerDocument;
-          }
           for (i = 0; i < tags.length; i++) {
-            var xpathResult = docforxpath.evaluate(xpathExpression, tags[i], null,  XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+            var xpathResult = (mfnode.ownerDocument || mfnode).evaluate(xpathExpression, tags[i], null,  XPathResult.FIRST_ORDERED_NODE_TYPE, null);
             if (xpathResult.singleNodeValue) {
               continue;
             } else {
@@ -203,45 +132,20 @@ ufJSParser.microformats["hAtom-hFeed"] = {
             return tagArray;
           }
         }
-      }      
+      }
+
     },
     value: [],
     ufjs: {
       "ufjsDisplayName" : {
         value: "",
         virtual: true,
-        getter: function(propnode, mfnode, definition) {
+        getter: function(propnode, mfnode) {
           if (mfnode.ownerDocument) {
             return mfnode.ownerDocument.title;
           } else {
             return mfnode.title;
           }
-        }
-      }
-    },
-    defaultGetter: function(propnode) {
-      if (((propnode.nodeName.toLowerCase() == "abbr") || (propnode.nodeName.toLowerCase() == "html:abbr")) && (propnode.getAttribute("title"))) {
-        return propnode.getAttribute("title");
-      } else if ((propnode.nodeName.toLowerCase() == "img") && (propnode.getAttribute("alt"))) {
-        return propnode.getAttribute("alt");
-      } else if ((propnode.nodeName.toLowerCase() == "area") && (propnode.getAttribute("alt"))) {
-        return propnode.getAttribute("alt");
-      } else {
-        var values = ufJSParser.getElementsByClassName(propnode, "value");
-        if (values.length > 0) {
-          var value = "";
-          for (var j=0;j<values.length;j++) {
-            value += values[j].textContent;
-          }
-          return value;
-        } else {
-          var s;
-          if (propnode.innerText) {
-            s = propnode.innerText;
-          } else {
-            s = propnode.textContent;
-          }
-          return ufJSParser.trim(s);
         }
       }
     }
