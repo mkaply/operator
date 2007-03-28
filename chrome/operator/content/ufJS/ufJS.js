@@ -625,9 +625,11 @@ var ufJS = {
         }
       } else {
         /* Work around upcoming.org bug */
-        if (content.document.location.href.indexOf("http://upcoming.org") == 0) {
-          dt = dt.replace(/-/g, "");
-          dt = (parseInt(dt)+1).toString();
+        if (!Operator.upcomingOrgBugFixed) {
+          if (content.document.location.href.indexOf("http://upcoming.org") == 0) {
+            dt = dt.replace(/-/g, "");
+            dt = (parseInt(dt)+1).toString();
+          }
         }
       }
       dt = dt.replace(/-/g,"").replace(/:/g,"");

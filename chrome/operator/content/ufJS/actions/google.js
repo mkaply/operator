@@ -147,6 +147,13 @@ ufJSActions.actions.google_calendar = {
               if (offset > T) {
                 dt = dt.substr(0, offset);
               }
+            } else {
+              if (!Operator.upcomingOrgBugFixed) {
+                if (content.document.location.href.indexOf("http://upcoming.org") == 0) {
+                  dt = dt.replace(/-/g, "");
+                  dt = (parseInt(dt)+1).toString();
+                }
+              }
             }
             url += dt.replace(/-/g,"").replace(/:/g,"");;
           } else {

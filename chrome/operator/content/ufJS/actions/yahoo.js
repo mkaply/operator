@@ -154,13 +154,21 @@ ufJSActions.actions.yahoo_calendar = {
           var duration_num, hours, minutes;
           var dtStartDate = ufJS.dateFromISO8601(hcalendar.dtstart);
           var dtEndDate = ufJS.dateFromISO8601(hcalendar.dtend);
+          if (!dtEndDate.time) {
+            dtEndDate.setDate(dtEndDate.getDate()-1);
+          }
+          if (!Operator.upcomingOrgBugFixed) {
+            if (content.document.location.href.indexOf("http://upcoming.org") == 0) {
+              dtEndDate.setDate(dtEndDate.getDate()+1);
+            }
+          }
           
           if (((dtEndDate.getTime() - dtStartDate.getTime()) > 24*60*60*1000) || !dtEndDate.time) {
             url += "&";
             url += "rend=%2b";
+            url += ufJS.iso8601FromDate(dtEndDate).replace(/-/g,"").replace(/:/g,"");
             if (dtEndDate.time && dtStartDate.time) {
               dtEndDate.time = false;
-              url += ufJS.iso8601FromDate(dtEndDate).replace(/-/g,"").replace(/:/g,"");
               var end = dtEndDate.getHours()*60 + dtEndDate.getMinutes();
               var start = dtStartDate.getHours()*60 + dtStartDate.getMinutes();
               duration_num = end-start;
@@ -175,11 +183,8 @@ ufJSActions.actions.yahoo_calendar = {
               }
               duration += minutes.toString();
               url += "&dur=" + duration;
-              } else {
-                url += hcalendar.dtend.replace(/-/g,"").replace(/:/g,"");
-      
-              }
-              url += "&rpat=1dy";
+            }
+            url += "&rpat=1dy";
           } else {
             duration_num = dtEndDate.getTime() - dtStartDate.getTime();
             duration_num = duration_num/1000/60;

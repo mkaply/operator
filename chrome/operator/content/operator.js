@@ -7,6 +7,7 @@ var Operator = {
   debug: false,
   official: true,
   view: 1,
+  upcomingOrgBugFixed: false,
   highlightMicroformats: false,
   useDescriptiveNames: false,
   removeDuplicates: true,
@@ -135,6 +136,7 @@ var Operator = {
         this.prefBranch.setBoolPref("debug", false);
         this.prefBranch.setBoolPref("statusbar", false);
         this.prefBranch.setBoolPref("highlightMicroformats", false);
+        this.prefBranch.setBoolPref("upcomingOrgBugFixed", false);
         this.prefBranch.setBoolPref("removeDuplicates", true);
         this.prefBranch.setBoolPref("observeDOMAttrModified", false);
         j = 1;
@@ -249,6 +251,9 @@ var Operator = {
       this.observeDOMAttrModified = this.prefBranch.getBoolPref("observeDOMAttrModified");
     } catch (ex) {}
     try {
+      this.upcomingOrgBugFixed = this.prefBranch.getBoolPref("upcomingOrgBugFixed");
+    } catch (ex) {}
+    try {
       this.view = this.prefBranch.getIntPref("view");
     } catch (ex) {}
     try {
@@ -306,6 +311,9 @@ var Operator = {
     }
     if (data == "observeDOMAttrModified") {
       this.observeDOMAttrModified = this.prefBranch.getBoolPref("observeDOMAttrModified");
+    }
+    if (data == "upcomingOrgBugFixed") {
+      this.upcomingOrgBugFixed = this.prefBranch.getBoolPref("upcomingOrgBugFixed");
     }
     if (data == "highlightMicroformats") {
       this.highlightMicroformats = this.prefBranch.getBoolPref("highlightMicroformats");
