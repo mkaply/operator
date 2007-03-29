@@ -10,22 +10,22 @@ ufJSParser.microformats.hCard = {
   definition: {
     properties: {
       "adr" : {
-        value: [],
+        cardinality: "plural",
         datatype: "microformat",
         microformat: "Address"
       },
       "agent" : {
-        value: []
+        cardinality: "plural"
       },
       "bday" : {
-        value: "",
+        cardinality: "singular",
         datatype: "dateTime"
       },
       "class" : {
-        value: ""
+        cardinality: "singular"
       },
       "category" : {
-        value: [],
+        cardinality: "plural",
         datatype: "microformat",
         microformat: "tag",
         microformat_property: "tag"
@@ -33,19 +33,19 @@ ufJSParser.microformats.hCard = {
       "email" : {
         subproperties: {
           "type" : {
-            value: [],
+            cardinality: "plural",
             types: ["internet", "x400", "pref"]
           },
           "value" : {
-            value: "",
+            cardinality: "singular",
             datatype: "email",
             virtual: true
           }
         },
-        value: []   
+        cardinality: "plural"   
       },
       "fn" : {
-        value: "",
+        cardinality: "singular",
         required: true
       },
       "geo" : {
@@ -54,37 +54,37 @@ ufJSParser.microformats.hCard = {
         microformat: "geo"
       },
       "key" : {
-        value: []
+        cardinality: "plural"
       },
       "label" : {
-        value: []
+        cardinality: "plural"
       },
       "logo" : {
-        value: [],
+        cardinality: "plural",
         datatype: "anyURI"
       },
       "mailer" : {
-        value: []
+        cardinality: "plural"
       },
       "n" : {
         subproperties: {
           "honorific-prefix" : {
-            value: []
+            cardinality: "plural"
           },
           "given-name" : {
-            value: ""
+            cardinality: "singular"
           },
           "additional-name" : {
-            value: []
+            cardinality: "plural"
           },
           "family-name" : {
-            value: ""
+            cardinality: "singular"
           },
           "honorific-suffix" : {
-            value: []
+            cardinality: "plural"
           }
         },
-        value: "",
+        cardinality: "singular",
         virtual: true,
         /*  Implied "n" Optimization */
         /* http://microformats.org/wiki/hcard#Implied_.22n.22_Optimization */
@@ -115,7 +115,7 @@ ufJSParser.microformats.hCard = {
         }
       },
       "nickname" : {
-        value: [],
+        cardinality: "plural",
         virtual: true,
         /* Implied "nickname" Optimization */
         /* http://microformats.org/wiki/hcard#Implied_.22nickname.22_Optimization */
@@ -134,72 +134,72 @@ ufJSParser.microformats.hCard = {
         }
       },
       "note" : {
-        value: [],
+        cardinality: "plural",
         datatype: "HTML"
       },
       "org" : {
         subproperties: {
           "organization-name" : {
-            value: ""
+            cardinality: "singular"
           },
           "organization-unit" : {
-            value: []
+            cardinality: "plural"
           }
         },
-        value: [],
+        cardinality: "plural",
         implied: "organization-name"
       },
       "photo" : {
-        value: [],
+        cardinality: "plural",
         datatype: "anyURI"
       },
       "rev" : {
-        value: "",
+        cardinality: "singular",
         datatype: "dateTime"
       },
       "role" : {
-        value: []
+        cardinality: "plural"
       },
       "sequence" : {
-        value: ""
+        cardinality: "singular"
       },
       "sort-string" : {
-        value: ""
+        cardinality: "singular"
       },
       "sound" : {
-        value: []
+        cardinality: "plural"
       },
       "title" : {
-        value: []
+        cardinality: "plural"
       },
       "tel" : {
         subproperties: {
           "type" : {
-            value: [],
+            cardinality: "plural",
             types: ["msg", "home", "work", "pref", "voice", "fax", "cell", "video", "pager", "bbs", "car", "isdn", "pcs"]
           },
           "value" : {
-            value: ""
+            cardinality: "singular"
           }
         },
-        value: [],
+        cardinality: "plural",
         implied: "value"
       },
       "tz" : {
-        value: ""
+        cardinality: "singular"
       },
       "uid" : {
-        value: "",
+        cardinality: "singular",
         datatype: "anyURI"
       },
       "url" : {
-        value: [],
+        cardinality: "plural",
         datatype: "anyURI"
       }
     },
     ufjs: {
       "ufjsDisplayName" : {
-        value: "",
+        cardinality: "singular",
         virtual: true,
         getter: function(mfnode) {
           if (mfnode.origNode) {

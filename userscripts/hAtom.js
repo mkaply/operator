@@ -15,7 +15,7 @@ ufJSParser.microformats["hAtom-hEntry"] = {
   definition: {
     properties: {
       "author" : {
-        value: [],
+        cardinality: "plural",
         virtual: true,
         getter: function(propnode, mfnode, definition) {
           if (propnode == mfnode) {
@@ -36,20 +36,20 @@ ufJSParser.microformats["hAtom-hEntry"] = {
       "bookmark" : {
         subproperties: {
           "link" : {
-            value: "",
+            cardinality: "singular",
             virtual: true,
             datatype: "anyURI"
           },
           "text" : {
-            value: "",
+            cardinality: "singular",
             virtual: true
           }
         },
-        value: "",
+        cardinality: "singular",
         rel: true
       },
       "entry-title" : {
-        value: "",
+        cardinality: "singular",
         virtual: true,
         getter: function(propnode, mfnode, definition) {
             /*
@@ -60,17 +60,17 @@ ufJSParser.microformats["hAtom-hEntry"] = {
         }
       },
       "entry-content" : {
-        value: []
+        cardinality: "plural"
       },
       "entry-summary" : {
-        value: []
+        cardinality: "plural"
       },
       "published" : {
-        value: "",
+        cardinality: "singular",
         datatype: "dateTime"
       },
       "updated" : {
-        value: "",
+        cardinality: "singular",
         virtual: true,
         datatype: "dateTime",
         getter: function(propnode, mfnode, definition) {
@@ -78,7 +78,7 @@ ufJSParser.microformats["hAtom-hEntry"] = {
         }
       },
       "tag" : {
-        value: "",
+        cardinality: "singular",
         rel: true,
         datatype: "microformat",
         microformat: "tag"
@@ -86,7 +86,7 @@ ufJSParser.microformats["hAtom-hEntry"] = {
     },
     ufjs: {
       "ufjsDisplayName" : {
-        value: "",
+        cardinality: "singular",
         virtual: true,
         getter: function(propnode, mfnode, definition) {
           /* NEEDS MORE WORK */
@@ -106,13 +106,13 @@ ufJSParser.microformats["hAtom-hFeed"] = {
   definition: {
     properties: {
       "author" : {
-        value: [],
+        cardinality: "plural",
         datatype: "microformat",
         microformat: "hCard"
       },
 
       "tag" : {
-        value: [],
+        cardinality: "plural",
         rel: true,
         datatype: "custom",
         customGetter: function(propnode, mfnode, definition) {
@@ -135,10 +135,10 @@ ufJSParser.microformats["hAtom-hFeed"] = {
       }
 
     },
-    value: [],
+    cardinality: "plural",
     ufjs: {
       "ufjsDisplayName" : {
-        value: "",
+        cardinality: "singular",
         virtual: true,
         getter: function(propnode, mfnode) {
           if (mfnode.ownerDocument) {

@@ -12,7 +12,7 @@ ufJSParser.microformats.GRDDL = {
   definition: {
     values: {
       "transformation" : {
-        value: "",
+        cardinality: "singular",
         virtual: true,
         getter: function(propnode, mfnode, definition) {
           return "foo";
@@ -21,7 +21,7 @@ ufJSParser.microformats.GRDDL = {
     },
     ufjs: {
       "ufjsDisplayName" : {
-        value: "",
+        cardinality: "singular",
         virtual: true,
         getter: function(propnode, mfnode, definition) {
           if (mfnode.ownerDocument) {

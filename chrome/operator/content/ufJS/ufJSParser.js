@@ -36,7 +36,6 @@ var ufJSParser = {
       mfnode = ufJSParser.preProcessMicroformat(in_mfnode);
     }
     var foundProps = false;
-    var foundValues = false;
     for (i in definition.properties) {
       var prop = ufJSParser.getMicroformatProperty(mfnode, mfname, i);
       if (prop) {
@@ -44,17 +43,7 @@ var ufJSParser = {
         microformat[i] = prop;
       }
     }
-    /* If it's an attribute microformat, get values */
-    if (ufJSParser.microformats[mfname].attributeName) {
-      for (i in definition.values) {
-        var value = ufJSParser.getMicroformatProperty(mfnode, mfname, i);
-        if (value) {
-          foundValues = true;
-          microformat[i] = value;
-        }
-      }
-    }
-    if (!foundProps && !foundValues) {
+    if (!foundProps) {
       return;
     }
 
@@ -72,8 +61,6 @@ var ufJSParser = {
     var tp;
     if (definition.properties && definition.properties[propname]) {
       tp = definition.properties[propname];
-    } else if (definition.values && definition.values[propname]) {
-      tp = definition.values[propname];
     } else if (definition.ufjs && definition.ufjs[propname]) {
       tp = definition.ufjs[propname];
     }
@@ -166,14 +153,14 @@ var ufJSParser = {
             if (result) {
               foundSubProperties = true;
               callPropertyGetter = false;
-              if (tp.value instanceof Array) {
+              if (tp.cardinality == "plural") {
                 if (!property) {
                   property = [];
                 }
                 if (!property[curprop]) {
                   property[curprop] = [];
                 }
-                if (tp.subproperties[subprop].value instanceof Array) {
+                if (tp.subproperties[subprop].cardinality == "plural") {
                   if (!property[curprop][subprop]) {
                     property[curprop][subprop] = [];
                   }
@@ -185,7 +172,7 @@ var ufJSParser = {
                 if (!property) {
                   property = {};
                 }
-                if (tp.subproperties[subprop].value instanceof Array) {
+                if (tp.subproperties[subprop].cardinality == "plural") {
                   if (!property[subprop]) {
                     property[subprop] = [];
                   }
@@ -196,7 +183,7 @@ var ufJSParser = {
               }
             }
             
-            if (!(tp.subproperties[subprop].value instanceof Array)) {
+            if (tp.subproperties[subprop].cardinality == "singular") {
               break;
             }
             cursubprop++;
@@ -204,20 +191,20 @@ var ufJSParser = {
           if (!foundSubProperties) {
             if (tp.subproperties[subprop].virtual) {
               if (tp.subproperties[subprop].getter) {
-                result = tp.subproperties[subprop].getter(propnodes[j], propnodes[j], definition);
+                result = tp.subproperties[subprop].getter(propnodes[j], propnodes[j]);
               } else {
                 result = ufJSParser.datatypeHelper(tp.subproperties[subprop], propnodes[j]);
               }
               if (result) {
                 callPropertyGetter = false;
-                if (tp.value instanceof Array) {
+                if (tp.cardinality == "plural") {
                   if (!property) {
                     property = [];
                   }
                   if (!property[curprop]) {
                     property[curprop] = [];
                   }
-                  if (tp.subproperties[subprop].value instanceof Array) {
+                  if (tp.subproperties[subprop].cardinality == "plural") {
                     if (!property[curprop][subprop]) {
                       property[curprop][subprop] = [];
                     }
@@ -229,7 +216,7 @@ var ufJSParser = {
                   if (!property) {
                     property = {};
                   }
-                  if (tp.subproperties[subprop].value instanceof Array) {
+                  if (tp.subproperties[subprop].cardinality == "plural") {
                     if (!property[subprop]) {
                       property[subprop] = [];
                     }
@@ -271,7 +258,7 @@ var ufJSParser = {
           }
         }
         if (result) {
-          if (tp.value instanceof Array) {
+          if (tp.cardinality == "plural") {
             if (!property) {
               property = [];
             }
@@ -283,7 +270,7 @@ var ufJSParser = {
             property = result;
           }
         }
-        if (!(tp.value instanceof Array)) {
+        if (tp.cardinality == "singular") {
           break;
         }
       }
@@ -294,11 +281,11 @@ var ufJSParser = {
     if (!foundProps) {
       if (tp.virtual) {
         if (tp.getter) {
-          result = tp.getter(mfnode, mfnode, definition);
+          result = tp.getter(mfnode, mfnode);
         } else {
           result = ufJSParser.datatypeHelper(tp, mfnode);
         }
-        if (tp.value instanceof Array) {
+        if (tp.cardinality == "plural") {
           if (result) {
             if (!property) {
               property = [];

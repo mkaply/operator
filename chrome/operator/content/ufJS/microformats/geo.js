@@ -10,7 +10,7 @@ ufJSParser.microformats.geo = {
   definition: {
     properties: {
       "latitude" : {
-        value: "",
+        cardinality: "singular",
         virtual: true,
         /* This will only be called in the virtual case */
         getter: function(mfnode) {
@@ -25,7 +25,7 @@ ufJSParser.microformats.geo = {
         },
       },
       "longitude" : {
-        value: "",
+        cardinality: "singular",
         virtual: true,
         /* This will only be called in the virtual case */
         getter: function(mfnode) {

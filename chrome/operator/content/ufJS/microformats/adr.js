@@ -9,29 +9,29 @@ ufJSParser.microformats.Address = {
   definition: {
     properties: {
       "type" : {
-        value: [],
+        cardinality: "plural",
         types: ["work", "home", "pref", "postal", "dom", "intl", "parcel"]
       },
       "post-office-box" : {
-        value: ""
+        cardinality: "singular"
       },
       "street-address" : {
-        value: []
+        cardinality: "plural"
       },
       "extended-address" : {
-        value: ""
+        cardinality: "singular"
       },
       "region" : {
-        value: ""
+        cardinality: "singular"
       },
       "locality" : {
-        value: ""
+        cardinality: "singular"
       },
       "postal-code" : {
-        value: ""
+        cardinality: "singular"
       },
       "country-name" : {
-        value: ""
+        cardinality: "singular"
       }
     }
   }

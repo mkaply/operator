@@ -9,13 +9,13 @@ ufJSParser.microformats.xFolk = {
   definition:  {
     properties: {
       "description" : {
-        value: []
+        cardinality: "plural"
       },
       "taggedlink" : {
-        value: "",
+        cardinality: "singular",
         subproperties: {
           "title" : {
-            value: "",
+            cardinality: "singular",
             virtual: true,
             getter: function(parentnode) {
               if (parentnode.getAttribute("title")) {
@@ -26,14 +26,14 @@ ufJSParser.microformats.xFolk = {
             }
           },
           "link" : {
-            value: "",
+            cardinality: "singular",
             datatype: "anyURI",
             virtual: true
           }
         },
       },
       "tag" : {
-        value: [],
+        cardinality: "plural",
         rel: true,
         datatype: "microformat",
         microformat: "tag",
@@ -42,7 +42,7 @@ ufJSParser.microformats.xFolk = {
     },
     ufjs: {
       "ufjsDisplayName" : {
-        value: "",
+        cardinality: "singular",
         virtual: true,
         getter: function(mfnode) {
           return ufJSParser.getMicroformatProperty(mfnode, "xFolk", "taggedlink.title");
