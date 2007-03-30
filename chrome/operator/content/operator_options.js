@@ -162,6 +162,11 @@ var Operator_Options = {
     }
 
     try {
+      document.getElementById("removeDuplicates").checked = this.prefBranch.getBoolPref("removeDuplicates");
+    } catch (ex) {
+    }
+
+    try {
       document.getElementById("observeDOMAttrModified").checked = this.prefBranch.getBoolPref("observeDOMAttrModified");
     } catch (ex) {
     }
