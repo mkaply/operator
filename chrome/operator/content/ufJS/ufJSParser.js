@@ -68,7 +68,7 @@ var ufJSParser = {
    that was passed in, look for it among the subproperties. If you find it, 
    AND the classname of the passed in mfnode matches the parent property,
    use it. This allows us to pass in an hentry and get it's entry-title
-   for instance */
+   for instance. This only works one level deep. */
     if (!tp) {
       for (i in definition.properties) {
         if (definition.properties[i].subproperties) {
@@ -153,14 +153,14 @@ var ufJSParser = {
             if (result) {
               foundSubProperties = true;
               callPropertyGetter = false;
-              if (tp.cardinality == "plural") {
+              if (tp.plural) {
                 if (!property) {
                   property = [];
                 }
                 if (!property[curprop]) {
                   property[curprop] = [];
                 }
-                if (tp.subproperties[subprop].cardinality == "plural") {
+                if (tp.subproperties[subprop].plural) {
                   if (!property[curprop][subprop]) {
                     property[curprop][subprop] = [];
                   }
@@ -172,7 +172,7 @@ var ufJSParser = {
                 if (!property) {
                   property = {};
                 }
-                if (tp.subproperties[subprop].cardinality == "plural") {
+                if (tp.subproperties[subprop].plural) {
                   if (!property[subprop]) {
                     property[subprop] = [];
                   }
@@ -183,7 +183,7 @@ var ufJSParser = {
               }
             }
             
-            if (tp.subproperties[subprop].cardinality == "singular") {
+            if (!tp.subproperties[subprop].plural) {
               break;
             }
             cursubprop++;
@@ -197,14 +197,14 @@ var ufJSParser = {
               }
               if (result) {
                 callPropertyGetter = false;
-                if (tp.cardinality == "plural") {
+                if (tp.plural) {
                   if (!property) {
                     property = [];
                   }
                   if (!property[curprop]) {
                     property[curprop] = [];
                   }
-                  if (tp.subproperties[subprop].cardinality == "plural") {
+                  if (tp.subproperties[subprop].plural) {
                     if (!property[curprop][subprop]) {
                       property[curprop][subprop] = [];
                     }
@@ -216,7 +216,7 @@ var ufJSParser = {
                   if (!property) {
                     property = {};
                   }
-                  if (tp.subproperties[subprop].cardinality == "plural") {
+                  if (tp.subproperties[subprop].plural) {
                     if (!property[subprop]) {
                       property[subprop] = [];
                     }
@@ -258,7 +258,7 @@ var ufJSParser = {
           }
         }
         if (result) {
-          if (tp.cardinality == "plural") {
+          if (tp.plural) {
             if (!property) {
               property = [];
             }
@@ -270,7 +270,7 @@ var ufJSParser = {
             property = result;
           }
         }
-        if (tp.cardinality == "singular") {
+        if (!tp.plural) {
           break;
         }
       }

@@ -10,66 +10,51 @@ ufJSParser.microformats.hCalendar = {
   definition: {
     properties: {
       "category" : {
-        cardinality: "plural",
+        plural: true,
         datatype: "microformat",
         microformat: "tag",
         microformat_property: "tag"
       },
       "class" : {
-        cardinality: "singular",
         types: ["public", "private", "confidential"]
       },
       "description" : {
-        cardinality: "singular",
         datatype: "HTML"
       },
       "dtend" : {
-        cardinality: "singular",
         datatype: "dateTime"
       },
       "dtstamp" : {
-        cardinality: "singular",
         datatype: "dateTime"
       },
       "dtstart" : {
-        cardinality: "singular",
         datatype: "dateTime"
       },
       "duration" : {
-        cardinality: "singular"
       },
       "location" : {
-        cardinality: "singular",
         datatype: "microformat",
         microformat: "hCard"
       },
       "status" : {
-        cardinality: "singular",
         types: ["tentative", "confirmed", "cancelled"]
       },
-      "summary" : {
-        cardinality: "singular"
-      },
+      "summary" : {},
       "transp" : {
-        cardinality: "singular",
         types: ["opaque", "transparent"]
       },
       "uid" : {
-        cardinality: "singular",
         datatype: "anyURI"
       },
       "url" : {
-        cardinality: "singular",
         datatype: "anyURI"
       },
       "last-modified" : {
-        cardinality: "singular",
         datatype: "dateTime"
       }
     },
     ufjs: {
       "ufjsDisplayName" : {
-        cardinality: "singular",
         virtual: true,
         getter: function(mfnode) {
           if (mfnode.origNode) {

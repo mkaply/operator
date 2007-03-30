@@ -12,30 +12,24 @@ ufJSParser.microformats.hReview = {
   definition: {
     properties: {
       "dtreviewed" : {
-        cardinality: "singular",
         datatype: "dateTime"
       },
       "description" : {
-        cardinality: "singular"
       },
       "item" : {
   /* These must be handled explicity by the item getter because of
      the different types of data that could be in the item
         subproperties: {
           "fn" : {
-            cardinality: "singular"
           },
           "url" : {
-            cardinality: "singular",
             }
           }
           "photo" : {
-            cardinality: "singular",
             }
           }
         },
   */
-        cardinality: "singular",
         datatype: "custom",
         customGetter: function(propnode) {
           var item;
@@ -66,42 +60,34 @@ ufJSParser.microformats.hReview = {
         }
       },
       "rating" : {
-        cardinality: "singular",
         datatype: "float"
       },
       "best" : {
-        cardinality: "singular",
         datatype: "float"
       },
       "worst" : {
-        cardinality: "singular",
         datatype: "float"
       },
       "reviewer" : {
-        cardinality: "singular",
         datatype: "microformat",
         microformat: "hCard"
       },
       "summary" : {
-        cardinality: "singular"
       },
       "type" : {
-        cardinality: "singular",
         types: ["product", "business", "event", "person", "place", "website", "url"]
       },
       "tag" : {
-        cardinality: "plural",
+        plural: true,
         rel: true,
         datatype: "microformat",
         microformat: "tag"
       },
       "version" : {
-        cardinality: "singular"
       }
     },
     ufjs: {
       "ufjsDisplayName" : {
-        cardinality: "singular",
         virtual: true,
         getter: function(propnode, mfnode, definition) {
           var item = ufJSParser.getMicroformatProperty(mfnode, "hReview", "item");

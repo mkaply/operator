@@ -12,26 +12,24 @@ ufJSParser.microformats.hResume = {
   definition: {
     properties: {
       "affiliation" : {
-        cardinality: "plural",
+        plural: true,
         datatype: "microformat",
         microformat: "hCard"
       },
       "education" : {
-        cardinality: "plural",
+        plural: true,
         datatype: "microformat",
         microformat: "hCalendar"
       },
       "experience" : {
-        cardinality: "plural",
+        plural: true,
         datatype: "microformat",
         microformat: "hCalendar"
       },
       "summary" : {
-        cardinality: "singular"
       },
       /* This might be incorrect. I use contact before I use address with vcard */
       "contact" : {
-        cardinality: "singular",
         virtual: true,
         datatype: "microformat",
         microformat: "hCard",
@@ -61,7 +59,6 @@ ufJSParser.microformats.hResume = {
     },
     ufjs: {
       "ufjsDisplayName" : {
-        cardinality: "singular",
         virtual: true,
         getter: function(mfnode) {
           return ufJSParser.getMicroformatProperty(mfnode, "hResume", "contact.fn");

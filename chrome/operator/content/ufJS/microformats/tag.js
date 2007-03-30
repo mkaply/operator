@@ -10,7 +10,6 @@ ufJSParser.microformats.tag = {
   definition: {
     properties: {
       "tag" : {
-        cardinality: "singular",
         virtual: true,
         getter: function(mfnode) {
           if (mfnode.href) {
@@ -24,18 +23,15 @@ ufJSParser.microformats.tag = {
         }
       },
       "link" : {
-        cardinality: "singular",
         virtual: true,
         datatype: "anyURI"
       },
       "text" : {
-        cardinality: "singular",
         virtual: true
       }
     },
     ufjs: {
       "ufjsDisplayName" : {
-        cardinality: "singular",
         virtual: true,
         getter: function(mfnode) {
           return ufJSParser.getMicroformatProperty(mfnode, "tag", "tag");

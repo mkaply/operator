@@ -13,27 +13,20 @@ ufJSParser.microformats.species = {
   definition: {
     properties: {
       "domain" : {
-        cardinality: "singular"
       },
       "kingdom" : {
-        cardinality: "singular"
       },
       "subkingdom" : {
-        cardinality: "singular"
       },
       "superphylum" : {
-        cardinality: "singular"
       },
       "vernacular" : {
-        cardinality: "singular"
       },
       "binomial" : {
-        cardinality: "singular"
       }
     },
     ufjs: {
       "ufjsDisplayName" : {
-        cardinality: "singular",
         virtual: true,
         getter: function(propnode, mfnode, definition) {
           return ufJSParser.getMicroformatProperty(mfnode, "species", "vernacular");

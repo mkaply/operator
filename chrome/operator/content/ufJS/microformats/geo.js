@@ -10,7 +10,6 @@ ufJSParser.microformats.geo = {
   definition: {
     properties: {
       "latitude" : {
-        cardinality: "singular",
         virtual: true,
         /* This will only be called in the virtual case */
         getter: function(mfnode) {
@@ -25,7 +24,6 @@ ufJSParser.microformats.geo = {
         },
       },
       "longitude" : {
-        cardinality: "singular",
         virtual: true,
         /* This will only be called in the virtual case */
         getter: function(mfnode) {
@@ -42,7 +40,6 @@ ufJSParser.microformats.geo = {
     },
     ufjs: {
       "ufjsDisplayName" : {
-        value: "",
         virtual: true,
         getter: function(propnode, mfnode) {
           if (ufJSParser.getMicroformatProperty(mfnode, "geo", "latitude") &&
