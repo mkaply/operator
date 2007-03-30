@@ -15,7 +15,7 @@ ufJSParser.microformats.xFolk = {
         subproperties: {
           "title" : {
             virtual: true,
-            getter: function(parentnode) {
+            virtualGetter: function(parentnode) {
               if (parentnode.getAttribute("title")) {
                 return parentnode.getAttribute("title");
               } else {
@@ -40,7 +40,7 @@ ufJSParser.microformats.xFolk = {
     ufjs: {
       "ufjsDisplayName" : {
         virtual: true,
-        getter: function(mfnode) {
+        virtualGetter: function(mfnode) {
           return ufJSParser.getMicroformatProperty(mfnode, "xFolk", "taggedlink.title");
         }
       }

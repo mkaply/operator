@@ -28,7 +28,7 @@ ufJSParser.microformats.species = {
     ufjs: {
       "ufjsDisplayName" : {
         virtual: true,
-        getter: function(propnode, mfnode, definition) {
+        virtualGetter: function(propnode, mfnode, definition) {
           return ufJSParser.getMicroformatProperty(mfnode, "species", "vernacular");
         }
       }

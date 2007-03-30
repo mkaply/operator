@@ -11,7 +11,7 @@ ufJSParser.microformats.tag = {
     properties: {
       "tag" : {
         virtual: true,
-        getter: function(mfnode) {
+        virtualGetter: function(mfnode) {
           if (mfnode.href) {
             var url_array = mfnode.getAttribute("href").split("/");
             for(var i=url_array.length-1; i > 0; i--) {
@@ -33,7 +33,7 @@ ufJSParser.microformats.tag = {
     ufjs: {
       "ufjsDisplayName" : {
         virtual: true,
-        getter: function(mfnode) {
+        virtualGetter: function(mfnode) {
           return ufJSParser.getMicroformatProperty(mfnode, "tag", "tag");
         }
       }

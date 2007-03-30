@@ -17,7 +17,7 @@ ufJSParser.microformats["hAtom-hEntry"] = {
       "author" : {
         plural: true,
         virtual: true,
-        getter: function(propnode, mfnode, definition) {
+        virtualGetter: function(propnode, mfnode, definition) {
           if (propnode == mfnode) {
             /* Virtual case */
             /* FIXME - THIS IS FIREFOX SPECIFIC */
@@ -47,7 +47,7 @@ ufJSParser.microformats["hAtom-hEntry"] = {
       },
       "entry-title" : {
         virtual: true,
-        getter: function(propnode, mfnode, definition) {
+        virtualGetter: function(propnode, mfnode, definition) {
             /*
     *  the first <h#> element in the Entry, or
     * the <title> of the page, if there is no enclosing Feed element, or
@@ -67,7 +67,7 @@ ufJSParser.microformats["hAtom-hEntry"] = {
       "updated" : {
         virtual: true,
         datatype: "dateTime",
-        getter: function(propnode, mfnode, definition) {
+        virtualGetter: function(propnode, mfnode, definition) {
           return ufJSParser.getMicroformatProperty(mfnode, "hAtom-hEntry", "published");
         }
       },
@@ -80,7 +80,7 @@ ufJSParser.microformats["hAtom-hEntry"] = {
     ufjs: {
       "ufjsDisplayName" : {
         virtual: true,
-        getter: function(propnode, mfnode, definition) {
+        virtualGetter: function(propnode, mfnode, definition) {
           /* NEEDS MORE WORK */
           return ufJSParser.getMicroformatProperty(mfnode, "hAtom-hEntry", "entry-title");
         }

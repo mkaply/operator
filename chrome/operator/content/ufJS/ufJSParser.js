@@ -190,8 +190,8 @@ var ufJSParser = {
           }
           if (!foundSubProperties) {
             if (tp.subproperties[subprop].virtual) {
-              if (tp.subproperties[subprop].getter) {
-                result = tp.subproperties[subprop].getter(propnodes[j], propnodes[j]);
+              if (tp.subproperties[subprop].virtualGetter) {
+                result = tp.subproperties[subprop].virtualGetter(propnodes[j], propnodes[j]);
               } else {
                 result = ufJSParser.datatypeHelper(tp.subproperties[subprop], propnodes[j]);
               }
@@ -280,8 +280,8 @@ var ufJSParser = {
        property and if so, call it's getter. */
     if (!foundProps) {
       if (tp.virtual) {
-        if (tp.getter) {
-          result = tp.getter(mfnode, mfnode);
+        if (tp.virtualGetter) {
+          result = tp.virtualGetter(mfnode, mfnode);
         } else {
           result = ufJSParser.datatypeHelper(tp, mfnode);
         }

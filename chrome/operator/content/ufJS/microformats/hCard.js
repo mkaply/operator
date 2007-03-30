@@ -80,7 +80,7 @@ ufJSParser.microformats.hCard = {
         virtual: true,
         /*  Implied "n" Optimization */
         /* http://microformats.org/wiki/hcard#Implied_.22n.22_Optimization */
-        getter: function(mfnode) {
+        virtualGetter: function(mfnode) {
           var fn = ufJSParser.getMicroformatProperty(mfnode, "hCard", "fn");
           var orgs = ufJSParser.getMicroformatProperty(mfnode, "hCard", "org");
           var given_name;
@@ -111,7 +111,7 @@ ufJSParser.microformats.hCard = {
         virtual: true,
         /* Implied "nickname" Optimization */
         /* http://microformats.org/wiki/hcard#Implied_.22nickname.22_Optimization */
-        getter: function(mfnode) {
+        virtualGetter: function(mfnode) {
           var fn = ufJSParser.getMicroformatProperty(mfnode, "hCard", "fn");
           var orgs = ufJSParser.getMicroformatProperty(mfnode, "hCard", "org");
           var given_name;
@@ -185,7 +185,7 @@ ufJSParser.microformats.hCard = {
     ufjs: {
       "ufjsDisplayName" : {
         virtual: true,
-        getter: function(mfnode) {
+        virtualGetter: function(mfnode) {
           if (mfnode.origNode) {
             /* If this microformat has an include pattern, put the */
             /* organization-name in parenthesis after the fn to differentiate */

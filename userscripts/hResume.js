@@ -33,7 +33,7 @@ ufJSParser.microformats.hResume = {
         virtual: true,
         datatype: "microformat",
         microformat: "hCard",
-        getter: function(mfnode) {
+        virtualGetter: function(mfnode) {
           /* We didn't find a contact, so use the first vcard */
           var vcards = ufJSParser.getElementsByClassName(mfnode, "vcard");
           if (vcards.length > 0) {
@@ -60,7 +60,7 @@ ufJSParser.microformats.hResume = {
     ufjs: {
       "ufjsDisplayName" : {
         virtual: true,
-        getter: function(mfnode) {
+        virtualGetter: function(mfnode) {
           return ufJSParser.getMicroformatProperty(mfnode, "hResume", "contact.fn");
         }
       }

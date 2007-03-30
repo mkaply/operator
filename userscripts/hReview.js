@@ -8,7 +8,7 @@ ufJSParser.microformats.hReview = {
   mfName: "hReview",
   mfObject: hReview,
   className: "hreview",
-  required: ["item","item.fn"],
+  required: ["item"],
   definition: {
     properties: {
       "dtreviewed" : {
@@ -89,7 +89,7 @@ ufJSParser.microformats.hReview = {
     ufjs: {
       "ufjsDisplayName" : {
         virtual: true,
-        getter: function(propnode, mfnode, definition) {
+        virtualGetter: function(propnode, mfnode, definition) {
           var item = ufJSParser.getMicroformatProperty(mfnode, "hReview", "item");
           var reviewer = ufJSParser.getMicroformatProperty(mfnode, "hReview", "reviewer");
           if (item) {

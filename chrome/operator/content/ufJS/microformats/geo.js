@@ -12,7 +12,7 @@ ufJSParser.microformats.geo = {
       "latitude" : {
         virtual: true,
         /* This will only be called in the virtual case */
-        getter: function(mfnode) {
+        virtualGetter: function(mfnode) {
           var value = ufJSParser.defaultGetter(mfnode);
           var latlong;
           if (value.match(';')) {
@@ -26,7 +26,7 @@ ufJSParser.microformats.geo = {
       "longitude" : {
         virtual: true,
         /* This will only be called in the virtual case */
-        getter: function(mfnode) {
+        virtualGetter: function(mfnode) {
           var value = ufJSParser.defaultGetter(mfnode);
           var latlong;
           if (value.match(';')) {
@@ -41,7 +41,7 @@ ufJSParser.microformats.geo = {
     ufjs: {
       "ufjsDisplayName" : {
         virtual: true,
-        getter: function(propnode, mfnode) {
+        virtualGetter: function(propnode, mfnode) {
           if (ufJSParser.getMicroformatProperty(mfnode, "geo", "latitude") &&
             ufJSParser.getMicroformatProperty(mfnode, "geo", "longitude")) {
   
