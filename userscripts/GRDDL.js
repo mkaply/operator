@@ -5,7 +5,6 @@ function GRDDL() {
 
 ufJSParser.microformats.GRDDL = {
   version: "0.2",
-  mfName: "GRDDL",
   mfObject: GRDDL,
   attributeName: "rel",
   attributeValues: ["transformation"],
@@ -66,10 +65,5 @@ ufJSActions.actions.extract_rdf = {
       openUILink(url, event);
     }
   }
-};
-
-Operator.microformatList["GRDDL"] = {
-  description: "GRDDL",
-  icon: "chrome://operator/content/other.png"
 };
 

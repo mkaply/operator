@@ -3,7 +3,6 @@ function hCard() {
 
 ufJSParser.microformats.hCard = {
   version: "0.2",
-  mfName: "hCard",
   mfObject: hCard,
   className: "vcard",
   required: ["fn"],

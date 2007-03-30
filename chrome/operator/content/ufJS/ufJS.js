@@ -14,7 +14,7 @@ var ufJS = {
       ufJSActions.init(ojl, baseurl);
     }
   },
-  getElementsByMicroformat: function(rootElement, in_microformatList, in_microformatsArrays) {
+  getElementsByMicroformat: function(rootElement, in_microformatsArrays, in_microformatList) {
     var i;
     var microformatList;
     if (in_microformatList) {

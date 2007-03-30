@@ -29,7 +29,7 @@ var Operator_Toolbar = {
           break;
         }
         if ((action) && (microformat) && (handler)) {
-          if (Operator.microformatList[microformat]) {
+          if (ufJSParser.microformats[microformat]) {
             button = document.createElement("toolbarbutton");
             button.setAttribute("disabled", "true");
             button.label = action;
@@ -41,7 +41,11 @@ var Operator_Toolbar = {
             if ((ufJSActions.actions[handler].scope.microformats[microformat]) && (ufJSActions.actions[handler].icon)) {
               button.style.listStyleImage = "url('" + ufJSActions.actions[handler].icon + "')";
             } else {
-              button.style.listStyleImage = "url('" + Operator.microformatList[microformat].icon + "')";
+              if (ufJSParser.microformats[microformat].icon) {
+                button.style.listStyleImage = "url('" + ufJSParser.microformats[microformat].icon + "')";
+              } else {
+                button.style.listStyleImage = "url('chrome://operator/content/other.png')";
+              }
             }
             button.id = "microformats-" + microformat + "-" + handler + "-toolbar-button";
             toolbar.insertBefore(button, document.getElementById("operator-spring"));
@@ -61,11 +65,15 @@ var Operator_Toolbar = {
           break;
         }
         if (microformat) {
-          if (Operator.microformatList[microformat]) {
+          if (ufJSParser.microformats[microformat]) {
             button = document.createElement("toolbarbutton");
             button.setAttribute("disabled", "true");
             if (Operator.useDescriptiveNames) {
-              button.label = Operator.microformatList[microformat].description;
+              if (ufJSParser.microformats[microformat].description) {
+                button.label = ufJSParser.microformats[microformat].description;
+              } else {
+                button.label = microformat;
+              }
               button.setAttribute("label", button.label);
               button.setAttribute("origlabel", button.label);
             } else {
@@ -77,7 +85,11 @@ var Operator_Toolbar = {
             button.setAttribute("type", "menu");
             button.addEventListener("mouseover", Operator_Toolbar.mouseOver, false);
 
-            button.style.listStyleImage = "url('" + Operator.microformatList[microformat].icon + "')";
+            if (ufJSParser.microformats[microformat].icon) {
+              button.style.listStyleImage = "url('" + ufJSParser.microformats[microformat].icon + "')";
+            } else {
+              button.style.listStyleImage = "url('chrome://operator/content/other.png')";
+            }
 
             button.id = "microformats-" + microformat + "-toolbar-button";
             toolbar.insertBefore(button, document.getElementById("operator-spring"));

@@ -5,7 +5,7 @@ function hReview() {
 
 ufJSParser.microformats.hReview = {
   version: "0.2",
-  mfName: "hReview",
+  description: "Review(s)",
   mfObject: hReview,
   className: "hreview",
   required: ["item"],
@@ -152,11 +152,5 @@ ufJSParser.microformats.hReview = {
       return true;
     }
   }
-};
-
-
-Operator.microformatList.hReview = {
-  description:  "Review(s)",
-  icon: "chrome://operator/content/other.png"
 };
 

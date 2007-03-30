@@ -3,7 +3,7 @@
 var Microformats = {
   init: function() {
     var i, j;
-    for (i in Operator.microformatList)
+    for (i in ufJSParser.microformats)
     {
       if (Microformats[i]) {
         for (j in Microformats[i].handlers) {

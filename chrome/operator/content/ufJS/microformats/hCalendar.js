@@ -3,7 +3,6 @@ function hCalendar() {
 
 ufJSParser.microformats.hCalendar = {
   version: "0.2",
-  mfName: "hCalendar",
   mfObject: hCalendar,
   className: "vevent",
   required: ["summary"],

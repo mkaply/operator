@@ -2,7 +2,6 @@
 
 var Operator = {
   microformats: {},
-  microformatList: {},
   prefBranch: null,
   debug: false,
   official: true,
@@ -27,7 +26,13 @@ var Operator = {
     var objScriptLoader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"].getService(Components.interfaces.mozIJSSubScriptLoader);
     objScriptLoader.loadSubScript("chrome://operator/content/ufJS/ufJS.js");
     ufJS.init(objScriptLoader, "chrome://operator/content/ufJS/");
-    objScriptLoader.loadSubScript("chrome://operator/content/microformats.js");
+
+    /* Operator specific parser stuff */
+    ufJSParser.microformats.hCard.icon = "chrome://operator/content/hCard.png";
+    ufJSParser.microformats.hCalendar.icon = "chrome://operator/content/hCalendar.png";
+    ufJSParser.microformats.geo.icon = "chrome://operator/content/geo.png";
+    ufJSParser.microformats.tag.sort = true;
+
     objScriptLoader.loadSubScript("chrome://operator/content/legacy_microformats.js");
     objScriptLoader.loadSubScript("chrome://operator/content/operator_toolbar.js");
     objScriptLoader.loadSubScript("chrome://operator/content/operator_statusbar.js");
@@ -39,10 +44,10 @@ var Operator = {
 
     var languageBundle = bundleService.createBundle("chrome://operator/locale/microformats.properties");
     var i;
-    for (i in Operator.microformatList)
+    for (i in ufJSParser.microformats)
     {
       try {
-        Operator.microformatList[i].description = languageBundle.GetStringFromName(i + ".description");
+        ufJSParser.microformats[i].description = languageBundle.GetStringFromName(i + ".description");
       } catch (ex) {
       }
     }
@@ -140,10 +145,12 @@ var Operator = {
         this.prefBranch.setBoolPref("removeDuplicates", true);
         this.prefBranch.setBoolPref("observeDOMAttrModified", false);
         j = 1;
-        for (i in Operator.microformatList)
+        for (i in ufJSParser.microformats)
         {
-          this.prefBranch.setCharPref("microformat" + (j), i);
-          j++;
+          if (ufJSParser.microformats[i].description) {
+            this.prefBranch.setCharPref("microformat" + (j), i);
+            j++;
+          }
         }
         i = 1;
         var microformat;
@@ -219,7 +226,7 @@ var Operator = {
         }
         i++;
       } while (1);
-      for (i in Operator.microformatList) {
+      for (i in ufJSParser.microformats) {
         try {
           Operator.prefBranch.clearUserPref(i + ".defaultHandler");
         } catch (ex) {}
@@ -463,7 +470,7 @@ var Operator = {
         }
       }
     }
-    if ((items.length > 1) && Operator.microformatList[microformat].sort && Operator.microformatList[microformat].sort === true) {
+    if ((items.length > 1) && ufJSParser.microformats[microformat].sort) {
       items = sorted_items;
     }
 
@@ -635,19 +642,23 @@ var Operator = {
 
   contextPopupShowing: function(event) {
     var element =   gContextMenu.target;
-    var mfNode = ufJS.isMicroformatNode(element, Operator.microformatList);
+    var mfNode = ufJS.isMicroformatNode(element);
     gContextMenu.showItem("operator-menu-0", false);
     gContextMenu.showItem("operator-menu-1", false);
     gContextMenu.showItem("operator-menu-2", false);
     gContextMenu.showItem("operator-separator", false);
     if (mfNode) {
-      var mfNames = ufJS.getMicroformatNameFromNode(mfNode, Operator.microformatList);
+      var mfNames = ufJS.getMicroformatNameFromNode(mfNode);
       gContextMenu.showItem("operator-separator", true);
       var i;
       for (i in mfNames) {
         gContextMenu.showItem("operator-menu-" + i, true);
         var menuitem = document.getElementById("operator-menu-" + i);
-        menuitem.label = "Operator " + Operator.microformatList[mfNames[i]].description;
+        if (ufJSParser.microformats[mfNames[i]].description) {
+          menuitem.label = "Operator " + ufJSParser.microformats[mfNames[i]].description;
+        } else {
+          menuitem.label = "Operator " + mfNames[i];
+        }
         menuitem.setAttribute("label", menuitem.label);
         for(var j=menuitem.childNodes.length - 1; j>=0; j--) {
           menuitem.removeChild(menuitem.childNodes.item(j));
@@ -681,7 +692,7 @@ var Operator = {
   },
   mouseOver: function(event) {
     var element = (event.target) ? event.target : event.srcElement;
-    var mfNode = ufJS.isMicroformatNode(element, Operator.microformatList);
+    var mfNode = ufJS.isMicroformatNode(element);
     Operator.highlightDOMNode(mfNode);
   },
   processMicroformatsDelayed: function(event)
@@ -884,11 +895,11 @@ var Operator = {
 
     var useActions = (Operator.view == 1);
 
-    var microformatsArrays = ufJS.getElementsByMicroformat(content.document, Operator.microformatList);
+    var microformatsArrays = ufJS.getElementsByMicroformat(content.document);
     var i;
 
     for (i = 0; i < content.frames.length; i++) {
-      microformatsArrays = ufJS.getElementsByMicroformat(content.frames[i].document, Operator.microformatList, microformatsArrays);
+      microformatsArrays = ufJS.getElementsByMicroformat(content.frames[i].document, microformatsArrays);
     }
 
     var popup;

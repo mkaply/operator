@@ -9,7 +9,7 @@ function hEntry() {
 
 ufJSParser.microformats["hAtom-hEntry"] = {
   version: "0.2",
-  mfName: "hAtom-hEntry",
+  description: "Atom Entry(s)",
   mfObject: hEntry,
   className: "hentry",
   definition: {
@@ -91,7 +91,7 @@ ufJSParser.microformats["hAtom-hEntry"] = {
 
 ufJSParser.microformats["hAtom-hFeed"] = {
   version: "0.2",
-  mfName: "hAtom-Feed",
+  description: "Atom Feed(s)",
   mfObject: hFeed,
   className: "hfeed",
   alternateClassName: "hentry",
@@ -143,16 +143,4 @@ ufJSParser.microformats["hAtom-hFeed"] = {
     }
   }
 };
-
-
-Operator.microformatList["hAtom-hEntry"] = {
-  description: "Atom Entry",
-  icon: "chrome://operator/content/other.png"
-};
-
-Operator.microformatList["hAtom-hFeed"] = {
-  description: "Atom Feed",
-  icon: "chrome://operator/content/other.png"
-};
-
 

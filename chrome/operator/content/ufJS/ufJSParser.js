@@ -2,7 +2,7 @@
 
 var ufJSParser = {
   version: "0.2",
-  microformats: [],
+  microformats: {},
   init: function(ojl, baseurl) {
     if (Components && !ojl) {
       ojl = Components.classes["@mozilla.org/moz/jssubscript-loader;1"].

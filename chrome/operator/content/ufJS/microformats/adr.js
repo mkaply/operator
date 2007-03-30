@@ -3,7 +3,6 @@ function Address() {
 
 ufJSParser.microformats.Address = {
   version: "0.2",
-  mfName: "Address",
   mfObject: Address,
   className: "adr",
   definition: {
@@ -26,6 +25,14 @@ ufJSParser.microformats.Address = {
       "postal-code" : {
       },
       "country-name" : {
+      }
+    },
+    ufjs: {
+      "ufjsDisplayName" : {
+        virtual: true,
+        virtualGetter: function(mfnode) {
+          return ufJSParser.getMicroformatProperty(mfnode, "Address", "street-address");
+        }
       }
     }
   }

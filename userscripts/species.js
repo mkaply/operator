@@ -7,7 +7,7 @@ function species() {
 
 ufJSParser.microformats.species = {
   version: "0.2",
-  mfName: "species",
+  description: "Species",
   mfObject: species,
   className: "biota",
   definition: {
@@ -66,10 +66,4 @@ ufJSActions.actions.wikispecies_search = {
     }
   }
 };
-
-Operator.microformatList.species = {
-  description: "Species",
-  icon: "chrome://operator/content/other.png"
-};
-
 

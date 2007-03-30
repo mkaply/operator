@@ -5,7 +5,7 @@ function hResume() {
 
 ufJSParser.microformats.hResume = {
   version: "0.2",
-  mfName: "hResume",
+  description: "Resume(s)",
   mfObject: hResume,
   className: "hresume",
   required: ["contact"],
@@ -76,11 +76,5 @@ ufJSParser.microformats.hResume = {
     }
     return true;
   }
-};
-
-
-Operator.microformatList.hResume = {
-  description: "Resume(s)",
-  icon: "chrome://operator/content/other.png"
 };
 
