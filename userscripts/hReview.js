@@ -1,10 +1,8 @@
-/*extern ufJSParser, hCard */
-
 function hReview() {
 }
 
 ufJSParser.microformats.hReview = {
-  version: "0.2",
+  version: "0.7",
   description: "Review(s)",
   mfObject: hReview,
   className: "hreview",

@@ -1,10 +1,8 @@
-/*extern ufJSParser, ufJS, ufJSActions, openUILink */ 
-
 function GRDDL() {
 }
 
 ufJSParser.microformats.GRDDL = {
-  version: "0.2",
+  version: "0.7",
   mfObject: GRDDL,
   attributeName: "rel",
   attributeValues: ["transformation"],

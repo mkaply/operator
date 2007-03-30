@@ -2,7 +2,7 @@ function XFN() {
 }
 
 ufJSParser.microformats.XFN = {
-  version: "0.2",
+  version: "0.7",
   description: "XFN Relationship(s)",
   mfObject: XFN,
   attributeName: "rel",

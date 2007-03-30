@@ -1,4 +1,3 @@
-/*extern ufJSParser */
 /* hAtom is kind of strange. I decided to separate it in to hFeed and hEntry */
 
 function hFeed() {
@@ -8,7 +7,7 @@ function hEntry() {
 }
 
 ufJSParser.microformats["hAtom-hEntry"] = {
-  version: "0.2",
+  version: "0.7",
   description: "Atom Entry(s)",
   mfObject: hEntry,
   className: "hentry",

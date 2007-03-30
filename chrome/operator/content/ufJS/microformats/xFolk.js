@@ -2,7 +2,7 @@ function xFolk() {
 }
 
 ufJSParser.microformats.xFolk = {
-  version: "0.2",
+  version: "0.7",
   mfObject: xFolk,
   className: "xfolkentry",
   definition:  {

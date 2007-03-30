@@ -2,7 +2,7 @@ function geo() {
 }
 
 ufJSParser.microformats.geo = {
-  version: "0.2",
+  version: "0.7",
   mfObject: geo,
   className: "geo",
   required: ["latitude","longitude"],

@@ -2,7 +2,7 @@ function tag() {
 }
 
 ufJSParser.microformats.tag = {
-  version: "0.2",
+  version: "0.7",
   mfObject: tag,
   attributeName: "rel",
   attributeValues: ["tag"],

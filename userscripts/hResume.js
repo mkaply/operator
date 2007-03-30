@@ -1,10 +1,8 @@
-/*extern ufJSParser */
-
 function hResume() {
 }
 
 ufJSParser.microformats.hResume = {
-  version: "0.2",
+  version: "0.7",
   description: "Resume(s)",
   mfObject: hResume,
   className: "hresume",

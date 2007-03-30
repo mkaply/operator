@@ -1,12 +1,8 @@
-/*extern ufJSParser, ufJS, ufJSActions, openUILink */ 
-
-
-
 function species() {
 }
 
 ufJSParser.microformats.species = {
-  version: "0.2",
+  version: "0.7",
   description: "Species",
   mfObject: species,
   className: "biota",

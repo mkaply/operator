@@ -2,7 +2,7 @@ function Address() {
 }
 
 ufJSParser.microformats.Address = {
-  version: "0.2",
+  version: "0.7",
   mfObject: Address,
   className: "adr",
   definition: {
