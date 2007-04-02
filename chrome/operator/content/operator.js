@@ -438,10 +438,10 @@ var Operator = {
     if (items.length > 1) {
       sorted_items = sorted_items.sort(
         function (a,b) {
-          if (a.displayname < b.displayname) {
+          if (a.displayname.toLowerCase() < b.displayname.toLowerCase()) {
             return -1;
           }
-          if (a.displayname > b.displayname) {
+          if (a.displayname.toLowerCase() > b.displayname.toLowerCase()) {
             return 1;
           }
           return 0;
