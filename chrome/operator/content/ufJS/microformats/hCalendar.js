@@ -55,7 +55,7 @@ ufJSParser.microformats.hCalendar = {
     ufjs: {
       "ufjsDisplayName" : {
         virtual: true,
-        getter: function(mfnode) {
+        virtualGetter: function(mfnode) {
           if (mfnode.origNode) {
             /* If this microformat has an include pattern, put the */
             /* dtstart in parenthesis after the summary to differentiate */
