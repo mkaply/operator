@@ -18,9 +18,9 @@ ufJSParser.microformats.Address = {
       },
       "extended-address" : {
       },
-      "region" : {
-      },
       "locality" : {
+      },
+      "region" : {
       },
       "postal-code" : {
       },
@@ -31,7 +31,25 @@ ufJSParser.microformats.Address = {
       "ufjsDisplayName" : {
         virtual: true,
         virtualGetter: function(mfnode) {
-          return ufJSParser.getMicroformatProperty(mfnode, "Address", "street-address");
+          var address = ufJSParser.createMicroformat(mfnode, "Address");
+          var address_text = "";
+          if (address["post-office-box"]) {
+            address_text += address["post-office-box"];
+            address_text += " ";
+          }
+          if (address["street-address"]) {
+            address_text += address["street-address"][0];
+            address_text += " ";
+          }
+          if (address["locality"]) {
+            address_text += address["locality"];
+            address_text += " ";
+          }
+          if (address["region"]) {
+            address_text += address["region"];
+            address_text += " ";
+          }
+          return address_text;
         }
       }
     }
