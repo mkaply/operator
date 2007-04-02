@@ -68,19 +68,13 @@ var Operator_Toolbar = {
           if (ufJSParser.microformats[microformat]) {
             button = document.createElement("toolbarbutton");
             button.setAttribute("disabled", "true");
-            if (Operator.useDescriptiveNames) {
-              if (ufJSParser.microformats[microformat].description) {
-                button.label = ufJSParser.microformats[microformat].description;
-              } else {
-                button.label = microformat;
-              }
-              button.setAttribute("label", button.label);
-              button.setAttribute("origlabel", button.label);
+            if ((Operator.useDescriptiveNames) && (ufJSParser.microformats[microformat].description)) {
+              button.label = ufJSParser.microformats[microformat].description;
             } else {
               button.label =  microformat;
-              button.setAttribute("label", button.label);
-              button.setAttribute("origlabel", button.label);
             }
+            button.setAttribute("label", button.label);
+            button.setAttribute("origlabel", button.label);
 
             button.setAttribute("type", "menu");
             button.addEventListener("mouseover", Operator_Toolbar.mouseOver, false);

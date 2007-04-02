@@ -959,13 +959,13 @@ var Operator = {
             }
             tempItem = document.createElement("menu");
             
-            if (this.useDescriptiveNames) {
-              tempItem.setAttribute("label", microformat); /* DESCRIPTION*/
-              tempItem.label = microformat; /* DESCRIPTION */
+            if ((this.useDescriptiveNames) && (ufJSParser.microformats[microformat].description)) {
+              tempItem.label = ufJSParser.microformats[microformat].description;
             } else {
-              tempItem.setAttribute("label", microformat);
               tempItem.label = microformat;
             }
+            tempItem.setAttribute("label", tempItem.label);
+
             popup.appendChild(tempItem);
 
             if (submenu.error === true) {
