@@ -19,6 +19,9 @@ var ufJSParser = {
   },
   createMicroformat: function(in_mfnode, mfname)  {
     /* check to see if we are even valid */
+    if (!ufJSParser.microformats[mfname]) {
+      return;
+    }
     if (ufJSParser.microformats[mfname].attributeName) {
       if (!(in_mfnode.getAttribute(ufJSParser.microformats[mfname].attributeName))) {
         return;
