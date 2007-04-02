@@ -103,7 +103,7 @@ var Operator = {
       this.prefBranch.getChildList("", newcount);
     } catch (ex) {}
     /* that nine is an attempt to handle the 0.5 to 0.6 failure case and fix it */
-    if ((newcount.value === 0) || (newcount.value == 9)) {
+    if ((newcount.value === 0) || (newcount.value == 9) || (newcount.value == 10)) {
       var action;
       /* check for old prefs and migrate them if they are there */
       var prefBranchOld = Components.classes["@mozilla.org/preferences-service;1"].
