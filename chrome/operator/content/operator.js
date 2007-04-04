@@ -702,30 +702,44 @@ var Operator = {
     }
     Operator.timerID = window.setTimeout(Operator.processMicroformats, 500);
   },
-  
+  recursiveAddListeners: function(window)
+  {
+    if (window && window.frames.length > 0) {
+      for (var i=0; i < window.frames.length; i++) {
+        Operator.recursiveAddListeners(window.frames[i]);
+      }
+    }
+    window.document.addEventListener("mouseover", Operator.mouseOver, false);
+    window.document.getElementsByTagName("body")[0].addEventListener("DOMNodeInserted", Operator.processMicroformatsDelayed, false);
+    window.document.getElementsByTagName("body")[0].addEventListener("DOMNodeRemoved", Operator.processMicroformatsDelayed, false);
+    if (Operator.observeDOMAttrModified) {
+      window.document.getElementsByTagName("body")[0].addEventListener("DOMAttrModified", Operator.processMicroformatsDelayed, false);
+    }
+  },
+  recursiveRemoveListeners: function(window)
+  {
+    if (window && window.frames.length > 0) {
+      for (var i=0; i < window.frames.length; i++) {
+        Operator.recursiveRemoveListeners(window.frames[i]);
+      }
+    }
+    window.document.removeEventListener("mouseover", Operator.mouseOver, false);
+    window.document.getElementsByTagName("body")[0].removeEventListener("DOMNodeInserted", Operator.processMicroformatsDelayed, false);
+    window.document.getElementsByTagName("body")[0].removeEventListener("DOMNodeRemoved", Operator.processMicroformatsDelayed, false);
+    if (Operator.observeDOMAttrModified) {
+      window.document.getElementsByTagName("body")[0].removeEventListener("DOMAttrModified", Operator.processMicroformatsDelayed, false);
+    }
+  },
   onPageShow: function(event) 
   {
     if (event.originalTarget instanceof HTMLDocument)
     {
       /* This is required so that things work properly when pages are opened */
-      /* in background tabs */
-      if (content && (event.originalTarget == content.document)) {
+      /* in background tabs (OR NOT - it broke nested page load notifications) */
+//      if (content && (event.originalTarget == content.document)) {
         Operator.processMicroformats();
-        content.document.addEventListener("mouseover", Operator.mouseOver, false);
-        content.document.getElementsByTagName("body")[0].addEventListener("DOMNodeInserted", Operator.processMicroformatsDelayed, false);
-        content.document.getElementsByTagName("body")[0].addEventListener("DOMNodeRemoved", Operator.processMicroformatsDelayed, false);
-        if (Operator.observeDOMAttrModified) {
-          content.document.getElementsByTagName("body")[0].addEventListener("DOMAttrModified", Operator.processMicroformatsDelayed, false);
-        }
-        for (var i = 0; i < content.frames.length; i++) {
-          content.frames[i].document.addEventListener("mouseover", Operator.mouseOver, false);
-          content.frames[i].document.getElementsByTagName("body")[0].addEventListener("DOMNodeInserted", Operator.processMicroformatsDelayed, false);
-          content.frames[i].document.getElementsByTagName("body")[0].addEventListener("DOMNodeRemoved", Operator.processMicroformatsDelayed, false);
-          if (Operator.observeDOMAttrModified) {
-            content.frames[i].document.getElementsByTagName("body")[0].addEventListener("DOMAttrModified", Operator.processMicroformatsDelayed, false);
-          }
-        }
-      }
+        Operator.recursiveAddListeners(content);
+//      }
     }
   },
   
@@ -743,20 +757,7 @@ var Operator = {
         Operator_Statusbar.disable();
         Operator_ToolbarButton.disable();
       }
-      content.document.removeEventListener("mouseover", Operator.mouseOver, false);
-      content.document.removeEventListener("DOMNodeInserted", Operator.processMicroformatsDelayed, false);
-      content.document.removeEventListener("DOMNodeRemoved", Operator.processMicroformatsDelayed, false);
-      if (Operator.observeDOMAttrModified) {
-        content.document.removeEventListener("DOMAttrModified", Operator.processMicroformatsDelayed, false);
-      }
-      for (var i = 0; i < content.frames.length; i++) {
-        content.frames[i].document.removeEventListener("mouseover", Operator.mouseOver, false);
-        content.frames[i].document.removeEventListener("DOMNodeInserted", Operator.processMicroformatsDelayed, false);
-        content.frames[i].document.removeEventListener("DOMNodeRemoved", Operator.processMicroformatsDelayed, false);
-        if (Operator.observeDOMAttrModified) {
-          content.frames[i].document.removeEventListener("DOMAttrModified", Operator.processMicroformatsDelayed, false);
-        }
-      }
+      Operator.recursiveRemoveListeners(content);
     }
   },
 
@@ -883,6 +884,15 @@ var Operator = {
                       vcfical,
                       X2V);
   },
+  recurseFrames: function(window, microformatsArrays)
+  {
+    if (window && window.frames.length > 0) {
+      for (var i=0; i < window.frames.length; i++) {
+        Operator.recurseFrames(window.frames[i], microformatsArrays);
+      }
+    }
+    ufJS.getElementsByMicroformat(window.document, microformatsArrays);
+  },
   processMicroformats: function()
   {
     Operator.timerID = null;
@@ -895,12 +905,10 @@ var Operator = {
 
     var useActions = (Operator.view == 1);
 
-    var microformatsArrays = ufJS.getElementsByMicroformat(content.document);
     var i;
+   var microformatsArrays = [];
 
-    for (i = 0; i < content.frames.length; i++) {
-      microformatsArrays = ufJS.getElementsByMicroformat(content.frames[i].document, microformatsArrays);
-    }
+    Operator.recurseFrames(content, microformatsArrays);
 
     var popup;
 
@@ -925,12 +933,11 @@ var Operator = {
               popup = document.createElement("menupopup");
             }               
             tempItem = document.createElement("menu");
-            
+
             tempItem.setAttribute("label", action);
             tempItem.label = action;
-            
+
             popup.appendChild(tempItem);
-  
 
             if (submenu.error === true) {
               tempItem.style.fontWeight = "bold";
