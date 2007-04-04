@@ -152,16 +152,18 @@ ufJSParser.microformats.XFN = {
           }
         }
       }
-    },
-    getXFNStatus: function(propnode, relationship)
-    {
-      var rel = propnode.getAttribute("rel");
-      if (rel.match("(^|\\s)" + relationship + "(\\s|$)")) {
-        return true;
-      }
-      return false;
     }
+  },
+  getXFNStatus: function(propnode, relationship)
+  {
+    var rel = propnode.getAttribute("rel");
+    if (rel.match("(^|\\s)" + relationship + "(\\s|$)")) {
+      return true;
+    }
+    return false;
   }
 };
 
-ufJSActions.actions.goto_url.scope.microformats.XFN = "link";
+if (ufJSActions.actions.goto_url) {
+  ufJSActions.actions.goto_url.scope.microformats.XFN = "link";
+}
