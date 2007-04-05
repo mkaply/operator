@@ -9,6 +9,7 @@ ufJSParser.microformats.geo = {
   definition: {
     properties: {
       "latitude" : {
+        datatype: "float",
         virtual: true,
         /* This will only be called in the virtual case */
         virtualGetter: function(mfnode) {
@@ -17,12 +18,13 @@ ufJSParser.microformats.geo = {
           if (value.match(';')) {
             latlong = value.split(';');
             if (latlong[0]) {
-              return latlong[0];
+              return parseFloat(latlong[0]);
             }
           }
         },
       },
       "longitude" : {
+        datatype: "float",
         virtual: true,
         /* This will only be called in the virtual case */
         virtualGetter: function(mfnode) {
@@ -31,7 +33,7 @@ ufJSParser.microformats.geo = {
           if (value.match(';')) {
             latlong = value.split(';');
             if (latlong[1]) {
-              return latlong[1];
+              return parseFloat(latlong[1]);
             }
           }
         }
