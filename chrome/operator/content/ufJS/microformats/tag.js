@@ -15,7 +15,7 @@ ufJSParser.microformats.tag = {
             var url_array = mfnode.getAttribute("href").split("/");
             for(var i=url_array.length-1; i > 0; i--) {
               if (url_array[i] !== "") {
-                return unescape(ufJSParser.microformats.tag.validTagName(url_array[i]));
+                return unescape(ufJSParser.microformats.tag.validTagName(url_array[i].replace(/\+/g, ' ')));
               }
             }
           }
