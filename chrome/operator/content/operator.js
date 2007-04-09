@@ -27,17 +27,19 @@ var Operator = {
     objScriptLoader.loadSubScript("chrome://operator/content/ufJS/ufJS.js");
     ufJS.init(objScriptLoader, "chrome://operator/content/ufJS/");
 
-    /* Operator specific parser stuff */
-    ufJSParser.microformats.hCard.icon = "chrome://operator/content/hCard.png";
-    ufJSParser.microformats.hCalendar.icon = "chrome://operator/content/hCalendar.png";
-    ufJSParser.microformats.geo.icon = "chrome://operator/content/geo.png";
-    ufJSParser.microformats.tag.sort = true;
-
-    objScriptLoader.loadSubScript("chrome://operator/content/legacy_microformats.js");
-    objScriptLoader.loadSubScript("chrome://operator/content/operator_toolbar.js");
-    objScriptLoader.loadSubScript("chrome://operator/content/operator_statusbar.js");
-    objScriptLoader.loadSubScript("chrome://operator/content/operator_toolbar_button.js");
-    objScriptLoader.loadSubScript("chrome://operator/content/operator_sidebar.js");
+    if (!options) {
+      /* Operator specific parser stuff */
+      ufJSParser.microformats.hCard.icon = "chrome://operator/content/hCard.png";
+      ufJSParser.microformats.hCalendar.icon = "chrome://operator/content/hCalendar.png";
+      ufJSParser.microformats.geo.icon = "chrome://operator/content/geo.png";
+      ufJSParser.microformats.tag.sort = true;
+  
+      objScriptLoader.loadSubScript("chrome://operator/content/legacy_microformats.js");
+      objScriptLoader.loadSubScript("chrome://operator/content/operator_toolbar.js");
+      objScriptLoader.loadSubScript("chrome://operator/content/operator_statusbar.js");
+      objScriptLoader.loadSubScript("chrome://operator/content/operator_toolbar_button.js");
+      objScriptLoader.loadSubScript("chrome://operator/content/operator_sidebar.js");
+    }
     var bundleService = Components.classes["@mozilla.org/intl/stringbundle;1"].
                                    getService(Components.interfaces.nsIStringBundleService);
     this.languageBundle = bundleService.createBundle("chrome://operator/locale/operator.properties");
@@ -74,7 +76,11 @@ var Operator = {
                                        getService(Components.interfaces.nsIIOService).
                                        getProtocolHandler("file").
                                        QueryInterface(Components.interfaces.nsIFileProtocolHandler);
-          objScriptLoader.loadSubScript(fileHandler.getURLSpecFromFile(f));
+          try {
+            objScriptLoader.loadSubScript(fileHandler.getURLSpecFromFile(f));
+          } catch (ex) {
+            alert("Unable to load " + f.leafName + "\n\n" + "(" + ex.message + ")");
+          }
         }
       }
     }
