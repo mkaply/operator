@@ -67,7 +67,7 @@ ufJSParser.microformats.hCalendar = {
                 var dtstart = ufJSParser.getMicroformatProperty(mfnode, "hCalendar", "dtstart");
                 if (dtstart) {
                   displayName += " (";
-                  displayName += ufJSParser.microformats.hCalendar.dateFromISO8601(dtstart).toLocaleString();
+                  displayName += ufJSParser.microformats.hCalendar.definition.dateFromISO8601(dtstart).toLocaleString();
                   displayName += ")";
                 }
                 return displayName;
