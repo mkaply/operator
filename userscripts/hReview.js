@@ -2,7 +2,7 @@ function hReview() {
 }
 
 ufJSParser.microformats.hReview = {
-  version: "0.7",
+  version: "0.7.1",
   description: "Review(s)",
   mfObject: hReview,
   className: "hreview",
@@ -43,11 +43,11 @@ ufJSParser.microformats.hReview = {
             }
             var urls = ufJSParser.getElementsByClassName(propnode, "url");
             if (urls.length > 0) {
-              item.url = ufJSParser.urlGetter(urls[0]);
+              item.url = ufJSParser.uriGetter(urls[0]);
             }
             var photos = ufJSParser.getElementsByClassName(propnode, "photo");
             if (photos.length > 0) {
-              item.photo = ufJSParser.urlGetter(photos[0]);
+              item.photo = ufJSParser.uriGetter(photos[0]);
             }
           }
           /* Only return item if it has stuff in it */
