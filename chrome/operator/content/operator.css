@@ -27,6 +27,3 @@ toolbar[iconsize="small"] #operator-toolbar-button[disabled="true"] {
    list-style-image: url("chrome://operator/content/options.png");
 }
 
-#operator-toolbar .operator-button-disabled .toolbarbutton-icon {
-  opacity: .3;
-}

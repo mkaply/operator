@@ -32,7 +32,6 @@ var Operator_Toolbar = {
           if (ufJSParser.microformats[microformat]) {
             button = document.createElement("toolbarbutton");
             button.setAttribute("disabled", "true");
-            button.className = "operator-button-disabled";
             button.label = action;
             button.setAttribute("label", button.label);
             button.setAttribute("origlabel", action);
@@ -50,6 +49,8 @@ var Operator_Toolbar = {
             }
             button.id = "microformats-" + microformat + "-" + handler + "-toolbar-button";
             toolbar.insertBefore(button, document.getElementById("operator-spring"));
+            var node = document.getAnonymousElementByAttribute(button, "class", "toolbarbutton-icon");
+            node.style.opacity = 0.3;
           }
         } else {
           break;
@@ -69,7 +70,6 @@ var Operator_Toolbar = {
           if (ufJSParser.microformats[microformat]) {
             button = document.createElement("toolbarbutton");
             button.setAttribute("disabled", "true");
-            button.className = "operator-button-disabled";
             if ((Operator.useDescriptiveNames) && (ufJSParser.microformats[microformat].description)) {
               button.label = ufJSParser.microformats[microformat].description;
             } else {
@@ -89,6 +89,8 @@ var Operator_Toolbar = {
 
             button.id = "microformats-" + microformat + "-toolbar-button";
             toolbar.insertBefore(button, document.getElementById("operator-spring"));
+            var node = document.getAnonymousElementByAttribute(button, "class", "toolbarbutton-icon");
+            node.style.opacity = 0.3;
           }
         } else {
           break;
@@ -157,7 +159,8 @@ var Operator_Toolbar = {
     for(var i=0; i < toolbarbuttons.length; i++) {
       if (toolbarbuttons[i].id != "operator-options") {
         toolbarbuttons[i].setAttribute("disabled", "true");
-        toolbarbuttons[i].className = "operator-button-disabled";
+        var node = document.getAnonymousElementByAttribute(toolbarbuttons[i], "class", "toolbarbutton-icon");
+        node.style.opacity = 0.3;
       }
     }
   },
@@ -182,9 +185,8 @@ var Operator_Toolbar = {
       if (toolbarbuttons[i].id != "operator-options") {
         if ((toolbarbuttons[i].label) != toolbarbuttons[i].getAttribute("origlabel")) {
           toolbarbuttons[i].setAttribute("disabled", "false");
-          if (toolbarbuttons[i].className.match("(^|\\s)" + "operator-button-disabled" + "(\\s|$)")) {
-            toolbarbuttons[i].className = toolbarbuttons[i].className.replace("operator-button-disabled", '');
-          }
+          var node = document.getAnonymousElementByAttribute(toolbarbuttons[i], "class", "toolbarbutton-icon");
+          node.style.opacity = 1.0;
         }
       }
     }
