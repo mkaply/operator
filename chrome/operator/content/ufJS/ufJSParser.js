@@ -57,7 +57,7 @@ var ufJSParser = {
     var i, j, k;
     var result;
     var mfnode = in_mfnode;
-    if (ufJSParser.microformats[mfname].className) {
+    if (!in_mfnode.origNode && ufJSParser.microformats[mfname].className) {
       mfnode = ufJSParser.preProcessMicroformat(in_mfnode);
     }
     var foundProps = false;
