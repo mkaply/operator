@@ -128,36 +128,46 @@ ufJSActions.actions.google_calendar = {
         if (hcalendar.dtstart) {
           url += "&";
           url += "dates="
-          var dt = hcalendar.dtstart;
-          var T = dt.indexOf("T");
+          var dtstart = hcalendar.dtstart;
+          /* If the date has a Z or nothing, use it as is (remove punctation) */
+          /* If it has an offset, convert to local time */
+          var T = dtstart.indexOf("T");
           if (T > -1) {
-            var offset = dt.lastIndexOf("-");
-            if (offset > T) {
-              dt = dt.substr(0, offset);
+            var offset = dtstart.lastIndexOf("-");
+            /* If there is an offset and there is no Z, localize */
+            if ((offset > T) || !dtstart.match("Z")) {
+              dtstart = ufJSParser.localizeISO8601(dtstart);
             }
           }
-          dt = dt.replace(/-/g,"").replace(/:/g,"");
-          url += dt;
+          /* This will need to change if Google ever supports TZ offsets */
+          dtstart = dtstart.replace(/-/g,"").replace(/:/g,"");
+          url += dtstart;
           url += "/";
           if (hcalendar.dtend) {
-            var dt = hcalendar.dtend;
-            var T = dt.indexOf("T");
+            var dtend = hcalendar.dtend;
+            var T = dtend.indexOf("T");
             if (T > -1) {
-              var offset = dt.lastIndexOf("-");
-              if (offset > T) {
-                dt = dt.substr(0, offset);
+              var offset = dtend.lastIndexOf("-");
+              /* If there is an offset and there is no Z, localize */
+              if ((offset > T) || !dtend.match("Z")) {
+                dtend = ufJSParser.localizeISO8601(dtend);
               }
             } else {
               if (!Operator.upcomingOrgBugFixed) {
                 if (content.document.location.href.indexOf("http://upcoming.org") == 0) {
-                  dt = dt.replace(/-/g, "");
-                  dt = (parseInt(dt)+1).toString();
+                  dtend = dtend.replace(/-/g, "");
+                  dtend = (parseInt(dtend)+1).toString();
                 }
               }
+              /* if dtstart had a time, dtend must have a time - google bug? */
+              if (dtstart.indexOf("T") > -1) {
+                dtend += dtstart.substr(dtstart.indexOf("T"));
+              }
             }
-            url += dt.replace(/-/g,"").replace(/:/g,"");;
+            /* This will need to change if Google ever supports TZ offsets */
+            url += dtend.replace(/-/g,"").replace(/:/g,"");
           } else {
-            url += dt;
+            url += dtstart;
           }
         }
         url += "&";
@@ -171,7 +181,9 @@ ufJSActions.actions.google_calendar = {
               url += hcalendar.location.fn;
             }
             if (hcalendar.location.adr[j]["street-address"]) {
-              url += ", ";
+              if (hcalendar.location.fn) {
+                url += ", ";
+              }
               url += encodeURIComponent(hcalendar.location.adr[j]["street-address"][0]);
             }
             if (hcalendar.location.adr[j].locality) {
@@ -214,6 +226,7 @@ ufJSActions.actions.google_calendar = {
       }
     }
     if (url) {
+      Operator.debug_alert(url);
       openUILink(url, event);
     }
   }

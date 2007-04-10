@@ -486,21 +486,9 @@ var ufJSParser = {
   },
   dateTimeGetter: function(propnode, parentnode) {
     var date = ufJSParser.defaultGetter(propnode, parentnode);
-    if (date.indexOf('-') == -1) {
-      var newdate = "";
-      var i;
-      for (i=0;i<date.length;i++) {
-        newdate += date.charAt(i);
-        if ((i == 3) || (i == 5)) {
-          newdate += "-";
-        }
-        if ((i == 10) || (i == 12)) {
-          newdate += ":";
-        }
-      }
-      date = newdate;
+    if (date) {
+      return ufJSParser.normalizeISO8601(date);
     }
-    return date;
   },
   uriGetter: function(propnode, parentnode) {
     if (propnode.nodeName.toLowerCase() == "a") {
@@ -569,6 +557,165 @@ var ufJSParser = {
         break;
     }
     return result;
+  },
+  /* This function normalizes an ISO8601 date by adding punctuation and */
+  /* ensuring that hours and seconds have values */
+  normalizeISO8601: function(string)
+  {
+    var dateArray = string.match(/(\d\d\d\d)(?:-?(\d\d)(?:-?(\d\d)(?:[T ](\d\d)(?::?(\d\d)(?::?(\d\d)(?:\.(\d+))?)?)?(?:([-+Z])(?:(\d\d)(?::?(\d\d))?)?)?)?)?)?/);
+
+    var dateString;
+    if (dateArray[1]) {
+      dateString = dateArray[1];
+      if (dateArray[2]) {
+        dateString += "-" + dateArray[2];
+        if (dateArray[3]) {
+          dateString += "-" + dateArray[3];
+          if (dateArray[4]) {
+            dateString += "T" + dateArray[4];
+            if (dateArray[5]) {
+              dateString += ":" + dateArray[5];
+            } else {
+              dateString += ":" + "00";
+            }
+            if (dateArray[6]) {
+              dateString += ":" + dateArray[6];
+            } else {
+              dateString += ":" + "00";
+            }
+            if (dateArray[7]) {
+              dateString += "." + dateArray[7];
+            }
+            if (dateArray[8]) {
+              dateString += dateArray[8];
+              if ((dateArray[8] == "+") || (dateArray[8] == "-")) {
+                if (dateArray[9]) {
+                  dateString += dateArray[9];
+                  if (dateArray[10]) {
+                    dateString += ":" + dateArray[10];
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    return dateString;
+  },
+  localizeISO8601: function(string)
+  {
+    var dateArray = string.match(/(\d\d\d\d)(?:-?(\d\d)(?:-?(\d\d)(?:[T ](\d\d)(?::?(\d\d)(?::?(\d\d)(?:\.(\d+))?)?)?(?:([-+Z])(?:(\d\d)(?::?(\d\d))?)?)?)?)?)?/);
+  
+    var date = new Date(dateArray[1], 0, 1);
+    date.time = false;
+
+    if (dateArray[2]) {
+      date.setMonth(dateArray[2] - 1);
+    }
+    if (dateArray[3]) {
+      date.setDate(dateArray[3]);
+    }
+    if (dateArray[4]) {
+      date.setHours(dateArray[4]);
+      date.time = true;
+      if (dateArray[5]) {
+        date.setMinutes(dateArray[5]);
+        if (dateArray[6]) {
+          date.setSeconds(dateArray[6]);
+          if (dateArray[7]) {
+            date.setMilliseconds(Number("0." + dateArray[7]) * 1000);
+          }
+        }
+      }
+    }
+    if (dateArray[8]) {
+      if (dateArray[8] == "-") {
+        if (dateArray[9] && dateArray[10]) {
+          date.setHours(date.getHours() + parseInt(dateArray[9], 10));
+          date.setMinutes(date.getMinutes() + parseInt(dateArray[10], 10));
+        }
+      } else if (dateArray[8] == "+") {
+        if (dateArray[9] && dateArray[10]) {
+          date.setHours(date.getHours() - parseInt(dateArray[9], 10));
+          date.setMinutes(date.getMinutes() - parseInt(dateArray[10], 10));
+        }
+      }
+      /* at this point we have the time in gmt */
+      /* convert to local if we had a Z - or + */
+      if (dateArray[8]) {
+        var tzOffset = date.getTimezoneOffset();
+        if (tzOffset < 0) {
+          date.setMinutes(date.getMinutes() + tzOffset); 
+        } else if (tzOffset > 0) {
+          date.setMinutes(date.getMinutes() - tzOffset); 
+        }
+      }
+    }
+    return ufJSParser.iso8601FromDate(date, true);
+  },
+  /* This function does NOT honor Z and Timezone offsets because */
+  /* JavaScript dates don't support them. It's only job is to represent */
+  /* an ISO date as a date object exactly, dropping Z and TZ offsets */
+  /* It is recommended that this only be called with a localized ISO date */
+  dateFromISO8601: function(string)
+  {
+    var dateArray = string.match(/(\d\d\d\d)(?:-?(\d\d)(?:-?(\d\d)(?:[T ](\d\d)(?::?(\d\d)(?::?(\d\d)(?:\.(\d+))?)?)?(?:([-+Z])(?:(\d\d)(?::?(\d\d))?)?)?)?)?)?/);
+  
+    var date = new Date(dateArray[1], 0, 1);
+    date.time = false;
+
+    if (dateArray[2]) {
+      date.setMonth(dateArray[2] - 1);
+    }
+    if (dateArray[3]) {
+      date.setDate(dateArray[3]);
+    }
+    if (dateArray[4]) {
+      date.setHours(dateArray[4]);
+      date.time = true;
+      if (dateArray[5]) {
+        date.setMinutes(dateArray[5]);
+        if (dateArray[6]) {
+          date.setSeconds(dateArray[6]);
+          if (dateArray[7]) {
+            date.setMilliseconds(Number("0." + dateArray[7]) * 1000);
+          }
+        }
+      }
+    }
+    return date;
+  },
+  iso8601FromDate: function(date, punctuation)
+  {
+    var string = date.getFullYear().toString();
+    if (punctuation) {
+      string += "-";
+    }
+    string += (date.getMonth() + 1).toString().replace(/\b(\d)\b/g, '0$1');
+    if (punctuation) {
+      string += "-";
+    }
+    string += date.getDate().toString().replace(/\b(\d)\b/g, '0$1');
+    if (date.time) {
+      string += "T";
+      string += date.getHours().toString().replace(/\b(\d)\b/g, '0$1');
+      if (punctuation) {
+        string += ":";
+      }
+      string += date.getMinutes().toString().replace(/\b(\d)\b/g, '0$1');
+      if (punctuation) {
+        string += ":";
+      }
+      string += date.getSeconds().toString().replace(/\b(\d)\b/g, '0$1');
+      if (date.getMilliseconds() > 0) {
+        if (punctuation) {
+          string += ".";
+        }
+        string += date.getMilliseconds().toString();
+      }
+    }
+    return string;
   }
 };
 

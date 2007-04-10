@@ -108,6 +108,16 @@ ufJSActions.actions.yahoo_search = {
   }
 };
 
+
+/* yahoo claims:
+The rend param is not needed, dont use it. Just specify a start time and 
+duration. */
+
+/* The best way to reverse engineer our seeds api is to go to 
+calendar.yahoo.com, create an event, and then click on it again to edit. 
+At the bottom of the edit screen you will see a panel with "*Want to 
+tell others about this event?" *with the seed url for your event. */
+
 ufJSActions.actions.yahoo_calendar = {
   description: "Add to Yahoo! Calendar",
   icon: "http://www.yahoo.com/favicon.ico",
@@ -147,13 +157,25 @@ ufJSActions.actions.yahoo_calendar = {
         if (hcalendar.dtstart) {
           url += "&";
           url += "st=";
-          url += hcalendar.dtstart.replace(/-/g,"").replace(/:/g,"");
+          var T = hcalendar.dtstart.indexOf("T");
+          var date;
+          var time;
+          if (T > -1) {
+            date = hcalendar.dtstart.substr(0, T);
+            time = hcalendar.dtstart.substr(T);
+          } else {
+            date = hcalendar.dtstart;
+          }
+          url += ufJS.simpleEscape(date.replace(/-/g,""));
+          if (time) {
+            url += ufJS.simpleEscape(time.replace(/:/g,""));
+          }
         }
         if (hcalendar.dtend) {
           var duration = "";
           var duration_num, hours, minutes;
-          var dtStartDate = ufJS.dateFromISO8601(hcalendar.dtstart);
-          var dtEndDate = ufJS.dateFromISO8601(hcalendar.dtend);
+          var dtStartDate = ufJSParser.dateFromISO8601(ufJSParser.localizeISO8601(hcalendar.dtstart));
+          var dtEndDate = ufJSParser.dateFromISO8601(ufJSParser.localizeISO8601(hcalendar.dtend));
           if (!dtEndDate.time) {
             dtEndDate.setDate(dtEndDate.getDate()-1);
           }
@@ -166,7 +188,7 @@ ufJSActions.actions.yahoo_calendar = {
           if (((dtEndDate.getTime() - dtStartDate.getTime()) > 24*60*60*1000) || !dtEndDate.time) {
             url += "&";
             url += "rend=%2b";
-            url += ufJS.iso8601FromDate(dtEndDate).replace(/-/g,"").replace(/:/g,"");
+            url += ufJSParser.iso8601FromDate(dtEndDate).replace(/-/g,"").replace(/:/g,"");
             if (dtEndDate.time && dtStartDate.time) {
               dtEndDate.time = false;
               var end = dtEndDate.getHours()*60 + dtEndDate.getMinutes();

@@ -252,6 +252,7 @@ var ufJS = {
     s = s.replace(/\&/g, '%26');
     s = s.replace(/\#/g, '%23');
     s = s.replace(/\+/g, '%2B');
+    s = s.replace(/\-/g, '%2D');
     s = s.replace(/\=/g, '%3D');
     s = s.replace(/\'/g, '%27');
     s = s.replace(/\,/g, '%2C');
@@ -259,67 +260,6 @@ var ufJS = {
 //    s = s.replace(/\n/g, '%0A');
     s = s.replace(/ /g, '+');
     return s;
-  },
-  dateFromISO8601: function(string)
-  {
-    var dateArray = string.match(/(\d\d\d\d)(?:-?(\d\d)(?:-?(\d\d)(?:[T ](\d\d)(?::?(\d\d)(?::?(\d\d)(?:\.(\d+))?)?)?(?:Z|(?:([-+])(\d\d)(?::?(\d\d))?)?)?)?)?)?/);
-  
-    var date = new Date(dateArray[1], 0, 1);
-    date.time = false;
-
-    if (dateArray[2]) {
-      date.setMonth(dateArray[2] - 1);
-    }
-    if (dateArray[3]) {
-      date.setDate(dateArray[3]);
-    }
-    if (dateArray[4]) {
-      date.setHours(dateArray[4]);
-      date.time = true;
-      if (dateArray[5]) {
-        date.setMinutes(dateArray[5]);
-        if (dateArray[6]) {
-          date.setSeconds(dateArray[6]);
-          if (dateArray[7]) {
-            date.setMilliseconds(Number("0." + dateArray[7]) * 1000);
-          }
-        }
-      }
-    }
-    return date;
-  },
-  iso8601FromDate: function(date)
-  {
-    var string = date.getFullYear().toString();
-    var month = date.getMonth() + 1;
-    if (month <= 9) {
-      month = "0" + month;
-    }
-    string += month.toString();
-    var day = date.getDate();
-    if (day <= 9) {
-      day = "0" + day;
-    }
-    string += day.toString();
-    if (date.time) {
-      string += "T";
-      var hours = date.getHours();
-      if (hours <= 9) {
-        string += "0";
-      }
-      string += hours.toString();
-      var minutes = date.getMinutes();
-      if (minutes <= 9) {
-        string += "0";
-      }
-      string += minutes.toString();
-      var seconds = date.getSeconds();
-      if (seconds <= 9) {
-        string += "0";
-      }
-      string += seconds.toString();
-    }
-    return string;
   },
   vCard: function(item)
   {
@@ -606,8 +546,9 @@ var ufJS = {
         ics += "-TIME";
         var T = dt.indexOf("T");
         var offset = dt.lastIndexOf("-");
-        if (offset > T) {
-          dt = dt.substr(0, offset);
+        /* If there is an offset and there is no Z, localize */
+        if ((offset > T) || !dt.match("Z")) {
+          dt = ufJSParser.localizeISO8601(dt);
         }
       }
       dt = dt.replace(/-/g,"").replace(/:/g,"");
@@ -620,8 +561,9 @@ var ufJS = {
         ics += "-TIME";
         var T = dt.indexOf("T");
         var offset = dt.lastIndexOf("-");
-        if (offset > T) {
-          dt = dt.substr(0, offset);
+        /* If there is an offset and there is no Z, localize */
+        if ((offset > T) || !dt.match("Z")) {
+          dt = ufJSParser.localizeISO8601(dt);
         }
       } else {
         /* Work around upcoming.org bug */
