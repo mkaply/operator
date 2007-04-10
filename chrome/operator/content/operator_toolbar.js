@@ -177,11 +177,14 @@ var Operator_Toolbar = {
   {
     var toolbar = document.getElementById("operator-toolbar");
     var toolbarbuttons = toolbar.getElementsByTagName("toolbarbutton");
+    var classes;
     for(var i=0; i < toolbarbuttons.length; i++) {
       if (toolbarbuttons[i].id != "operator-options") {
         if ((toolbarbuttons[i].label) != toolbarbuttons[i].getAttribute("origlabel")) {
           toolbarbuttons[i].setAttribute("disabled", "false");
-          toolbarbuttons[i].className = "";
+          if (toolbarbuttons[i].className.match("(^|\\s)" + "operator-button-disabled" + "(\\s|$)")) {
+            toolbarbuttons[i].className = toolbarbuttons[i].className.replace("operator-button-disabled", '');
+          }
         }
       }
     }
