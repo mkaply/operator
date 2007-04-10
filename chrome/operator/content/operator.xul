@@ -11,7 +11,7 @@
 
   <toolbox id="navigator-toolbox">
     <toolbar accesskey="&operatorToolbar.accesskey;" class="chromeclass-toolbar" collapsed="false"
-     context="toolbar-context-menu;"
+     context="toolbar-context-menu"
      grippytooltiptext="&operatorToolbar.name;" hidden="false" iconsize="small"
      id="operator-toolbar" inherits="collapsed,hidden" mode="full"
      persist="collapsed,hidden" toolbarname="&operatorToolbar.name;">
