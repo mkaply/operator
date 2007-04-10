@@ -32,6 +32,7 @@ var Operator_Toolbar = {
           if (ufJSParser.microformats[microformat]) {
             button = document.createElement("toolbarbutton");
             button.setAttribute("disabled", "true");
+            button.className = "operator-button-disabled";
             button.label = action;
             button.setAttribute("label", button.label);
             button.setAttribute("origlabel", action);
@@ -68,6 +69,7 @@ var Operator_Toolbar = {
           if (ufJSParser.microformats[microformat]) {
             button = document.createElement("toolbarbutton");
             button.setAttribute("disabled", "true");
+            button.className = "operator-button-disabled";
             if ((Operator.useDescriptiveNames) && (ufJSParser.microformats[microformat].description)) {
               button.label = ufJSParser.microformats[microformat].description;
             } else {
@@ -155,6 +157,7 @@ var Operator_Toolbar = {
     for(var i=0; i < toolbarbuttons.length; i++) {
       if (toolbarbuttons[i].id != "operator-options") {
         toolbarbuttons[i].setAttribute("disabled", "true");
+        toolbarbuttons[i].className = "operator-button-disabled";
       }
     }
   },
@@ -178,6 +181,7 @@ var Operator_Toolbar = {
       if (toolbarbuttons[i].id != "operator-options") {
         if ((toolbarbuttons[i].label) != toolbarbuttons[i].getAttribute("origlabel")) {
           toolbarbuttons[i].setAttribute("disabled", "false");
+          toolbarbuttons[i].className = "";
         }
       }
     }
