@@ -20,15 +20,35 @@ ufJSParser.microformats.hResume = {
         microformat: "hCalendar"
       },
       "experience" : {
+  /* These must be handled explicity by the experience getter because of
+     the possibility of vcard
         subproperties: {
           "vcard" : {
             datatype: "microformat",
             microformat: "hCard"
           },
         },
-        plural: true,
         datatype: "microformat",
         microformat: "hCalendar"
+  */
+        datatype: "custom",
+        customGetter: function(propnode) {
+          var experience = ufJSParser.createMicroformat(propnode, "hCalendar");
+          var vcardnode;
+          if (propnode.className.match("(^|\\s)" + "vcard" + "(\\s|$)")) {
+            vcardnode = propnode;
+          } else {
+            var vcards = ufJSParser.getElementsByClassName(propnode, "vcard");
+            if (vcards.length > 0) {
+              vcardnode = vcards[0];
+            }
+          }
+          if (vcardnode && experience) {
+            experience.vcard = ufJSParser.createMicroformat(vcardnode, "hCard");
+          }
+          return experience;
+        },
+        plural: true,
       },
       "summary" : {
       },
