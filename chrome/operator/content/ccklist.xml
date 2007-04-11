@@ -116,7 +116,10 @@
       </handler>
       <handler event="command">
         if (event.originalTarget.type == "delete") {
-            var dodelete = eval(this.getAttribute("ondelete"));
+            var dodelete = true;
+            if (this.getAttribute("ondelete")) {
+              dodelete = eval(this.getAttribute("ondelete"));
+            }
             if (dodelete) {
               var listbox = document.getAnonymousElementByAttribute(this, 'anonid', 'listbox');
               listbox.removeItemAt(listbox.selectedIndex);
@@ -151,7 +154,10 @@
       </handler>
       <handler event="keypress" keycode="VK_DELETE">
         if (event.originalTarget.tagName == "xul:listbox") {
-          var dodelete = eval(this.getAttribute("ondelete"));
+          var dodelete = true;
+          if (this.getAttribute("ondelete")) {
+            dodelete = eval(this.getAttribute("ondelete"));
+          }
           if (dodelete) {
             var listbox=document.getAnonymousNodes(this)[0].childNodes[0].childNodes[0];
             listbox.removeItemAt(listbox.selectedIndex);
