@@ -27,6 +27,8 @@ var Operator = {
     objScriptLoader.loadSubScript("chrome://operator/content/ufJS/ufJS.js");
     ufJS.init(objScriptLoader, "chrome://operator/content/ufJS/");
 
+    objScriptLoader.loadSubScript("chrome://operator/content/legacy_microformats.js");
+
     if (!options) {
       /* Operator specific parser stuff */
       ufJSParser.microformats.hCard.icon = "chrome://operator/content/hCard.png";
@@ -34,7 +36,6 @@ var Operator = {
       ufJSParser.microformats.geo.icon = "chrome://operator/content/geo.png";
       ufJSParser.microformats.tag.sort = true;
   
-      objScriptLoader.loadSubScript("chrome://operator/content/legacy_microformats.js");
       objScriptLoader.loadSubScript("chrome://operator/content/operator_toolbar.js");
       objScriptLoader.loadSubScript("chrome://operator/content/operator_statusbar.js");
       objScriptLoader.loadSubScript("chrome://operator/content/operator_toolbar_button.js");
@@ -531,7 +532,7 @@ var Operator = {
     if (this.view === 0) {
     } else {
       if (ufJSActions.actions[handler].scope.microformats[microformat]) {
-        if (ufJSActions.actions[handler].doActionAll) {
+        if ((ufJSActions.actions[handler].doActionAll) && (itemsadded > 0)) {
           var sep = document.createElement("menuseparator");
           menu.appendChild(sep);
           tempItem = document.createElement("menuitem");
@@ -637,8 +638,8 @@ var Operator = {
       menuitem = document.createElement("menuseparator");
       menu.appendChild(menuitem);
       menuitem = document.createElement("menuitem");
-      menuitem.setAttribute("label", "Debug");
-      menuitem.label = "Dump microformat";
+      menuitem.label = "Debug";
+      menuitem.setAttribute("label", menuitem.label);
       menuitem.addEventListener("command", this.errorCallbackGenerator(microformat, node), true);
       menu.appendChild(menuitem);
     }
