@@ -2,7 +2,7 @@ function hResume() {
 }
 
 ufJSParser.microformats.hResume = {
-  version: "0.7",
+  version: "0.7.1",
   description: "Resume(s)",
   mfObject: hResume,
   className: "hresume",
@@ -20,6 +20,12 @@ ufJSParser.microformats.hResume = {
         microformat: "hCalendar"
       },
       "experience" : {
+        subproperties: {
+          "vcard" : {
+            datatype: "microformat",
+            microformat: "hCard"
+          },
+        },
         plural: true,
         datatype: "microformat",
         microformat: "hCalendar"
