@@ -1,6 +1,6 @@
 /*extern ufJS, ufJSActions, ufJSParser, openUILink */ 
 
-ufJSActions.actions.export_vcard = {
+ufJSActions.actions.bluetooth_vcard = {
   description: "Send to Bluetooth Device",
   descriptionAll: "Send All to Bluetooth Device",
   scope: {
@@ -103,7 +103,7 @@ ufJSActions.actions.export_vcard = {
   }
 };
 
-ufJSActions.actions.export_icalendar = {
+ufJSActions.actions.bluetooth_icalendar = {
   description: "Send to Bluetooth Device",
   scope: {
     microformats: {
