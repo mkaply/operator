@@ -126,7 +126,8 @@ ufJSActions.actions.bluetooth_icalendar = {
                               getService(Components.interfaces.nsIProperties).
                               get("TmpD", Components.interfaces.nsIFile);
 
-        file.append("hCalendar.ics");
+//        file.append("hCalendar.ics");
+        file.append("hCalendar.vcs");
 
         var fos = Components.classes["@mozilla.org/network/file-output-stream;1"].
                              createInstance(Components.interfaces.nsIFileOutputStream);
