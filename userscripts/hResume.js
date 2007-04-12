@@ -2,7 +2,7 @@ function hResume() {
 }
 
 ufJSParser.microformats.hResume = {
-  version: "0.7.1",
+  version: "0.7.2",
   description: "Resume(s)",
   mfObject: hResume,
   className: "hresume",
@@ -63,7 +63,7 @@ ufJSParser.microformats.hResume = {
           if (vcards.length > 0) {
             var i;
             var noAffiliation = -1;
-            for (i in vcards) {
+            for (var i =0; i < vcards.length; i++) {
               if (vcards[i].nodeName.toLowerCase() == "address") {
                 return ufJSParser.createMicroformat(vcards[i], "hCard");
               } else {
