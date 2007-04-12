@@ -18,7 +18,7 @@
       <tab id="dump.tab" label="Structure"/>
 		  <tab id="source.tab" label="Source"/>
       <tab id="vcfical.tab" label="vCard/iCalendar"/>
-      <tab id="x2v.tab" label="X2V"/>
+      <tab id="x2v.tab" label="X2V" onclick="Operator_Debug.X2V()"/>
 	  </tabs>
 	  <tabpanels>
       <tabpanel id="error.tabpanel">

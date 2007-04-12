@@ -867,17 +867,13 @@ var Operator = {
       try {
         vcfical = ufJS.vCard(item);
       } catch (ex) {}
-      try {
-        X2V = Operator.vCardXSLT(item);
-      } catch (ex) {}
+      X2V = item;
     }
     if (microformat == "hCalendar") {
       try {
         vcfical = ufJS.iCalendar(item, true, true);
       } catch (ex) {}
-      try {
-        X2V = Operator.iCalendarXSLT(item);
-      } catch (ex) {}
+      X2V = item;
     }
     
     var error = {};
@@ -1092,74 +1088,6 @@ var Operator = {
       string += seconds.toString();
     }
     return string;
-  },
-  vCardXSLT: function(item)
-  {
-    var xsltfile;
-    try {
-      var processor = new XSLTProcessor();
-      var serializer = new XMLSerializer();
-    
-      var xmlDocument = document.implementation.createDocument('', '', null);
-      var xslDocument = document.implementation.createDocument('', '', null);
-
-      xmlDocument.appendChild(item.cloneNode(true));
-    
-      xslDocument.async = false;
-      var file = Components.classes["@mozilla.org/file/directory_service;1"].
-                            getService(Components.interfaces.nsIProperties).
-                            get("ProfD", Components.interfaces.nsILocalFile);
-      file.append("microformats");
-
-      file.append("xhtml2vcard.xsl");
-
-      var ioServ = Components.classes["@mozilla.org/network/io-service;1"].
-                              getService(Components.interfaces.nsIIOService);
-      xsltfile = ioServ.newFileURI(file);
-
-      xslDocument.load(xsltfile.spec);
-      
-      processor.importStylesheet(xslDocument);
-
-      var vcf = serializer.serializeToString(processor.transformToFragment(xmlDocument, document));
-      return vcf.replace(/\n\n/g, "\n");
-    } catch (ex) {
-//      return xsltfile.spec + "\n" + ex.message;
-    }
-  },
-  iCalendarXSLT: function(item)
-  {
-    var xsltfile;
-    try {
-      var processor = new XSLTProcessor();
-      var serializer = new XMLSerializer();
-    
-      var xmlDocument = document.implementation.createDocument('', '', null);
-      var xslDocument = document.implementation.createDocument('', '', null);
-    
-      xmlDocument.appendChild(item.cloneNode(true));
-    
-      xslDocument.async = false;
-      var file = Components.classes["@mozilla.org/file/directory_service;1"].
-                            getService(Components.interfaces.nsIProperties).
-                            get("ProfD", Components.interfaces.nsILocalFile);
-      file.append("microformats");
-
-      file.append("xhtml2vcal.xsl");
-
-      var ioServ = Components.classes["@mozilla.org/network/io-service;1"].
-                              getService(Components.interfaces.nsIIOService);
-      xsltfile = ioServ.newFileURI(file);
-
-      xslDocument.load(xsltfile.spec);
-
-      processor.importStylesheet(xslDocument);
-
-      var ics = serializer.serializeToString(processor.transformToFragment(xmlDocument, content.document));
-      return ics.replace(/\n\n/g, "\n");
-    } catch (ex) {
-//      return xsltfile.spec + "\n" + ex.message;
-    }
   }
 };
 
