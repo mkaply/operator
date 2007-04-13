@@ -261,8 +261,12 @@ var ufJS = {
     s = s.replace(/ /g, '+');
     return s;
   },
-  vCard: function(item)
+  vCard: function(item, lineending)
   {
+    var crlf = "\n";
+    if (lineending) {
+      crlf = lineending;
+    }
     var hcard = ufJSParser.createMicroformat(item, "hCard");
     if (!hcard) {
       return;
@@ -270,12 +274,12 @@ var ufJS = {
     var vcf;
     var i;
     var j;
-    vcf  = "BEGIN:VCARD\n";
-//    vcf += "PRODID:-//kaply.com//Operator 0.6.2//EN\n";
-    vcf += "PRODID:\n";
-    vcf += "SOURCE:" + content.document.location.href + "\n";
-    vcf += "NAME:" + content.document.title + "\n";
-    vcf += "VERSION:3.0\n";
+    vcf  = "BEGIN:VCARD" + crlf;
+    vcf += "PRODID:-//kaply.com//Operator 0.7//EN" + crlf;
+    vcf += "PRODID:" + crlf;
+    vcf += "SOURCE:" + content.document.location.href + crlf;
+    vcf += "NAME:" + content.document.title + crlf;
+    vcf += "VERSION:3.0" + crlf;
     if (hcard.n && (hcard.n["family-name"] || hcard.n["given-name"] ||
         hcard.n["additional-name"] || hcard.n["honorific-prefix"] ||
         hcard.n["honorific-suffix"])) {
@@ -299,9 +303,9 @@ var ufJS = {
       if (hcard.n["honorific-suffix"]) {
         vcf += hcard.n["honorific-suffix"].join(",");
       }
-      vcf += "\n";
+      vcf += crlf;
     } else {
-      vcf += "N:;;;;\n";
+      vcf += "N:;;" + crlf;
     }
     if (hcard.org) {
       vcf += "ORG;CHARSET=UTF-8:";
@@ -312,43 +316,43 @@ var ufJS = {
         vcf += ";";
         vcf += hcard.org[0]["organization-unit"].join(";");
       }
-      vcf += "\n";
+      vcf += crlf;
     }
     if (hcard.fn) {
-      vcf += "FN;CHARSET=UTF-8:" + hcard.fn + "\n";
+      vcf += "FN;CHARSET=UTF-8:" + hcard.fn + crlf;
     }
     if (hcard.title) {
-      vcf += "TITLE;CHARSET=UTF-8:" + hcard.title[0] + "\n";
+      vcf += "TITLE;CHARSET=UTF-8:" + hcard.title[0] + crlf;
     }
     if (hcard.role) {
-      vcf += "ROLE;CHARSET=UTF-8:" + hcard.role[0] + "\n";
+      vcf += "ROLE;CHARSET=UTF-8:" + hcard.role[0] + crlf;
     }
     if (hcard["sort-string"]) {
-      vcf += "SORT-STRING;CHARSET=UTF-8:" + hcard["sort-string"][0] + "\n";
+      vcf += "SORT-STRING;CHARSET=UTF-8:" + hcard["sort-string"][0] + crlf;
     }
     if (hcard["class"]) {
-      vcf += "CLASS;CHARSET=UTF-8:" + hcard["class"] + "\n";
+      vcf += "CLASS;CHARSET=UTF-8:" + hcard["class"] + crlf;
     }
     if (hcard.tz) {
-      vcf += "TZ;CHARSET=UTF-8:" + hcard.tz + "\n";
+      vcf += "TZ;CHARSET=UTF-8:" + hcard.tz + crlf;
     }
     if (hcard.category) {
-      vcf += "CATEGORIES;CHARSET=UTF-8:" + hcard.category.join(",") + "\n";
+      vcf += "CATEGORIES;CHARSET=UTF-8:" + hcard.category.join(",") + crlf;
     }
     if (hcard.rev) {
-      vcf += "REV:" + hcard.rev + "\n";
+      vcf += "REV:" + hcard.rev + crlf;
     }
     if (hcard.bday) {
-      vcf += "BDAY:" + hcard.bday + "\n";
+      vcf += "BDAY:" + hcard.bday + crlf;
     }
     if (hcard.uid) {
-      vcf += "UID:" + hcard.uid + "\n";
+      vcf += "UID:" + hcard.uid + crlf;
     } else {
-      vcf += "UID:\n";
+      vcf += "UID:" + crlf;
     }
     if (hcard.url) {
       for (i=0;i<hcard.url.length;i++) {
-        vcf += "URL:" + hcard.url[i] + "\n";
+        vcf += "URL:" + hcard.url[i] + crlf;
       }
     }
     if (hcard.email) {
@@ -360,7 +364,7 @@ var ufJS = {
         }
         vcf += ":";
         vcf += hcard.email[i].value;
-        vcf += "\n";
+        vcf += crlf;
       }
     }
     if (hcard.adr) {
@@ -398,7 +402,7 @@ var ufJS = {
         if (hcard.adr[i]["country-name"]) {
           vcf += hcard.adr[i]["country-name"];
         }
-        vcf += "\n";
+        vcf += crlf;
       }
     }
     if (hcard.tel) {
@@ -410,11 +414,11 @@ var ufJS = {
         }
         vcf += ":";
         vcf += hcard.tel[i].value;
-        vcf += "\n";
+        vcf += crlf;
       }
     }
     if (hcard.geo) {
-      vcf += "GEO:" + hcard.geo.latitude + ";" + hcard. geo.longitude + "\n";
+      vcf += "GEO:" + hcard.geo.latitude + ";" + hcard. geo.longitude + crlf;
     }
     if (hcard.note) {
       vcf += "NOTE;CHARSET=UTF-8:";
@@ -430,39 +434,40 @@ var ufJS = {
         }
         vcf += s;
       }
-      vcf += "\n";
+      vcf += crlf;
     }
     if (hcard.nickname) {
-      vcf += "NICKNAME;CHARSET=UTF-8:" + hcard.nickname + "\n";
+      vcf += "NICKNAME;CHARSET=UTF-8:" + hcard.nickname + crlf;
     }
     /* Add code to handle data URLs */
     if (hcard.photo) {
-      vcf += "PHOTO;VALUE=uri:" + hcard.photo + "\n";
+      vcf += "PHOTO;VALUE=uri:" + hcard.photo + crlf;
     }
     if (hcard.logo) {
-      vcf += "LOGO;VALUE=uri:" + hcard.logo + "\n";
+      vcf += "LOGO;VALUE=uri:" + hcard.logo + crlf;
     }
-    vcf += "END:VCARD\n";
+    vcf += "END:VCARD" + crlf;
     return vcf;
   },
   iCalendar: function(item, header, footer)
   {
+    var crlf = "\n";
     var hcalendar = ufJSParser.createMicroformat(item, "hCalendar");
     if (!hcalendar) {
       return;
     }
     var ics = "";
     if (header) {
-      ics += "BEGIN:VCALENDAR\n";
-      ics += "PRODID:\n";
-      ics += "X-ORIGINAL-URL:" + content.document.location.href + "\n";
-      ics += "X-WR-CALNAME:\n";
-      ics += "VERSION:2.0\n";
-      ics += "METHOD:PUBLISH\n";
+      ics += "BEGIN:VCALENDAR" + crlf;;
+      ics += "PRODID:" + crlf;;
+      ics += "X-ORIGINAL-URL:" + content.document.location.href + crlf;;
+      ics += "X-WR-CALNAME:" + crlf;;
+      ics += "VERSION:2.0" + crlf;;
+      ics += "METHOD:PUBLISH" + crlf;;
     }
-    ics += "BEGIN:VEVENT\n";
+    ics += "BEGIN:VEVENT" + crlf;;
     if (hcalendar["class"]) {
-      ics += "CLASS:" + hcalendar["class"] + "\n";
+      ics += "CLASS:" + hcalendar["class"] + crlf;;
     }
     if (hcalendar.description) {
       var s = hcalendar.description;
@@ -487,7 +492,7 @@ var ufJS = {
         }
       }
 */
-      ics += "DESCRIPTION;CHARSET=UTF-8:" + s + "\n";
+      ics += "DESCRIPTION;CHARSET=UTF-8:" + s + crlf;;
     }
     if (hcalendar.location) {
       ics += "LOCATION;CHARSET=UTF-8:";
@@ -518,25 +523,25 @@ var ufJS = {
       } else {
         ics += hcalendar.location;
       }
-      ics += "\n";
+      ics += crlf;;
     }
     if (hcalendar.summary) {
-      ics += "SUMMARY;CHARSET=UTF-8:" + hcalendar.summary + "\n";
+      ics += "SUMMARY;CHARSET=UTF-8:" + hcalendar.summary + crlf;;
     }
     if (hcalendar.status) {
-      ics += "STATUS:" + hcalendar.status + "\n";
+      ics += "STATUS:" + hcalendar.status + crlf;;
     }
     if (hcalendar.transp) {
-      ics += "TRANSP:" + hcalendar.transp + "\n";
+      ics += "TRANSP:" + hcalendar.transp + crlf;;
     }
     /* OUTLOOK REQUIRES UID */
     ics += "UID:";
     if (hcalendar.uid) {
       ics += hcalendar.uid;
     }
-    ics += "\n";
+    ics += crlf;;
     if (hcalendar.url) {
-      ics += "URL:" + hcalendar.url + "\n";
+      ics += "URL:" + hcalendar.url + crlf;;
     }
     var dt;
     if (hcalendar.dtstart) {
@@ -552,7 +557,7 @@ var ufJS = {
         }
       }
       dt = dt.replace(/-/g,"").replace(/:/g,"");
-      ics += ":" + dt + "\n";
+      ics += ":" + dt + crlf;;
     }
     if (hcalendar.dtend) {
       dt = hcalendar.dtend;
@@ -575,7 +580,7 @@ var ufJS = {
         }
       }
       dt = dt.replace(/-/g,"").replace(/:/g,"");
-      ics += ":" + dt + "\n";
+      ics += ":" + dt + crlf;;
     }
     /* OUTLOOK REQUIRES DTSTAMP */
     ics += "DTSTAMP:";
@@ -584,20 +589,20 @@ var ufJS = {
     } else {
       ics += "19701209T000000Z";
     }
-    ics += "\n";
+    ics += crlf;;
     if (hcalendar.category) {
-      ics += "CATEGORIES;CHARSET=UTF-8:" + hcalendar.category.join(",") + "\n";
+      ics += "CATEGORIES;CHARSET=UTF-8:" + hcalendar.category.join(",") + crlf;;
     }
     if (hcalendar.location) {
       if (typeof hcalendar.location == "object") {
         if (hcalendar.location.geo) {
-          ics += "GEO:" + hcalendar.location.geo.latitude + ";" + hcalendar.location.geo.longitude + "\n";
+          ics += "GEO:" + hcalendar.location.geo.latitude + ";" + hcalendar.location.geo.longitude + crlf;;
         }
       }
     }
-    ics += "END:VEVENT\n";
+    ics += "END:VEVENT" + crlf;;
     if (footer) {
-      ics += "END:VCALENDAR\n";
+      ics += "END:VCALENDAR" + crlf;;
     }
 
     return ics;
