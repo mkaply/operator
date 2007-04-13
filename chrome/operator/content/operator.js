@@ -653,24 +653,33 @@ var Operator = {
     gContextMenu.showItem("operator-menu-0", false);
     gContextMenu.showItem("operator-menu-1", false);
     gContextMenu.showItem("operator-menu-2", false);
+    gContextMenu.showItem("operator-menu-3", false);
+    gContextMenu.showItem("operator-menu-4", false);
     gContextMenu.showItem("operator-separator", false);
     if (mfNode) {
       var mfNames = ufJS.getMicroformatNameFromNode(mfNode);
-      gContextMenu.showItem("operator-separator", true);
       var i;
+      var actionmenu;
+      var shown_separator = false;
       for (i in mfNames) {
-        gContextMenu.showItem("operator-menu-" + i, true);
-        var menuitem = document.getElementById("operator-menu-" + i);
-        if (ufJSParser.microformats[mfNames[i]].description) {
-          menuitem.label = "Operator " + ufJSParser.microformats[mfNames[i]].description;
-        } else {
-          menuitem.label = "Operator " + mfNames[i];
+        actionmenu = Operator.buildPopupMenu(mfNames[i], mfNode);
+        if (actionmenu.childNodes.length > 0) {
+          if (!shown_separator) {
+            gContextMenu.showItem("operator-separator", true);
+          }
+          gContextMenu.showItem("operator-menu-" + i, true);
+          var menuitem = document.getElementById("operator-menu-" + i);
+          if (ufJSParser.microformats[mfNames[i]].description) {
+            menuitem.label = "Operator " + ufJSParser.microformats[mfNames[i]].description;
+          } else {
+            menuitem.label = "Operator " + mfNames[i];
+          }
+          menuitem.setAttribute("label", menuitem.label);
+          for(var j=menuitem.childNodes.length - 1; j>=0; j--) {
+            menuitem.removeChild(menuitem.childNodes.item(j));
+          }
+          menuitem.appendChild(actionmenu);
         }
-        menuitem.setAttribute("label", menuitem.label);
-        for(var j=menuitem.childNodes.length - 1; j>=0; j--) {
-          menuitem.removeChild(menuitem.childNodes.item(j));
-        }
-        menuitem.appendChild(Operator.buildPopupMenu(mfNames[i], mfNode));
       }
     }
   },
