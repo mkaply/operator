@@ -276,7 +276,6 @@ var ufJS = {
     var j;
     vcf  = "BEGIN:VCARD" + crlf;
     vcf += "PRODID:-//kaply.com//Operator 0.7//EN" + crlf;
-    vcf += "PRODID:" + crlf;
     vcf += "SOURCE:" + content.document.location.href + crlf;
     vcf += "NAME:" + content.document.title + crlf;
     vcf += "VERSION:3.0" + crlf;
