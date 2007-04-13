@@ -51,6 +51,8 @@ var Operator_Toolbar = {
             toolbar.insertBefore(button, document.getElementById("operator-spring"));
             var node = document.getAnonymousElementByAttribute(button, "class", "toolbarbutton-icon");
             node.style.opacity = 0.3;
+            node.style.width = "16px";
+            node.style.height = "16px";
           }
         } else {
           break;
@@ -91,6 +93,8 @@ var Operator_Toolbar = {
             toolbar.insertBefore(button, document.getElementById("operator-spring"));
             var node = document.getAnonymousElementByAttribute(button, "class", "toolbarbutton-icon");
             node.style.opacity = 0.3;
+            node.style.width = "16px";
+            node.style.height = "16px";
           }
         } else {
           break;
@@ -161,6 +165,8 @@ var Operator_Toolbar = {
         toolbarbuttons[i].setAttribute("disabled", "true");
         var node = document.getAnonymousElementByAttribute(toolbarbuttons[i], "class", "toolbarbutton-icon");
         node.style.opacity = 0.3;
+        node.style.width = "16px";
+        node.style.height = "16px";
       }
     }
   },
@@ -187,6 +193,8 @@ var Operator_Toolbar = {
           toolbarbuttons[i].setAttribute("disabled", "false");
           var node = document.getAnonymousElementByAttribute(toolbarbuttons[i], "class", "toolbarbutton-icon");
           node.style.opacity = 1.0;
+          node.style.width = "16px";
+          node.style.height = "16px";
         }
       }
     }
