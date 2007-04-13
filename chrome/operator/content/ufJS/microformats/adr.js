@@ -32,24 +32,26 @@ ufJSParser.microformats.Address = {
         virtual: true,
         virtualGetter: function(mfnode) {
           var address = ufJSParser.createMicroformat(mfnode, "Address");
-          var address_text = "";
-          if (address["post-office-box"]) {
-            address_text += address["post-office-box"];
-            address_text += " ";
+          if (address) {
+            var address_text = "";
+            if (address["post-office-box"]) {
+              address_text += address["post-office-box"];
+              address_text += " ";
+            }
+            if (address["street-address"]) {
+              address_text += address["street-address"][0];
+              address_text += " ";
+            }
+            if (address["locality"]) {
+              address_text += address["locality"];
+              address_text += " ";
+            }
+            if (address["region"]) {
+              address_text += address["region"];
+              address_text += " ";
+            }
+            return address_text;
           }
-          if (address["street-address"]) {
-            address_text += address["street-address"][0];
-            address_text += " ";
-          }
-          if (address["locality"]) {
-            address_text += address["locality"];
-            address_text += " ";
-          }
-          if (address["region"]) {
-            address_text += address["region"];
-            address_text += " ";
-          }
-          return address_text;
         }
       }
     }
