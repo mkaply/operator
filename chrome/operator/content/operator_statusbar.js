@@ -53,6 +53,7 @@ var Operator_Statusbar = {
     if (!this.isHidden()) {
       document.getElementById("operator-statusbar").setAttribute("disabled", "true");
       document.getElementById("operator-statusbar").src="chrome://operator/content/operator_small_disabled.png";
+      document.getElementById("operator-statusbar").setAttribute("tooltiptext", Operator.languageBundle.GetStringFromName("operatorNoMicroformats"));
     }
   },
   enable: function()
@@ -60,6 +61,7 @@ var Operator_Statusbar = {
     if (!this.isHidden()) {
       document.getElementById("operator-statusbar").setAttribute("disabled", "false");
       document.getElementById("operator-statusbar").src="chrome://operator/content/operator_small.png";
+      document.getElementById("operator-statusbar").setAttribute("tooltiptext", Operator.languageBundle.GetStringFromName("operatorFoundMicroformats"));
     }
   },
   hide: function()
