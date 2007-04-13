@@ -263,7 +263,7 @@ var ufJS = {
   },
   vCard: function(item, lineending)
   {
-    var crlf = "\n";
+    var crlf = "\r\n";
     if (lineending) {
       crlf = lineending;
     }
