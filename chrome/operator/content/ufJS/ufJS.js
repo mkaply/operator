@@ -225,9 +225,9 @@ var ufJS = {
       mfname = microformatList[i];
       if (ufJSParser.microformats[mfname]) {
         if (ufJSParser.microformats[mfname].className) {
-          xpathExpression = "self::*[contains(concat(' ', @class, ' '), ' " + ufJSParser.microformats[mfname].className + " ')]";
+          xpathExpression = "ancestor-or-self::*[contains(concat(' ', @class, ' '), ' " + ufJSParser.microformats[mfname].className + " ')]";
         } else if (ufJSParser.microformats[mfname].attributeValues) {
-          xpathExpression = "self::*[";
+          xpathExpression = "ancestor-or-self::*[";
           for (i in ufJSParser.microformats[mfname].attributeValues) {
             if (i != 0) {
               xpathExpression += " or ";
