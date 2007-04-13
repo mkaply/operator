@@ -3,7 +3,7 @@
     <Description about="urn:mozilla:install-manifest">
         <em:id>{95C9A302-8557-4052-91B7-2BB6BA33C885}</em:id>
         <em:name>Operator</em:name>
-        <em:version>0.7.1</em:version>
+        <em:version>0.7.1b</em:version>
         <em:description></em:description>
         <em:creator>Michael Kaply (IBM)</em:creator>
         <em:homepageURL>http://www.kaply.com/weblog/</em:homepageURL>
