@@ -26,7 +26,6 @@
    <statusbarpanel class="statusbarpanel-menu-iconic" disabled="true"
      id="operator-statusbar"
      src="chrome://operator/content/operator_small_disabled.png"
-     tooltiptext="&operator.name;"
    />
  </statusbar>
  	<toolbarpalette id="BrowserToolbarPalette">
