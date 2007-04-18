@@ -42,6 +42,13 @@ ufJSActions.actions.magnolia_bookmark = {
         if (xfolk.description) {
           url += '&description=' + encodeURIComponent(xfolk.description);
         }
+        if (xfolk.tag) {
+          url += '&tags=';
+          for (var i = 0; i < xfolk.tag.length; i++) {
+            url += encodeURIComponent(xfolk.tag[i]);
+            url += ",";
+          }
+        }
       }
     }
     if (url) {
