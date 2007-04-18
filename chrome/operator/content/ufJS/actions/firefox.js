@@ -16,53 +16,41 @@ ufJSActions.actions.bookmark = {
     }
   },
   doAction: function(node, microformatName, event) {
-    var microformatNames;
-    if (!microformatName) {
-      microformatNames = ufJS.getMicroformatNameFromNode(node);
+    var url, name, description;
+    if (microformatName == "xFolk") {
+      var taggedlink = ufJSParser.getMicroformatProperty(node, "xFolk", "taggedlink");
+      if (taggedlink) {
+        url = taggedlink.link;
+        name = taggedlink.title;
+      }
+      description = ufJSParser.getMicroformatProperty(node, "xFolk", "description");
+    } else if (microformatName == "hAtom") {
+      name = ufJSParser.getMicroformatProperty(node, "hAtom", "entry-title");
+      var bookmark = ufJSParser.getMicroformatProperty(node, "hAtom", "bookmark");
+      url = bookmark.link;
     } else {
-      microformatNames = [];
-      microformatNames.push(microformatName);
+      var serializer = new XMLSerializer();
+      var xmlString = serializer.serializeToString(node);
+      url = "data:text/html;charset=utf8," + xmlString;
+      name = ufJSParser.getMicroformatProperty(node, microformatName, "ufjsDisplayName");
     }
-    var url;
-    var action = ufJSActions.actions.goto_url;
-    for (var i in microformatNames) {
-      var name;
-      var description;
-      if (microformatNames[i] == "xFolk") {
-        var taggedlink = ufJSParser.getMicroformatProperty(node, "xFolk", "taggedlink");
-        if (taggedlink) {
-          url = taggedlink.link;
-          name = taggedlink.title;
-        }
-        description = ufJSParser.getMicroformatProperty(node, "xFolk", "description");
-      } else if (microformatNames[i] == "hAtom") {
-        var name = ufJSParser.getMicroformatProperty(node, "hAtom", "entry-title");
-        var bookmark = ufJSParser.getMicroformatProperty(node, "hAtom", "bookmark");
-        url = bookmark.link;
-      } else {
-        var serializer = new XMLSerializer();
-        var xmlString = serializer.serializeToString(node);
-        url = "data:text/html;charset=utf8," + xmlString;
-        name = ufJSParser.getMicroformatProperty(node, microformatNames[i], "ufjsDisplayName");
-      }
-      var dArgs = {
-        name: name,
-        url: url,
-        charset: "",
-        bWebPanel: false,
-        description: description
-      };
-      var ADD_BM_DIALOG_FEATURES = "centerscreen,chrome,dialog,resizable,";
-        
-      if (navigator.platform.search(/mac/i) > -1) {
-        ADD_BM_DIALOG_FEATURES += "modal";
-      } else {
-        ADD_BM_DIALOG_FEATURES += "dependent";
-      }
-  
-      window.openDialog("chrome://browser/content/bookmarks/addBookmark2.xul", "",
-                        ADD_BM_DIALOG_FEATURES, dArgs);
+    var dArgs = {
+      name: name,
+      url: url,
+      charset: "",
+      bWebPanel: false,
+      description: description
+    };
+    var ADD_BM_DIALOG_FEATURES = "centerscreen,chrome,dialog,resizable,";
+      
+    if (navigator.platform.search(/mac/i) > -1) {
+      ADD_BM_DIALOG_FEATURES += "modal";
+    } else {
+      ADD_BM_DIALOG_FEATURES += "dependent";
     }
+
+    window.openDialog("chrome://browser/content/bookmarks/addBookmark2.xul", "",
+                      ADD_BM_DIALOG_FEATURES, dArgs);
   }
 };
 

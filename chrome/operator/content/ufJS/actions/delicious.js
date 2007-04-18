@@ -9,21 +9,11 @@ ufJSActions.actions.delicious_search_tags = {
     }
   },
   doAction: function(node, microformatName, event) {
-    var microformatNames;
-    if (!microformatName) {
-      microformatNames = ufJS.getMicroformatNameFromNode(node);
-    } else {
-      microformatNames = [];
-      microformatNames.push(microformatName);
-    }
     var url;
-    for (var i in microformatNames) {
-      if (microformatNames[i] == "tag") {
-        var tag = ufJSParser.getMicroformatProperty(node, "tag", "tag");
-        if (tag) {
-          url = "http://del.icio.us/tag/" + encodeURIComponent(tag);
-          break;
-        }
+    if (microformatName == "tag") {
+      var tag = ufJSParser.getMicroformatProperty(node, "tag", "tag");
+      if (tag) {
+        url = "http://del.icio.us/tag/" + encodeURIComponent(tag);
       }
     }
     if (url) {
@@ -41,37 +31,27 @@ ufJSActions.actions.delicious_bookmark = {
     }
   },
   doAction: function(node, microformatName, event) {
-    var microformatNames;
-    if (!microformatName) {
-      microformatNames = ufJS.getMicroformatNameFromNode(node);
-    } else {
-      microformatNames = [];
-      microformatNames.push(microformatName);
-    }
     var url;
-    for (var i in microformatNames) {
-      if (microformatNames[i] == "xFolk") {
-        var xfolk = ufJSParser.createMicroformat(node, "xFolk");
-        if (xfolk && xfolk.taggedlink && xfolk.taggedlink.link) {
-          url = 'http://del.icio.us/post?v=4;url=' + encodeURIComponent(xfolk.taggedlink.link);
-          if (xfolk.taggedlink.title) {
-            url += ';title=' + encodeURIComponent(xfolk.taggedlink.title);
-          }
-          if (xfolk.description) {
-            url += ';notes=' + encodeURIComponent(xfolk.description);
-          }
-/*
-          if (xfolk.tag) {
-            url += ';tags=';
-            var j;
-            for (j = 0; j < xfolk.tag.length; j++) {
-              url += encodeURIComponent(xfolk.tag[j].tag);
-              url += "+";
-            }
-          }
-*/
+    if (microformatName == "xFolk") {
+      var xfolk = ufJSParser.createMicroformat(node, "xFolk");
+      if (xfolk && xfolk.taggedlink && xfolk.taggedlink.link) {
+        url = 'http://del.icio.us/post?v=4;url=' + encodeURIComponent(xfolk.taggedlink.link);
+        if (xfolk.taggedlink.title) {
+          url += ';title=' + encodeURIComponent(xfolk.taggedlink.title);
         }
-        break;
+        if (xfolk.description) {
+          url += ';notes=' + encodeURIComponent(xfolk.description);
+        }
+        /*
+        if (xfolk.tag) {
+          url += ';tags=';
+          var j;
+          for (j = 0; j < xfolk.tag.length; j++) {
+            url += encodeURIComponent(xfolk.tag[j].tag);
+            url += "+";
+          }
+        }
+        */
       }
     }
     if (url) {

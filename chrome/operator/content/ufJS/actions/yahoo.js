@@ -10,54 +10,43 @@ ufJSActions.actions.yahoo_maps = {
     }
   },
   doAction: function(node, microformatName, event) {
-    var microformatNames;
-    if (!microformatName) {
-      microformatNames = ufJS.getMicroformatNameFromNode(node);
-    } else {
-      microformatNames = [];
-      microformatNames.push(microformatName);
-    }
     var url;
-    for (var i in microformatNames) {
-      if (microformatNames[i] == "hCard") {
-        var adr = ufJSParser.getMicroformatProperty(node, "hCard", "adr");
-        if (adr) {
-          url = "http://maps.yahoo.com/maps_result?";
-          if (adr[0]["street-address"]) {
-            url += "&addr=" + encodeURIComponent(adr[0]["street-address"]);
-          }
-          if ((adr[0].locality) || (adr[0].region) || (adr[0]["postal-code"])) {
-            url += "&csz=";
-            if (adr[0].locality) {
-              url += encodeURIComponent(adr[0].locality);
-              if (adr[0].region) {
-                url += ", ";
-              } else if (adr[0]["postal-code"]) {
-                url += " ";
-              }
-            }
+    if (microformatName == "hCard") {
+      var adr = ufJSParser.getMicroformatProperty(node, "hCard", "adr");
+      if (adr) {
+        url = "http://maps.yahoo.com/maps_result?";
+        if (adr[0]["street-address"]) {
+          url += "&addr=" + encodeURIComponent(adr[0]["street-address"]);
+        }
+        if ((adr[0].locality) || (adr[0].region) || (adr[0]["postal-code"])) {
+          url += "&csz=";
+          if (adr[0].locality) {
+            url += encodeURIComponent(adr[0].locality);
             if (adr[0].region) {
-              url += encodeURIComponent(adr[0].region);
-              if (adr[0]["postal-code"]) {
-                url += " ";
-              }
+              url += ", ";
+            } else if (adr[0]["postal-code"]) {
+              url += " ";
             }
+          }
+          if (adr[0].region) {
+            url += encodeURIComponent(adr[0].region);
             if (adr[0]["postal-code"]) {
-              url += encodeURIComponent(adr[0]["postal-code"]);
+              url += " ";
             }
           }
-          if (adr[0]["country-name"]) {
-            url += "&country=" + encodeURIComponent(adr[0]["country-name"]);
+          if (adr[0]["postal-code"]) {
+            url += encodeURIComponent(adr[0]["postal-code"]);
           }
-          break;
         }
-      } else if (microformatNames[i] == "geo") {
-        var latitude = ufJSParser.getMicroformatProperty(node, "geo", "latitude");
-        var longitude = ufJSParser.getMicroformatProperty(node, "geo", "longitude");
-        if (latitude && longitude) {
-          url = "http://maps.yahoo.com/#lat=" + latitude + "&lon=" + longitude + "&mag=3";
-          break;
+        if (adr[0]["country-name"]) {
+          url += "&country=" + encodeURIComponent(adr[0]["country-name"]);
         }
+      }
+    } else if (microformatName == "geo") {
+      var latitude = ufJSParser.getMicroformatProperty(node, "geo", "latitude");
+      var longitude = ufJSParser.getMicroformatProperty(node, "geo", "longitude");
+      if (latitude && longitude) {
+        url = "http://maps.yahoo.com/#lat=" + latitude + "&lon=" + longitude + "&mag=3";
       }
     }
     if (url) {
@@ -76,30 +65,17 @@ ufJSActions.actions.yahoo_search = {
     }
   },
   doAction: function(node, microformatName, event) {
-    var microformatNames;
-    if (!microformatName) {
-      microformatNames = ufJS.getMicroformatNameFromNode(node);
-    } else {
-      microformatNames = [];
-      microformatNames.push(microformatName);
-    }
     var searchstring;
     var action = ufJSActions.actions.yahoo_search;
-    for (var i in microformatNames) {
-      if (microformatNames[i] == "hReview") {
-        var hreview = ufJSParser.createMicroformat(node, "hReview");
-        if (hreview.item.summary) {
-          searchstring = hreview.item.summary;
-        } else if (hreview.item.fn) {
-          searchstring = hreview.item.fn;
-        }
-        break;
-      } else {
-        searchstring = ufJSParser.getMicroformatProperty(node, microformatNames[i], action.scope.microformats[microformatNames[i]]);
-        if (searchstring) {
-          break;
-        }
+    if (microformatName == "hReview") {
+      var hreview = ufJSParser.createMicroformat(node, "hReview");
+      if (hreview.item.summary) {
+        searchstring = hreview.item.summary;
+      } else if (hreview.item.fn) {
+        searchstring = hreview.item.fn;
       }
+    } else {
+      searchstring = ufJSParser.getMicroformatProperty(node, microformatName, action.scope.microformats[microformatName]);
     }
     if (searchstring) {
       var url = "http://search.yahoo.com/search?p=" + encodeURIComponent(searchstring);
@@ -287,153 +263,143 @@ ufJSActions.actions.yahoo_contact = {
     }
   },
   doAction: function(node, microformatName, event) {
-    var microformatNames;
-    if (!microformatName) {
-      microformatNames = ufJS.getMicroformatNameFromNode(node);
-    } else {
-      microformatNames = [];
-      microformatNames.push(microformatName);
-    }
     var url;
-    for (var i in microformatNames) {
-      if (microformatNames[i] == "hCard") {
-        var j, k;
-        var hcard = ufJSParser.createMicroformat(node, "hCard");
-        url = "http://address.yahoo.com/?";
-        if (hcard.n && (hcard.n["family-name"]) && (hcard.n["given-name"])) {
-          url += "ln=" + hcard.n["family-name"] + "&";
-          url += "fn=" + hcard.n["given-name"] + "&";
-          if (hcard.n["additional-name"]) {
-            url += "mn=";
-            for (j=0;j<hcard.n["additional-name"].length;j++) {
-              url += hcard.n["additional-name"][j];
-              if (i != hcard.n["additional-name"].length -1) {
-                url += " ";
-              }
-              url += "&";
+    if (microformatName == "hCard") {
+      var i, j, k;
+      var hcard = new hCard(node);
+      url = "http://address.yahoo.com/?";
+      if (hcard.n && (hcard.n["family-name"]) && (hcard.n["given-name"])) {
+        url += "ln=" + hcard.n["family-name"] + "&";
+        url += "fn=" + hcard.n["given-name"] + "&";
+        if (hcard.n["additional-name"]) {
+          url += "mn=";
+          for (j=0;j<hcard.n["additional-name"].length;j++) {
+            url += hcard.n["additional-name"][j];
+            if (i != hcard.n["additional-name"].length -1) {
+              url += " ";
             }
+            url += "&";
           }
-        } else {
-          url += "fn=" + hcard.fn + "&";
         }
-        if (hcard.org) {
-          url += "co=" + hcard.org[0]["organization-name"] + "&";
-        }
-        /* only using the first email */
-        if (hcard.email) {
-          url += "e=";
-          /* Default to first email address */
-          var email = hcard.email[0].value;
-          /* Look for a preferred */
-          for (j=0;j<hcard.email.length;j++) {
-            if (hcard.email[j].type) {
-              for (k=0;k<hcard.email[j].type.length;k++) {
-                if (hcard.email[j].type[k] == "pref") {
-                  email = hcard.email[j].value;
-                  break;
-                }
+      } else {
+        url += "fn=" + hcard.fn + "&";
+      }
+      if (hcard.org) {
+        url += "co=" + hcard.org[0]["organization-name"] + "&";
+      }
+      /* only using the first email */
+      if (hcard.email) {
+        url += "e=";
+        /* Default to first email address */
+        var email = hcard.email[0].value;
+        /* Look for a preferred */
+        for (j=0;j<hcard.email.length;j++) {
+          if (hcard.email[j].type) {
+            for (k=0;k<hcard.email[j].type.length;k++) {
+              if (hcard.email[j].type[k] == "pref") {
+                email = hcard.email[j].value;
+                break;
               }
             }
           }
-          url += email;
-          url += "&";
         }
-    
-        if (hcard.adr) {
-          for (j=0;j<hcard.adr.length;j++) {
-            var prefix = "h";
-            /* If business, default to work */
-            if (hcard.org && (hcard.fn == hcard.org)) {
-              prefix = "w";
-            }
-            if (hcard.adr[j].type) {
-              /* Should I have a way to have one address be work and home? */
-              for (k=0;k<hcard.adr[j].type.length;k++) {
-                if (hcard.adr[j].type[k].toLowerCase() == "work") {
-                  prefix = "w";
-                  break;
-                }
-              }
-            }
-      
-            if (hcard.adr[j]["street-address"]) {
-              url += prefix + "a1=" + escape(hcard.adr[j]["street-address"][0]) + "&";
-            }
-            if (hcard.adr[j]["extended-address"]) {
-              url += prefix + "a2=" + hcard.adr[j]["extended-address"] + "&";
-            }
-            if (hcard.adr[j].locality) {
-              url += prefix + "c=" + hcard.adr[j].locality + "&";
-            }
-            if (hcard.adr[j].region) {
-              url += prefix + "s=" + hcard.adr[j].region + "&";
-            }
-            if (hcard.adr[j]["postal-code"]) {
-              url += prefix + "z=" + hcard.adr[j]["postal-code"] + "&";
-            }
-            if (hcard.adr[j]["country-name"]) {
-              url += prefix + "co=" + hcard.adr[j]["country-name"] + "&";
-            }
-          }
-        }
-        if (hcard.tel) {
-          /* default home phone to first number */
-          var homephone;
-          var workphone;
-          var mobilephone;
-          var preferred;
+        url += email;
+        url += "&";
+      }
+  
+      if (hcard.adr) {
+        for (j=0;j<hcard.adr.length;j++) {
+          var prefix = "h";
           /* If business, default to work */
           if (hcard.org && (hcard.fn == hcard.org)) {
-            workphone = hcard.tel[0].value;
-          } else {
-            homephone = hcard.tel[0].value;
+            prefix = "w";
           }
-          preferred = hcard.tel[0].value;
-          
-          for (j=0;j<hcard.tel.length;j++) {
-            if (hcard.tel[j].type) {
-              for (k=0;k<hcard.tel[j].type.length;k++) {
-                if (hcard.tel[j].type[k].toLowerCase() == "home") {
-                  homephone = hcard.tel[j].value; 
-                }
-                if (hcard.tel[j].type[k].toLowerCase() == "work") {
-                  workphone = hcard.tel[j].value; 
-                }
-                if (hcard.tel[j].type[k].toLowerCase() == "cell") {
-                  mobilephone = hcard.tel[j].value; 
-                }
-                if (hcard.tel[j].type[k].toLowerCase() == "pref") {
-                  preferred = hcard.tel[j].value; 
-                }
+          if (hcard.adr[j].type) {
+            /* Should I have a way to have one address be work and home? */
+            for (k=0;k<hcard.adr[j].type.length;k++) {
+              if (hcard.adr[j].type[k].toLowerCase() == "work") {
+                prefix = "w";
+                break;
               }
             }
           }
-          /* op for other */
-          if (homephone) {
-            url += "hp=" + homephone + "&";
+    
+          if (hcard.adr[j]["street-address"]) {
+            url += prefix + "a1=" + escape(hcard.adr[j]["street-address"][0]) + "&";
           }
-          if (workphone) {
-            url += "wp=" + workphone + "&";
+          if (hcard.adr[j]["extended-address"]) {
+            url += prefix + "a2=" + hcard.adr[j]["extended-address"] + "&";
           }
-          if (mobilephone) {
-            url += "mb=" + mobilephone + "&";
+          if (hcard.adr[j].locality) {
+            url += prefix + "c=" + hcard.adr[j].locality + "&";
           }
-          /* 0=home, 1=work, 2=mobile */
-          if (preferred == workphone) {
-            url += "pp=1&";
-          } else if (preferred == mobilephone) {
-            url += "pp=2&";
-          } else {
-            url += "pp=0&";
+          if (hcard.adr[j].region) {
+            url += prefix + "s=" + hcard.adr[j].region + "&";
+          }
+          if (hcard.adr[j]["postal-code"]) {
+            url += prefix + "z=" + hcard.adr[j]["postal-code"] + "&";
+          }
+          if (hcard.adr[j]["country-name"]) {
+            url += prefix + "co=" + hcard.adr[j]["country-name"] + "&";
           }
         }
-        /* can be wu for a work url */
-        if (hcard.url) {
-          url += "pu=" + hcard.url[0] + "&";
-        }
-        url += "A=C";
-        break;
       }
+      if (hcard.tel) {
+        /* default home phone to first number */
+        var homephone;
+        var workphone;
+        var mobilephone;
+        var preferred;
+        /* If business, default to work */
+        if (hcard.org && (hcard.fn == hcard.org)) {
+          workphone = hcard.tel[0].value;
+        } else {
+          homephone = hcard.tel[0].value;
+        }
+        preferred = hcard.tel[0].value;
+        
+        for (j=0;j<hcard.tel.length;j++) {
+          if (hcard.tel[j].type) {
+            for (k=0;k<hcard.tel[j].type.length;k++) {
+              if (hcard.tel[j].type[k].toLowerCase() == "home") {
+                homephone = hcard.tel[j].value; 
+              }
+              if (hcard.tel[j].type[k].toLowerCase() == "work") {
+                workphone = hcard.tel[j].value; 
+              }
+              if (hcard.tel[j].type[k].toLowerCase() == "cell") {
+                mobilephone = hcard.tel[j].value; 
+              }
+              if (hcard.tel[j].type[k].toLowerCase() == "pref") {
+                preferred = hcard.tel[j].value; 
+              }
+            }
+          }
+        }
+        /* op for other */
+        if (homephone) {
+          url += "hp=" + homephone + "&";
+        }
+        if (workphone) {
+          url += "wp=" + workphone + "&";
+        }
+        if (mobilephone) {
+          url += "mb=" + mobilephone + "&";
+        }
+        /* 0=home, 1=work, 2=mobile */
+        if (preferred == workphone) {
+          url += "pp=1&";
+        } else if (preferred == mobilephone) {
+          url += "pp=2&";
+        } else {
+          url += "pp=0&";
+        }
+      }
+      /* can be wu for a work url */
+      if (hcard.url) {
+        url += "pu=" + hcard.url[0] + "&";
+      }
+      url += "A=C";
     }
     if (url) {
       openUILink(url, event);
