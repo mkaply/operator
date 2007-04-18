@@ -103,89 +103,65 @@ ufJSActions.actions.yahoo_calendar = {
     }
   },
   doAction: function(node, microformatName, event) {
-    var microformatNames;
-    if (!microformatName) {
-      microformatNames = ufJS.getMicroformatNameFromNode(node);
-    } else {
-      microformatNames = [];
-      microformatNames.push(microformatName);
-    }
     var url;
-    for (var i in microformatNames) {
-      if (microformatNames[i] == "hCalendar") {
-        var hcalendar = ufJSParser.createMicroformat(node, "hCalendar");
-        url = "http://calendar.yahoo.com/?v=60&";
-        url += "type=";
-        if (hcalendar.category) {
-          switch (hcalendar.category[0].toLowerCase()) {
-            case "music":
-            case "performing arts":
-            case "festivals":
-              url += "24";
-              break;
-            default:
-              url += "0";
-              break;
-          }
+    if (microformatName == "hCalendar") {
+      var hcalendar = ufJSParser.createMicroformat(node, "hCalendar");
+      url = "http://calendar.yahoo.com/?v=60&";
+      url += "type=";
+      if (hcalendar.category) {
+        switch (hcalendar.category[0].toLowerCase()) {
+          case "music":
+          case "performing arts":
+          case "festivals":
+            url += "24";
+            break;
+          default:
+            url += "0";
+            break;
+        }
+      } else {
+        url += "0";
+      }
+      if (hcalendar.dtstart) {
+        url += "&";
+        url += "st=";
+        var T = hcalendar.dtstart.indexOf("T");
+        var date;
+        var time;
+        if (T > -1) {
+          date = hcalendar.dtstart.substr(0, T);
+          time = hcalendar.dtstart.substr(T);
         } else {
-          url += "0";
+          date = hcalendar.dtstart;
         }
-        if (hcalendar.dtstart) {
+        url += ufJS.simpleEscape(date.replace(/-/g,""));
+        if (time) {
+          url += ufJS.simpleEscape(time.replace(/:/g,""));
+        }
+      }
+      if (hcalendar.dtend) {
+        var duration = "";
+        var duration_num, hours, minutes;
+        var dtStartDate = ufJSParser.dateFromISO8601(ufJSParser.localizeISO8601(hcalendar.dtstart));
+        var dtEndDate = ufJSParser.dateFromISO8601(ufJSParser.localizeISO8601(hcalendar.dtend));
+        if (!dtEndDate.time) {
+          dtEndDate.setDate(dtEndDate.getDate()-1);
+        }
+        if (!Operator.upcomingOrgBugFixed) {
+          if (content.document.location.href.indexOf("http://upcoming.org") == 0) {
+            dtEndDate.setDate(dtEndDate.getDate()+1);
+          }
+        }
+        
+        if (((dtEndDate.getTime() - dtStartDate.getTime()) > 24*60*60*1000) || !dtEndDate.time) {
           url += "&";
-          url += "st=";
-          var T = hcalendar.dtstart.indexOf("T");
-          var date;
-          var time;
-          if (T > -1) {
-            date = hcalendar.dtstart.substr(0, T);
-            time = hcalendar.dtstart.substr(T);
-          } else {
-            date = hcalendar.dtstart;
-          }
-          url += ufJS.simpleEscape(date.replace(/-/g,""));
-          if (time) {
-            url += ufJS.simpleEscape(time.replace(/:/g,""));
-          }
-        }
-        if (hcalendar.dtend) {
-          var duration = "";
-          var duration_num, hours, minutes;
-          var dtStartDate = ufJSParser.dateFromISO8601(ufJSParser.localizeISO8601(hcalendar.dtstart));
-          var dtEndDate = ufJSParser.dateFromISO8601(ufJSParser.localizeISO8601(hcalendar.dtend));
-          if (!dtEndDate.time) {
-            dtEndDate.setDate(dtEndDate.getDate()-1);
-          }
-          if (!Operator.upcomingOrgBugFixed) {
-            if (content.document.location.href.indexOf("http://upcoming.org") == 0) {
-              dtEndDate.setDate(dtEndDate.getDate()+1);
-            }
-          }
-          
-          if (((dtEndDate.getTime() - dtStartDate.getTime()) > 24*60*60*1000) || !dtEndDate.time) {
-            url += "&";
-            url += "rend=%2b";
-            url += ufJSParser.iso8601FromDate(dtEndDate).replace(/-/g,"").replace(/:/g,"");
-            if (dtEndDate.time && dtStartDate.time) {
-              dtEndDate.time = false;
-              var end = dtEndDate.getHours()*60 + dtEndDate.getMinutes();
-              var start = dtStartDate.getHours()*60 + dtStartDate.getMinutes();
-              duration_num = end-start;
-              hours = Math.floor(duration_num/60);
-              minutes = duration_num - (hours * 60);
-              if (hours <= 9) {
-                duration += "0";
-              }
-              duration += hours.toString();
-              if (minutes <= 9) {
-                duration += "0";
-              }
-              duration += minutes.toString();
-              url += "&dur=" + duration;
-            }
-            url += "&rpat=1dy";
-          } else {
-            duration_num = dtEndDate.getTime() - dtStartDate.getTime();
-            duration_num = duration_num/1000/60;
+          url += "rend=%2b";
+          url += ufJSParser.iso8601FromDate(dtEndDate).replace(/-/g,"").replace(/:/g,"");
+          if (dtEndDate.time && dtStartDate.time) {
+            dtEndDate.time = false;
+            var end = dtEndDate.getHours()*60 + dtEndDate.getMinutes();
+            var start = dtStartDate.getHours()*60 + dtStartDate.getMinutes();
+            duration_num = end-start;
             hours = Math.floor(duration_num/60);
             minutes = duration_num - (hours * 60);
             if (hours <= 9) {
@@ -198,54 +174,68 @@ ufJSActions.actions.yahoo_calendar = {
             duration += minutes.toString();
             url += "&dur=" + duration;
           }
+          url += "&rpat=1dy";
+        } else {
+          duration_num = dtEndDate.getTime() - dtStartDate.getTime();
+          duration_num = duration_num/1000/60;
+          hours = Math.floor(duration_num/60);
+          minutes = duration_num - (hours * 60);
+          if (hours <= 9) {
+            duration += "0";
+          }
+          duration += hours.toString();
+          if (minutes <= 9) {
+            duration += "0";
+          }
+          duration += minutes.toString();
+          url += "&dur=" + duration;
         }
+      }
+      url += "&";
+      url += "title=" + ufJS.simpleEscape(hcalendar.summary);
+      if (hcalendar.description) {
         url += "&";
-        url += "title=" + ufJS.simpleEscape(hcalendar.summary);
-        if (hcalendar.description) {
+        var s = hcalendar.description;
+        s = s.replace(/\<br\s*\>/gi, '%0D%0A');
+        s = s.replace(/\<\/p>/gi, '%0D%0A%0D%0A');
+        s	= s.replace(/\<.*?\>/gi, '');
+        s	= s.replace(/^\s+/, '');
+        url += "DESC=" + ufJS.simpleEscape(s.substr(0,2048));
+        if (s.length > 2048) {
+          url += "...";
+        }
+      }
+      if (hcalendar.location) {
+        if (typeof hcalendar.location == "object") {
+          var j = 0;
           url += "&";
-          var s = hcalendar.description;
-          s = s.replace(/\<br\s*\>/gi, '%0D%0A');
-          s = s.replace(/\<\/p>/gi, '%0D%0A%0D%0A');
-          s	= s.replace(/\<.*?\>/gi, '');
-          s	= s.replace(/^\s+/, '');
-          url += "DESC=" + ufJS.simpleEscape(s.substr(0,2048));
-          if (s.length > 2048) {
-            url += "...";
+          if (hcalendar.location.fn) {
+            url += "in_loc=" + hcalendar.location.fn;
           }
-        }
-        if (hcalendar.location) {
-          if (typeof hcalendar.location == "object") {
-            var j = 0;
+          if (hcalendar.location.adr[j]["street-address"]) {
             url += "&";
-            if (hcalendar.location.fn) {
-              url += "in_loc=" + hcalendar.location.fn;
-            }
-            if (hcalendar.location.adr[j]["street-address"]) {
-              url += "&";
-              url += "in_st=" + encodeURIComponent(hcalendar.location.adr[j]["street-address"][0]);
-            }
-            if (hcalendar.location.adr[j].locality) {
-              url += "&";
-              url += "in_csz=" + hcalendar.location.adr[j].locality;
-              if (hcalendar.location.adr[j].region) {
-                url += ", ";
-                url += hcalendar.location.adr[j].region;
-              }
-              if (hcalendar.location.adr[j]["postal-code"]) {
-                url += " ";
-                url += hcalendar.location.adr[j]["postal-code"];
-              }
-            }
-          } else {
-            url += "&";
-            url += "in_loc=" + hcalendar.location;
+            url += "in_st=" + encodeURIComponent(hcalendar.location.adr[j]["street-address"][0]);
           }
-        }
-        if (hcalendar.url) {
+          if (hcalendar.location.adr[j].locality) {
+            url += "&";
+            url += "in_csz=" + hcalendar.location.adr[j].locality;
+            if (hcalendar.location.adr[j].region) {
+              url += ", ";
+              url += hcalendar.location.adr[j].region;
+            }
+            if (hcalendar.location.adr[j]["postal-code"]) {
+              url += " ";
+              url += hcalendar.location.adr[j]["postal-code"];
+            }
+          }
+        } else {
           url += "&";
-          url += "url=" + hcalendar.url;
+          url += "in_loc=" + hcalendar.location;
         }
-        break;
+      }
+      if (hcalendar.url) {
+        url += "&";
+        url += "url=" + hcalendar.url;
       }
     }
     if (url) {
@@ -266,7 +256,7 @@ ufJSActions.actions.yahoo_contact = {
     var url;
     if (microformatName == "hCard") {
       var i, j, k;
-      var hcard = new hCard(node);
+      var hcard = ufJSParser.createMicroformat(node, "hCard");
       url = "http://address.yahoo.com/?";
       if (hcard.n && (hcard.n["family-name"]) && (hcard.n["given-name"])) {
         url += "ln=" + hcard.n["family-name"] + "&";
