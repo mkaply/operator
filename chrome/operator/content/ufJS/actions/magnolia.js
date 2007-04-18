@@ -33,7 +33,7 @@ ufJSActions.actions.magnolia_bookmark = {
   doAction: function(node, microformatName, event) {
     var url;
     if (microformatName == "xFolk") {
-      var xfolk = new xFolk(node);
+      var xfolk = ufJSParser.createMicroformat(node, "xFolk");
       if (xfolk && xfolk.taggedlink && xfolk.taggedlink.link) {
         url = 'http://ma.gnolia.com/bookmarklet/add?url=' + encodeURIComponent(xfolk.taggedlink.link);
         if (xfolk.taggedlink.title) {
