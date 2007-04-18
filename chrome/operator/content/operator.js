@@ -806,7 +806,9 @@ var Operator = {
         todisplay += this.dumpObject(instance[i], "\t");
         todisplay += "}\n";
       } else {
-        todisplay += i + "=" + instance[i] + "\n";
+        if (instance[i]) {
+          todisplay += i + "=" + instance[i] + "\n";
+        }
       }
     }
     if (todisplay.length === 0) {
@@ -830,7 +832,9 @@ var Operator = {
         toreturn += this.dumpObject(item[i], indent + "\t");
         toreturn += indent + "}\n";
       } else {
-        toreturn += indent + i + "=" + item[i] + "\n";
+        if (item[i]) {
+          toreturn += indent + i + "=" + item[i] + "\n";
+        }
       }
     }
     return toreturn;
