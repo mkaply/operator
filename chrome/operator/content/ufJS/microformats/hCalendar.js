@@ -1,4 +1,7 @@
-function hCalendar() {
+function hCalendar(node) {
+  if (node) {
+    ufJSParser.newMicroformat(this, node, "hCalendar");
+  }
 }
 
 ufJSParser.microformats.hCalendar = {
@@ -20,13 +23,13 @@ ufJSParser.microformats.hCalendar = {
       "description" : {
         datatype: "HTML"
       },
+      "dtstart" : {
+        datatype: "dateTime"
+      },
       "dtend" : {
         datatype: "dateTime"
       },
       "dtstamp" : {
-        datatype: "dateTime"
-      },
-      "dtstart" : {
         datatype: "dateTime"
       },
       "duration" : {
