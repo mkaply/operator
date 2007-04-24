@@ -40,6 +40,8 @@ var ufJSParser = {
     for (var i in definition.properties) {
       object.__defineGetter__(i, ufJSParser.getMicroformatPropertyGenerator(node, microformat, i, object));
     }
+    
+    object.node = node;
   },
   getMicroformatPropertyGenerator: function(node, name, property, microformat)
   {
@@ -482,6 +484,18 @@ var ufJSParser = {
     if (ufJSParser.microformats[mfname].validate) {
       return ufJSParser.microformats[mfname].validate(mfnode, error);
     } else {
+      if (ufJSParser.microformats[mfname].required) {
+        var mfobject = new ufJSParser.microformats[mfname].mfObject(mfnode);
+        error.message = "";
+        for (var i=0;i<ufJSParser.microformats[mfname].required.length;i++) {
+          if (!mfobject[ufJSParser.microformats[mfname].required[i]]) {
+            error.message += "Required property " + ufJSParser.microformats[mfname].required[i] + " not specified\n";
+          }
+        }
+        if (error.message.length > 0) {
+          return false;
+        }
+      }
       return true;
     }
   },
