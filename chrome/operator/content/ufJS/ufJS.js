@@ -542,44 +542,45 @@ var ufJS = {
     if (hcalendar.url) {
       ics += "URL:" + hcalendar.url + crlf;;
     }
-    var dt;
+    var date;
+    var time;
     if (hcalendar.dtstart) {
-      dt = hcalendar.dtstart;
       ics += "DTSTART;VALUE=DATE";
-      if (hcalendar.dtstart.match("T")) {
+      var T = hcalendar.dtstart.indexOf("T");
+      if (T > -1) {
         ics += "-TIME";
-        var T = dt.indexOf("T");
-        var offset = dt.lastIndexOf("-");
-        /* If there is an offset and there is no Z, localize */
-        if ((offset > T) || !dt.match("Z")) {
-          dt = ufJSParser.localizeISO8601(dt);
-        }
+        date = hcalendar.dtstart.substr(0, T);
+        time = hcalendar.dtstart.substr(T);
+      } else {
+        date = hcalendar.dtstart;
       }
-      dt = dt.replace(/-/g,"").replace(/:/g,"");
-      ics += ":" + dt + crlf;;
+      ics += ":" + date.replace(/-/g,"");
+      if (time) {
+        ics += time.replace(/:/g,"");
+      }
+      ics += crlf;
     }
     if (hcalendar.dtend) {
-      dt = hcalendar.dtend;
       ics += "DTEND;VALUE=DATE";
-      if (hcalendar.dtstart.match("T")) {
+      var T = hcalendar.dtend.indexOf("T");
+      if (T > -1) {
         ics += "-TIME";
-        var T = dt.indexOf("T");
-        var offset = dt.lastIndexOf("-");
-        /* If there is an offset and there is no Z, localize */
-        if ((offset > T) || !dt.match("Z")) {
-          dt = ufJSParser.localizeISO8601(dt);
-        }
+        date = hcalendar.dtend.substr(0, T);
+        time = hcalendar.dtend.substr(T);
       } else {
-        /* Work around upcoming.org bug */
+        date = hcalendar.dtend;
         if (!Operator.upcomingOrgBugFixed) {
           if (content.document.location.href.indexOf("http://upcoming.org") == 0) {
-            dt = dt.replace(/-/g, "");
-            dt = (parseInt(dt)+1).toString();
+            date = date.replace(/-/g, "");
+            date = (parseInt(date)+1).toString();
           }
         }
       }
-      dt = dt.replace(/-/g,"").replace(/:/g,"");
-      ics += ":" + dt + crlf;;
+      ics += ":" + date.replace(/-/g,"");
+      if (time) {
+        ics += time.replace(/:/g,"");
+      }
+      ics += crlf;
     }
     /* OUTLOOK REQUIRES DTSTAMP */
     ics += "DTSTAMP:";
