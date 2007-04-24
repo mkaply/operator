@@ -33,7 +33,7 @@ ufJSActions.actions.delicious_bookmark = {
   doAction: function(node, microformatName, event) {
     var url;
     if (microformatName == "xFolk") {
-      var xfolk = ufJSParser.createMicroformat(node, "xFolk");
+      var xfolk = new xFolk(node);
       if (xfolk && xfolk.taggedlink && xfolk.taggedlink.link) {
         url = 'http://del.icio.us/post?v=4;url=' + encodeURIComponent(xfolk.taggedlink.link);
         if (xfolk.taggedlink.title) {
