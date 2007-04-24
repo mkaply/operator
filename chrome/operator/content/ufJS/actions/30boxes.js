@@ -11,7 +11,7 @@ ufJSActions.actions["30boxes_calendar"] = {
   doAction: function(node, microformatName, event) {
     var url;
     if (microformatName == "hCalendar") {
-      var hcalendar = ufJSParser.createMicroformat(node, "hCalendar");
+      var hcalendar = new hCalendar(node);
       url = "http://30boxes.com/add.php?e=";
       if (hcalendar.summary) {
   //      url += encodeURIComponent(hcalendar.summary);
