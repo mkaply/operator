@@ -367,15 +367,20 @@ var Operator = {
   actionCallbackGenerator: function(formatname, item, handler)
   {
     return function(event) {
-//      handler.action(item, event);
-      ufJSActions.actions[handler].doAction(item, formatname, event);
+      var url;
+      if (url = ufJSActions.actions[handler].doAction(item, formatname, event)) {
+        openUILink(url, event);
+      }
     };
   },
   actionAllCallbackGenerator: function(formatname, doc, handler)
   {
     return function(event) {
-//      handler.action(item, event);
-      ufJSActions.actions[handler].doActionAll(doc, formatname, event);
+      var url;
+      if (url = ufJSActions.actions[handler].doActionAll(doc, formatname, event)) {
+        openUILink(url, event);
+      }
+
     };
   },
   clickCallbackGenerator: function(formatname, item, handler)
@@ -384,9 +389,10 @@ var Operator = {
       /* This is for middle click only */
       if (event.button == 1) {
         if (event.target.getAttribute("disabled") != "true") {
-            ufJSActions.actions[handler].doAction(item, formatname, event);
-
-//          handler.action(item, event);
+          var url;
+          if (url = ufJSActions.actions[handler].doAction(item, formatname, event)) {
+            openUILink(url, event);
+          }
           closeMenus(event.target);
         }
       }
@@ -431,7 +437,8 @@ var Operator = {
     for (j=0; j < nodes.length; j++) {
       items[j] = {} ;
       items[j].node = nodes[j];
-      displayname = ufJSParser.getMicroformatProperty(nodes[j], microformat, "ufjsDisplayName");
+      items[j].object = new ufJSParser.microformats[microformat].mfObject(nodes[j]);
+      displayname = items[j].object.toString();
       if (displayname) {
         items[j].displayname = displayname;
         items[j].error = false;
@@ -531,7 +538,7 @@ var Operator = {
     
     if (this.view === 0) {
     } else {
-      if (ufJSActions.actions[handler].scope.microformats[microformat]) {
+      if (ufJSActions.actions[handler].scope.semantic[microformat]) {
         if ((ufJSActions.actions[handler].doActionAll) && (itemsadded > 0)) {
           var sep = document.createElement("menuseparator");
           menu.appendChild(sep);
@@ -566,11 +573,11 @@ var Operator = {
       var k;
       var addedAction = false;
       for (k in ufJSActions.actions) {
-        if (!ufJSActions.actions[k].scope.microformats[microformat]) {
+        if (!ufJSActions.actions[k].scope.semantic[microformat]) {
           continue;
         }
-        if (ufJSActions.actions[k].scope.microformats[microformat] != microformat) {
-          required = ufJSParser.getMicroformatProperty(node, microformat, ufJSActions.actions[k].scope.microformats[microformat]);
+        if (ufJSActions.actions[k].scope.semantic[microformat] != microformat) {
+          required = ufJSParser.getMicroformatProperty(node, microformat, ufJSActions.actions[k].scope.semantic[microformat]);
           if (!required) {
             continue;
           }
@@ -602,8 +609,8 @@ var Operator = {
       parentmenu.addEventListener("command", parentmenu.store_oncommand, true);
       parentmenu.store_onclick = this.clickCallbackGenerator(microformat, node, handler);
       parentmenu.addEventListener("click", parentmenu.store_onclick, true);
-      if (ufJSActions.actions[handler].scope.microformats[microformat] != microformat) {
-        required = ufJSParser.getMicroformatProperty(node, microformat, ufJSActions.actions[handler].scope.microformats[microformat]);
+      if (ufJSActions.actions[handler].scope.semantic[microformat] != microformat) {
+        required = ufJSParser.getMicroformatProperty(node, microformat, ufJSActions.actions[handler].scope.semantic[microformat]);
         if (!required) {
           parentmenu.setAttribute("disabled", "true");    
         }
@@ -617,11 +624,11 @@ var Operator = {
     var required;
     var k;
     for (k in ufJSActions.actions) {
-      if (!ufJSActions.actions[k].scope.microformats[microformat]) {
+      if (!ufJSActions.actions[k].scope.semantic[microformat]) {
         continue;
       }
-      if (ufJSActions.actions[k].scope.microformats[microformat] != microformat) {
-        required = ufJSParser.getMicroformatProperty(node, microformat, ufJSActions.actions[k].scope.microformats[microformat]);
+      if (ufJSActions.actions[k].scope.semantic[microformat] != microformat) {
+        required = ufJSParser.getMicroformatProperty(node, microformat, ufJSActions.actions[k].scope.semantic[microformat]);
         if (!required) {
           continue;
         }
@@ -802,9 +809,11 @@ var Operator = {
         continue;
       }
       if (typeof instance[i] == "object") {
-        todisplay += "object " + i + " { \n";
-        todisplay += this.dumpObject(instance[i], "\t");
-        todisplay += "}\n";
+        if (i != "node") {
+          todisplay += "object " + i + " { \n";
+          todisplay += this.dumpObject(instance[i], "\t");
+          todisplay += "}\n";
+        }
       } else {
         if (instance[i]) {
           todisplay += i + "=" + instance[i] + "\n";
@@ -828,9 +837,11 @@ var Operator = {
         continue;
       }
       if (typeof item[i] == "object") {
-        toreturn += indent + "object " + i + " { \n";
-        toreturn += this.dumpObject(item[i], indent + "\t");
-        toreturn += indent + "}\n";
+        if (i != "node") {
+          toreturn += indent + "object " + i + " { \n";
+          toreturn += this.dumpObject(item[i], indent + "\t");
+          toreturn += indent + "}\n";
+        }
       } else {
         if (item[i]) {
           toreturn += indent + i + "=" + item[i] + "\n";
@@ -880,13 +891,13 @@ var Operator = {
       try {
         vcfical = ufJS.vCard(item);
       } catch (ex) {}
-      X2V = item;
+      X2V = ufJSParser.preProcessMicroformat(item);
     }
     if (microformat == "hCalendar") {
       try {
         vcfical = ufJS.iCalendar(item, true, true);
       } catch (ex) {}
-      X2V = item;
+      X2V = ufJSParser.preProcessMicroformat(item);
     }
     
     var error = {};
