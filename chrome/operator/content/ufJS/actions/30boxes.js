@@ -1,16 +1,14 @@
-/*extern ufJS, ufJSActions, ufJSParser, openUILink */ 
-
 ufJSActions.actions["30boxes_calendar"] = {
   description: "Add to 30 Boxes",
   icon: "http://30boxes.com/favicon.ico",
   scope: {
-    microformats: {
+    semantic: {
       "hCalendar" : "dtstart"
     }
   },
-  doAction: function(node, microformatName, event) {
+  doAction: function(node, semanticObjectType) {
     var url;
-    if (microformatName == "hCalendar") {
+    if (semanticObjectType == "hCalendar") {
       var hcalendar = new hCalendar(node);
       url = "http://30boxes.com/add.php?e=";
       if (hcalendar.summary) {
@@ -93,8 +91,6 @@ ufJSActions.actions["30boxes_calendar"] = {
         url += "]";
       }
     }
-    if (url) {
-      openUILink(url, event);
-    }
+    return url;
   }
 };

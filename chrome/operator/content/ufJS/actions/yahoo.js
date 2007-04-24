@@ -4,14 +4,14 @@ ufJSActions.actions.yahoo_maps = {
   description: "Find with Yahoo! Maps",
   icon: "http://www.yahoo.com/favicon.ico",
   scope: {
-    microformats: {
+    semantic: {
       "hCard" : "adr",
       "geo" : "geo"
     }
   },
-  doAction: function(node, microformatName, event) {
+  doAction: function(node, semanticObjectType) {
     var url;
-    if (microformatName == "hCard") {
+    if (semanticObjectType == "hCard") {
       var adr = ufJSParser.getMicroformatProperty(node, "hCard", "adr");
       if (adr) {
         url = "http://maps.yahoo.com/maps_result?";
@@ -42,16 +42,14 @@ ufJSActions.actions.yahoo_maps = {
           url += "&country=" + encodeURIComponent(adr[0]["country-name"]);
         }
       }
-    } else if (microformatName == "geo") {
+    } else if (semanticObjectType == "geo") {
       var latitude = ufJSParser.getMicroformatProperty(node, "geo", "latitude");
       var longitude = ufJSParser.getMicroformatProperty(node, "geo", "longitude");
       if (latitude && longitude) {
         url = "http://maps.yahoo.com/#lat=" + latitude + "&lon=" + longitude + "&mag=3";
       }
     }
-    if (url) {
-      openUILink(url, event);
-    }
+    return url;
   }
 };
 
@@ -59,15 +57,15 @@ ufJSActions.actions.yahoo_search = {
   description: "Find with Yahoo! Search",
   icon: "http://www.yahoo.com/favicon.ico",
   scope: {
-    microformats: {
+    semantic: {
       "hReview" : "hReview",
       "hResume" : "ufjsDisplayName"
     }
   },
-  doAction: function(node, microformatName, event) {
+  doAction: function(node, semanticObjectType) {
     var searchstring;
     var action = ufJSActions.actions.yahoo_search;
-    if (microformatName == "hReview") {
+    if (semanticObjectType == "hReview") {
       var hreview = ufJSParser.createMicroformat(node, "hReview");
       if (hreview.item.summary) {
         searchstring = hreview.item.summary;
@@ -75,11 +73,10 @@ ufJSActions.actions.yahoo_search = {
         searchstring = hreview.item.fn;
       }
     } else {
-      searchstring = ufJSParser.getMicroformatProperty(node, microformatName, action.scope.microformats[microformatName]);
+      searchstring = ufJSParser.getMicroformatProperty(node, semanticObjectType, action.scope.microformats[semanticObjectType]);
     }
     if (searchstring) {
-      var url = "http://search.yahoo.com/search?p=" + encodeURIComponent(searchstring);
-      openUILink(url, event);
+      return "http://search.yahoo.com/search?p=" + encodeURIComponent(searchstring);
     }
   }
 };
@@ -98,13 +95,13 @@ ufJSActions.actions.yahoo_calendar = {
   description: "Add to Yahoo! Calendar",
   icon: "http://www.yahoo.com/favicon.ico",
   scope: {
-    microformats: {
+    semantic: {
       "hCalendar" : "dtstart"
     }
   },
-  doAction: function(node, microformatName, event) {
+  doAction: function(node, semanticObjectType) {
     var url;
-    if (microformatName == "hCalendar") {
+    if (semanticObjectType == "hCalendar") {
       var hcalendar = ufJSParser.createMicroformat(node, "hCalendar");
       url = "http://calendar.yahoo.com/?v=60&";
       url += "type=";
@@ -238,9 +235,7 @@ ufJSActions.actions.yahoo_calendar = {
         url += "url=" + hcalendar.url;
       }
     }
-    if (url) {
-      openUILink(url, event);
-    }
+    return url;
   }
 };
 
@@ -248,13 +243,13 @@ ufJSActions.actions.yahoo_contact = {
   description: "Add to Yahoo! Contacts",
   icon: "http://www.yahoo.com/favicon.ico",
   scope: {
-    microformats: {
+    semantic: {
       "hCard" : "hCard"
     }
   },
-  doAction: function(node, microformatName, event) {
+  doAction: function(node, semanticObjectType) {
     var url;
-    if (microformatName == "hCard") {
+    if (semanticObjectType == "hCard") {
       var i, j, k;
       var hcard = ufJSParser.createMicroformat(node, "hCard");
       url = "http://address.yahoo.com/?";
@@ -391,9 +386,7 @@ ufJSActions.actions.yahoo_contact = {
       }
       url += "A=C";
     }
-    if (url) {
-      openUILink(url, event);
-    }
+    return url;
   }
 };
 

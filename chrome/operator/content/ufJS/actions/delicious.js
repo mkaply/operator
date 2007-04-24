@@ -4,21 +4,19 @@ ufJSActions.actions.delicious_search_tags = {
   description: "Find bookmarks on del.icio.us",
   icon: "http://del.icio.us/favicon.ico",
   scope: {
-    microformats: {
+    semantic: {
       "tag" : "tag"
     }
   },
-  doAction: function(node, microformatName, event) {
+  doAction: function(node, semanticObjectType) {
     var url;
-    if (microformatName == "tag") {
+    if (semanticObjectType == "tag") {
       var tag = ufJSParser.getMicroformatProperty(node, "tag", "tag");
       if (tag) {
         url = "http://del.icio.us/tag/" + encodeURIComponent(tag);
       }
     }
-    if (url) {
-      openUILink(url, event);
-    }
+    return url;
   }
 };
 
@@ -26,13 +24,13 @@ ufJSActions.actions.delicious_bookmark = {
   description: "Bookmark with del.icio.us",
   icon: "http://del.icio.us/favicon.ico",
   scope: {
-    microformats: {
+    semantic: {
       "xFolk" : "taggedlink"
     }
   },
-  doAction: function(node, microformatName, event) {
+  doAction: function(node, semanticObjectType) {
     var url;
-    if (microformatName == "xFolk") {
+    if (semanticObjectType == "xFolk") {
       var xfolk = new xFolk(node);
       if (xfolk && xfolk.taggedlink && xfolk.taggedlink.link) {
         url = 'http://del.icio.us/post?v=4;url=' + encodeURIComponent(xfolk.taggedlink.link);
@@ -54,9 +52,7 @@ ufJSActions.actions.delicious_bookmark = {
         */
       }
     }
-    if (url) {
-      openUILink(url, event);
-    }
+    return url;
   }
 };
 

@@ -4,20 +4,18 @@ ufJSActions.actions.upcoming_search_tags = {
   description: "Find events on Upcoming.org",
   icon: "http://upcoming.org/favicon.ico",
   scope: {
-    microformats: {
+    semantic: {
       "tag" : "tag"
     }
   },
-  doAction: function(node, microformatName, event) {
+  doAction: function(node, semanticObjectType) {
     var url;
-    if (microformatName == "tag") {
+    if (semanticObjectType == "tag") {
       var tag = ufJSParser.getMicroformatProperty(node, "tag", "tag");
       if (tag) {
         url = "http://upcoming.org/tag/" + encodeURIComponent(tag);
       }
     }
-    if (url) {
-      openUILink(url, event);
-    }
+    return url;
   }
 };

@@ -4,20 +4,18 @@ ufJSActions.actions.yedda_search_tags = {
   description: "Find answers on Yedda",
   icon: "http://yedda.com/favicon.ico",
   scope: {
-    microformats: {
+    semantic: {
       "tag" : "tag"
     }
   },
-  doAction: function(node, microformatName, event) {
+  doAction: function(node, semanticObjectType) {
     var url;
-    if (microformatName == "tag") {
+    if (semanticObjectType == "tag") {
       var tag = ufJSParser.getMicroformatProperty(node, "tag", "tag");
       if (tag) {
         url = "http://yedda.com/questions/tags/" + encodeURIComponent(tag) + "?source=operator";
       }
     }
-    if (url) {
-      openUILink(url, event);
-    }
+    return url;
   }
 };

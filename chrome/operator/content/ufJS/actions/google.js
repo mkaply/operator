@@ -4,14 +4,14 @@ ufJSActions.actions.google_maps = {
   description: "Find with Google Maps",
   icon: "http://www.google.com/favicon.ico",
   scope: {
-    microformats: {
+    semantic: {
       "hCard" : "adr",
       "geo" : "geo"
     }
   },
-  doAction: function(node, microformatName, event) {
+  doAction: function(node, semanticObjectType) {
     var url;
-    if (microformatName == "hCard") {
+    if (semanticObjectType == "hCard") {
       var adr = ufJSParser.getMicroformatProperty(node, "hCard", "adr");
       if (adr) {
         url = "http://maps.google.com/maps?q=";
@@ -38,16 +38,14 @@ ufJSActions.actions.google_maps = {
           url = url.substring(0, url.lastIndexOf(", "));
         }
       }
-    } else if (microformatName == "geo") {
+    } else if (semanticObjectType == "geo") {
       var latitude = ufJSParser.getMicroformatProperty(node, "geo", "latitude");
       var longitude = ufJSParser.getMicroformatProperty(node, "geo", "longitude");
       if (latitude && longitude) {
         url = "http://maps.google.com/maps?ll=" + latitude + "," + longitude + "&q=" + latitude + "," + longitude;
       }
     }
-    if (url) {
-      openUILink(url, event);
-    }
+    return url;
   }
 };
 
@@ -55,15 +53,15 @@ ufJSActions.actions.google_search = {
   description: "Find with Google Search",
   icon: "http://www.google.com/favicon.ico",
   scope: {
-    microformats: {
+    semantic: {
       "hReview" : "hReview",
-      "hResume" : "ufjsDisplayName"
+      "hResume" : "contact.fn"
     }
   },
-  doAction: function(node, microformatName, event) {
+  doAction: function(node, semanticObjectType) {
     var searchstring;
     var action = ufJSActions.actions.google_search;
-    if (microformatName == "hReview") {
+    if (semanticObjectType == "hReview") {
       var hreview = ufJSParser.createMicroformat(node, "hReview");
       if (hreview.item.summary) {
         searchstring = hreview.item.summary;
@@ -71,11 +69,10 @@ ufJSActions.actions.google_search = {
         searchstring = hreview.item.fn;
       }
     } else {
-      searchstring = ufJSParser.getMicroformatProperty(node, microformatName, action.scope.microformats[microformatName]);
+      searchstring = ufJSParser.getMicroformatProperty(node, semanticObjectType, action.scope.microformats[semanticObjectType]);
     }
     if (searchstring) {
-      var url = "http://www.google.com/search?q=" + encodeURIComponent(searchstring);
-      openUILink(url, event);
+      return  "http://www.google.com/search?q=" + encodeURIComponent(searchstring);
     }
   }
 };
@@ -84,13 +81,13 @@ ufJSActions.actions.google_calendar = {
   description: "Add to Google Calendar",
   icon: "http://www.google.com/calendar/images/favicon.ico",
   scope: {
-    microformats: {
+    semantic: {
       "hCalendar" : "dtstart"
     }
   },
-  doAction: function(node, microformatName, event) {
+  doAction: function(node, semanticObjectType) {
     var url;
-    if (microformatName == "hCalendar") {
+    if (semanticObjectType == "hCalendar") {
       var hcalendar = ufJSParser.createMicroformat(node, "hCalendar");
       url = "http://www.google.com/calendar/event?action=TEMPLATE";
       if (hcalendar.dtstart) {
@@ -191,10 +188,7 @@ ufJSActions.actions.google_calendar = {
         }
       }
     }
-    if (url) {
-      Operator.debug_alert(url);
-      openUILink(url, event);
-    }
+    return url;
   }
 };
 

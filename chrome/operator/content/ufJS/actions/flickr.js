@@ -4,13 +4,13 @@ ufJSActions.actions.flickr_search_tags = {
   description: "Find photos on flickr",
   icon: "http://flickr.com/favicon.ico",
   scope: {
-    microformats: {
+    semantic: {
       "tag" : "tag"
     }
   },
-  doAction: function(node, microformatName, event) {
+  doAction: function(node, semanticObjectType) {
     var url;
-    if (microformatName == "tag") {
+    if (semanticObjectType == "tag") {
       var tag = ufJSParser.getMicroformatProperty(node, "tag", "tag");
       if (tag) {
         /* Flickr treats spaces as multiple tags - replace space with + */
@@ -18,8 +18,6 @@ ufJSActions.actions.flickr_search_tags = {
         url = "http://flickr.com/photos/tags/" + encodeURIComponent(tag);
       }
     }
-    if (url) {
-      openUILink(url, event);
-    }
+    return url;
   }
 };

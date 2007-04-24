@@ -1,16 +1,14 @@
-/*extern ufJS, ufJSActions, ufJSParser, openUILink */ 
-
 ufJSActions.actions.export_vcard = {
   description: "Export Contact",
   descriptionAll: "Export All",
   scope: {
-    microformats: {
+    semantic: {
       "hCard" : "hCard"
     }
   },
-  doActionAll: function(doc, microformatName, event) {
+  doActionAll: function(doc, semanticObjectType) {
     var url;
-    if (microformatName == "hCard") {
+    if (semanticObjectType == "hCard") {
       var vcards = ufJSParser.getElementsByClassName(doc, "vcard");
       if (vcards.length > 0) {
         var file = Components.classes["@mozilla.org/file/directory_service;1"].
@@ -48,13 +46,11 @@ ufJSActions.actions.export_vcard = {
                          spec;
       }
     }
-    if (url) {
-      openUILink(url, event);
-    }
+    return url;
   },
-  doAction: function(node, microformatName, event) {
+  doAction: function(node, semanticObjectType) {
     var url;
-    if (microformatName == "hCard") {
+    if (semanticObjectType == "hCard") {
       var vcf = ufJS.vCard(node);
       var file = Components.classes["@mozilla.org/file/directory_service;1"].
                             getService(Components.interfaces.nsIProperties).
@@ -83,9 +79,7 @@ ufJSActions.actions.export_vcard = {
                        newFileURI(f).
                        spec;
     }
-    if (url) {
-      openUILink(url, event);
-    }
+    return url;
   }
 };
 
@@ -93,13 +87,13 @@ ufJSActions.actions.export_icalendar = {
   description: "Export Event",
   descriptionAll: "Export All",
   scope: {
-    microformats: {
+    semantic: {
       "hCalendar" : "dtstart"
     }
   },
-  doAction: function(node, microformatName, event) {
+  doAction: function(node, semanticObjectType) {
     var url;
-    if (microformatName == "hCalendar") {
+    if (semanticObjectType == "hCalendar") {
       var ics = ufJS.iCalendar(node, true, true);
       var file = Components.classes["@mozilla.org/file/directory_service;1"].
                             getService(Components.interfaces.nsIProperties).
@@ -128,13 +122,11 @@ ufJSActions.actions.export_icalendar = {
                        newFileURI(f).
                        spec;
     }
-    if (url) {
-      openUILink(url, event);
-    }
+    return url;
   },
-  doActionAll: function(doc, microformatName, event) {
+  doActionAll: function(doc, semanticObjectType) {
     var url;
-    if (microformatName == "hCalendar") {
+    if (semanticObjectType == "hCalendar") {
       var icals = ufJSParser.getElementsByClassName(doc, "vevent");
       if (icals.length > 0) {
         var file = Components.classes["@mozilla.org/file/directory_service;1"].
@@ -183,9 +175,7 @@ ufJSActions.actions.export_icalendar = {
                          spec;
       }
     }
-    if (url) {
-      openUILink(url, event);
-    }
+    return url;
   }
 };
 
