@@ -17,7 +17,49 @@ var ufJSParser = {
       ojl.loadSubScript(baseurl + "microformats/xFolk.js");
     }
   },
+  newMicroformat: function(object, in_node, microformat) {
+    /* check to see if we are even valid */
+    if (!ufJSParser.microformats[microformat]) {
+      throw("Invalid microformat");
+    }
+    if (ufJSParser.microformats[microformat].attributeName) {
+      if (!(in_node.getAttribute(ufJSParser.microformats[microformat].attributeName))) {
+        throw("Node is not a microformat (" + microformat + ")");
+      }
+    } else {
+      if (!(in_node.className.match("(^|\\s)" + ufJSParser.microformats[microformat].className + "(\\s|$)"))) {
+        throw("Node is not a microformat (" + microformat + ")");
+      }
+    }
+    var node = in_node;
+    var definition = ufJSParser.microformats[microformat].definition;
+    if (ufJSParser.microformats[microformat].className) {
+      node = ufJSParser.preProcessMicroformat(in_node);
+    }
+
+    for (var i in definition.properties) {
+      object.__defineGetter__(i, ufJSParser.getMicroformatPropertyGenerator(node, microformat, i, object));
+    }
+  },
+  getMicroformatPropertyGenerator: function(node, name, property, microformat)
+  {
+    return function() {
+      var result = ufJSParser.getMicroformatProperty(node, name, property);
+      delete microformat[property];
+      if (result) {
+        microformat[property] = result; 
+        return result;
+      }
+    };
+  },
   createMicroformat: function(in_mfnode, mfname)  {
+    if (document.__defineGetter__) {
+      try {
+        return new ufJSParser.microformats[mfname].mfObject(in_mfnode);
+      } catch (ex) {
+        return;
+      }
+    }
     /* check to see if we are even valid */
     if (!ufJSParser.microformats[mfname]) {
       return;
@@ -540,7 +582,9 @@ var ufJSParser = {
         result = prop.customGetter(node, parentnode);
         break;
       case "microformat":
-        result = ufJSParser.createMicroformat(node, prop.microformat);
+        try {
+          result = ufJSParser.createMicroformat(node, prop.microformat);
+        } catch (ex) {}
         if (result) {
           if (prop.microformat_property) {
             result = result[prop.microformat_property];
