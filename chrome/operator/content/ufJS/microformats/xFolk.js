@@ -1,4 +1,7 @@
-function xFolk() {
+function xFolk(node) {
+  if (node) {
+    ufJSParser.newMicroformat(this, node, "xFolk");
+  }
 }
 
 ufJSParser.microformats.xFolk = {

@@ -1,4 +1,7 @@
-function hCard() {
+function hCard(node) {
+  if (node) {
+    ufJSParser.newMicroformat(this, node, "hCard");
+  }
 }
 
 ufJSParser.microformats.hCard = {

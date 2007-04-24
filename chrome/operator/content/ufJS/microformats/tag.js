@@ -1,4 +1,7 @@
-function tag() {
+function tag(node) {
+  if (node) {
+    ufJSParser.newMicroformat(this, node, "tag");
+  }
 }
 
 ufJSParser.microformats.tag = {

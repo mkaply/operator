@@ -1,4 +1,7 @@
-function geo() {
+function geo(node) {
+  if (node) {
+    ufJSParser.newMicroformat(this, node, "geo");
+  }
 }
 
 ufJSParser.microformats.geo = {

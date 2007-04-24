@@ -1,4 +1,7 @@
-function Address() {
+function Address(node) {
+  if (node) {
+    ufJSParser.newMicroformat(this, node, "Address");
+  }
 }
 
 ufJSParser.microformats.Address = {
