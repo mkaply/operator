@@ -3,6 +3,26 @@ function Address(node) {
     ufJSParser.newMicroformat(this, node, "Address");
   }
 }
+Address.prototype.toString = function() {
+  var address_text = "";
+  if (this["post-office-box"]) {
+    address_text += this["post-office-box"];
+    address_text += " ";
+  }
+  if (this["street-address"]) {
+    address_text += this["street-address"][0];
+    address_text += " ";
+  }
+  if (this["locality"]) {
+    address_text += this["locality"];
+    address_text += " ";
+  }
+  if (this["region"]) {
+    address_text += this["region"];
+    address_text += " ";
+  }
+  return address_text;
+}
 
 ufJSParser.microformats.Address = {
   version: "0.7",
@@ -28,34 +48,6 @@ ufJSParser.microformats.Address = {
       "postal-code" : {
       },
       "country-name" : {
-      }
-    },
-    ufjs: {
-      "ufjsDisplayName" : {
-        virtual: true,
-        virtualGetter: function(mfnode) {
-          var address = ufJSParser.createMicroformat(mfnode, "Address");
-          if (address) {
-            var address_text = "";
-            if (address["post-office-box"]) {
-              address_text += address["post-office-box"];
-              address_text += " ";
-            }
-            if (address["street-address"]) {
-              address_text += address["street-address"][0];
-              address_text += " ";
-            }
-            if (address["locality"]) {
-              address_text += address["locality"];
-              address_text += " ";
-            }
-            if (address["region"]) {
-              address_text += address["region"];
-              address_text += " ";
-            }
-            return address_text;
-          }
-        }
       }
     }
   }

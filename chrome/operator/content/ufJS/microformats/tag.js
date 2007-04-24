@@ -3,6 +3,9 @@ function tag(node) {
     ufJSParser.newMicroformat(this, node, "tag");
   }
 }
+tag.prototype.toString = function() {
+  return this.tag;
+}
 
 ufJSParser.microformats.tag = {
   version: "0.7",
@@ -31,15 +34,7 @@ ufJSParser.microformats.tag = {
       "text" : {
         virtual: true
       }
-    },
-    ufjs: {
-      "ufjsDisplayName" : {
-        virtual: true,
-        virtualGetter: function(mfnode) {
-          return ufJSParser.getMicroformatProperty(mfnode, "tag", "tag");
-        }
-      }
-    },
+    }
   },
   validTagName: function(tag)
   {

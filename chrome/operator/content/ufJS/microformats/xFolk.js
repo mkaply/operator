@@ -3,11 +3,17 @@ function xFolk(node) {
     ufJSParser.newMicroformat(this, node, "xFolk");
   }
 }
+xFolk.prototype.toString = function() {
+  if (this.taggedlink) {
+    return this.taggedlink.title;
+  }
+}
 
 ufJSParser.microformats.xFolk = {
   version: "0.7",
   mfObject: xFolk,
   className: "xfolkentry",
+  required: ["taggedlink"],
   definition:  {
     properties: {
       "description" : {
@@ -38,24 +44,6 @@ ufJSParser.microformats.xFolk = {
         microformat: "tag",
         microformat_property: "tag"
       }
-    },
-    ufjs: {
-      "ufjsDisplayName" : {
-        virtual: true,
-        virtualGetter: function(mfnode) {
-          return ufJSParser.getMicroformatProperty(mfnode, "xFolk", "taggedlink.title");
-        }
-      }
     }
-  },
-  validate: function(node, error) {
-    var taggedlink = ufJSParser.getMicroformatProperty(node, "xFolk", "taggedlink");
-    if (!taggedlink) {
-      if (error) {
-        error.message = "No taggedlink specified";
-      }
-      return false;
-    }
-    return true;
   }
 };

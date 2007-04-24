@@ -3,6 +3,22 @@ function hCard(node) {
     ufJSParser.newMicroformat(this, node, "hCard");
   }
 }
+hCard.prototype.toString = function() {
+  if (this.node.origNode) {
+    /* If this microformat has an include pattern, put the */
+    /* organization-name in parenthesis after the fn to differentiate */
+    /* them. */
+    var fns = ufJSParser.getElementsByClassName(this.node.origNode, "fn");
+    if (fns.length === 0) {
+      if (this.fn) {
+        if (this.org[0]["organization-name"] && (this.fn != this.org[0]["organization-name"])) {
+          return this.fn + " (" + this.org[0]["organization-name"] + ")";
+        }
+      }
+    }
+  }
+  return this.fn;
+}
 
 ufJSParser.microformats.hCard = {
   version: "0.7",
@@ -183,42 +199,6 @@ ufJSParser.microformats.hCard = {
         plural: true,
         datatype: "anyURI"
       }
-    },
-    ufjs: {
-      "ufjsDisplayName" : {
-        virtual: true,
-        virtualGetter: function(mfnode) {
-          if (mfnode.origNode) {
-            /* If this microformat has an include pattern, put the */
-            /* organization-name in parenthesis after the fn to differentiate */
-            /* them. */
-            var fns = ufJSParser.getElementsByClassName(mfnode.origNode, "fn");
-            if (fns.length === 0) {
-              var displayName = ufJSParser.getMicroformatProperty(mfnode, "hCard", "fn");
-              if (displayName) {
-                var org = ufJSParser.getMicroformatProperty(mfnode, "hCard", "org");
-                if (org && org[0]["organization-name"] && (displayName != org[0]["organization-name"])) {
-                  displayName += " (";
-                  displayName += org[0]["organization-name"];
-                  displayName += ")";
-                }  
-                return displayName;
-              }
-            }
-          }
-          return ufJSParser.getMicroformatProperty(mfnode, "hCard", "fn");
-        }
-      }
     }
-  },
-  validate: function(node, error) {
-    var displayName = ufJSParser.getMicroformatProperty(node, "hCard", "fn");
-    if (!displayName) {
-      if (error) {
-        error.message = "No fn specified";
-      }
-      return false;
-    }
-    return true;
   }
 };
