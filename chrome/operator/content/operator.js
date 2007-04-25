@@ -878,7 +878,7 @@ var Operator = {
   error: function(semanticObject, semanticObjectType)
   {
     var serializer = new XMLSerializer();
-    var xmlString = serializer.serializeToString(semanticObject.node);
+    var xmlString = serializer.serializeToString(semanticObject.node.origNode || semanticObject.node);
     var vcfical = null;
     var X2V = null;
     
@@ -886,13 +886,13 @@ var Operator = {
       try {
         vcfical = ufJS.vCard(semanticObject);
       } catch (ex) {}
-      X2V = ufJSParser.preProcessMicroformat(semanticObject.node);
+      X2V = semanticObject.node;
     }
     if (semanticObjectType == "hCalendar") {
       try {
         vcfical = ufJS.iCalendar(semanticObject, true, true);
       } catch (ex) {}
-      X2V = ufJSParser.preProcessMicroformat(semanticObject.node);
+      X2V = semanticObject.node;
     }
     
     var error = {};
