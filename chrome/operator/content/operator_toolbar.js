@@ -38,7 +38,7 @@ var Operator_Toolbar = {
             button.setAttribute("type", "menu");
             button.addEventListener("mouseover", Operator_Toolbar.mouseOver, false);
 
-            if ((ufJSActions.actions[handler].scope.microformats[microformat]) && (ufJSActions.actions[handler].icon)) {
+            if ((ufJSActions.actions[handler].scope.semantic[microformat]) && (ufJSActions.actions[handler].icon)) {
               button.style.listStyleImage = "url('" + ufJSActions.actions[handler].icon + "')";
             } else {
               if (ufJSParser.microformats[microformat].icon) {
@@ -47,7 +47,7 @@ var Operator_Toolbar = {
                 button.style.listStyleImage = "url('chrome://operator/content/other.png')";
               }
             }
-            button.id = "microformats-" + microformat + "-" + handler + "-toolbar-button";
+            button.id = "operator-" + microformat + "-" + handler + "-toolbar-button";
             toolbar.insertBefore(button, document.getElementById("operator-spring"));
             var node = document.getAnonymousElementByAttribute(button, "class", "toolbarbutton-icon");
             node.style.opacity = 0.3;
@@ -89,7 +89,7 @@ var Operator_Toolbar = {
               button.style.listStyleImage = "url('chrome://operator/content/other.png')";
             }
 
-            button.id = "microformats-" + microformat + "-toolbar-button";
+            button.id = "operator-" + microformat + "-toolbar-button";
             toolbar.insertBefore(button, document.getElementById("operator-spring"));
             var node = document.getAnonymousElementByAttribute(button, "class", "toolbarbutton-icon");
             node.style.opacity = 0.3;
@@ -104,7 +104,7 @@ var Operator_Toolbar = {
     }
   },
 
-  addButtonMenu: function(menu, microformat, handler)
+  addButtonMenu: function(menu, semanticObjectType, semanticAction)
   {
     var useActions = (Operator.view == 1);
     var button;
@@ -136,12 +136,10 @@ var Operator_Toolbar = {
       }
     }
 
-    if (handler) {
-      button = document.getElementById("microformats-" + microformat + "-" + handler + "-toolbar-button");
-      newmenu.id = "microformats-" + microformat + "-" + handler + "-menu";
+    if (semanticAction) {
+      button = document.getElementById("operator-" + semanticObjectType + "-" + semanticAction + "-toolbar-button");
     } else {
-      button = document.getElementById("microformats-" + microformat + "-toolbar-button");
-      newmenu.id = "microformats-" + microformat + "-menu";
+      button = document.getElementById("operator-" + semanticObjectType + "-toolbar-button");
     }
     if (menu.error === true) {
       button.style.fontWeight = "bold";

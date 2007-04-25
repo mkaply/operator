@@ -465,8 +465,7 @@ var Operator = {
       if (this.removeDuplicates) {
         while (sorted_items[j]) {
           if ((sorted_items[j].displayname == sorted_items[j-1].displayname) && (sorted_items[j].error === false)) {
-            if (this.dumpObject(sorted_items[j].object) ==
-              this.dumpObject(sorted_items[j-1].object)) {
+            if (Operator.areEqualObjects(sorted_items[j].object, sorted_items[j-1].object)) {
               for (m = 0; m < items.length; m++) {
                 if (items[m].node == sorted_items[j].node) {
                   items[m].duplicate = true;
@@ -793,6 +792,31 @@ var Operator = {
   {
     Operator.processSemanticData();
   },
+  /* This function compares the strings in two objects to see if they are equal */
+  areEqualObjects: function(object1, object2)
+  {
+    if (object1.__count__ != object2.__count__) {
+      return false;
+    }
+    for (var i in object1) {
+      if (!object2[i]) {
+        return false;
+      }
+      if (object1[i] instanceof String) {
+        if (object1[i] == object2[i]) {
+          continue;
+        }
+      } else if (object1[i] instanceof Array) {
+        if (Operator.areEqualObjects(object1[i], object2[i])) {
+          continue;
+        }
+      } else {
+        continue;
+      }
+      return false;
+    }
+    return true;
+  },
   dumpObject: function(item, indent)
   {
     if (!indent) {
@@ -883,15 +907,15 @@ var Operator = {
                       vcfical,
                       X2V);
   },
-  recurseFrames: function(window, semanticArrays)
+  getSemanticData: function(window, semanticArrays)
   {
     if (window && window.frames.length > 0) {
       for (var i=0; i < window.frames.length; i++) {
         Operator.recurseFrames(window.frames[i], semanticArrays);
       }
     }
-//    ufJS.getElementsByMicroformat(window.document, semanticArrays);
     ufJS.getMicroformats(window.document, semanticArrays);
+    /* XXX TODO This is where to add RDFa */
   },
   /* This is the heavy lifter for Operator. It goes through the document
      looking for semantic data and creates the menus and buttons */
@@ -913,7 +937,7 @@ var Operator = {
     var i;
     var semanticArrays = [];
 
-    Operator.recurseFrames(content, semanticArrays);
+    Operator.getSemanticData(content, semanticArrays);
 
     var popup;
 

@@ -1,5 +1,3 @@
-/*extern Microformats, Operator, Components, content */
-
 var Operator_Statusbar = {
   addPopup: function(menu, clone)
   {
