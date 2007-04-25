@@ -484,8 +484,8 @@ var ufJSParser = {
     if (ufJSParser.microformats[mfname].validate) {
       return ufJSParser.microformats[mfname].validate(mfnode, error);
     } else {
+      var mfobject = new ufJSParser.microformats[mfname].mfObject(mfnode);
       if (ufJSParser.microformats[mfname].required) {
-        var mfobject = new ufJSParser.microformats[mfname].mfObject(mfnode);
         error.message = "";
         for (var i=0;i<ufJSParser.microformats[mfname].required.length;i++) {
           if (!mfobject[ufJSParser.microformats[mfname].required[i]]) {
@@ -493,6 +493,11 @@ var ufJSParser = {
           }
         }
         if (error.message.length > 0) {
+          return false;
+        }
+      } else {
+        if (!mfobject.toString()) {
+          error.message = "Unable to create microformat";
           return false;
         }
       }
