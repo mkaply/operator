@@ -48,10 +48,10 @@ ufJSActions.actions.export_vcard = {
     }
     return url;
   },
-  doAction: function(node, semanticObjectType) {
+  doAction: function(semanticObject, semanticObjectType) {
     var url;
     if (semanticObjectType == "hCard") {
-      var vcf = ufJS.vCard(node);
+      var vcf = ufJS.vCard(semanticObject);
       var file = Components.classes["@mozilla.org/file/directory_service;1"].
                             getService(Components.interfaces.nsIProperties).
                             get("TmpD", Components.interfaces.nsIFile);
@@ -91,10 +91,10 @@ ufJSActions.actions.export_icalendar = {
       "hCalendar" : "dtstart"
     }
   },
-  doAction: function(node, semanticObjectType) {
+  doAction: function(semanticObject, semanticObjectType) {
     var url;
     if (semanticObjectType == "hCalendar") {
-      var ics = ufJS.iCalendar(node, true, true);
+      var ics = ufJS.iCalendar(semanticObject, true, true);
       var file = Components.classes["@mozilla.org/file/directory_service;1"].
                             getService(Components.interfaces.nsIProperties).
                             get("TmpD", Components.interfaces.nsIFile);

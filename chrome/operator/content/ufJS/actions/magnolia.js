@@ -8,15 +8,10 @@ ufJSActions.actions.magnolia_search_tags = {
       "tag" : "tag"
     }
   },
-  doAction: function(node, semanticObjectType) {
-    var url;
-    if (semanticObjectType == "tag") {
-      var tag = ufJSParser.getMicroformatProperty(node, "tag", "tag");
-      if (tag) {
-        url = "http://ma.gnolia.com/tags/" + encodeURIComponent(tag);
-      }
+  doAction: function(semanticObject, semanticObjectType) {
+    if (semanticObject.tag) {
+      return "http://ma.gnolia.com/tags/" + encodeURIComponent(semanticObject.tag);
     }
-    return url;
   }
 };
 
@@ -28,10 +23,10 @@ ufJSActions.actions.magnolia_bookmark = {
       "xFolk" : "taggedlink"
     }
   },
-  doAction: function(node, semanticObjectType) {
+  doAction: function(semanticObject, semanticObjectType) {
     var url;
     if (semanticObjectType == "xFolk") {
-      var xfolk = ufJSParser.createMicroformat(node, "xFolk");
+      var xfolk = semanticObject;
       if (xfolk && xfolk.taggedlink && xfolk.taggedlink.link) {
         url = 'http://ma.gnolia.com/bookmarklet/add?url=' + encodeURIComponent(xfolk.taggedlink.link);
         if (xfolk.taggedlink.title) {

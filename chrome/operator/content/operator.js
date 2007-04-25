@@ -95,7 +95,7 @@ var Operator = {
     
     window.addEventListener("load", function(e)   { Operator.startup(); }, false);
     window.addEventListener("unload", function(e) { Operator.shutdown(); }, false);
-    window.addEventListener("operator-sidebar-load", Operator_Sidebar.processMicroformats, false, true);
+    window.addEventListener("operator-sidebar-load", Operator_Sidebar.processSemanticData, false, true);
     
   },
   startup: function()
@@ -286,7 +286,7 @@ var Operator = {
     getBrowser().tabContainer.addEventListener("select", function(e) { Operator.onTabChanged(e); }, true);
     var menu = document.getElementById("contentAreaContextMenu");
     menu.addEventListener("popupshowing", Operator.contextPopupShowing, false);
-    document.addEventListener("operator-refresh", Operator.processMicroformats, false, true);
+    document.addEventListener("operator-refresh", Operator.processSemanticData, false, true);
   },
   shutdown: function()
   {
@@ -296,7 +296,7 @@ var Operator = {
     getBrowser().tabContainer.removeEventListener("select", function(e) { Operator.onTabChanged(e); }, true);
     var menu = document.getElementById("contentAreaContextMenu");
     menu.removeEventListener("popupshowing", Operator.contextPopupShowing, false);
-    document.removeEventListener("operator-refresh", Operator.processMicroformats, false, true);
+    document.removeEventListener("operator-refresh", Operator.processSemanticData, false, true);
   },
   observe: function(subject, topic, data)
   {
@@ -350,7 +350,7 @@ var Operator = {
 
     if (!this.batchPrefChanges) {
       Operator_Toolbar.create();
-      Operator.processMicroformats();
+      Operator.processSemanticData();
     }
   },
 
@@ -364,11 +364,11 @@ var Operator = {
   },
 
   
-  actionCallbackGenerator: function(formatname, item, handler)
+  actionCallbackGenerator: function(semanticObject, semanticObjectType, semanticAction)
   {
     return function(event) {
       var url;
-      if (url = ufJSActions.actions[handler].doAction(item, formatname, event)) {
+      if (url = ufJSActions.actions[semanticAction].doAction(semanticObject, semanticObjectType)) {
         openUILink(url, event);
       }
     };
@@ -377,20 +377,20 @@ var Operator = {
   {
     return function(event) {
       var url;
-      if (url = ufJSActions.actions[handler].doActionAll(doc, formatname, event)) {
+      if (url = ufJSActions.actions[handler].doActionAll(doc, formatname)) {
         openUILink(url, event);
       }
 
     };
   },
-  clickCallbackGenerator: function(formatname, item, handler)
+  clickCallbackGenerator: function(semanticObject, semanticObjectType, semanticAction)
   {
     return function(event) {
       /* This is for middle click only */
       if (event.button == 1) {
         if (event.target.getAttribute("disabled") != "true") {
           var url;
-          if (url = ufJSActions.actions[handler].doAction(item, formatname, event)) {
+          if (url = ufJSActions.actions[semanticAction].doAction(semanticObject, semanticObjectType)) {
             openUILink(url, event);
           }
           closeMenus(event.target);
@@ -404,7 +404,7 @@ var Operator = {
       /* This is for middle click only */
       if (event.button == 1) {
         if (event.target.getAttribute("disabled") != "true") {
-            ufJSActions.actions[handler].doActionAll(doc, formatname, event);
+            ufJSActions.actions[handler].doActionAll(doc, formatname);
 
 //          handler.action(item, event);
           closeMenus(event.target);
@@ -420,13 +420,13 @@ var Operator = {
     };
   },
 
-  errorCallbackGenerator: function(formatname, item)
+  errorCallbackGenerator: function(semanticObject, semanticObjectType)
   {
     return function(event) {
-      Operator.error(formatname, item);
+      Operator.error(semanticObject, semanticObjectType);
     };
   },
-  buildMenu: function(microformat, nodes, handler)
+  buildMenu: function(semanticObjects, semanticObjectType, semanticAction)
   {
     var menu = null;
     var items;
@@ -434,10 +434,10 @@ var Operator = {
     items = [];
     var displayname;
     var j, m;
-    for (j=0; j < nodes.length; j++) {
+    for (j=0; j < semanticObjects.length; j++) {
       items[j] = {} ;
-      items[j].node = nodes[j];
-      items[j].object = new ufJSParser.microformats[microformat].mfObject(nodes[j]);
+      items[j].node = semanticObjects[j].node;
+      items[j].object = semanticObjects[j];
       displayname = items[j].object.toString();
       if (displayname) {
         items[j].displayname = displayname;
@@ -448,7 +448,6 @@ var Operator = {
       }
     }
     var sorted_items = items.slice();
-//    if ((items.length > 1) && Operator.microformats[microformat].sort && Operator.microformats[microformat].sort === true) {
     if (items.length > 1) {
       sorted_items = sorted_items.sort(
         function (a,b) {
@@ -466,8 +465,8 @@ var Operator = {
       if (this.removeDuplicates) {
         while (sorted_items[j]) {
           if ((sorted_items[j].displayname == sorted_items[j-1].displayname) && (sorted_items[j].error === false)) {
-            if (this.dump_microformat(sorted_items[j].node, microformat) ==
-              this.dump_microformat(sorted_items[j-1].node, microformat)) {
+            if (this.dumpObject(sorted_items[j].object) ==
+              this.dumpObject(sorted_items[j-1].object)) {
               for (m = 0; m < items.length; m++) {
                 if (items[m].node == sorted_items[j].node) {
                   items[m].duplicate = true;
@@ -484,12 +483,13 @@ var Operator = {
         }
       }
     }
-    if ((items.length > 1) && ufJSParser.microformats[microformat].sort) {
+    /* XXX TODO Need a better way to figure out sorting! */
+    if ((items.length > 1) && ufJSParser.microformats[semanticObjectType].sort) {
       items = sorted_items;
     }
 
     var itemsadded = 0;
-    var tempItem;
+    var tempMenu;
     var menuitem;
     for (j=0; j < items.length; j++) {
       if (!items[j].duplicate) {
@@ -498,35 +498,36 @@ var Operator = {
             menu = document.createElement("menupopup");
           }
           if ((this.view === 0) && (!items[j].error)) {
-            tempItem = document.createElement("menu");
+            tempMenu = document.createElement("menu");
           } else {
-            tempItem = document.createElement("menuitem");
+            tempMenu = document.createElement("menuitem");
           }
-          tempItem.store_onDOMMenuItemActive = this.highlightCallbackGenerator(items[j].node);
-          tempItem.addEventListener("DOMMenuItemActive", tempItem.store_onDOMMenuItemActive, true);
-          tempItem.setAttribute("label", items[j].displayname);
-          tempItem.label = items[j].displayname;
+          tempMenu.store_onDOMMenuItemActive = this.highlightCallbackGenerator(items[j].node);
+          tempMenu.addEventListener("DOMMenuItemActive", tempMenu.store_onDOMMenuItemActive, true);
+          tempMenu.setAttribute("label", items[j].displayname);
+          tempMenu.label = items[j].displayname;
           if (items[j].error) {
-            tempItem.store_oncommand = this.errorCallbackGenerator(microformat, items[j].node);
-            tempItem.addEventListener("command", tempItem.store_oncommand, true);
-            tempItem.style.fontWeight = "bold";
+            tempMenu.store_oncommand = this.errorCallbackGenerator(items[j].object, semanticObjectType);
+            tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
+            tempMenu.style.fontWeight = "bold";
             menu.error = true;
           } else {
             /* NOT ACTIONS */
             if (this.view === 0) {
               var submenu = document.createElement("menupopup");
-              tempItem.appendChild(submenu);
-              tempItem.store_onpopupshowing = this.popupShowing(microformat, items[j].node, handler);
-              tempItem.addEventListener("popupshowing", tempItem.store_onpopupshowing, false);
+              tempMenu.appendChild(submenu);
+              tempMenu.store_onpopupshowing = this.popupShowing(items[j].object, semanticObjectType, semanticAction);
+              tempMenu.addEventListener("popupshowing", tempMenu.store_onpopupshowing, false);
             } else {
-              this.buildActionMenu(tempItem, microformat, items[j].node, handler);
+              this.buildActionMenu(tempMenu, items[j].object, semanticObjectType, semanticAction);
             }
           }
-          menu.appendChild(tempItem);
+          menu.appendChild(tempMenu);
           itemsadded++;
         } else {
           var error = {};
-          ufJSParser.validate(items[j].node, microformat, error);
+          /* XXX TODO Validate needs to be more generic? Or do we only call it in the microformat case? */
+          ufJSParser.validate(items[j].node, semanticObjectType, error);
 
           Operator.console_message(error.message, Operator.lineNumberFromDOMNode(items[j].node));
 //          if (typeof Firebug != "undefined") {
@@ -536,34 +537,37 @@ var Operator = {
       }
     }
     
+    /* XXX TODO Action All */
+/*
     if (this.view === 0) {
     } else {
-      if (ufJSActions.actions[handler].scope.semantic[microformat]) {
-        if ((ufJSActions.actions[handler].doActionAll) && (itemsadded > 0)) {
+      if (ufJSActions.actions[semanticAction].scope.semantic[semanticObjectType]) {
+        if ((ufJSActions.actions[semanticAction].doActionAll) && (itemsadded > 0)) {
           var sep = document.createElement("menuseparator");
           menu.appendChild(sep);
-          tempItem = document.createElement("menuitem");
-          tempItem.label = ufJSActions.actions[handler].descriptionAll;
-          tempItem.setAttribute("label", tempItem.label);
-          tempItem.store_oncommand = this.actionAllCallbackGenerator(microformat, content.document, handler);
-          tempItem.addEventListener("command", tempItem.store_oncommand, true);
-          tempItem.store_onclick = this.clickAllCallbackGenerator(microformat, content.document, handler);
-          tempItem.addEventListener("click", tempItem.store_onclick, true);
-          menu.appendChild(tempItem);
+          tempMenu = document.createElement("menuitem");
+          tempMenu.label = ufJSActions.actions[semanticAction].descriptionAll;
+          tempMenu.setAttribute("label", tempMenu.label);
+          tempMenu.store_oncommand = this.actionAllCallbackGenerator(microformat, content.document, handler);
+          tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
+          tempMenu.store_onclick = this.clickAllCallbackGenerator(microformat, content.document, handler);
+          tempMenu.addEventListener("click", tempMenu.store_onclick, true);
+          menu.appendChild(tempMenu);
         }
       }
     }
+*/
     return menu;
   },
-  popupShowing: function(microformat, node, handler)
+  popupShowing: function(semanticObject, semanticObjectType, semanticAction)
   {
     return function(event) {
       if (event.target.childNodes.length == 0) {
-        Operator.buildActionMenu(event.target, microformat, node, handler);
+        Operator.buildActionMenu(event.target, semanticObject, semanticObjectType, semanticAction);
       }
     };
   },
-  buildActionMenu: function(parentmenu, microformat, node, handler)
+  buildActionMenu: function(parentmenu, semanticObject, semanticObjectType, semanticAction)
   {
     var required;
     var menuitem;
@@ -573,11 +577,11 @@ var Operator = {
       var k;
       var addedAction = false;
       for (k in ufJSActions.actions) {
-        if (!ufJSActions.actions[k].scope.semantic[microformat]) {
+        if (!ufJSActions.actions[k].scope.semantic[semanticObjectType]) {
           continue;
         }
-        if (ufJSActions.actions[k].scope.semantic[microformat] != microformat) {
-          required = ufJSParser.getMicroformatProperty(node, microformat, ufJSActions.actions[k].scope.semantic[microformat]);
+        if (ufJSActions.actions[k].scope.semantic[semanticObjectType] != semanticObjectType) {
+          required = semanticObject[ufJSActions.actions[k].scope.semantic[semanticObjectType]];
           if (!required) {
             continue;
           }
@@ -585,9 +589,9 @@ var Operator = {
         menuitem = document.createElement("menuitem");
         menuitem.label = ufJSActions.actions[k].description;
         menuitem.setAttribute("label", menuitem.label);
-        menuitem.store_oncommand = this.actionCallbackGenerator(microformat, node, k);
+        menuitem.store_oncommand = this.actionCallbackGenerator(semanticObject, semanticObjectType, k);
         menuitem.addEventListener("command", menuitem.store_oncommand, true);
-        menuitem.store_onclick = this.clickCallbackGenerator(microformat, node, k);
+        menuitem.store_onclick = this.clickCallbackGenerator(semanticObject, semanticObjectType, k);
         menuitem.addEventListener("click", menuitem.store_onclick, true);
         submenu.appendChild(menuitem);
         addedAction = true;
@@ -600,35 +604,35 @@ var Operator = {
         menuitem = document.createElement("menuitem");
         menuitem.label = "Debug";
         menuitem.setAttribute("label", menuitem.label);
-        menuitem.store_oncommand = this.errorCallbackGenerator(microformat, node);
+        menuitem.store_oncommand = this.errorCallbackGenerator(semanticObject, semanticObjectType);
         menuitem.addEventListener("command", menuitem.store_oncommand, true);
         submenu.appendChild(menuitem);
       }
     } else {
-      parentmenu.store_oncommand = this.actionCallbackGenerator(microformat, node, handler);
+      parentmenu.store_oncommand = this.actionCallbackGenerator(semanticObject, semanticObjectType, semanticAction);
       parentmenu.addEventListener("command", parentmenu.store_oncommand, true);
-      parentmenu.store_onclick = this.clickCallbackGenerator(microformat, node, handler);
+      parentmenu.store_onclick = this.clickCallbackGenerator(semanticObject, semanticObjectType, semanticAction);
       parentmenu.addEventListener("click", parentmenu.store_onclick, true);
-      if (ufJSActions.actions[handler].scope.semantic[microformat] != microformat) {
-        required = ufJSParser.getMicroformatProperty(node, microformat, ufJSActions.actions[handler].scope.semantic[microformat]);
+      if (ufJSActions.actions[semanticAction].scope.semantic[semanticObjectType] != semanticObjectType) {
+        required = semanticObject[ufJSActions.actions[semanticAction].scope.semantic[semanticObjectType]];
         if (!required) {
           parentmenu.setAttribute("disabled", "true");    
         }
       }
     }
   },
-  buildPopupMenu: function(microformat, node)
+  buildPopupMenu: function(semanticObject, semanticObjectType)
   {
     var menu = document.createElement("menupopup");
     var menuitem;
     var required;
     var k;
     for (k in ufJSActions.actions) {
-      if (!ufJSActions.actions[k].scope.semantic[microformat]) {
+      if (!ufJSActions.actions[k].scope.semantic[semanticObjectType]) {
         continue;
       }
-      if (ufJSActions.actions[k].scope.semantic[microformat] != microformat) {
-        required = ufJSParser.getMicroformatProperty(node, microformat, ufJSActions.actions[k].scope.semantic[microformat]);
+      if (ufJSActions.actions[k].scope.semantic[semanticObjectType] != semanticObjectType) {
+        required = semanticObject[ufJSActions.actions[k].scope.semantic[semanticObjectType]];
         if (!required) {
           continue;
         }
@@ -636,8 +640,8 @@ var Operator = {
       menuitem = document.createElement("menuitem");
       menuitem.label = ufJSActions.actions[k].description;
       menuitem.setAttribute("label", menuitem.label);
-      menuitem.addEventListener("command", this.actionCallbackGenerator(microformat, node, k), true);
-      menuitem.addEventListener("click", this.clickCallbackGenerator(microformat, node, k), true);
+      menuitem.addEventListener("command", this.actionCallbackGenerator(semanticObject, semanticObjectType, k), true);
+      menuitem.addEventListener("click", this.clickCallbackGenerator(semanticObject, semanticObjectType, k), true);
       menu.appendChild(menuitem);
 
     }
@@ -647,7 +651,7 @@ var Operator = {
       menuitem = document.createElement("menuitem");
       menuitem.label = "Debug";
       menuitem.setAttribute("label", menuitem.label);
-      menuitem.addEventListener("command", this.errorCallbackGenerator(microformat, node), true);
+      menuitem.addEventListener("command", this.errorCallbackGenerator(semanticObject, semanticObjectType), true);
       menu.appendChild(menuitem);
     }
 
@@ -669,7 +673,7 @@ var Operator = {
       var actionmenu;
       var shown_separator = false;
       for (i in mfNames) {
-        actionmenu = Operator.buildPopupMenu(mfNames[i], mfNode);
+        actionmenu = Operator.buildPopupMenu(new ufJSParser.microformats[mfNames[i]].mfObject(mfNode), mfNames[i]);
         if (actionmenu.childNodes.length > 0) {
           if (!shown_separator) {
             gContextMenu.showItem("operator-separator", true);
@@ -718,12 +722,12 @@ var Operator = {
     var mfNode = ufJS.isMicroformatNode(element);
     Operator.highlightDOMNode(mfNode);
   },
-  processMicroformatsDelayed: function(event)
+  processSemanticDataDelayed: function(event)
   {
     if (Operator.timerID) {
       window.clearTimeout(Operator.timerID);
     }
-    Operator.timerID = window.setTimeout(Operator.processMicroformats, 500);
+    Operator.timerID = window.setTimeout(Operator.processSemanticData, 500);
   },
   recursiveAddListeners: function(window)
   {
@@ -733,10 +737,10 @@ var Operator = {
       }
     }
     window.document.addEventListener("mouseover", Operator.mouseOver, false);
-    window.document.getElementsByTagName("body")[0].addEventListener("DOMNodeInserted", Operator.processMicroformatsDelayed, false);
-    window.document.getElementsByTagName("body")[0].addEventListener("DOMNodeRemoved", Operator.processMicroformatsDelayed, false);
+    window.document.getElementsByTagName("body")[0].addEventListener("DOMNodeInserted", Operator.processSemanticDataDelayed, false);
+    window.document.getElementsByTagName("body")[0].addEventListener("DOMNodeRemoved", Operator.processSemanticDataDelayed, false);
     if (Operator.observeDOMAttrModified) {
-      window.document.getElementsByTagName("body")[0].addEventListener("DOMAttrModified", Operator.processMicroformatsDelayed, false);
+      window.document.getElementsByTagName("body")[0].addEventListener("DOMAttrModified", Operator.processSemanticDataDelayed, false);
     }
   },
   recursiveRemoveListeners: function(window)
@@ -747,10 +751,10 @@ var Operator = {
       }
     }
     window.document.removeEventListener("mouseover", Operator.mouseOver, false);
-    window.document.getElementsByTagName("body")[0].removeEventListener("DOMNodeInserted", Operator.processMicroformatsDelayed, false);
-    window.document.getElementsByTagName("body")[0].removeEventListener("DOMNodeRemoved", Operator.processMicroformatsDelayed, false);
+    window.document.getElementsByTagName("body")[0].removeEventListener("DOMNodeInserted", Operator.processSemanticDataDelayed, false);
+    window.document.getElementsByTagName("body")[0].removeEventListener("DOMNodeRemoved", Operator.processSemanticDataDelayed, false);
     if (Operator.observeDOMAttrModified) {
-      window.document.getElementsByTagName("body")[0].removeEventListener("DOMAttrModified", Operator.processMicroformatsDelayed, false);
+      window.document.getElementsByTagName("body")[0].removeEventListener("DOMAttrModified", Operator.processSemanticDataDelayed, false);
     }
   },
   onPageShow: function(event) 
@@ -760,7 +764,7 @@ var Operator = {
       /* This is required so that things work properly when pages are opened */
       /* in background tabs (OR NOT - it broke nested page load notifications) */
 //      if (content && (event.originalTarget == content.document)) {
-        Operator.processMicroformats();
+        Operator.processSemanticData();
         Operator.recursiveAddListeners(content);
 //      }
     }
@@ -787,46 +791,13 @@ var Operator = {
 
   onTabChanged: function(event) 
   {
-    Operator.processMicroformats();
-  },
-  dump_microformat: function(item, microformat)
-  {
-    var instance;
-    if (microformat) {
-      instance = ufJSParser.createMicroformat(item, microformat);
-      if (!instance) {
-        return "Unable to create microformat";
-      }
-    } else { 
-      instance = item;
-    }
-    var todisplay = "";
-    var i;
-    var testArray = [];
-    for (i in instance)
-    {
-      if (testArray[i]) {
-        continue;
-      }
-      if (typeof instance[i] == "object") {
-        if (i != "node") {
-          todisplay += "object " + i + " { \n";
-          todisplay += this.dumpObject(instance[i], "\t");
-          todisplay += "}\n";
-        }
-      } else {
-        if (instance[i]) {
-          todisplay += i + "=" + instance[i] + "\n";
-        }
-      }
-    }
-    if (todisplay.length === 0) {
-      todisplay = "No data in microformat";
-    }
-    return todisplay;
+    Operator.processSemanticData();
   },
   dumpObject: function(item, indent)
   {
+    if (!indent) {
+      indent = "";
+    }
     var i;
     var toreturn = "";
     var testArray = [];
@@ -880,49 +851,56 @@ var Operator = {
     var lines = less_source.split("\n");
     return lines.length;
   },
-  error: function(microformat, item)
+  error: function(semanticObject, semanticObjectType)
   {
     var serializer = new XMLSerializer();
-    var xmlString = serializer.serializeToString(item);
+    var xmlString = serializer.serializeToString(semanticObject.node);
     var vcfical = null;
     var X2V = null;
     
-    if (microformat == "hCard") {
+    if (semanticObjectType == "hCard") {
       try {
-        vcfical = ufJS.vCard(item);
+        vcfical = ufJS.vCard(semanticObject);
       } catch (ex) {}
-      X2V = ufJSParser.preProcessMicroformat(item);
+      X2V = ufJSParser.preProcessMicroformat(semanticObject.node);
     }
-    if (microformat == "hCalendar") {
+    if (semanticObjectType == "hCalendar") {
       try {
-        vcfical = ufJS.iCalendar(item, true, true);
+        vcfical = ufJS.iCalendar(semanticObject, true, true);
       } catch (ex) {}
-      X2V = ufJSParser.preProcessMicroformat(item);
+      X2V = ufJSParser.preProcessMicroformat(semanticObject.node);
     }
     
     var error = {};
-    ufJSParser.validate(item, microformat, error);
+    /* XXX TODO cross semantic validation */
+    ufJSParser.validate(semanticObject.node, semanticObjectType, error);
 
     window.openDialog("chrome://operator/content/operator_debug.xul","debug","chrome,centerscreen",
-                      microformat,
+                      semanticObjectType,
                       error.message,
-                      Operator.dump_microformat(item, microformat),
+                      Operator.dumpObject(semanticObject),
                       xmlString,
                       vcfical,
                       X2V);
   },
-  recurseFrames: function(window, microformatsArrays)
+  recurseFrames: function(window, semanticArrays)
   {
     if (window && window.frames.length > 0) {
       for (var i=0; i < window.frames.length; i++) {
-        Operator.recurseFrames(window.frames[i], microformatsArrays);
+        Operator.recurseFrames(window.frames[i], semanticArrays);
       }
     }
-    ufJS.getElementsByMicroformat(window.document, microformatsArrays);
+//    ufJS.getElementsByMicroformat(window.document, semanticArrays);
+    ufJS.getMicroformats(window.document, semanticArrays);
   },
-  processMicroformats: function()
+  /* This is the heavy lifter for Operator. It goes through the document
+     looking for semantic data and creates the menus and buttons */
+  processSemanticData: function()
   {
+    /* Reset the timer we're using to batch processing */
     Operator.timerID = null;
+
+    /* Clear all the existing data and disable everything */
     Operator_Toolbar.clearPopups();
     Operator_Statusbar.clearPopup();
     Operator_ToolbarButton.clearPopup();
@@ -933,9 +911,9 @@ var Operator = {
     var useActions = (Operator.view == 1);
 
     var i;
-   var microformatsArrays = [];
+    var semanticArrays = [];
 
-    Operator.recurseFrames(content, microformatsArrays);
+    Operator.recurseFrames(content, semanticArrays);
 
     var popup;
 
@@ -952,8 +930,8 @@ var Operator = {
         } catch (ex) {
           break;
         }
-        if (action && microformatsArrays[microformat] && microformatsArrays[microformat].length > 0) {
-          submenu = Operator.buildMenu(microformat, microformatsArrays[microformat], handler);
+        if (action && semanticArrays[microformat] && semanticArrays[microformat].length > 0) {
+          submenu = Operator.buildMenu(semanticArrays[microformat], microformat, handler);
 
           if (submenu) {
             if (!popup) {
@@ -978,15 +956,19 @@ var Operator = {
       } while (1);
 
     } else {
+      /* This is the case where each semantic type is dislayed individually */
       i=1;
       do {
+        /* Get the active semantic items from preferences */
         try {
           microformat = Operator.prefBranch.getCharPref("microformat" + i);
         } catch (ex) {
           break;
         }
-        if (microformat && microformatsArrays[microformat] && microformatsArrays[microformat].length > 0) {
-          submenu = Operator.buildMenu(microformat, microformatsArrays[microformat]);
+        /* If the semantic item is in our array and has items in this documents,
+           process it */
+        if (microformat && semanticArrays[microformat] && semanticArrays[microformat].length > 0) {
+          submenu = Operator.buildMenu(semanticArrays[microformat], microformat);
           if (submenu) {
             if (!popup) {
              popup = document.createElement("menupopup");
@@ -1051,67 +1033,6 @@ var Operator = {
     s = s.replace(/\=/g, '%3D');
     s = s.replace(/ /g, '+');
     return s;
-  },
-  dateFromISO8601: function(string)
-  {
-    var dateArray = string.match(/(\d\d\d\d)(?:-?(\d\d)(?:-?(\d\d)(?:[T ](\d\d)(?::?(\d\d)(?::?(\d\d)(?:\.(\d+))?)?)?(?:Z|(?:([-+])(\d\d)(?::?(\d\d))?)?)?)?)?)?/);
-  
-    var date = new Date(dateArray[1], 0, 1);
-    date.time = false;
-
-    if (dateArray[2]) {
-      date.setMonth(dateArray[2] - 1);
-    }
-    if (dateArray[3]) {
-      date.setDate(dateArray[3]);
-    }
-    if (dateArray[4]) {
-      date.setHours(dateArray[4]);
-      date.time = true;
-      if (dateArray[5]) {
-        date.setMinutes(dateArray[5]);
-        if (dateArray[6]) {
-          date.setSeconds(dateArray[6]);
-          if (dateArray[7]) {
-            date.setMilliseconds(Number("0." + dateArray[7]) * 1000);
-          }
-        }
-      }
-    }
-    return date;
-  },
-  iso8601FromDate: function(date)
-  {
-    var string = date.getFullYear().toString();
-    var month = date.getMonth() + 1;
-    if (month <= 9) {
-      month = "0" + month;
-    }
-    string += month.toString();
-    var day = date.getDate();
-    if (day <= 9) {
-      day = "0" + day;
-    }
-    string += day.toString();
-    if (date.time) {
-      string += "T";
-      var hours = date.getHours();
-      if (hours <= 9) {
-        string += "0";
-      }
-      string += hours.toString();
-      var minutes = date.getMinutes();
-      if (minutes <= 9) {
-        string += "0";
-      }
-      string += minutes.toString();
-      var seconds = date.getSeconds();
-      if (seconds <= 9) {
-        string += "0";
-      }
-      string += seconds.toString();
-    }
-    return string;
   }
 };
 

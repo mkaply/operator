@@ -8,14 +8,9 @@ ufJSActions.actions.upcoming_search_tags = {
       "tag" : "tag"
     }
   },
-  doAction: function(node, semanticObjectType) {
-    var url;
-    if (semanticObjectType == "tag") {
-      var tag = ufJSParser.getMicroformatProperty(node, "tag", "tag");
-      if (tag) {
-        url = "http://upcoming.org/tag/" + encodeURIComponent(tag);
-      }
+  doAction: function(semanticObject, semanticObjectType) {
+    if (semanticObject.tag) {
+      return "http://upcoming.org/tag/" + encodeURIComponent(semanticObject.tag);
     }
-    return url;
   }
 };

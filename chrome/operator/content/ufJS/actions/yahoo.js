@@ -9,10 +9,10 @@ ufJSActions.actions.yahoo_maps = {
       "geo" : "geo"
     }
   },
-  doAction: function(node, semanticObjectType) {
+  doAction: function(semanticObject, semanticObjectType) {
     var url;
     if (semanticObjectType == "hCard") {
-      var adr = ufJSParser.getMicroformatProperty(node, "hCard", "adr");
+      var adr = semanticObject.adr;
       if (adr) {
         url = "http://maps.yahoo.com/maps_result?";
         if (adr[0]["street-address"]) {
@@ -43,10 +43,8 @@ ufJSActions.actions.yahoo_maps = {
         }
       }
     } else if (semanticObjectType == "geo") {
-      var latitude = ufJSParser.getMicroformatProperty(node, "geo", "latitude");
-      var longitude = ufJSParser.getMicroformatProperty(node, "geo", "longitude");
-      if (latitude && longitude) {
-        url = "http://maps.yahoo.com/#lat=" + latitude + "&lon=" + longitude + "&mag=3";
+      if (semanticObject.latitude && semanticObject.longitude) {
+        return "http://maps.yahoo.com/#lat=" + semanticObject.latitude + "&lon=" + semanticObject.longitude + "&mag=3";
       }
     }
     return url;
@@ -59,21 +57,21 @@ ufJSActions.actions.yahoo_search = {
   scope: {
     semantic: {
       "hReview" : "hReview",
-      "hResume" : "ufjsDisplayName"
+      "hResume" : "contact.fn"
     }
   },
-  doAction: function(node, semanticObjectType) {
+  doAction: function(semanticObject, semanticObjectType) {
     var searchstring;
     var action = ufJSActions.actions.yahoo_search;
     if (semanticObjectType == "hReview") {
-      var hreview = ufJSParser.createMicroformat(node, "hReview");
+      var hreview = semanticObject;
       if (hreview.item.summary) {
         searchstring = hreview.item.summary;
       } else if (hreview.item.fn) {
         searchstring = hreview.item.fn;
       }
     } else {
-      searchstring = ufJSParser.getMicroformatProperty(node, semanticObjectType, action.scope.microformats[semanticObjectType]);
+      searchstring = semanticObject[action.scope.semantic[semanticObjectType]];
     }
     if (searchstring) {
       return "http://search.yahoo.com/search?p=" + encodeURIComponent(searchstring);
@@ -82,9 +80,9 @@ ufJSActions.actions.yahoo_search = {
 };
 
 
-/* yahoo claims:
+/* yahoo says:
 The rend param is not needed, dont use it. Just specify a start time and 
-duration. */
+duration. (This didn't work for me) */
 
 /* The best way to reverse engineer our seeds api is to go to 
 calendar.yahoo.com, create an event, and then click on it again to edit. 
@@ -99,10 +97,10 @@ ufJSActions.actions.yahoo_calendar = {
       "hCalendar" : "dtstart"
     }
   },
-  doAction: function(node, semanticObjectType) {
+  doAction: function(semanticObject, semanticObjectType) {
     var url;
     if (semanticObjectType == "hCalendar") {
-      var hcalendar = ufJSParser.createMicroformat(node, "hCalendar");
+      var hcalendar = semanticObject;
       url = "http://calendar.yahoo.com/?v=60&";
       url += "type=";
       if (hcalendar.category) {
@@ -247,11 +245,11 @@ ufJSActions.actions.yahoo_contact = {
       "hCard" : "hCard"
     }
   },
-  doAction: function(node, semanticObjectType) {
+  doAction: function(semanticObject, semanticObjectType) {
     var url;
     if (semanticObjectType == "hCard") {
       var i, j, k;
-      var hcard = ufJSParser.createMicroformat(node, "hCard");
+      var hcard = semanticObject;
       url = "http://address.yahoo.com/?";
       if (hcard.n && (hcard.n["family-name"]) && (hcard.n["given-name"])) {
         url += "ln=" + hcard.n["family-name"] + "&";

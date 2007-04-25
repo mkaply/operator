@@ -9,10 +9,10 @@ ufJSActions.actions.google_maps = {
       "geo" : "geo"
     }
   },
-  doAction: function(node, semanticObjectType) {
+  doAction: function(semanticObject, semanticObjectType) {
     var url;
     if (semanticObjectType == "hCard") {
-      var adr = ufJSParser.getMicroformatProperty(node, "hCard", "adr");
+      var adr = semanticObject.adr;
       if (adr) {
         url = "http://maps.google.com/maps?q=";
         if (adr[0]["street-address"]) {
@@ -39,10 +39,8 @@ ufJSActions.actions.google_maps = {
         }
       }
     } else if (semanticObjectType == "geo") {
-      var latitude = ufJSParser.getMicroformatProperty(node, "geo", "latitude");
-      var longitude = ufJSParser.getMicroformatProperty(node, "geo", "longitude");
-      if (latitude && longitude) {
-        url = "http://maps.google.com/maps?ll=" + latitude + "," + longitude + "&q=" + latitude + "," + longitude;
+      if (semanticObject.latitude && semanticObject.longitude) {
+        return "http://maps.google.com/maps?ll=" + semanticObject.latitude + "," + semanticObject.longitude + "&q=" + semanticObject.latitude + "," + semanticObject.longitude;
       }
     }
     return url;
@@ -58,18 +56,18 @@ ufJSActions.actions.google_search = {
       "hResume" : "contact.fn"
     }
   },
-  doAction: function(node, semanticObjectType) {
+  doAction: function(semanticObject, semanticObjectType) {
     var searchstring;
     var action = ufJSActions.actions.google_search;
     if (semanticObjectType == "hReview") {
-      var hreview = ufJSParser.createMicroformat(node, "hReview");
+      var hreview = semanticObject;
       if (hreview.item.summary) {
         searchstring = hreview.item.summary;
       } else if (hreview.item.fn) {
         searchstring = hreview.item.fn;
       }
     } else {
-      searchstring = ufJSParser.getMicroformatProperty(node, semanticObjectType, action.scope.microformats[semanticObjectType]);
+      searchstring = semanticObject[action.scope.semantic[semanticObjectType]];
     }
     if (searchstring) {
       return  "http://www.google.com/search?q=" + encodeURIComponent(searchstring);
@@ -85,10 +83,10 @@ ufJSActions.actions.google_calendar = {
       "hCalendar" : "dtstart"
     }
   },
-  doAction: function(node, semanticObjectType) {
+  doAction: function(semanticObject, semanticObjectType) {
     var url;
     if (semanticObjectType == "hCalendar") {
-      var hcalendar = ufJSParser.createMicroformat(node, "hCalendar");
+      var hcalendar = semanticObject;
       url = "http://www.google.com/calendar/event?action=TEMPLATE";
       if (hcalendar.dtstart) {
         url += "&";

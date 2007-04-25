@@ -6,10 +6,10 @@ ufJSActions.actions["30boxes_calendar"] = {
       "hCalendar" : "dtstart"
     }
   },
-  doAction: function(node, semanticObjectType) {
+  doAction: function(semanticObject, semanticObjectType) {
     var url;
     if (semanticObjectType == "hCalendar") {
-      var hcalendar = new hCalendar(node);
+      var hcalendar = semanticObject;
       url = "http://30boxes.com/add.php?e=";
       if (hcalendar.summary) {
   //      url += encodeURIComponent(hcalendar.summary);

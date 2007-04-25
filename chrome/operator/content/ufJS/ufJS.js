@@ -14,6 +14,54 @@ var ufJS = {
       ufJSActions.init(ojl, baseurl);
     }
   },
+  getMicroformats: function(rootElement, in_microformatsArrays) {
+    var i, j;
+    var microformatList = [];
+    for (i in ufJSParser.microformats) {
+      microformatList.push(i);
+    }
+    var microformats;
+    if (in_microformatsArrays) {
+      microformats = in_microformatsArrays;
+    } else {
+      microformats = [];
+    }
+    var mfname;
+    var mfs;
+    for (i in microformatList) {
+      mfname = microformatList[i];
+      if (ufJSParser.microformats[mfname]) {
+        if (ufJSParser.microformats[mfname].className) {
+          mfs = ufJS.getElementsByClassName(rootElement,
+                                            ufJSParser.microformats[mfname].className);
+          /* alternateClassName is for cases where a parent microformat is inferred by the children */
+          /* IF we find alternateClassName, the entire document becomes the microformat */
+          if ((mfs.length == 0) && (ufJSParser.microformats[mfname].alternateClassName)) {
+            var temp = ufJS.getElementsByClassName(rootElement, ufJSParser.microformats[mfname].alternateClassName);
+            if (temp.length > 0) {
+              mfs.push(rootElement); 
+            }
+          }
+        } else if (ufJSParser.microformats[mfname].attributeValues) {
+          mfs = ufJS.getElementsByAttribute(rootElement,
+                                            ufJSParser.microformats[mfname].attributeName,
+                                            ufJSParser.microformats[mfname].attributeValues);
+          
+        }
+      } else {
+        mfs = [];
+      }
+      if (!microformats[mfname]) {
+        microformats[mfname] = [];
+      }
+      for (j = 0; j < mfs.length; j++) {
+        microformats[mfname].push(new ufJSParser.microformats[mfname].mfObject(mfs[j]));
+      }
+//      microformats[mfname] = microformats[mfname].concat(mfs);
+    }
+    return microformats;
+  },
+  /* Make this take arrays and strings for className */
   getElementsByMicroformat: function(rootElement, in_microformatsArrays, in_microformatList) {
     var i;
     var microformatList;
@@ -261,15 +309,11 @@ var ufJS = {
     s = s.replace(/ /g, '+');
     return s;
   },
-  vCard: function(item, lineending)
+  vCard: function(hcard, lineending)
   {
     var crlf = "\r\n";
     if (lineending) {
       crlf = lineending;
-    }
-    var hcard = ufJSParser.createMicroformat(item, "hCard");
-    if (!hcard) {
-      return;
     }
     var vcf;
     var i;
@@ -448,13 +492,9 @@ var ufJS = {
     vcf += "END:VCARD" + crlf;
     return vcf;
   },
-  iCalendar: function(item, header, footer)
+  iCalendar: function(hcalendar, header, footer)
   {
     var crlf = "\n";
-    var hcalendar = ufJSParser.createMicroformat(item, "hCalendar");
-    if (!hcalendar) {
-      return;
-    }
     var ics = "";
     if (header) {
       ics += "BEGIN:VCALENDAR" + crlf;;

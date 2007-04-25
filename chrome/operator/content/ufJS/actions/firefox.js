@@ -1,4 +1,3 @@
-/*extern ufJS, ufJSActions, ufJSParser, openUILink, XMLSerializer, Components */ 
 /* These are actions that will only work in Firefox */ 
 
 ufJSActions.actions.bookmark = {
@@ -15,25 +14,22 @@ ufJSActions.actions.bookmark = {
       "hAtom" : "hAtom"
     }
   },
-  doAction: function(node, semanticObjectType) {
+  doAction: function(semanticObject, semanticObjectType) {
     var url, name, description;
     if (semanticObjectType == "xFolk") {
-      var taggedlink = ufJSParser.getMicroformatProperty(node, "xFolk", "taggedlink");
-      if (taggedlink) {
-        url = taggedlink.link;
-        name = taggedlink.title;
+      if (semanticObject.taggedlink) {
+        url = semanticObject.taggedlink.link;
+        name = semanticObject.taggedlink.title;
       }
-      description = ufJSParser.getMicroformatProperty(node, "xFolk", "description");
+      description = semanticObject.description;
     } else if (semanticObjectType == "hAtom") {
-      name = ufJSParser.getMicroformatProperty(node, "hAtom", "entry-title");
-      var bookmark = ufJSParser.getMicroformatProperty(node, "hAtom", "bookmark");
-      url = bookmark.link;
+      name = semanticObject['entry-title'];
+      url = semanticObject.bookmark.link;
     } else {
       var serializer = new XMLSerializer();
-      var xmlString = serializer.serializeToString(node);
+      var xmlString = serializer.serializeToString(semanticObject.node);
       url = "data:text/html;charset=utf8," + xmlString;
-      var foo = new ufJSParser.microformats[semanticObjectType].mfObject(node);
-      name = foo.toString();
+      name = semanticObject.toString();
     }
     var dArgs = {
       name: name,

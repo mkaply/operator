@@ -106,6 +106,7 @@ var Operator_Toolbar = {
 
   addButtonMenu: function(menu, microformat, handler)
   {
+    var useActions = (Operator.view == 1);
     var button;
     var newmenu = menu.cloneNode(true);
     var menuitems = menu.getElementsByTagName("menuitem");
@@ -151,9 +152,13 @@ var Operator_Toolbar = {
   
     button.appendChild(newmenu);
     if (newmenu.childNodes.length > 0) {
-//      button.label = button.getAttribute("origlabel") + " (" + newmenu.childNodes.length + ")";
-      button.label = button.getAttribute("origlabel") + " (" + numitems + ")";
+      if (useActions) {
+        button.label = button.getAttribute("origlabel");
+      } else {
+        button.label = button.getAttribute("origlabel") + " (" + numitems + ")";
+      }
       button.setAttribute("label", button.label);
+      button.numitems = numitems;
     }
   },
   disable: function()
@@ -162,6 +167,7 @@ var Operator_Toolbar = {
     var toolbarbuttons = toolbar.getElementsByTagName("toolbarbutton");
     for(var i=0; i < toolbarbuttons.length; i++) {
       if (toolbarbuttons[i].id != "operator-options") {
+        toolbarbuttons[i].numitems = 0;
         toolbarbuttons[i].setAttribute("disabled", "true");
         var node = document.getAnonymousElementByAttribute(toolbarbuttons[i], "class", "toolbarbutton-icon");
         node.style.opacity = 0.3;
@@ -189,7 +195,7 @@ var Operator_Toolbar = {
     var classes;
     for(var i=0; i < toolbarbuttons.length; i++) {
       if (toolbarbuttons[i].id != "operator-options") {
-        if ((toolbarbuttons[i].label) != toolbarbuttons[i].getAttribute("origlabel")) {
+        if (toolbarbuttons[i].numitems > 0) {
           toolbarbuttons[i].setAttribute("disabled", "false");
           var node = document.getAnonymousElementByAttribute(toolbarbuttons[i], "class", "toolbarbutton-icon");
           node.style.opacity = 1.0;

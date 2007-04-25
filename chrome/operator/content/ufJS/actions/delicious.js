@@ -8,15 +8,10 @@ ufJSActions.actions.delicious_search_tags = {
       "tag" : "tag"
     }
   },
-  doAction: function(node, semanticObjectType) {
-    var url;
-    if (semanticObjectType == "tag") {
-      var tag = ufJSParser.getMicroformatProperty(node, "tag", "tag");
-      if (tag) {
-        url = "http://del.icio.us/tag/" + encodeURIComponent(tag);
-      }
+  doAction: function(semanticObject, semanticObjectType) {
+    if (semanticObject.tag) {
+      return "http://del.icio.us/tag/" + encodeURIComponent(semanticObject.tag);
     }
-    return url;
   }
 };
 
@@ -28,10 +23,10 @@ ufJSActions.actions.delicious_bookmark = {
       "xFolk" : "taggedlink"
     }
   },
-  doAction: function(node, semanticObjectType) {
+  doAction: function(semanticObject, semanticObjectType) {
     var url;
     if (semanticObjectType == "xFolk") {
-      var xfolk = new xFolk(node);
+      var xfolk = semanticObject;
       if (xfolk && xfolk.taggedlink && xfolk.taggedlink.link) {
         url = 'http://del.icio.us/post?v=4;url=' + encodeURIComponent(xfolk.taggedlink.link);
         if (xfolk.taggedlink.title) {

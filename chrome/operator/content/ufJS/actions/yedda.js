@@ -1,5 +1,3 @@
-/*extern ufJS, ufJSActions, ufJSParser, openUILink */ 
-
 ufJSActions.actions.yedda_search_tags = {
   description: "Find answers on Yedda",
   icon: "http://yedda.com/favicon.ico",
@@ -8,14 +6,9 @@ ufJSActions.actions.yedda_search_tags = {
       "tag" : "tag"
     }
   },
-  doAction: function(node, semanticObjectType) {
-    var url;
-    if (semanticObjectType == "tag") {
-      var tag = ufJSParser.getMicroformatProperty(node, "tag", "tag");
-      if (tag) {
-        url = "http://yedda.com/questions/tags/" + encodeURIComponent(tag) + "?source=operator";
-      }
+  doAction: function(semanticObject, semanticObjectType) {
+    if (semanticObject.tag) {
+      return "http://yedda.com/questions/tags/" + encodeURIComponent(semanticObject.tag) + "?source=operator";
     }
-    return url;
   }
 };
