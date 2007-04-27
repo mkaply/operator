@@ -389,7 +389,11 @@ var ufJSParser = {
         var headers = in_mfnode.getAttribute("headers").split(" ");
         for (i = 0; i < headers.length; i++) {
           try {
-            mfnode.appendChild(in_mfnode.ownerDocument.getElementById(headers[i]).cloneNode(true));
+            var tempNode = in_mfnode.ownerDocument.createElement("span");
+            var headerNode = in_mfnode.ownerDocument.getElementById(headers[i]);
+            tempNode.innerHTML = headerNode.innerHTML;
+            tempNode.className = headerNode.className;
+            mfnode.appendChild(tempNode);
           } catch(ex) {}
         }
       }
