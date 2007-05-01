@@ -585,6 +585,11 @@ var Operator = {
             continue;
           }
         }
+        if (ufJSActions.actions[k].scope.url) {
+          if (!(content.document.location.href.match(ufJSActions.actions[k].scope.url))) {
+            continue;
+          }
+        }
         menuitem = document.createElement("menuitem");
         menuitem.label = ufJSActions.actions[k].description;
         menuitem.setAttribute("label", menuitem.label);
@@ -633,6 +638,11 @@ var Operator = {
       if (ufJSActions.actions[k].scope.semantic[semanticObjectType] != semanticObjectType) {
         required = semanticObject[ufJSActions.actions[k].scope.semantic[semanticObjectType]];
         if (!required) {
+          continue;
+        }
+      }
+      if (ufJSActions.actions[k].scope.url) {
+        if (!(content.document.location.href.match(ufJSActions.actions[k].scope.url))) {
           continue;
         }
       }
