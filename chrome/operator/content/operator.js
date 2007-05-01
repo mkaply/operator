@@ -746,10 +746,10 @@ var Operator = {
       }
     }
     window.document.addEventListener("mouseover", Operator.mouseOver, false);
-    window.document.getElementsByTagName("body")[0].addEventListener("DOMNodeInserted", Operator.processSemanticDataDelayed, false);
-    window.document.getElementsByTagName("body")[0].addEventListener("DOMNodeRemoved", Operator.processSemanticDataDelayed, false);
+    window.document.addEventListener("DOMNodeInserted", Operator.processSemanticDataDelayed, false);
+    window.document.addEventListener("DOMNodeRemoved", Operator.processSemanticDataDelayed, false);
     if (Operator.observeDOMAttrModified) {
-      window.document.getElementsByTagName("body")[0].addEventListener("DOMAttrModified", Operator.processSemanticDataDelayed, false);
+      window.document.addEventListener("DOMAttrModified", Operator.processSemanticDataDelayed, false);
     }
   },
   recursiveRemoveListeners: function(window)
@@ -760,15 +760,14 @@ var Operator = {
       }
     }
     window.document.removeEventListener("mouseover", Operator.mouseOver, false);
-    window.document.getElementsByTagName("body")[0].removeEventListener("DOMNodeInserted", Operator.processSemanticDataDelayed, false);
-    window.document.getElementsByTagName("body")[0].removeEventListener("DOMNodeRemoved", Operator.processSemanticDataDelayed, false);
+    window.document.removeEventListener("DOMNodeInserted", Operator.processSemanticDataDelayed, false);
+    window.document.removeEventListener("DOMNodeRemoved", Operator.processSemanticDataDelayed, false);
     if (Operator.observeDOMAttrModified) {
-      window.document.getElementsByTagName("body")[0].removeEventListener("DOMAttrModified", Operator.processSemanticDataDelayed, false);
+      window.document.removeEventListener("DOMAttrModified", Operator.processSemanticDataDelayed, false);
     }
   },
   onPageShow: function(event) 
   {
-    if (event.originalTarget instanceof HTMLDocument)
     {
       /* This is required so that things work properly when pages are opened */
       /* in background tabs (OR NOT - it broke nested page load notifications) */
@@ -781,7 +780,6 @@ var Operator = {
   
   onPageHide: function(event) 
   {
-    if (event.originalTarget instanceof HTMLDocument)
     {
       /* This is required so that things work properly when pages are opened */
       /* in background tabs */
