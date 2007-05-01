@@ -911,7 +911,7 @@ var Operator = {
   {
     if (window && window.frames.length > 0) {
       for (var i=0; i < window.frames.length; i++) {
-        Operator.recurseFrames(window.frames[i], semanticArrays);
+        Operator.getSemanticData(window.frames[i], semanticArrays);
       }
     }
     ufJS.getMicroformats(window.document, semanticArrays);

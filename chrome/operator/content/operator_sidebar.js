@@ -5,7 +5,7 @@ var Operator_Sidebar = {
   {
 //    var doc = document.getElementById("sidebar").contentDocument;
   },
-  processMicroformats: function(event) 
+  processSemanticData: function(event) 
   {
     try {
       Operator_Sidebar.clear();
