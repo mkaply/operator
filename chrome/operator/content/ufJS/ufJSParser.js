@@ -27,7 +27,7 @@ var ufJSParser = {
         throw("Node is not a microformat (" + microformat + ")");
       }
     } else {
-      if (!(in_node.className.match("(^|\\s)" + ufJSParser.microformats[microformat].className + "(\\s|$)"))) {
+      if (!(in_node.getAttribute('class').match("(^|\\s)" + ufJSParser.microformats[microformat].className + "(\\s|$)"))) {
         throw("Node is not a microformat (" + microformat + ")");
       }
     }
@@ -71,7 +71,7 @@ var ufJSParser = {
         return;
       }
     } else {
-      if (!(in_mfnode.className.match("(^|\\s)" + ufJSParser.microformats[mfname].className + "(\\s|$)"))) {
+      if (!(in_mfnode.getAttribute('class').match("(^|\\s)" + ufJSParser.microformats[mfname].className + "(\\s|$)"))) {
         return;
       }
     }
@@ -120,14 +120,11 @@ var ufJSParser = {
       for (i in definition.properties) {
         if (definition.properties[i].subproperties) {
           if (definition.properties[i].subproperties[propname]) {
-            if (mfnode.className &&  mfnode.className.match("(^|\\s)" + i + "(\\s|$)")) {
-              tp = definition.properties[i].subproperties[propname];
-              break;
-            }
-          } else if ((definition.properties[i].ufjs) && (definition.properties[i].ufjs[propname])) {
-            if (mfnode.className &&  mfnode.className.match("(^|\\s)" + i + "(\\s|$)")) {
-              tp = definition.properties[i].ufjs[propname];
-              break;
+            if (mfnode.getAttribute('class')) {
+              if (mfnode.getAttribute('class').match("(^|\\s)" + i + "(\\s|$)")) {
+                tp = definition.properties[i].subproperties[propname];
+                break;
+              }
             }
           }
         }
@@ -519,7 +516,7 @@ var ufJSParser = {
       var values;
       /* This is ugly. Some cases (email and tel for hCard) are called value */
       /* but can also use value-excerpting. This handles that */
-      if (parentnode && propnode.className.match("(^|\\s)" + "value" + "(\\s|$)")) {
+      if (parentnode && propnode.getAttribute('class').match("(^|\\s)" + "value" + "(\\s|$)")) {
         var parent_values = ufJSParser.getElementsByClassName(parentnode, "value");
         if (parent_values.length > 1) {
           values = parent_values;
