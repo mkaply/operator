@@ -1,4 +1,12 @@
-function hResume() {
+function hResume(node) {
+  if (node) {
+    ufJSParser.newMicroformat(this, node, "hResume");
+  }
+}
+hResume.prototype.toString = function() {
+  if (this.contact) {
+    return this.contact.fn;
+  }
 }
 
 ufJSParser.microformats.hResume = {
@@ -80,25 +88,7 @@ ufJSParser.microformats.hResume = {
           }
         }
       }
-    },
-    ufjs: {
-      "ufjsDisplayName" : {
-        virtual: true,
-        virtualGetter: function(mfnode) {
-          return ufJSParser.getMicroformatProperty(mfnode, "hResume", "contact.fn");
-        }
-      }
     }
-  },
-  validate: function(node, error) {
-    var contact = ufJSParser.getMicroformatProperty(node, "hResume", "contact");
-    if (!contact) {
-      if (error) {
-        error.message = "No contact vcard specified";
-      }
-      return false;
-    }
-    return true;
   }
 };
 

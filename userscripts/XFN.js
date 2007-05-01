@@ -1,4 +1,24 @@
-function XFN() {
+function XFN(node) {
+  if (node) {
+    ufJSParser.newMicroformat(this, node, "XFN");
+  }
+}
+XFN.prototype.toString = function() {
+  var displayName = this.text + " (";
+  var first = true;
+  var i;
+  for (i in this) {
+    if ((i != "text") && (i != "link")) {
+      if (!first) {
+        displayName += ",";
+      } else {
+        first = false;
+      }
+      displayName += i;
+    }
+  }
+  displayName += ")";
+  return displayName;
 }
 
 ufJSParser.microformats.XFN = {
@@ -127,31 +147,6 @@ ufJSParser.microformats.XFN = {
       "text" : {
         virtual: true
       }
-    },
-    ufjs: {
-      "ufjsDisplayName" : {
-        virtual: true,
-        virtualGetter: function(propnode, mfnode, definition) {
-          var i;
-          var xfn = ufJSParser.createMicroformat(mfnode, "XFN");
-          if (xfn) { 
-            var displayName = xfn.text + " (";
-            var first = true;
-            for (i in xfn) {
-              if ((i != "text") && (i != "link")) {
-                if (!first) {
-                  displayName += ",";
-                } else {
-                  first = false;
-                }
-                displayName += i;
-              }
-            }
-            displayName += ")";
-            return displayName;
-          }
-        }
-      }
     }
   },
   getXFNStatus: function(propnode, relationship)
@@ -165,5 +160,5 @@ ufJSParser.microformats.XFN = {
 };
 
 if (ufJSActions.actions.goto_url) {
-  ufJSActions.actions.goto_url.scope.microformats.XFN = "link";
+  ufJSActions.actions.goto_url.scope.semantic.XFN = "link";
 }

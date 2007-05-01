@@ -1,4 +1,26 @@
-function hReview() {
+function hReview(node) {
+  if (node) {
+    ufJSParser.newMicroformat(this, node, "hReview");
+  }
+}
+hReview.prototype.toString = function() {
+  var fn;
+  if (this.item) {
+    if (this.item.summary) {
+      fn = this.item.summary
+    } else if (this.item.fn) {
+      fn = this.item.fn;
+    }
+    if (this.reviewer) {
+      if (this.reviewer.fn) {
+        return fn + " (" + this.reviewer.fn + ")";
+      } else {
+        return fn + " (" + this.reviewer + ")";
+      }
+    } else {
+      return fn;
+    }
+  }
 }
 
 ufJSParser.microformats.hReview = {
@@ -82,32 +104,6 @@ ufJSParser.microformats.hReview = {
         microformat: "tag"
       },
       "version" : {
-      }
-    },
-    ufjs: {
-      "ufjsDisplayName" : {
-        virtual: true,
-        virtualGetter: function(propnode, mfnode, definition) {
-          var item = ufJSParser.getMicroformatProperty(mfnode, "hReview", "item");
-          var reviewer = ufJSParser.getMicroformatProperty(mfnode, "hReview", "reviewer");
-          if (item) {
-            var fn;
-            if (item.summary) {
-              fn = item.summary
-            } else if (item.fn) {
-              fn = item.fn;
-            }
-            if (reviewer) {
-              if (reviewer.fn) {
-                return fn + " (" + reviewer.fn + ")";
-              } else {
-                return fn + " (" + reviewer + ")";
-              }
-            } else {
-              return fn;
-            }
-          }
-        }
       }
     }
   },

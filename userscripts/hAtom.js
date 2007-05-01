@@ -1,9 +1,25 @@
 /* hAtom is kind of strange. I decided to separate it in to hFeed and hEntry */
 
-function hFeed() {
+function hFeed(node) {
+  if (node) {
+    ufJSParser.newMicroformat(this, node, "hFeed");
+  }
+}
+hFeed.prototype.toString = function() {
+  if (this.node.ownerDocument) {
+    return this.node.ownerDocument.title;
+  } else {
+    return this.node.title;
+  }
 }
 
-function hEntry() {
+function hEntry(node) {
+  if (node) {
+    ufJSParser.newMicroformat(this, node, "hEntry");
+  }
+}
+hEntry.prototype.toString = function() {
+  return this["entry-title"];
 }
 
 ufJSParser.microformats["hAtom-hEntry"] = {
@@ -75,15 +91,6 @@ ufJSParser.microformats["hAtom-hEntry"] = {
         datatype: "microformat",
         microformat: "tag"
       }
-    },
-    ufjs: {
-      "ufjsDisplayName" : {
-        virtual: true,
-        virtualGetter: function(propnode, mfnode, definition) {
-          /* NEEDS MORE WORK */
-          return ufJSParser.getMicroformatProperty(mfnode, "hAtom-hEntry", "entry-title");
-        }
-      }
     }
   }
 };
@@ -125,18 +132,6 @@ ufJSParser.microformats["hAtom-hFeed"] = {
         }
       }
 
-    },
-    ufjs: {
-      "ufjsDisplayName" : {
-        virtual: true,
-        virtualGetter: function(propnode, mfnode) {
-          if (mfnode.ownerDocument) {
-            return mfnode.ownerDocument.title;
-          } else {
-            return mfnode.title;
-          }
-        }
-      }
     }
   }
 };
