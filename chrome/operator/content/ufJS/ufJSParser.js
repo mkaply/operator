@@ -41,6 +41,7 @@ var ufJSParser = {
     }
     
     object.node = node;
+    object.semanticType = microformat;
   },
   getMicroformatPropertyGenerator: function(node, name, property, microformat)
   {
