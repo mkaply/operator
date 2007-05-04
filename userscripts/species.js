@@ -12,20 +12,18 @@ ufJSParser.microformats.species = {
   description: "Species",
   mfObject: species,
   className: "biota",
-  definition: {
-    properties: {
-      "domain" : {
-      },
-      "kingdom" : {
-      },
-      "subkingdom" : {
-      },
-      "superphylum" : {
-      },
-      "vernacular" : {
-      },
-      "binomial" : {
-      }
+  properties: {
+    "domain" : {
+    },
+    "kingdom" : {
+    },
+    "subkingdom" : {
+    },
+    "superphylum" : {
+    },
+    "vernacular" : {
+    },
+    "binomial" : {
     }
   }
 };

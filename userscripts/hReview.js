@@ -29,82 +29,80 @@ ufJSParser.microformats.hReview = {
   mfObject: hReview,
   className: "hreview",
   required: ["item"],
-  definition: {
-    properties: {
-      "dtreviewed" : {
-        datatype: "dateTime"
-      },
-      "description" : {
-      },
-      "item" : {
-  /* These must be handled explicity by the item getter because of
-     the different types of data that could be in the item
-        subproperties: {
-          "fn" : {
-          },
-          "url" : {
-            }
-          }
-          "photo" : {
-            }
-          }
+  properties: {
+    "dtreviewed" : {
+      datatype: "dateTime"
+    },
+    "description" : {
+    },
+    "item" : {
+/* These must be handled explicity by the item getter because of
+   the different types of data that could be in the item
+      subproperties: {
+        "fn" : {
         },
-  */
-        datatype: "custom",
-        customGetter: function(propnode) {
-          var item;
-          if (propnode.className.match("(^|\\s)" + "vcard" + "(\\s|$)")) {
-            item = ufJSParser.createMicroformat(propnode, "hCard");
-          } else if (propnode.className.match("(^|\\s)" + "vevent" + "(\\s|$)")) {
-            item = ufJSParser.createMicroformat(propnode, "hCalendar");
-          } else {
-            item = {};
-            var fns = ufJSParser.getElementsByClassName(propnode, "fn");
-            if (fns.length > 0) {
-              item.fn = ufJSParser.defaultGetter(fns[0]);
-            }
-            var urls = ufJSParser.getElementsByClassName(propnode, "url");
-            if (urls.length > 0) {
-              item.url = ufJSParser.uriGetter(urls[0]);
-            }
-            var photos = ufJSParser.getElementsByClassName(propnode, "photo");
-            if (photos.length > 0) {
-              item.photo = ufJSParser.uriGetter(photos[0]);
-            }
+        "url" : {
           }
-          /* Only return item if it has stuff in it */
-          for (var i in item) {
-            return item;
+        }
+        "photo" : {
           }
-          return;
         }
       },
-      "rating" : {
-        datatype: "float"
-      },
-      "best" : {
-        datatype: "float"
-      },
-      "worst" : {
-        datatype: "float"
-      },
-      "reviewer" : {
-        datatype: "microformat",
-        microformat: "hCard"
-      },
-      "summary" : {
-      },
-      "type" : {
-        types: ["product", "business", "event", "person", "place", "website", "url"]
-      },
-      "tag" : {
-        plural: true,
-        rel: true,
-        datatype: "microformat",
-        microformat: "tag"
-      },
-      "version" : {
+*/
+      datatype: "custom",
+      customGetter: function(propnode) {
+        var item;
+        if (propnode.className.match("(^|\\s)" + "vcard" + "(\\s|$)")) {
+          item = ufJSParser.createMicroformat(propnode, "hCard");
+        } else if (propnode.className.match("(^|\\s)" + "vevent" + "(\\s|$)")) {
+          item = ufJSParser.createMicroformat(propnode, "hCalendar");
+        } else {
+          item = {};
+          var fns = ufJSParser.getElementsByClassName(propnode, "fn");
+          if (fns.length > 0) {
+            item.fn = ufJSParser.defaultGetter(fns[0]);
+          }
+          var urls = ufJSParser.getElementsByClassName(propnode, "url");
+          if (urls.length > 0) {
+            item.url = ufJSParser.uriGetter(urls[0]);
+          }
+          var photos = ufJSParser.getElementsByClassName(propnode, "photo");
+          if (photos.length > 0) {
+            item.photo = ufJSParser.uriGetter(photos[0]);
+          }
+        }
+        /* Only return item if it has stuff in it */
+        for (var i in item) {
+          return item;
+        }
+        return;
       }
+    },
+    "rating" : {
+      datatype: "float"
+    },
+    "best" : {
+      datatype: "float"
+    },
+    "worst" : {
+      datatype: "float"
+    },
+    "reviewer" : {
+      datatype: "microformat",
+      microformat: "hCard"
+    },
+    "summary" : {
+    },
+    "type" : {
+      types: ["product", "business", "event", "person", "place", "website", "url"]
+    },
+    "tag" : {
+      plural: true,
+      rel: true,
+      datatype: "microformat",
+      microformat: "tag"
+    },
+    "version" : {
     }
   },
   validate: function(node, error) {

@@ -16,13 +16,11 @@ ufJSParser.microformats.GRDDL = {
   mfObject: GRDDL,
   attributeName: "rel",
   attributeValues: ["transformation"],
-  definition: {
-    values: {
-      "transformation" : {
-        virtual: true,
-        virtualGetter: function(propnode, mfnode, definition) {
-          return "foo";
-        }
+  properties: {
+    "transformation" : {
+      virtual: true,
+      virtualGetter: function(propnode, mfnode, definition) {
+        return "foo";
       }
     }
   }
