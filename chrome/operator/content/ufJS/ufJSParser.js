@@ -40,7 +40,10 @@ var ufJSParser = {
       object.__defineGetter__(i, ufJSParser.getMicroformatPropertyGenerator(node, microformat, i, object));
     }
     
-    object.node = node;
+    /* The node in the object should be the original node */
+    object.node = in_node;
+    /* we also store the nodes that has been "resolved" */
+    object.resolvedNode = node; 
     object.semanticType = microformat;
   },
   getMicroformatPropertyGenerator: function(node, name, property, microformat)
