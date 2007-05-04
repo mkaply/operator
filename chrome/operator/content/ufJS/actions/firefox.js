@@ -27,7 +27,7 @@ ufJSActions.actions.bookmark = {
       url = semanticObject.bookmark.link;
     } else {
       var serializer = new XMLSerializer();
-      var xmlString = serializer.serializeToString(semanticObject.node);
+      var xmlString = serializer.serializeToString(semanticObject.resolvedNode);
       url = "data:text/html;charset=utf8," + xmlString;
       name = semanticObject.toString();
     }
