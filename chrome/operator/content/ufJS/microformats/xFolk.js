@@ -14,36 +14,34 @@ ufJSParser.microformats.xFolk = {
   mfObject: xFolk,
   className: "xfolkentry",
   required: ["taggedlink"],
-  definition:  {
-    properties: {
-      "description" : {
-        plural: true
-      },
-      "taggedlink" : {
-        subproperties: {
-          "title" : {
-            virtual: true,
-            virtualGetter: function(parentnode) {
-              if (parentnode.getAttribute("title")) {
-                return parentnode.getAttribute("title");
-              } else {
-                return ufJSParser.defaultGetter(parentnode);
-              }
+  properties: {
+    "description" : {
+      plural: true
+    },
+    "taggedlink" : {
+      subproperties: {
+        "title" : {
+          virtual: true,
+          virtualGetter: function(parentnode) {
+            if (parentnode.getAttribute("title")) {
+              return parentnode.getAttribute("title");
+            } else {
+              return ufJSParser.defaultGetter(parentnode);
             }
-          },
-          "link" : {
-            datatype: "anyURI",
-            virtual: true
           }
         },
+        "link" : {
+          datatype: "anyURI",
+          virtual: true
+        }
       },
-      "tag" : {
-        plural: true,
-        rel: true,
-        datatype: "microformat",
-        microformat: "tag",
-        microformat_property: "tag"
-      }
+    },
+    "tag" : {
+      plural: true,
+      rel: true,
+      datatype: "microformat",
+      microformat: "tag",
+      microformat_property: "tag"
     }
   }
 };

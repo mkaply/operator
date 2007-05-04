@@ -28,27 +28,25 @@ ufJSParser.microformats.Address = {
   version: "0.7",
   mfObject: Address,
   className: "adr",
-  definition: {
-    properties: {
-      "type" : {
-        plural: true,
-        types: ["work", "home", "pref", "postal", "dom", "intl", "parcel"]
-      },
-      "post-office-box" : {
-      },
-      "street-address" : {
-        plural: true,
-      },
-      "extended-address" : {
-      },
-      "locality" : {
-      },
-      "region" : {
-      },
-      "postal-code" : {
-      },
-      "country-name" : {
-      }
+  properties: {
+    "type" : {
+      plural: true,
+      types: ["work", "home", "pref", "postal", "dom", "intl", "parcel"]
+    },
+    "post-office-box" : {
+    },
+    "street-address" : {
+      plural: true,
+    },
+    "extended-address" : {
+    },
+    "locality" : {
+    },
+    "region" : {
+    },
+    "postal-code" : {
+    },
+    "country-name" : {
     }
   }
 };

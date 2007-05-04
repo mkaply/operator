@@ -42,35 +42,33 @@ ufJSParser.microformats.geo = {
   mfObject: geo,
   className: "geo",
   required: ["latitude","longitude"],
-  definition: {
-    properties: {
-      "latitude" : {
-        datatype: "float",
-        virtual: true,
-        /* This will only be called in the virtual case */
-        virtualGetter: function(mfnode) {
-          var value = ufJSParser.defaultGetter(mfnode);
-          var latlong;
-          if (value.match(';')) {
-            latlong = value.split(';');
-            if (latlong[0]) {
-              return parseFloat(latlong[0]);
-            }
+  properties: {
+    "latitude" : {
+      datatype: "float",
+      virtual: true,
+      /* This will only be called in the virtual case */
+      virtualGetter: function(mfnode) {
+        var value = ufJSParser.defaultGetter(mfnode);
+        var latlong;
+        if (value.match(';')) {
+          latlong = value.split(';');
+          if (latlong[0]) {
+            return parseFloat(latlong[0]);
           }
-        },
+        }
       },
-      "longitude" : {
-        datatype: "float",
-        virtual: true,
-        /* This will only be called in the virtual case */
-        virtualGetter: function(mfnode) {
-          var value = ufJSParser.defaultGetter(mfnode);
-          var latlong;
-          if (value.match(';')) {
-            latlong = value.split(';');
-            if (latlong[1]) {
-              return parseFloat(latlong[1]);
-            }
+    },
+    "longitude" : {
+      datatype: "float",
+      virtual: true,
+      /* This will only be called in the virtual case */
+      virtualGetter: function(mfnode) {
+        var value = ufJSParser.defaultGetter(mfnode);
+        var latlong;
+        if (value.match(';')) {
+          latlong = value.split(';');
+          if (latlong[1]) {
+            return parseFloat(latlong[1]);
           }
         }
       }

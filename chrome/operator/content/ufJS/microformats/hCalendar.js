@@ -25,51 +25,49 @@ ufJSParser.microformats.hCalendar = {
   mfObject: hCalendar,
   className: "vevent",
   required: ["summary"],
-  definition: {
-    properties: {
-      "category" : {
-        plural: true,
-        datatype: "microformat",
-        microformat: "tag",
-        microformat_property: "tag"
-      },
-      "class" : {
-        types: ["public", "private", "confidential"]
-      },
-      "description" : {
-        datatype: "HTML"
-      },
-      "dtstart" : {
-        datatype: "dateTime"
-      },
-      "dtend" : {
-        datatype: "dateTime"
-      },
-      "dtstamp" : {
-        datatype: "dateTime"
-      },
-      "duration" : {
-      },
-      "location" : {
-        datatype: "microformat",
-        microformat: "hCard"
-      },
-      "status" : {
-        types: ["tentative", "confirmed", "cancelled"]
-      },
-      "summary" : {},
-      "transp" : {
-        types: ["opaque", "transparent"]
-      },
-      "uid" : {
-        datatype: "anyURI"
-      },
-      "url" : {
-        datatype: "anyURI"
-      },
-      "last-modified" : {
-        datatype: "dateTime"
-      }
+  properties: {
+    "category" : {
+      plural: true,
+      datatype: "microformat",
+      microformat: "tag",
+      microformat_property: "tag"
+    },
+    "class" : {
+      types: ["public", "private", "confidential"]
+    },
+    "description" : {
+      datatype: "HTML"
+    },
+    "dtstart" : {
+      datatype: "dateTime"
+    },
+    "dtend" : {
+      datatype: "dateTime"
+    },
+    "dtstamp" : {
+      datatype: "dateTime"
+    },
+    "duration" : {
+    },
+    "location" : {
+      datatype: "microformat",
+      microformat: "hCard"
+    },
+    "status" : {
+      types: ["tentative", "confirmed", "cancelled"]
+    },
+    "summary" : {},
+    "transp" : {
+      types: ["opaque", "transparent"]
+    },
+    "uid" : {
+      datatype: "anyURI"
+    },
+    "url" : {
+      datatype: "anyURI"
+    },
+    "last-modified" : {
+      datatype: "dateTime"
     }
   }
 };

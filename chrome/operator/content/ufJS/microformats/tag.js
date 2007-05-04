@@ -12,28 +12,26 @@ ufJSParser.microformats.tag = {
   mfObject: tag,
   attributeName: "rel",
   attributeValues: ["tag"],
-  definition: {
-    properties: {
-      "tag" : {
-        virtual: true,
-        virtualGetter: function(mfnode) {
-          if (mfnode.href) {
-            var url_array = mfnode.getAttribute("href").split("/");
-            for(var i=url_array.length-1; i > 0; i--) {
-              if (url_array[i] !== "") {
-                return unescape(ufJSParser.microformats.tag.validTagName(url_array[i].replace(/\+/g, ' ')));
-              }
+  properties: {
+    "tag" : {
+      virtual: true,
+      virtualGetter: function(mfnode) {
+        if (mfnode.href) {
+          var url_array = mfnode.getAttribute("href").split("/");
+          for(var i=url_array.length-1; i > 0; i--) {
+            if (url_array[i] !== "") {
+              return unescape(ufJSParser.microformats.tag.validTagName(url_array[i].replace(/\+/g, ' ')));
             }
           }
         }
-      },
-      "link" : {
-        virtual: true,
-        datatype: "anyURI"
-      },
-      "text" : {
-        virtual: true
       }
+    },
+    "link" : {
+      virtual: true,
+      datatype: "anyURI"
+    },
+    "text" : {
+      virtual: true
     }
   },
   validTagName: function(tag)
