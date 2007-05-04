@@ -32,12 +32,11 @@ var ufJSParser = {
       }
     }
     var node = in_node;
-    var definition = ufJSParser.microformats[microformat].definition;
     if (ufJSParser.microformats[microformat].className) {
       node = ufJSParser.preProcessMicroformat(in_node);
     }
 
-    for (var i in definition.properties) {
+    for (var i in ufJSParser.microformats[microformat].properties) {
       object.__defineGetter__(i, ufJSParser.getMicroformatPropertyGenerator(node, microformat, i, object));
     }
     
@@ -77,13 +76,12 @@ var ufJSParser = {
     }
     var mfnode = in_mfnode;
     var microformat = new ufJSParser.microformats[mfname].mfObject();
-    var definition = ufJSParser.microformats[mfname].definition;
     var i;
     if (ufJSParser.microformats[mfname].className) {
       mfnode = ufJSParser.preProcessMicroformat(in_mfnode);
     }
     var foundProps = false;
-    for (i in definition.properties) {
+    for (i in ufJSParser.microformats[mfname].properties) {
       var prop = ufJSParser.getMicroformatProperty(mfnode, mfname, i);
       if (prop) {
         foundProps = true;
@@ -97,7 +95,6 @@ var ufJSParser = {
     return microformat;
   },
   getMicroformatProperty: function(in_mfnode, mfname, propname) {
-    var definition = ufJSParser.microformats[mfname].definition;
     var i, j, k;
     var result;
     var mfnode = in_mfnode;
@@ -106,10 +103,8 @@ var ufJSParser = {
     }
     var foundProps = false;
     var tp;
-    if (definition.properties && definition.properties[propname]) {
-      tp = definition.properties[propname];
-    } else if (definition.ufjs && definition.ufjs[propname]) {
-      tp = definition.ufjs[propname];
+    if (ufJSParser.microformats[mfname].properties[propname]) {
+      tp = ufJSParser.microformats[mfname].properties[propname];
     }
 /* OK this is strange so let me explain it. If we didn't find the property
    that was passed in, look for it among the subproperties. If you find it, 
@@ -117,12 +112,12 @@ var ufJSParser = {
    use it. This allows us to pass in an hentry and get it's entry-title
    for instance. This only works one level deep. */
     if (!tp) {
-      for (i in definition.properties) {
-        if (definition.properties[i].subproperties) {
-          if (definition.properties[i].subproperties[propname]) {
+      for (i in ufJSParser.microformats[mfname].properties) {
+        if (ufJSParser.microformats[mfname].properties[i].subproperties) {
+          if (ufJSParser.microformats[mfname].properties[i].subproperties[propname]) {
             if (mfnode.getAttribute('class')) {
               if (mfnode.getAttribute('class').match("(^|\\s)" + i + "(\\s|$)")) {
-                tp = definition.properties[i].subproperties[propname];
+                tp = ufJSParser.microformats[mfname].properties[i].subproperties[propname];
                 break;
               }
             }
@@ -135,7 +130,7 @@ var ufJSParser = {
       /* propname contains a . - dereference it */
       if (propname.indexOf(".") != -1) {
         var props = propname.split(".");
-        tp = definition.properties[props[0]];
+        tp = ufJSParser.microformats[mfname].properties[props[0]];
         if (tp && tp.rel == true) {
           propnodes = ufJSParser.getElementsByAttribute(mfnode, "rel", props[0]);
         } else {
