@@ -16,7 +16,7 @@ ufJSActions.actions.liveclipboard = {
     xmlString += "\" contenttype=\"application/xhtml+xml\">";
     xmlString += "<lc:item>";
     var serializer = new XMLSerializer();
-    xmlString += serializer.serializeToString(semanticObject.node);
+    xmlString += serializer.serializeToString(semanticObject.resolvedNode);
     xmlString += "</lc:item>";
     xmlString += "</lc:format>";
     xmlString += "</lc:data>";
