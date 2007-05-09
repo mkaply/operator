@@ -11,6 +11,86 @@ var Operator_Toolbar = {
         toolbar.removeChild(toolbar.childNodes[i]);
       }
     }
+    /* Actions */
+    if (Operator.view == 1) {
+      /* Enumerate through all the actions (eventually all prefed actions */
+      /* For each action, enumerate through microformats it recognizes (based on the semantic array) */
+      /* If it is an understood microformat, check for requires and display/enable/disable item */
+      i = 1;
+      do {
+        try {
+//          var action = Operator.prefBranch.getComplexValue("action" + i, Components.interfaces.nsISupportsString).data;
+          action = Operator.prefBranch.getCharPref("action" + i);
+        } catch (ex) {
+          break;
+        }
+        button = document.createElement("toolbarbutton");
+        button.setAttribute("disabled", "true");
+        button.label = ufJSActions.actions[action].description;
+        button.setAttribute("label", button.label);
+        button.setAttribute("origlabel", ufJSActions.actions[action].description);
+        button.setAttribute("type", "menu");
+        button.addEventListener("mouseover", Operator_Toolbar.mouseOver, false);
+
+        if (ufJSActions.actions[action].icon) {
+          button.style.listStyleImage = "url('" + ufJSActions.actions[action].icon + "')";
+        } else {
+          button.style.listStyleImage = "url('chrome://operator/content/other.png')";
+        }
+        button.id = "operator-" + action + "-toolbar-button";
+        toolbar.insertBefore(button, document.getElementById("operator-spring"));
+        var node = document.getAnonymousElementByAttribute(button, "class", "toolbarbutton-icon");
+        node.style.opacity = 0.3;
+        node.style.width = "16px";
+        node.style.height = "16px";
+        i++;
+      } while (1)
+    }
+
+    if (Operator.view == 0) {
+      var semanticType;
+      i = 1;
+      do {
+        try {
+          semanticType = Operator.prefBranch.getCharPref("microformat" + i);
+        } catch (ex) {
+          break;
+        }
+        if (semanticType) {
+          button = document.createElement("toolbarbutton");
+          button.setAttribute("disabled", "true");
+//          if ((Operator.useDescriptiveNames) && (ufJSParser.microformats[microformat].description)) {
+//            button.label = ufJSParser.microformats[microformat].description;
+//          } else {
+            button.label =  semanticType;
+//          }
+          button.setAttribute("label", button.label);
+          button.setAttribute("origlabel", button.label);
+
+          button.setAttribute("type", "menu");
+          button.addEventListener("mouseover", Operator_Toolbar.mouseOver, false);
+
+//          if (ufJSParser.microformats[microformat].icon) {
+//            button.style.listStyleImage = "url('" + ufJSParser.microformats[microformat].icon + "')";
+//          } else {
+            button.style.listStyleImage = "url('chrome://operator/content/other.png')";
+//          }
+
+          button.id = "operator-" + semanticType + "-toolbar-button";
+          toolbar.insertBefore(button, document.getElementById("operator-spring"));
+          var node = document.getAnonymousElementByAttribute(button, "class", "toolbarbutton-icon");
+          node.style.opacity = 0.3;
+          node.style.width = "16px";
+          node.style.height = "16px";
+        }
+        i++;
+      } while (1);
+    }
+
+
+    return;
+    
+    
     var useActions = (Operator.view == 1);
     
     var microformat;
@@ -121,23 +201,23 @@ var Operator_Toolbar = {
       }
       if (menuitems[i].store_onDOMMenuItemActive) {
         newmenuitems[i].addEventListener("DOMMenuItemActive", menuitems[i].store_onDOMMenuItemActive, true);
-        numitems++;
       }
+      numitems++;
     }
     var menus = menu.getElementsByTagName("menu");
     var newmenus = newmenu.getElementsByTagName("menu");
     for(var i=0; i < menus.length; i++) {
       if (menus[i].store_onDOMMenuItemActive) {
         newmenus[i].addEventListener("DOMMenuItemActive", menus[i].store_onDOMMenuItemActive, true);
-        numitems++;
       }
       if (menus[i].store_onpopupshowing) {
         newmenus[i].addEventListener("popupshowing", menus[i].store_onpopupshowing, true);
       }
+      numitems++;
     }
 
     if (semanticAction) {
-      button = document.getElementById("operator-" + semanticObjectType + "-" + semanticAction + "-toolbar-button");
+      button = document.getElementById("operator-" + semanticAction + "-toolbar-button");
     } else {
       button = document.getElementById("operator-" + semanticObjectType + "-toolbar-button");
     }
@@ -217,6 +297,20 @@ var Operator_Toolbar = {
         }
       }
     }
+  },
+  isHidden: function()
+  {
+    if (document.getElementById("operator-toolbar")) {
+      return false;
+    }
+    return true;
+  },
+  isVisible: function()
+  {
+    if (document.getElementById("operator-toolbar")) {
+      return true;
+    }
+    return false;
   }
 };
 

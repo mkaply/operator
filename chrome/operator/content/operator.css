@@ -27,3 +27,26 @@ toolbar[iconsize="small"] #operator-toolbar-button[disabled="true"] {
    list-style-image: url("chrome://operator/content/options.png");
 }
 
+#operator-hCard-button {
+   list-style-image: url("chrome://operator/content/hCard_test.png");
+}
+
+#operator-hCard-button:hover {
+   list-style-image: url("chrome://operator/content/hCard_test.png");
+}
+#operator-hCard-button[disabled="true"] {
+   list-style-image: url("chrome://operator/content/hCard_test.png");
+}
+
+/* Small */
+toolbar[iconsize="small"] #operator-hCard-button {
+   list-style-image: url("chrome://operator/content/hCard_test_small.png");
+}
+
+toolbar[iconsize="small"] #operator-hCard-button:hover {
+   list-style-image: url("chrome://operator/content/hCard_test_small.png");
+}
+toolbar[iconsize="small"] #operator-hCard-button[disabled="true"] {
+   list-style-image: url("chrome://operator/content/hCard_test_small.png");
+}
+

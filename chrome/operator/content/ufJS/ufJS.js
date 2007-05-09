@@ -14,7 +14,44 @@ var ufJS = {
       ufJSActions.init(ojl, baseurl);
     }
   },
-  getMicroformats: function(rootElement, in_microformatsArrays) {
+  /* This function gets microformats of a particular type */
+  getMicroformats: function(rootElement, mfname, in_microformatsArray) {
+    var mfs;
+    var microformats;
+    if (in_microformatsArray) {
+      microformats = in_microformatsArray;
+    } else {
+      microformats = [];
+    }
+    if (ufJSParser.microformats[mfname]) {
+      if (ufJSParser.microformats[mfname].className) {
+        mfs = ufJS.getElementsByClassName(rootElement,
+                                          ufJSParser.microformats[mfname].className);
+        /* alternateClassName is for cases where a parent microformat is inferred by the children */
+        /* IF we find alternateClassName, the entire document becomes the microformat */
+        if ((mfs.length == 0) && (ufJSParser.microformats[mfname].alternateClassName)) {
+          var temp = ufJS.getElementsByClassName(rootElement, ufJSParser.microformats[mfname].alternateClassName);
+          if (temp.length > 0) {
+            mfs.push(rootElement); 
+          }
+        }
+      } else if (ufJSParser.microformats[mfname].attributeValues) {
+        mfs = ufJS.getElementsByAttribute(rootElement,
+                                          ufJSParser.microformats[mfname].attributeName,
+                                          ufJSParser.microformats[mfname].attributeValues);
+        
+      }
+    } else {
+      mfs = [];
+    }
+    var i;
+    for (i = 0; i < mfs.length; i++) {
+      microformats.push(new ufJSParser.microformats[mfname].mfObject(mfs[i]));
+    }
+    return microformats;
+  },
+  /* This function gets all microformats */
+  getAllMicroformats: function(rootElement, in_microformatsArrays) {
     var i, j;
     var microformatList = [];
     for (i in ufJSParser.microformats) {
@@ -29,94 +66,7 @@ var ufJS = {
     var mfname;
     var mfs;
     for (i in microformatList) {
-      mfname = microformatList[i];
-      if (ufJSParser.microformats[mfname]) {
-        if (ufJSParser.microformats[mfname].className) {
-          mfs = ufJS.getElementsByClassName(rootElement,
-                                            ufJSParser.microformats[mfname].className);
-          /* alternateClassName is for cases where a parent microformat is inferred by the children */
-          /* IF we find alternateClassName, the entire document becomes the microformat */
-          if ((mfs.length == 0) && (ufJSParser.microformats[mfname].alternateClassName)) {
-            var temp = ufJS.getElementsByClassName(rootElement, ufJSParser.microformats[mfname].alternateClassName);
-            if (temp.length > 0) {
-              mfs.push(rootElement); 
-            }
-          }
-        } else if (ufJSParser.microformats[mfname].attributeValues) {
-          mfs = ufJS.getElementsByAttribute(rootElement,
-                                            ufJSParser.microformats[mfname].attributeName,
-                                            ufJSParser.microformats[mfname].attributeValues);
-          
-        }
-      } else {
-        mfs = [];
-      }
-      if (!microformats[mfname]) {
-        microformats[mfname] = [];
-      }
-      for (j = 0; j < mfs.length; j++) {
-        microformats[mfname].push(new ufJSParser.microformats[mfname].mfObject(mfs[j]));
-      }
-//      microformats[mfname] = microformats[mfname].concat(mfs);
-    }
-    return microformats;
-  },
-  /* Make this take arrays and strings for className */
-  getElementsByMicroformat: function(rootElement, in_microformatsArrays, in_microformatList) {
-    var i;
-    var microformatList;
-    if (in_microformatList) {
-      if (in_microformatList instanceof Array) {
-        microformatList = in_microformatList;
-      } else if (in_microformatList instanceof Object) {
-        microformatList = [];
-        for (i in in_microformatList) {
-          microformatList.push(i);
-        }
-      } else {
-        microformatList = in_microformatList.split(" ");
-      }
-    } else {
-      microformatList = [];
-      for (i in ufJSParser.microformats) {
-        microformatList.push(i);
-      }
-    }
-    var microformats;
-    if (in_microformatsArrays) {
-      microformats = in_microformatsArrays;
-    } else {
-      microformats = [];
-    }
-    var mfname;
-    var mfs;
-    for (i in microformatList) {
-      mfname = microformatList[i];
-      if (ufJSParser.microformats[mfname]) {
-        if (ufJSParser.microformats[mfname].className) {
-          mfs = ufJS.getElementsByClassName(rootElement,
-                                            ufJSParser.microformats[mfname].className);
-          /* alternateClassName is for cases where a parent microformat is inferred by the children */
-          /* IF we find alternateClassName, the entire document becomes the microformat */
-          if ((mfs.length == 0) && (ufJSParser.microformats[mfname].alternateClassName)) {
-            var temp = ufJS.getElementsByClassName(rootElement, ufJSParser.microformats[mfname].alternateClassName);
-            if (temp.length > 0) {
-              mfs.push(rootElement); 
-            }
-          }
-        } else if (ufJSParser.microformats[mfname].attributeValues) {
-          mfs = ufJS.getElementsByAttribute(rootElement,
-                                            ufJSParser.microformats[mfname].attributeName,
-                                            ufJSParser.microformats[mfname].attributeValues);
-          
-        }
-      } else {
-        mfs = [];
-      }
-      if (!microformats[mfname]) {
-        microformats[mfname] = [];
-      }
-      microformats[mfname] = microformats[mfname].concat(mfs);
+      microformats[microformatList[i]] = ufJS.getMicroformats(rootElement, microformatList[i], microformats[microformatList[i]]);
     }
     return microformats;
   },
@@ -184,42 +134,36 @@ var ufJS = {
     }
     return returnElements;
   },
-  isMicroformatElement: function(node, in_microformatList) {
-    this.isMicroformatNode(node, in_microformatList);
-  },
   /* Needs to be ported to work in Internet Explorer/Opera */
-  isMicroformatNode: function(node, in_microformatList) {
-    var microformatList;
+  /* This function determines if the passed in node IS a microformat */
+  isMicroformatNode: function(node) {
     var i;
-    if (in_microformatList) {
-      if (in_microformatList instanceof Array) {
-        microformatList = in_microformatList;
-      } else if (in_microformatList instanceof Object) {
-        microformatList = [];
-        for (i in in_microformatList) {
-          microformatList.push(i);
+    for (i in ufJSParser.microformats)
+    {
+      if (node.getAttribute('class')) {
+        if (node.getAttribute('class').match("(^|\\s)" + ufJSParser.microformats[i].className + "(\\s|$)")) {
+          return true;
         }
-      } else {
-        microformatList = in_microformatList.split(" ");
-      }
-    } else {
-      microformatList = [];
-      for (i in ufJSParser.microformats) {
-        microformatList.push(i);
       }
     }
-
+    return false;
+  },
+  /* Needs to be ported to work in Internet Explorer/Opera */
+  /* This function gets the first microformat that is a parent of this node */
+  /* If the passed in node is a microformat, it still gets the parent! */
+  getParentMicroformatNode: function(node) {
     var xpathExpression;
     var xpathResult;
     var mfname;
-    for (i in microformatList)
+    var i;
+    for (i in ufJSParser.microformats)
     {
-      mfname = microformatList[i];
+      mfname = i;
       if (ufJSParser.microformats[mfname]) {
         if (ufJSParser.microformats[mfname].className) {
-          xpathExpression = "ancestor-or-self::*[contains(concat(' ', @class, ' '), ' " + ufJSParser.microformats[mfname].className + " ')]";
+          xpathExpression = "ancestor::*[contains(concat(' ', @class, ' '), ' " + ufJSParser.microformats[mfname].className + " ')]";
         } else if (ufJSParser.microformats[mfname].attributeValues) {
-          xpathExpression = "ancestor-or-self::*[";
+          xpathExpression = "ancestor::*[";
           for (i in ufJSParser.microformats[mfname].attributeValues) {
             if (i != 0) {
               xpathExpression += " or ";
@@ -239,11 +183,10 @@ var ufJS = {
     }
     return false;
   },
-  getMicroformatNameFromElement: function(node, in_microformatList) {
-    this.getMicroformatNameFromNode(node, in_microformatList);
-  },
   /* Needs to be ported to work in Internet Explorer/Opera */
-  getMicroformatNameFromNode: function(node, in_microformatList) {
+  /* This function returns an array of the microformat types that correspond EXACTLY */
+  /* to a given node */
+  getMicroformatNamesFromNode: function(node, in_microformatList) {
     var i;
     var microformatList;
     if (in_microformatList) {
@@ -273,9 +216,9 @@ var ufJS = {
       mfname = microformatList[i];
       if (ufJSParser.microformats[mfname]) {
         if (ufJSParser.microformats[mfname].className) {
-          xpathExpression = "ancestor-or-self::*[contains(concat(' ', @class, ' '), ' " + ufJSParser.microformats[mfname].className + " ')]";
+          xpathExpression = "self::*[contains(concat(' ', @class, ' '), ' " + ufJSParser.microformats[mfname].className + " ')]";
         } else if (ufJSParser.microformats[mfname].attributeValues) {
-          xpathExpression = "ancestor-or-self::*[";
+          xpathExpression = "self::*[";
           for (i in ufJSParser.microformats[mfname].attributeValues) {
             if (i != 0) {
               xpathExpression += " or ";

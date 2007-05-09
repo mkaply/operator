@@ -5,14 +5,19 @@ ufJSActions.actions.google_maps = {
   icon: "http://www.google.com/favicon.ico",
   scope: {
     semantic: {
-      "hCard" : "adr",
-      "geo" : "geo"
+      "geo" : "geo",
+      "Address" : "Address"
     }
   },
   doAction: function(semanticObject, semanticObjectType) {
     var url;
-    if (semanticObjectType == "hCard") {
-      var adr = semanticObject.adr;
+    if ((semanticObjectType == "hCard") || (semanticObjectType == "adr")) {
+      var adr;
+      if (semanticObjectType == "hCard") {
+        adr = semanticObject.adr;
+      } else {
+        adr = semanticObject;
+      }
       if (adr) {
         url = "http://maps.google.com/maps?q=";
         if (adr[0]["street-address"]) {

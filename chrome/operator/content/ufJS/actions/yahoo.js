@@ -5,14 +5,14 @@ ufJSActions.actions.yahoo_maps = {
   icon: "http://www.yahoo.com/favicon.ico",
   scope: {
     semantic: {
-      "hCard" : "adr",
+      "Address" : "Address",
       "geo" : "geo"
     }
   },
   doAction: function(semanticObject, semanticObjectType) {
     var url;
-    if (semanticObjectType == "hCard") {
-      var adr = semanticObject.adr;
+    if (semanticObjectType == "Address") {
+      var adr = semanticObject;
       if (adr) {
         url = "http://maps.yahoo.com/maps_result?";
         if (adr[0]["street-address"]) {
@@ -242,12 +242,121 @@ ufJSActions.actions.yahoo_contact = {
   icon: "http://www.yahoo.com/favicon.ico",
   scope: {
     semantic: {
-      "hCard" : "hCard"
+      "hCard" : "hCard",
+      "foaf" : "foaf"
     }
   },
   doAction: function(semanticObject, semanticObjectType) {
     var url;
-    if (semanticObjectType == "hCard") {
+    if (semanticObjectType == "foaf") {
+      var i, j, k;
+      var foaf = semanticObject;
+      url = "http://address.yahoo.com/?";
+      if (foaf.family_name) {
+        url += "ln=" + foaf.family_name + "&";
+      }
+      if (foaf.givenname) {
+        url += "fn=" + foaf.givenname + "&";
+      }
+      if (foaf.homepage) {
+        url += "pu=" + foaf.homepage + "&";
+      }
+      url += "A=C";
+      return url;
+      if (hcard.adr) {
+        for (j=0;j<hcard.adr.length;j++) {
+          var prefix = "h";
+          /* If business, default to work */
+          if (hcard.org && (hcard.fn == hcard.org)) {
+            prefix = "w";
+          }
+          if (hcard.adr[j].type) {
+            /* Should I have a way to have one address be work and home? */
+            for (k=0;k<hcard.adr[j].type.length;k++) {
+              if (hcard.adr[j].type[k].toLowerCase() == "work") {
+                prefix = "w";
+                break;
+              }
+            }
+          }
+    
+          if (hcard.adr[j]["street-address"]) {
+            url += prefix + "a1=" + escape(hcard.adr[j]["street-address"][0]) + "&";
+          }
+          if (hcard.adr[j]["extended-address"]) {
+            url += prefix + "a2=" + hcard.adr[j]["extended-address"] + "&";
+          }
+          if (hcard.adr[j].locality) {
+            url += prefix + "c=" + hcard.adr[j].locality + "&";
+          }
+          if (hcard.adr[j].region) {
+            url += prefix + "s=" + hcard.adr[j].region + "&";
+          }
+          if (hcard.adr[j]["postal-code"]) {
+            url += prefix + "z=" + hcard.adr[j]["postal-code"] + "&";
+          }
+          if (hcard.adr[j]["country-name"]) {
+            url += prefix + "co=" + hcard.adr[j]["country-name"] + "&";
+          }
+        }
+      }
+      if (hcard.tel) {
+        /* default home phone to first number */
+        var homephone;
+        var workphone;
+        var mobilephone;
+        var preferred;
+        /* If business, default to work */
+        if (hcard.org && (hcard.fn == hcard.org)) {
+          workphone = hcard.tel[0].value;
+        } else {
+          homephone = hcard.tel[0].value;
+        }
+        preferred = hcard.tel[0].value;
+        
+        for (j=0;j<hcard.tel.length;j++) {
+          if (hcard.tel[j].type) {
+            for (k=0;k<hcard.tel[j].type.length;k++) {
+              if (hcard.tel[j].type[k].toLowerCase() == "home") {
+                homephone = hcard.tel[j].value; 
+              }
+              if (hcard.tel[j].type[k].toLowerCase() == "work") {
+                workphone = hcard.tel[j].value; 
+              }
+              if (hcard.tel[j].type[k].toLowerCase() == "cell") {
+                mobilephone = hcard.tel[j].value; 
+              }
+              if (hcard.tel[j].type[k].toLowerCase() == "pref") {
+                preferred = hcard.tel[j].value; 
+              }
+            }
+          }
+        }
+        /* op for other */
+        if (homephone) {
+          url += "hp=" + homephone + "&";
+        }
+        if (workphone) {
+          url += "wp=" + workphone + "&";
+        }
+        if (mobilephone) {
+          url += "mb=" + mobilephone + "&";
+        }
+        /* 0=home, 1=work, 2=mobile */
+        if (preferred == workphone) {
+          url += "pp=1&";
+        } else if (preferred == mobilephone) {
+          url += "pp=2&";
+        } else {
+          url += "pp=0&";
+        }
+      }
+      /* can be wu for a work url */
+      if (hcard.url) {
+        url += "pu=" + hcard.url[0] + "&";
+      }
+      url += "A=C";
+    } else if (semanticObjectType == "hCard") {
       var i, j, k;
       var hcard = semanticObject;
       url = "http://address.yahoo.com/?";

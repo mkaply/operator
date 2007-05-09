@@ -2,7 +2,7 @@
 <!DOCTYPE operator_options_microformat SYSTEM "chrome://operator/locale/operator_options.dtd">
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 <dialog
-  title="&action.label;"
+  title="&microformat.label;"
 	orient="vertical"
 	autostretch="always"
   buttons="accept,cancel"

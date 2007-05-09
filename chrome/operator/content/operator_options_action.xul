@@ -12,14 +12,8 @@
   <script type="application/x-javascript" src="chrome://operator/content/operator.js"/>
   <script type="application/x-javascript" src="chrome://operator/content/operator_options.js"/>
   <vbox>
-    <label control="action">&action.label;</label>
-    <textbox flex="1" id="action" onchange="Operator_Options.actionCheckOKButton();" onkeyup="Operator_Options.actionCheckOKButton();"/>
-    <label control="microformats">&microformat.label;</label>
-    <menulist id="microformats" oncommand="Operator_Options.onChangeMicroformat()">
-      <menupopup/>
-    </menulist>
-    <label control="handlers">&handler.label;</label>
-    <menulist id="handlers">
+    <label control="actions">&action.label;</label>
+    <menulist id="actions">
       <menupopup/>
     </menulist>
   </vbox>

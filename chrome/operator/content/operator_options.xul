@@ -44,7 +44,7 @@
       <box class="ccklist" id="microformats" disablenew="Operator_Options.disableNewMicroformat();" new="Operator_Options.onNewMicroformat();" edit="Operator_Options.onEditMicroformat();"/>
       </tabpanel>
       <tabpanel>
-      <box class="ccklist" id="actions" new="Operator_Options.onNewAction();" edit="Operator_Options.onEditAction();"/>
+      <box class="ccklist" id="actions" disablenew="Operator_Options.disableNewAction();" new="Operator_Options.onNewAction();" edit="Operator_Options.onEditAction();"/>
       </tabpanel>
       <tabpanel>
       <box class="ccklist" id="userscripts" buttons="new,delete" new="Operator_Options.onNewUserScript();" edit="Operator_Options.onEditUserScript();" ondelete="Operator_Options.onDeleteUserScript();"/>
