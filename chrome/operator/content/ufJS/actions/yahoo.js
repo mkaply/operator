@@ -243,7 +243,10 @@ ufJSActions.actions.yahoo_contact = {
   scope: {
     semantic: {
       "hCard" : "hCard",
-      "RDFa" : "http://xmlns.com/foaf/0.1/givenname"
+      "RDFa" :  {
+        property : "http://xmlns.com/foaf/0.1/givenname",
+        defaultNS : "http://xmlns.com/foaf/0.1/"
+      }
     }
   },
   doAction: function(semanticObject, semanticObjectType) {
