@@ -915,7 +915,7 @@ var Operator = {
     var dump;
     if (ufJSParser.microformats[semanticObjectType]) {
       ufJSParser.validate(semanticObject.node, semanticObjectType, error);
-      dump = Operator.dumpObject(semanticObject);
+      dump = Operator.dumpObject(semanticObject, '', true);
     } else {
       dump = Operator.dumpObject(semanticObject, '', false);
     }
