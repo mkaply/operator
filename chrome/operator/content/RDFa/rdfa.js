@@ -11,17 +11,18 @@ var RDFa = {
     rdf:'http://www.w3.org/1999/02/22-rdf-syntax-ns#'
   },
   ns : {
-    rdf : function(name) { return RDFa.DEFAULT_NS.rdf + name },
-    rdfs : function(name) { return RDFa.DEFAULT_NS.rdfs + name },
-    dc : function(name) { return RDFa.DEFAULT_NS.dc + name },
+    rdf : function(name) { return RDFa.DEFAULT_NS.rdf + name; },
+    rdfs : function(name) { return RDFa.DEFAULT_NS.rdfs + name; },
+    dc : function(name) { return RDFa.DEFAULT_NS.dc + name; }
   },
   parse: function(rootElement)
   {
     var bnodes = {nodes:[], counter:[]};
     var model = new RDFa.Model();
 
-    if(!RDFa.hasRDFa(rootElement)) 
+    if(!RDFa.hasRDFa(rootElement)) {
       return;
+    }
 
     var ctx = [RDFa.createContext(rootElement.documentElement || rootElement.ownerDocument.documentElement)];
 
@@ -31,8 +32,9 @@ var RDFa = {
 
     while(node) {
     
-      while(ctx.length > 0 && !RDFa.isAncestor(ctx[ctx.length-1].e, node))
+      while(ctx.length > 0 && !RDFa.isAncestor(ctx[ctx.length-1].e, node)) {
         ctx.pop(-1);
+      }
     
       ctx.push(RDFa.createContext(node, ctx[ctx.length-1], bnodes));
 
@@ -59,7 +61,7 @@ var RDFa = {
 
       if(node.hasAttribute("rev") && node.hasAttribute("href")) {
         var revs = node.getAttribute("rev").split(" ");
-        for(var r = 0; r < rels.length; r++) {
+        for(var r = 0; r < revs.length; r++) {
           var rev = RDFa.expandURI(revs[r], ctx);
           model.addResource(node.getAttribute("href"),rev,ctx[ctx.length-1].about);
         }
@@ -83,24 +85,25 @@ var RDFa = {
     return (RDFa.evaluateXPath("count(//" + RDFa.xpathExpression + ")", rootElement).numberValue > 0);
   },
   expandURI: function(prefixed, context) {
-    if(prefixed == undefined || prefixed.length == 0)
+    if(prefixed === undefined || prefixed.length === 0) {
       return null;
+    }
 
     if(prefixed[0] == "[" && prefixed.endsWith("]")) {
       prefixed = prefixed.substr(1,prefixed.length-2);
-      if(prefixed.length == 0) {
+      if(prefixed.length === 0) {
         // generate bnode
         prefixed = RDFa.generateBNodeName(context.e, context.bnodes);
       }
     }
 
-    if(prefixed.indexOf("_:") == 0) {
+    if(prefixed.indexOf("_:") === 0) {
       return [null, prefixed];
     }
 
     var prefix = prefixed.split(":",2);
     // no ':', let's resolve it to a local property
-    if(prefix.length == 0) { 
+    if(prefix.length === 0) { 
       return [null, RDFa.resolveURL(context.base, prefix)];
     }
 
@@ -140,9 +143,9 @@ var RDFa = {
 
     for(var i = 0; i < e.attributes.length; i++) {
       var attrib = e.attributes.item(i);
-      if(attrib.nodeName.indexOf("xmlns:") == 0) {
+      if(attrib.nodeName.indexOf("xmlns:") === 0) {
         prefixes[attrib.nodeName.substr(6)] = e.getAttribute(attrib.nodeName);
-      } else if(attrib.nodeName.indexOf("xml:base") == 0) {
+      } else if(attrib.nodeName.indexOf("xml:base") === 0) {
         newContext.base = attrib.nodeName.indexOf("xml:base"); 
       }
     }
@@ -165,7 +168,7 @@ var RDFa = {
        about = RDFa.generateBNodeName(e, bnodes);
     }
 
-    if(about && about.indexOf("_:") != 0)  {
+    if(about && about.indexOf("_:") !== 0)  {
         newContext.about = RDFa.resolveURL(newContext.base,about);
     } else {
         newContext.about = about;
@@ -182,7 +185,7 @@ var RDFa = {
   },
   generateBNodeName: function(e, bnodes)
   {
-    if(bnodes.nodes[e]) return bnodes.nodes[e];
+    if(bnodes.nodes[e]) { return bnodes.nodes[e]; }
     
     var name = e.nodeName.toLowerCase();
     bnodes.counter[name] = !bnodes.counter[name] ? 0 : bnodes.counter[name] + 1;
@@ -204,13 +207,14 @@ RDFa.Resource = function(_s, _model) {
     return model.$uris[s];
   };
   this.isBlank = function() {
-    return model.$uris[s].indexOf("_:") == 0;
+    return model.$uris[s].indexOf("_:") === 0;
   };
   this.equals = function(obj) {
     try {
       if(obj.url !== undefined) {
-         if(obj.model === obj.model && obj.index == s)
+         if(obj.model === obj.model && obj.index == s) {
            return true; 
+         }
       }
     } catch(e) {
         // ignore
@@ -234,15 +238,16 @@ RDFa.Literal = function(_value, _type, _lang, _model) {
   this.equals = function(obj) {
     try {
       if(obj.value !== undefined) {
-         if(obj.model === obj.model && obj.index == s)
+         if(obj.model === obj.model && obj.index == s) {
            return true; 
+         }
       }
     } catch(e) {
         // ignore
     }
     return false;
   };
-  this.__defineGetter__("value", function() { return model.literals[value] });
+  this.__defineGetter__("value", function() { return model.literals[value]; });
   this.__defineGetter__("model", function() { return model; });
   this.__defineGetter__("index", function() { return value; });
 };
@@ -251,7 +256,7 @@ RDFa.Model = function() {
 
   var triples = [];
   var subjects = {};
-  var properties = []
+  var properties = [];
   var namespaces = {};
   var uris_map = {};
   var uris_arr = [];
@@ -270,7 +275,7 @@ RDFa.Model = function() {
     namespaces[prefix] = url;
   };
   this.getUriNs = function(uri) {
-    if(uris_map[uri] != undefined) {
+    if(uris_map[uri] !== undefined) {
       uri = uris_map[uri];
     } 
 
@@ -286,14 +291,16 @@ RDFa.Model = function() {
       }
       return u;
     } else {
-      if(uris_map[uri] == undefined)
+      if(uris_map[uri] === undefined) {
         uris_map[uri] = uris_arr.push(uri) - 1;
+      }
       return uris_map[uri];
     }
   };
   this.indexLiteral = function(literal) {
-    if(literals_map[literal] == undefined)
+    if(literals_map[literal] === undefined) {
       literals_map[literal] = literals_arr.push(literal) - 1;
+    }
     return literals_map[literal];
   };
   this.addLiteral = function(s, p, o) {
@@ -303,10 +310,10 @@ RDFa.Model = function() {
     this.add(this.createResource(s),this.createResource(p),this.createResource(o));
   };
   this.add = function(s, p, o) {
-    if(subjects[s.index] == undefined) {
+    if(subjects[s.index] === undefined) {
       subjects[s.index] = {};
     }
-    if(subjects[s.index][p.index] == undefined) {
+    if(subjects[s.index][p.index] === undefined) {
       subjects[s.index][p.index] = [];
     }
     var existing = subjects[s.index][p.index];
@@ -319,18 +326,18 @@ RDFa.Model = function() {
     var index = triples.push([s.index,p.index,o]);
     subjects[s.index][p.index].push(index-1);
 
-    if(properties[p.index] == undefined) {
+    if(properties[p.index] === undefined) {
       properties[p.index] = [];
     }
     properties[p.index].push(index-1);
   };
   this.getObject = function(s) {
-    if(subjects[s] == undefined) {
+    if(subjects[s] === undefined) {
       return null;
     }
     return new RDFa.SemanticObject(s, model);
   };
-  this.getObjectsWithProperty = function(p) {
+  this.getObjectsWithProperty = function(p, ns) {
     if(uris_map[p] !== undefined) {
       p = uris_map[p];
     }
@@ -339,7 +346,13 @@ RDFa.Model = function() {
       var ts = properties[p];
       for(var x = 0; x < ts.length; x++) {
         var sub = triples[ts[x]][0];
-        objects.push(new RDFa.SemanticObject(this, uris_arr[sub])); 
+        var newObj = new RDFa.SemanticObject(this, uris_arr[sub]);
+        if(ns !== undefined) {
+          if(typeof(ns) == 'string') {
+            newObj.setDefaultNS(ns);
+          }
+        }
+        objects.push(newObj); 
       }
       return objects;
     }
@@ -379,7 +392,7 @@ RDFa.Model = function() {
   this.getSubjects = function() {
     var results = [];
     for(i in subjects) { 
-      if(uris_arr[i].indexOf("_:") == 0) continue;
+      if(uris_arr[i].indexOf("_:") === 0) { continue; }
       results.push(uris_arr[i]);
     } 
     return results;
@@ -429,16 +442,16 @@ RDFa.SemanticProperty = function (_prop, _name, _parent) {
 
   function first() {
     return (subproperties.length > 0) ? subproperties[0] : null;
-  };
+  }
   function all() {
     return subproperties;
-  };
+  }
   function hasMore() {
     return (subproperties.length > 1);
-  };
+  }
   function namespace() {
     return _this.model.getUriNs(prop);
-  };
+  }
   this.toString = function() {
     return first() ? first().toString() : "null";
   };
@@ -485,7 +498,7 @@ RDFa.SemanticObject = function (_model, _subject) {
 
     var objects  = this.model.getProperty(this.subject, RDFa.ns.rdfs("label"));
 
-    if(objects == undefined || objects.length == 0) {
+    if(objects === undefined || objects.length === 0) {
       objects = this.model.getProperty(this.subject, RDFa.ns.dc("title"));
     }
 
@@ -517,15 +530,17 @@ RDFa.Utilities = {
         var props = this.model.enumProperties(subject);
         for(var i = 0; i < props.length; i++) {
           var u = props[i].url;
-          if(u.indexOf(this.namespaces[p]) != 0) 
+          if(u.indexOf(this.namespaces[p]) !== 0) {
             continue;
+          }
           var name = base + u.substring(this.namespaces[p].length);
           var objects  = this.model.getProperty(subject, u);
           var all_objects = true;
           for(o in objects) {
             if(objects[o].url !== undefined) {
-              if(this.model.hasSubject(objects[o].url))
+              if(this.model.hasSubject(objects[o].url)) {
                 continue;
+              }
             }
             all_objects = false;
             break;
@@ -545,13 +560,14 @@ RDFa.Utilities = {
 
 RDFa.TestSuite = {
   ns : {
-    foaf : function(name) { return "http://xmlns.com/foaf/0.1/" + name },
-    rdf : function(name) { return "http://www.w3.org/1999/02/22-rdf-syntax-ns#" + name },
+    foaf : function(name) { return "http://xmlns.com/foaf/0.1/" + name; },
+    rdf : function(name) { return "http://www.w3.org/1999/02/22-rdf-syntax-ns#" + name; }
   }, 
   run : function() {
     for(var i = 0; i < RDFa.TestSuite.tests.length; i++) {
-        if(typeof(RDFa.TestSuite.tests[i]) == 'function')
+        if(typeof(RDFa.TestSuite.tests[i]) == 'function') {
           RDFa.TestSuite.tests[i].apply(RDFa.TestSuite);
+        }
     }
     alert("Success!");
   },
@@ -659,6 +675,24 @@ RDFa.TestSuite = {
         var objects = model.getObjectsWithProperty(ns.foaf("knows"));
 
         this.assertTrue(2, objects.length);
+    },
+    function() {
+        var ns = RDFa.TestSuite.ns;
+        var model = new RDFa.Model();
+        var s1 = "http://example.org/card.xhtml#i";
+        var s2 = "http://example.org/card.xhtml#you";
+        var s3 = "http://example.org/card.xhtml#her";
+
+        model.addLiteral(s1, ns.foaf("knows"), "Lee");
+        model.addResource(s2, ns.foaf("knows"), "Whatever");
+
+        var objects = model.getObjectsWithProperty(ns.foaf("knows"), ns.foaf(""));
+
+        this.assertTrue(2, objects.length);
+        for(var i = 0; i < objects.length; i++) {
+            this.assert(objects[i].knows, "missing foaf:knows property, default NS did not work");
+        }
+
     },
     function() {
         var ns = RDFa.TestSuite.ns;
