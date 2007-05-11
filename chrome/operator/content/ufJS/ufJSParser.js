@@ -568,9 +568,9 @@ var ufJSParser = {
     if ((propnode.nodeName.toLowerCase() == "a") || (propnode.nodeName.toLowerCase() == "area")) {
       var mailto = propnode.href;
       if (mailto.indexOf('?') > 0) {
-        return mailto.substring("mailto:".length, mailto.indexOf('?'));
+        return unescape(mailto.substring("mailto:".length, mailto.indexOf('?')));
       } else {
-        return mailto.substring("mailto:".length);
+        return unescape(mailto.substring("mailto:".length));
       }
     } else {
       return ufJSParser.defaultGetter(propnode, parentnode);
