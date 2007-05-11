@@ -330,7 +330,7 @@ ufJSActions.actions.yahoo_contact = {
             url += prefix + "a1=" + escape(hcard.adr[j]["street-address"][0]) + "&";
           }
           if (hcard.adr[j]["extended-address"]) {
-            url += prefix + "a2=" + hcard.adr[j]["extended-address"] + "&";
+            url += prefix + "a2=" + escape(hcard.adr[j]["extended-address"]) + "&";
           }
           if (hcard.adr[j].locality) {
             url += prefix + "c=" + hcard.adr[j].locality + "&";
