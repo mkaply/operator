@@ -991,7 +991,8 @@ var Operator = {
               /* Fill in objectArray by asking model for property */
               /* We actually need to loop through all RDFa models */
               /* and concatenate into one object array */
-              objectArray = semanticArrays[j][0].getObjectsWithProperty(ufJSActions.actions[action].scope.semantic[j]); 
+              objectArray = semanticArrays[j][0].getObjectsWithProperty(ufJSActions.actions[action].scope.semantic[j]["property"],
+                                                                        ufJSActions.actions[action].scope.semantic[j]["defaultNS"]); 
             } else {
               objectArray = semanticArrays[j];
             }
