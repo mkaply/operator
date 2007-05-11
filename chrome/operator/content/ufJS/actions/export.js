@@ -4,6 +4,7 @@ ufJSActions.actions.export_vcard = {
   scope: {
     semantic: {
       "hCard" : "hCard",
+      "RDFa" : "http://xmlns.com/foaf/0.1/givenname"
     }
   },
   /* doActionAll gets ALL of the semantic Object arrays */
@@ -48,6 +49,9 @@ ufJSActions.actions.export_vcard = {
   },
   doAction: function(semanticObject, semanticObjectType) {
     var url;
+    if (semanticObjectType == "RDFa") {
+      alert("RDFA");
+    }
     if (semanticObjectType == "hCard") {
       var vcf = ufJS.vCard(semanticObject);
       var file = Components.classes["@mozilla.org/file/directory_service;1"].

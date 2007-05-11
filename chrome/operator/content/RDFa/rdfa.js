@@ -2,82 +2,80 @@
 
 var RDFa = {
   xpathExpression: "*[contains(@rel,':') or contains(@rev,':') or @property or contains(@class,':')]",
-  getRDFa: function(rootElement, in_semanticArrays) {
-    var model = RDFa.parse(rootElement);
-    var semanticObject;
-    if (model) {
-      for (var i; i < model.subjects.length; i++) {
-        var semanticObject = new RDFa.SemanticObject(model, model.subjects[i]);
-        /* Query namespaces */
-        /* For foo in namespaces */
-          /* set default NS for semantic Object */
-          /* semanticObject.setDefaultNS("http://xmlns.com/foaf/0.1/"); */
-          /* push object into semanticArray that coreesponds to the namespace */
-          /*if (!in_semanticArrays[NAMESPACE]) {
-            in_semanticArrays[NAMESPACE] = [];
-          };
-          in_semanticArrays[NAMESPACE].push(semanticObject);
-          */
-        /**/
-      }
-    }
+  DEFAULT_NS:  { 
+    dc:'http://purl.org/dc/elements/1.1/',
+    xhtml:'http://www.w3.org/1999/xhtml',
+    cc:'http://web.resource.org/cc/',
+    foaf:'http://xmlns.com/foaf/0.1/',
+    rdfs:'http://www.w3.org/2000/01/rdf-schema#',
+    rdf:'http://www.w3.org/1999/02/22-rdf-syntax-ns#'
+  },
+  ns : {
+    rdf : function(name) { return RDFa.DEFAULT_NS.rdf + name },
+    rdfs : function(name) { return RDFa.DEFAULT_NS.rdfs + name },
+    dc : function(name) { return RDFa.DEFAULT_NS.dc + name },
   },
   parse: function(rootElement)
   {
-    try {
-        var bnodes = {nodes:[], counter:[]};
-        var model = new RDFa.Model();
+    var bnodes = {nodes:[], counter:[]};
+    var model = new RDFa.Model();
 
-        if(!RDFa.hasRDFa(rootElement)) 
-          return;
+    if(!RDFa.hasRDFa(rootElement)) 
+      return;
 
+    var ctx = [RDFa.createContext(rootElement.documentElement || rootElement.ownerDocument.documentElement)];
 
-        var ctx = [RDFa.createContext(rootElement.documentElement || rootElement.ownerDocument.documentElement)];
+    var xpathResult = RDFa.evaluateXPath("//" + RDFa.xpathExpression, rootElement, 5);
 
-        var xpathResult = RDFa.evaluateXPath("//" + RDFa.xpathExpression, rootElement, 5);
+    var node = xpathResult.iterateNext();
 
-        var node = xpathResult.iterateNext();
+    while(node) {
+    
+      while(ctx.length > 0 && !RDFa.isAncestor(ctx[ctx.length-1].e, node))
+        ctx.pop(-1);
+    
+      ctx.push(RDFa.createContext(node, ctx[ctx.length-1], bnodes));
 
-        while(node) {
-        
-          while(ctx.length > 0 && !RDFa.isAncestor(ctx[ctx.length-1].e, node))
-            ctx.pop(-1);
-        
-          ctx.push(RDFa.createContext(node, ctx[ctx.length-1], bnodes));
-
-          if(node.hasAttribute("property")) {
-            model.addLiteral(ctx[ctx.length-1].about,RDFa.expandURI(node.getAttribute("property"),ctx),node.innerHTML);
-          }
-
-          if(node.hasAttribute("rel")) {
-            var rel = RDFa.expandURI(node.getAttribute("rel"), ctx);
-            if(node.hasAttribute("href")) {
-              model.addResource(ctx[ctx.length-1].about,rel,node.getAttribute("href"));
-            } else {
-              model.addResource(ctx[ctx.length-2].about,rel,ctx[ctx.length-1].about);
-            }
-          }
-
-          if(node.hasAttribute("rev") && node.hasAttribute("href")) {
-            model.addResource(node.getAttribute("href"),RDFa.expandURI(node.getAttribute("rev"),ctx),ctx[ctx.length-1].about);
-          }
-
-          node = xpathResult.iterateNext();
+      if(node.hasAttribute("property")) {
+        var properties = node.getAttribute("property").split(" ");
+        for(var p = 0; p < properties.length; p++) {
+          var expandedProperty = RDFa.expandURI(properties[p],ctx);
+          model.addLiteral(ctx[ctx.length-1].about,expandedProperty,node.innerHTML);
         }
-    } catch(e) {
-        alert("Error while parsing: " + e);
+      }
+
+      if(node.hasAttribute("rel")) {
+        var rels = node.getAttribute("rel").split(" ");
+        for(var r = 0; r < rels.length; r++) {
+          var rel = RDFa.expandURI(rels[r], ctx);
+          if(node.hasAttribute("href")) {
+            model.addResource(ctx[ctx.length-1].about,rel,node.getAttribute("href"));
+          } else {
+            model.addResource(ctx[ctx.length-2].about,rel,ctx[ctx.length-1].about);
+          }
+        }
+        
+      }
+
+      if(node.hasAttribute("rev") && node.hasAttribute("href")) {
+        var revs = node.getAttribute("rev").split(" ");
+        for(var r = 0; r < rels.length; r++) {
+          var rev = RDFa.expandURI(revs[r], ctx);
+          model.addResource(node.getAttribute("href"),rev,ctx[ctx.length-1].about);
+        }
+      }
+
+      node = xpathResult.iterateNext();
     }
-/*
-    var x = model.subjects[0];
-    model.getProperty(x,"http://xmlns.com/foaf/0.1/knows");
-    model.enumProperties(x);
-    var y = new RDFa.SemanticObject(model, x);
-    y.setDefaultNS("http://xmlns.com/foaf/0.1/");
-    alert(y.office.address.street);
-    alert(y.office.address.city);
-    alert(y.office.address.country);
-    alert(y.knows.$all);
- */  
+
+
+    // load NS
+    var prefixes = {};
+    for(var i = ctx.length - 1; i >= 0; i--) {
+      for(p in ctx[i].prefixes) {
+        model.setNamespace(p, ctx[i].prefixes[p]);
+      }  
+    }
     return model;
   },
   hasRDFa: function(rootElement)
@@ -85,13 +83,40 @@ var RDFa = {
     return (RDFa.evaluateXPath("count(//" + RDFa.xpathExpression + ")", rootElement).numberValue > 0);
   },
   expandURI: function(prefixed, context) {
-    var prefix = prefixed.split(":");
-    if(prefix.length == 0) return prefixed;
+    if(prefixed == undefined || prefixed.length == 0)
+      return null;
+
+    if(prefixed[0] == "[" && prefixed.endsWith("]")) {
+      prefixed = prefixed.substr(1,prefixed.length-2);
+      if(prefixed.length == 0) {
+        // generate bnode
+        prefixed = RDFa.generateBNodeName(context.e, context.bnodes);
+      }
+    }
+
+    if(prefixed.indexOf("_:") == 0) {
+      return [null, prefixed];
+    }
+
+    var prefix = prefixed.split(":",2);
+    // no ':', let's resolve it to a local property
+    if(prefix.length == 0) { 
+      return [null, RDFa.resolveURL(context.base, prefix)];
+    }
+
     for(var i = context.length - 1; i >= 0; i--) {
         if(context[i].prefixes[prefix[0]]) {
-            return context[i].prefixes[prefix.shift()] + prefix.join(":");
+            return [context[i].prefixes[prefix[0]], context[i].prefixes[prefix[0]] + prefix[1]];
         } 
     }  
+
+    // for sake of being practical
+    if(RDFa.DEFAULT_NS[prefix[0]]) {
+      return [RDFa.DEFAULT_NS[prefix[0]], RDFa.DEFAULT_NS[prefix[0]] + prefix[1]];
+    }
+
+    // most likely http://
+    return [null, prefixed];
   },
   resolveURL: function(baseURL, relURL) {
     try {
@@ -108,6 +133,7 @@ var RDFa = {
     var newContext = {};
 
     newContext.e = e;
+    newContext.bnodes = bnodes;
 
     // set prefixes
     var prefixes = {};
@@ -175,10 +201,10 @@ RDFa.Resource = function(_s, _model) {
   var s = _s;
 
   this.toString = function() {
-    return model.uris[s];
+    return model.$uris[s];
   };
   this.isBlank = function() {
-    return model.uris[s].indexOf("_:") == 0;
+    return model.$uris[s].indexOf("_:") == 0;
   };
   this.equals = function(obj) {
     try {
@@ -191,7 +217,7 @@ RDFa.Resource = function(_s, _model) {
     }
     return false;
   };
-  this.__defineGetter__("url", function() { return model.uris[s]; });
+  this.__defineGetter__("url", function() { return model.$uris[s]; });
   this.__defineGetter__("model", function() { return model; });
   this.__defineGetter__("index", function() { return s; });
 };
@@ -224,20 +250,46 @@ RDFa.Literal = function(_value, _type, _lang, _model) {
 RDFa.Model = function() {
 
   var triples = [];
-  var subjects = [];
+  var subjects = {};
+  var properties = []
+  var namespaces = {};
   var uris_map = {};
   var uris_arr = [];
+  var uris_ns = {};
   var literals_map = {};
   var literals_arr = [];
 
   this.__defineGetter__("triples", function() { return triples; });
   this.__defineGetter__("subjects", function() { return this.getSubjects(); });
-  this.__defineGetter__("uris", function() { return uris_arr; });
+  this.__defineGetter__("$uris", function() { return uris_arr; });
   this.__defineGetter__("literals", function() { return literals_arr; });
+  this.__defineGetter__("$uris_ns", function() { return uris_ns; });
+  this.__defineGetter__("$uris_map", function() { return uris_map; });
+  this.__defineGetter__("namespaces", function() { return namespaces; });
+  this.setNamespace = function(prefix, url) {
+    namespaces[prefix] = url;
+  };
+  this.getUriNs = function(uri) {
+    if(uris_map[uri] != undefined) {
+      uri = uris_map[uri];
+    } 
+
+    if(uris_ns[uri] !== undefined) {
+      return uris_arr[uris_ns[uri]];
+    }
+  };
   this.indexURI = function(uri) {
-    if(uris_map[uri] == undefined)
-      uris_map[uri] = uris_arr.push(uri) - 1;
-    return uris_map[uri];
+    if(typeof(uri) == 'object' && uri.length && uri.length == 2) {
+      var u = this.indexURI(uri[1]);
+      if(uri[0] !== undefined) {
+        uris_ns[u] = this.indexURI(uri[0]);  
+      }
+      return u;
+    } else {
+      if(uris_map[uri] == undefined)
+        uris_map[uri] = uris_arr.push(uri) - 1;
+      return uris_map[uri];
+    }
   };
   this.indexLiteral = function(literal) {
     if(literals_map[literal] == undefined)
@@ -259,19 +311,39 @@ RDFa.Model = function() {
     }
     var existing = subjects[s.index][p.index];
 
-    for(i in existing) {
+    for(var i = 0; i < existing.length; i++) {
         if(triples[existing[i]][2].equals(o)) {
             return;
         }
     } 
     var index = triples.push([s.index,p.index,o]);
     subjects[s.index][p.index].push(index-1);
+
+    if(properties[p.index] == undefined) {
+      properties[p.index] = [];
+    }
+    properties[p.index].push(index-1);
   };
   this.getObject = function(s) {
     if(subjects[s] == undefined) {
       return null;
     }
     return new RDFa.SemanticObject(s, model);
+  };
+  this.getObjectsWithProperty = function(p) {
+    if(uris_map[p] !== undefined) {
+      p = uris_map[p];
+    }
+    if(properties[p] !== undefined) {
+      var objects = [];
+      var ts = properties[p];
+      for(var x = 0; x < ts.length; x++) {
+        var sub = triples[ts[x]][0];
+        objects.push(new RDFa.SemanticObject(this, uris_arr[sub])); 
+      }
+      return objects;
+    }
+    return [];
   };
   this.getProperty = function(s, p) {
     if(uris_map[s] !== undefined) {
@@ -283,7 +355,7 @@ RDFa.Model = function() {
     if(subjects[s] !== undefined && subjects[s][p] !== undefined) {
       var props = [];
       var ts = subjects[s][p];
-      for(x in ts) {
+      for(var x = 0; x < ts.length; x++) {
         props.push(triples[ts[x]][2]);
       }
       return props;
@@ -364,25 +436,43 @@ RDFa.SemanticProperty = function (_prop, _name, _parent) {
   function hasMore() {
     return (subproperties.length > 1);
   };
+  function namespace() {
+    return _this.model.getUriNs(prop);
+  };
   this.toString = function() {
     return first() ? first().toString() : "null";
   };
   this.__defineGetter__("$first", first);
   this.__defineGetter__("$all", all);
   this.__defineGetter__("$hasMore", hasMore);
+  this.__defineGetter__("$ns", namespace);
 };
 
 RDFa.SemanticObject = function (_model, _subject) {
   var _this = this;
+  var nslist = null;
 
   this.namespaces = {};
   this.model = _model;
   this.subject = _subject;
 
+
   if(!this.model.hasSubject(this.subject)) {
     throw new Error("Invalid subject passed to constructor.");
   }
 
+  this.getNamespaceList = function() {
+    var props = this.model.enumProperties(this.subject);
+    for(var j = 0; j < props.length; j++) {
+      var ns = this.model.getUriNs(props[j]); 
+      ns_stats[ns] = 1;
+    }
+    var nslist = [];
+    for(ns in ns_stats) {
+      nslist.push(ns);
+    }
+    return nslist;
+  };
   this.setDefaultNS = function(_ns) {
     this.namespaces['_default_'] = _ns;
     RDFa.Utilities.rebind.apply(this, [this.subject]);
@@ -392,6 +482,19 @@ RDFa.SemanticObject = function (_model, _subject) {
     RDFa.Utilities.rebind.apply(this, [this.subject]);
   };
   this.toString = function() {
+
+    var objects  = this.model.getProperty(this.subject, RDFa.ns.rdfs("label"));
+
+    if(objects == undefined || objects.length == 0) {
+      objects = this.model.getProperty(this.subject, RDFa.ns.dc("title"));
+    }
+
+    if(objects !== undefined && objects.length > 0) {
+      return objects[0].toString();
+    } else {
+      return this.subject;
+    }
+ 
     return this.subject;
   };
 };
@@ -412,8 +515,8 @@ RDFa.Utilities = {
             base = p + "_";
         }
         var props = this.model.enumProperties(subject);
-        for(prop in props) {
-          var u = props[prop].url;
+        for(var i = 0; i < props.length; i++) {
+          var u = props[i].url;
           if(u.indexOf(this.namespaces[p]) != 0) 
             continue;
           var name = base + u.substring(this.namespaces[p].length);
@@ -446,8 +549,9 @@ RDFa.TestSuite = {
     rdf : function(name) { return "http://www.w3.org/1999/02/22-rdf-syntax-ns#" + name },
   }, 
   run : function() {
-    for(i in RDFa.TestSuite.tests) {
-        RDFa.TestSuite.tests[i].apply(RDFa.TestSuite);
+    for(var i = 0; i < RDFa.TestSuite.tests.length; i++) {
+        if(typeof(RDFa.TestSuite.tests[i]) == 'function')
+          RDFa.TestSuite.tests[i].apply(RDFa.TestSuite);
     }
     alert("Success!");
   },
@@ -541,6 +645,20 @@ RDFa.TestSuite = {
         this.assertTrue("Lee", y.knows.$all[0].toString());
         this.assertTrue(b1, y.knows.$all[1].toString());
         this.assertTrue("Elias", y.knows.$all[1].knows.toString());
+    },
+    function() {
+        var ns = RDFa.TestSuite.ns;
+        var model = new RDFa.Model();
+        var s1 = "http://example.org/card.xhtml#i";
+        var s2 = "http://example.org/card.xhtml#you";
+        var s3 = "http://example.org/card.xhtml#her";
+
+        model.addLiteral(s1, ns.foaf("knows"), "Lee");
+        model.addResource(s2, ns.foaf("knows"), "Whatever");
+
+        var objects = model.getObjectsWithProperty(ns.foaf("knows"));
+
+        this.assertTrue(2, objects.length);
     },
     function() {
         var ns = RDFa.TestSuite.ns;

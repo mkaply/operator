@@ -7,7 +7,7 @@
 <overlay id="microformats" 
          xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-  <script type="application/x-javascript" src="chrome://operator/content/operator.js"/>
+  <script type="application/x-javascript;version=1.7" src="chrome://operator/content/operator.js"/>
 
   <toolbox id="navigator-toolbox">
     <toolbar accesskey="&operatorToolbar.accesskey;" class="chromeclass-toolbar" collapsed="false"
@@ -35,12 +35,12 @@
       type="menu"
       tooltiptext="&operator.name;"
       />
-			<toolbarbutton id="operator-hCard-button" label="hCard"
+			<!-- toolbarbutton id="operator-hCard-button" label="hCard"
       disabled="true"
       type="menu-button"
       tooltiptext="hCard"
       class="toolbarbutton-1 chromeclass-toolbar-additional"
-      />
+      / -->
 	</toolbarpalette>
 <popup id="contentAreaContextMenu">
   <menuseparator id="operator-separator"/>

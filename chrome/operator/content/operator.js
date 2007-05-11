@@ -30,7 +30,7 @@ var Operator = {
     objScriptLoader.loadSubScript("chrome://operator/content/legacy_microformats.js");
     /* Don't assume we have RDF */
     try {
-      objScriptLoader.loadSubScript("chrome://operator/content/rdfa.js");
+      objScriptLoader.loadSubScript("chrome://operator/content/RDFa/rdfa.js");
     } catch (ex) {}
 
     if (!options) {
@@ -619,12 +619,6 @@ var Operator = {
       parentmenu.addEventListener("command", parentmenu.store_oncommand, true);
       parentmenu.store_onclick = this.clickCallbackGenerator(semanticObject, semanticObjectType, semanticAction);
       parentmenu.addEventListener("click", parentmenu.store_onclick, true);
-      if (ufJSActions.actions[semanticAction].scope.semantic[semanticObjectType] != semanticObjectType) {
-        required = semanticObject[ufJSActions.actions[semanticAction].scope.semantic[semanticObjectType]];
-        if (!required) {
-          parentmenu.setAttribute("disabled", "true");    
-        }
-      }
     }
   },
   buildPopupMenu: function(semanticObject, semanticObjectType)
@@ -944,7 +938,14 @@ var Operator = {
     }
     ufJS.getAllMicroformats(window.document, semanticArrays);
     try {
-      RDFa.getRDFa(window.document, semanticArrays);
+      if(RDFa.hasRDFa(window.document)) {
+        if (!semanticArrays["RDFa"]) {
+          semanticArrays["RDFa"] = [];
+        }
+        /* Put model in the semanticArray (RDFa) */
+        semanticArrays["RDFa"].push(RDFa.parse(window.document));
+        
+      }
     } catch (ex) {}
   },
   /* This is the heavy lifter for Operator. It goes through the document
@@ -985,45 +986,52 @@ var Operator = {
 
         for (j in ufJSActions.actions[action].scope.semantic) {
           if (semanticArrays[j]) {
-            for (k=0; k < semanticArrays[j].length; k++) {
+            var objectArray;
+            if (j == "RDFa") {
+              /* Fill in objectArray by asking model for property */
+              /* We actually need to loop through all RDFa models */
+              /* and concatenate into one object array */
+              objectArray = semanticArrays[j][0].getObjectsWithProperty(ufJSActions.actions[action].scope.semantic[j]); 
+            } else {
+              objectArray = semanticArrays[j];
+            }
+            for (k=0; k < objectArray.length; k++) {
               /* Here we know we have objects that will work with this action */
               /* Create a menu that corresponds to the action? */
               /* Or postpone the creation until we are sure we have the first one? */
-              if (ufJSActions.actions[action].scope.semantic[j]) {
-                if (ufJSActions.actions[action].scope.semantic[j] != j) {
-                  if (!semanticArrays[j][k][ufJSActions.actions[action].scope.semantic[j]]) {
-                    continue;
-                  }
+              if ((ufJSActions.actions[action].scope.semantic[j] != j) && (j != "RDFa")) {
+                if (!objectArray[k][ufJSActions.actions[action].scope.semantic[j]]) {
+                  continue;
                 }
-                if (!menu) {
-                  menu = document.createElement("menupopup");
-                }
-                if (semanticArrays[j][k].toString()) {
-                  tempMenu = document.createElement("menuitem");
-                  tempMenu.label = semanticArrays[j][k].toString();
-                  tempMenu.setAttribute("label", tempMenu.label);
-                  Operator.attachActions(tempMenu, semanticArrays[j][k], j, action);
-                  tempMenu.store_oncommand = Operator.actionCallbackGenerator(semanticArrays[j][k], j, action);
-                  tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
-                  tempMenu.store_onclick = Operator.clickCallbackGenerator(semanticArrays[j][k], j, action);
-                  tempMenu.addEventListener("click", tempMenu.store_onclick, true);
-                } else if (Operator.debug) {
-                  tempMenu = document.createElement("menuitem");
-                  /* L10N */
-                  tempMenu.label = "Invalid - select for more details";
-                  tempMenu.setAttribute("label", tempMenu.label);
-                  tempMenu.store_oncommand = Operator.errorCallbackGenerator(semanticArrays[j][k], j);
-                  tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
-                  tempMenu.style.fontWeight = "bold";
-                  menu.error = true;
-                }
-                if (tempMenu) {
-                  tempMenu.store_onDOMMenuItemActive = Operator.highlightCallbackGenerator(semanticArrays[j][k].node);
-                  tempMenu.addEventListener("DOMMenuItemActive", tempMenu.store_onDOMMenuItemActive, true);
-                  menu.appendChild(tempMenu);
-                }
-                tempMenu = null;
               }
+              if (!menu) {
+                menu = document.createElement("menupopup");
+              }
+              if (objectArray[k].toString()) {
+                tempMenu = document.createElement("menuitem");
+                tempMenu.label = objectArray[k].toString();
+                tempMenu.setAttribute("label", tempMenu.label);
+                Operator.attachActions(tempMenu, objectArray[k], j, action);
+                tempMenu.store_oncommand = Operator.actionCallbackGenerator(objectArray[k], j, action);
+                tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
+                tempMenu.store_onclick = Operator.clickCallbackGenerator(objectArray[k], j, action);
+                tempMenu.addEventListener("click", tempMenu.store_onclick, true);
+              } else if (Operator.debug) {
+                tempMenu = document.createElement("menuitem");
+                /* L10N */
+                tempMenu.label = "Invalid - select for more details";
+                tempMenu.setAttribute("label", tempMenu.label);
+                tempMenu.store_oncommand = Operator.errorCallbackGenerator(objectArray[k], j);
+                tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
+                tempMenu.style.fontWeight = "bold";
+                menu.error = true;
+              }
+              if (tempMenu) {
+                tempMenu.store_onDOMMenuItemActive = Operator.highlightCallbackGenerator(objectArray[k].node);
+                tempMenu.addEventListener("DOMMenuItemActive", tempMenu.store_onDOMMenuItemActive, true);
+                menu.appendChild(tempMenu);
+              }
+              tempMenu = null;
             }
           }
         }
