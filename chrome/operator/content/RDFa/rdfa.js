@@ -1,14 +1,15 @@
 /*extern Operator, Components, content */
 
 var RDFa = {
-  xpathExpression: "*[contains(@rel,':') or contains(@rev,':') or @property or contains(@class,':')]",
+  xpathExpression: "*[@about or contains(@rel,':') or contains(@rev,':') or @property or contains(@class,':')]",
   DEFAULT_NS:  { 
     dc:'http://purl.org/dc/elements/1.1/',
     xhtml:'http://www.w3.org/1999/xhtml',
     cc:'http://web.resource.org/cc/',
     foaf:'http://xmlns.com/foaf/0.1/',
     rdfs:'http://www.w3.org/2000/01/rdf-schema#',
-    rdf:'http://www.w3.org/1999/02/22-rdf-syntax-ns#'
+    rdf:'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+    xsd :'http://www.w3.org/2001/XMLSchema#'
   },
   ns : {
     rdf : function(name) { return RDFa.DEFAULT_NS.rdf + name; },
@@ -37,12 +38,54 @@ var RDFa = {
       }
     
       ctx.push(RDFa.createContext(node, ctx[ctx.length-1], bnodes));
-
+      
+      if(node.hasAttribute("class")) {
+        var classes = node.getAttribute("class").split(" ");
+        for(var c = 0; c < classes.length; c++) {
+          if(classes[c].indexOf(":") == -1) {
+            continue;
+          }
+          model.addResource(ctx[ctx.length-1].about,RDFa.ns.rdf("type"),RDFa.expandURI(classes[c],ctx));
+        }
+      }
+      
       if(node.hasAttribute("property")) {
         var properties = node.getAttribute("property").split(" ");
         for(var p = 0; p < properties.length; p++) {
           var expandedProperty = RDFa.expandURI(properties[p],ctx);
-          model.addLiteral(ctx[ctx.length-1].about,expandedProperty,node.innerHTML);
+          // now extract the content
+          var datatype;
+          var content = "";
+          if(node.hasAttribute("datatype")) {
+            datatype = node.getAttribute("datatype").replace(/^\s+|\s+$/, '');
+            // if(datatype==''), it means plain, leave it alone, don't resolve it.
+            if(datatype.length > 0) {
+              datatype = RDFa.expandURI(node.getAttribute("datatype").replace(/^\s+|\s+$/, ''), ctx);
+            }
+          }
+          if(node.hasAttribute("content")) {
+            content = node.getAttribute("content");
+          } else {
+            // if datatype explicitly set to '' empty string (overriding to plain literal)
+            // or node has only one child node of type TEXT
+            if(datatype == '' || 
+                 (datatype === undefined 
+                    && node.childNodes.length == 1 
+                    && node.childNodes[0].nodeType == 3)) {
+              content = node.textContent;
+            } else if(datatype == RDFa.ns.rdf("XMLLiteral") || datatype === undefined) {
+              // assuming if the previous failed (undefined && single child not text) then
+              // this must be XMLLiteral
+              content = node.innerHTML;
+            }
+          }
+          if(content !== undefined && content.length > 0) {
+            if(datatype == '' || datatype === undefined) {
+              model.addLiteral(ctx[ctx.length-1].about,expandedProperty,content);
+            } else {
+              model.addTypedLiteral(ctx[ctx.length-1].about,expandedProperty,content,datatype);
+            }
+          }
         }
       }
 
@@ -247,9 +290,11 @@ RDFa.Literal = function(_value, _type, _lang, _model) {
     }
     return false;
   };
-  this.__defineGetter__("value", function() { return model.literals[value]; });
-  this.__defineGetter__("model", function() { return model; });
-  this.__defineGetter__("index", function() { return value; });
+  this.__defineGetter__("$value", function() { return model.literals[value]; });
+  this.__defineGetter__("$model", function() { return model; });
+  this.__defineGetter__("$index", function() { return value; });
+  this.__defineGetter__("$type", function() { return type ? model.$uris[type] : null; });
+  this.__defineGetter__("$lang", function() { return lang; });
 };
 
 RDFa.Model = function() {
@@ -284,7 +329,7 @@ RDFa.Model = function() {
     }
   };
   this.indexURI = function(uri) {
-    if(typeof(uri) == 'object' && uri.length && uri.length == 2) {
+    if(uri && uri !== undefined && typeof(uri) == 'object' && uri.length && uri.length == 2) {
       var u = this.indexURI(uri[1]);
       if(uri[0] !== undefined) {
         uris_ns[u] = this.indexURI(uri[0]);  
@@ -305,6 +350,12 @@ RDFa.Model = function() {
   };
   this.addLiteral = function(s, p, o) {
     this.add(this.createResource(s),this.createResource(p),this.createLiteral(o));
+  };
+  this.addTypedLiteral = function(s, p, o, t) {
+    this.add(this.createResource(s),this.createResource(p),this.createLiteral(o,t));
+  };
+  this.addLangLiteral = function(s, p, o, l) {
+    this.add(this.createResource(s),this.createResource(p),this.createLiteral(o,null,l));
   };
   this.addResource = function(s, p, o) {
     this.add(this.createResource(s),this.createResource(p),this.createResource(o));
@@ -411,7 +462,8 @@ RDFa.Model = function() {
   };
   this.createLiteral = function(l,t,lang) {
     var index = this.indexLiteral(l);
-    return new RDFa.Literal(index, t, lang, this);
+    var tindex = (t !== undefined) ? this.indexURI(t) : null;
+    return new RDFa.Literal(index, tindex, lang, this);
   };
 };
 
