@@ -13,7 +13,7 @@ ufJSActions.actions["30boxes_calendar"] = {
       url = "http://30boxes.com/add.php?e=";
       if (hcalendar.summary) {
   //      url += encodeURIComponent(hcalendar.summary);
-        url += ufJS.simpleEscape(hcalendar.summary) + " ";
+        url += Microformats.simpleEscape(hcalendar.summary) + " ";
       }
       if (hcalendar.description) {
         url += " (";
@@ -30,8 +30,7 @@ ufJSActions.actions["30boxes_calendar"] = {
       }
       var dt;
       if (hcalendar.dtstart) {
-        dt = ufJSParser.localizeISO8601(hcalendar.dtstart);
-        var dtStartDate = ufJSParser.dateFromISO8601(dt);
+        var dtStartDate = Microformats.dateFromISO8601(hcalendar.dtstart);
         url += (dtStartDate.getMonth()+1) + "/" + dtStartDate.getDate() + "/" + dtStartDate.getFullYear();
         if (dtStartDate.time) {
           url += " " + dtStartDate.getHours() + ":";
@@ -42,8 +41,7 @@ ufJSActions.actions["30boxes_calendar"] = {
         }
         if (hcalendar.dtend) {
           url += " - ";
-          dt = ufJSParser.localizeISO8601(hcalendar.dtend);
-          var dtEndDate = ufJSParser.dateFromISO8601(dt);
+          var dtEndDate = Microformats.dateFromISO8601(hcalendar.dtend);
           if (!dtEndDate.time) {
             dtEndDate.setDate(dtEndDate.getDate()-1);
           }

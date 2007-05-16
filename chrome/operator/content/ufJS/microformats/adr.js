@@ -1,6 +1,13 @@
+if (Operator.useLoader) {
+  try {
+    Components.utils.import("rel:Microformats.js");
+    EXPORTED_SYMBOLS = ["Address"];
+  } catch (ex) {}
+}
+
 function Address(node) {
   if (node) {
-    ufJSParser.newMicroformat(this, node, "Address");
+    Microformats.parser.newMicroformat(this, node, "Address");
   }
 }
 Address.prototype.toString = function() {
@@ -24,7 +31,7 @@ Address.prototype.toString = function() {
   return address_text;
 }
 
-ufJSParser.microformats.Address = {
+var Address_definition = {
   version: "0.7",
   mfObject: Address,
   className: "adr",
@@ -50,3 +57,5 @@ ufJSParser.microformats.Address = {
     }
   }
 };
+
+Microformats.add("Address", Address_definition);

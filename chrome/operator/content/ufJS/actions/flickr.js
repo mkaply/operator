@@ -1,5 +1,3 @@
-/*extern ufJS, ufJSActions, ufJSParser, openUILink */ 
-
 ufJSActions.actions.flickr_search_tags = {
   description: "Find photos on flickr",
   icon: "http://flickr.com/favicon.ico",

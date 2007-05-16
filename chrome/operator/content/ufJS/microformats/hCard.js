@@ -1,6 +1,13 @@
+if (Operator.useLoader) {
+  try {
+    Components.utils.import("rel:Microformats.js");
+    EXPORTED_SYMBOLS = ["hCard"];
+  } catch (ex) {}
+}
+
 function hCard(node) {
   if (node) {
-    ufJSParser.newMicroformat(this, node, "hCard");
+    Microformats.parser.newMicroformat(this, node, "hCard");
   }
 }
 hCard.prototype.toString = function() {
@@ -8,7 +15,7 @@ hCard.prototype.toString = function() {
     /* If this microformat has an include pattern, put the */
     /* organization-name in parenthesis after the fn to differentiate */
     /* them. */
-    var fns = ufJSParser.getElementsByClassName(this.node.origNode, "fn");
+    var fns = Microformats.getElementsByClassName(this.node, "fn");
     if (fns.length === 0) {
       if (this.fn) {
         if (this.org[0]["organization-name"] && (this.fn != this.org[0]["organization-name"])) {
@@ -20,7 +27,7 @@ hCard.prototype.toString = function() {
   return this.fn;
 }
 
-ufJSParser.microformats.hCard = {
+var hCard_definition = {
   version: "0.7",
   mfObject: hCard,
   className: "vcard",
@@ -129,8 +136,8 @@ ufJSParser.microformats.hCard = {
       /* Implied "nickname" Optimization */
       /* http://microformats.org/wiki/hcard#Implied_.22nickname.22_Optimization */
       virtualGetter: function(mfnode) {
-        var fn = ufJSParser.getMicroformatProperty(mfnode, "hCard", "fn");
-        var orgs = ufJSParser.getMicroformatProperty(mfnode, "hCard", "org");
+        var fn = Microformats.parser.getMicroformatProperty(mfnode, "hCard", "fn");
+        var orgs = Microformats.parser.getMicroformatProperty(mfnode, "hCard", "org");
         var given_name;
         var family_name;
         if (fn && (!orgs || (orgs.length) > 1 || (fn != orgs[0]["organization-name"]))) {
@@ -200,3 +207,5 @@ ufJSParser.microformats.hCard = {
     }
   }
 };
+
+Microformats.add("hCard", hCard_definition);

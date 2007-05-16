@@ -1,5 +1,3 @@
-/*extern ufJS, ufJSActions, ufJSParser, openUILink */ 
-
 ufJSActions.actions.magnolia_search_tags = {
   description: "Find bookmarks on Ma.gnolia",
   icon: "http://ma.gnolia.com/favicon.ico",

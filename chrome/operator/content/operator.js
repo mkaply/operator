@@ -17,6 +17,7 @@ var Operator = {
   highlightedElement: null,
   highlightedElementOutlineStyle: null,
   timerID: null,
+  useLoader: false,
   init: function()
   {
     var options = false;
@@ -24,10 +25,23 @@ var Operator = {
       options = true;
     }
     var objScriptLoader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"].getService(Components.interfaces.mozIJSSubScriptLoader);
-    objScriptLoader.loadSubScript("chrome://operator/content/ufJS/ufJS.js");
-    ufJS.init(objScriptLoader, "chrome://operator/content/ufJS/");
+    if (this.useLoader) {
+      try {
+        Components.utils.import("rel:Microformats.js");
+        Components.utils.import("rel:adr.js");
+        Components.utils.import("rel:geo.js");
+        Components.utils.import("rel:hCard.js");
+        Components.utils.import("rel:tag.js");
+        Components.utils.import("rel:xFolk.js");
+        } catch (ex) {
+      }
+    } else {
+      objScriptLoader.loadSubScript("chrome://operator/content/ufJS/Microformats.js");
+      Microformats.init(objScriptLoader, "chrome://operator/content/ufJS/");
+    }
 
-    objScriptLoader.loadSubScript("chrome://operator/content/legacy_microformats.js");
+    objScriptLoader.loadSubScript("chrome://operator/content/ufJS/ufJSActions.js");
+    ufJSActions.init(objScriptLoader, "chrome://operator/content/ufJS/");
     /* Don't assume we have RDF */
     try {
       objScriptLoader.loadSubScript("chrome://operator/content/RDFa/rdfa.js");
@@ -35,10 +49,10 @@ var Operator = {
 
     if (!options) {
       /* Operator specific parser stuff */
-      ufJSParser.microformats.hCard.icon = "chrome://operator/content/hCard.png";
-      ufJSParser.microformats.hCalendar.icon = "chrome://operator/content/hCalendar.png";
-      ufJSParser.microformats.geo.icon = "chrome://operator/content/geo.png";
-      ufJSParser.microformats.tag.sort = true;
+//      Microformats.hCard.icon = "chrome://operator/content/hCard.png";
+//      Microformats.hCalendar.icon = "chrome://operator/content/hCalendar.png";
+//      Microformats.geo.icon = "chrome://operator/content/geo.png";
+//      Microformats.tag.sort = true;
   
       objScriptLoader.loadSubScript("chrome://operator/content/operator_toolbar.js");
       objScriptLoader.loadSubScript("chrome://operator/content/operator_statusbar.js");
@@ -52,10 +66,10 @@ var Operator = {
 
     var languageBundle = bundleService.createBundle("chrome://operator/locale/microformats.properties");
     var i;
-    for (i in ufJSParser.microformats)
+    for (i in Microformats)
     {
       try {
-        ufJSParser.microformats[i].description = languageBundle.GetStringFromName(i + ".description");
+        Microformats[i].description = languageBundle.GetStringFromName(i + ".description");
       } catch (ex) {
       }
     }
@@ -90,8 +104,6 @@ var Operator = {
         }
       }
     }
-
-    Microformats.init();
 
     if (options) {
       return;
@@ -157,9 +169,9 @@ var Operator = {
         this.prefBranch.setBoolPref("removeDuplicates", true);
         this.prefBranch.setBoolPref("observeDOMAttrModified", false);
         j = 1;
-        for (i in ufJSParser.microformats)
+        for (i in Microformats)
         {
-          if (ufJSParser.microformats[i].description) {
+          if (Microformats[i].description) {
             this.prefBranch.setCharPref("microformat" + (j), i);
             j++;
           }
@@ -238,7 +250,7 @@ var Operator = {
         }
         i++;
       } while (1);
-      for (i in ufJSParser.microformats) {
+      for (i in Microformats) {
         try {
           Operator.prefBranch.clearUserPref(i + ".defaultHandler");
         } catch (ex) {}
@@ -487,7 +499,7 @@ var Operator = {
       }
     }
     /* XXX TODO Need a better way to figure out sorting! */
-    if ((items.length > 1) && ufJSParser.microformats[semanticObjectType].sort) {
+    if ((items.length > 1) && Microformats[semanticObjectType].sort) {
       items = sorted_items;
     }
 
@@ -530,7 +542,7 @@ var Operator = {
         } else {
           var error = {};
           /* XXX TODO Validate needs to be more generic? Or do we only call it in the microformat case? */
-          ufJSParser.validate(items[j].node, semanticObjectType, error);
+          Microformats.parser.validate(items[j].node, semanticObjectType, error);
 
           Operator.console_message(error.message, Operator.lineNumberFromDOMNode(items[j].node));
 //          if (typeof Firebug != "undefined") {
@@ -672,19 +684,20 @@ var Operator = {
     gContextMenu.showItem("operator-separator", false);
     var node = gContextMenu.target;
     var mfNode;
-    if (ufJS.isMicroformatNode(node)) {
-      mfNode = ufJS.isMicroformatNode(node);
+    if (Microformats.isMicroformat(node)) {
+      mfNode = node;
     } else {
-      mfNode = ufJS.getParentMicroformatNode(node);
+      mfNode = Microformats.getParent(node);
     }
     var curmenu = 0;
     while (mfNode) {
-      var mfNames = ufJS.getMicroformatNamesFromNode(mfNode);
+      var mfNameString = Microformats.getMicroformatNamesFromNode(mfNode);
+      var mfNames = mfNameString.split(" ");
       var i;
       var actionmenu;
       var shown_separator = false;
       for (i=0; i < mfNames.length; i++) {
-        actionmenu = Operator.buildPopupMenu(new ufJSParser.microformats[mfNames[i]].mfObject(mfNode), mfNames[i]);
+        actionmenu = Operator.buildPopupMenu(new Microformats[mfNames[i]].mfObject(mfNode), mfNames[i]);
         if (actionmenu.childNodes.length > 0) {
           if (!shown_separator) {
             gContextMenu.showItem("operator-separator", true);
@@ -692,8 +705,8 @@ var Operator = {
           gContextMenu.showItem("operator-menu-" + curmenu, true);
           var menuitem = document.getElementById("operator-menu-" + curmenu);
           curmenu++;
-          if (ufJSParser.microformats[mfNames[i]].description) {
-            menuitem.label = "Operator " + ufJSParser.microformats[mfNames[i]].description;
+          if (Microformats[mfNames[i]].description) {
+            menuitem.label = "Operator " + Microformats[mfNames[i]].description;
           } else {
             menuitem.label = "Operator " + mfNames[i];
           }
@@ -704,7 +717,7 @@ var Operator = {
           menuitem.appendChild(actionmenu);
         }
       }
-      mfNode = ufJS.getParentMicroformatNode(mfNode);
+      mfNode = Microformats.getParent(mfNode);
     }
   },
   highlightDOMNode: function(node)
@@ -732,7 +745,7 @@ var Operator = {
   },
   mouseOver: function(event) {
     var element = (event.target) ? event.target : event.srcElement;
-    var mfNode = ufJS.isMicroformatNode(element);
+    var mfNode = Microformats.isMicroformat(element);
     Operator.highlightDOMNode(mfNode);
   },
   processSemanticDataDelayed: function(event)
@@ -899,13 +912,13 @@ var Operator = {
     
     if (semanticObjectType == "hCard") {
       try {
-        vcfical = ufJS.vCard(semanticObject);
+        vcfical = ufJSActions.actions.export_vcard.vCard(semanticObject);
       } catch (ex) {}
       X2V = semanticObject.node;
     }
     if (semanticObjectType == "hCalendar") {
       try {
-        vcfical = ufJS.iCalendar(semanticObject, true, true);
+        vcfical = ufJSActions.actions.export_icalendar.iCalendar(semanticObject, true, true);
       } catch (ex) {}
       X2V = semanticObject.node;
     }
@@ -913,8 +926,8 @@ var Operator = {
     var error = {};
     /* XXX TODO cross semantic validation */
     var dump;
-    if (ufJSParser.microformats[semanticObjectType]) {
-      ufJSParser.validate(semanticObject.node, semanticObjectType, error);
+    if (Microformats[semanticObjectType]) {
+      Microformats.parser.validate(semanticObject.node, semanticObjectType, error);
       dump = Operator.dumpObject(semanticObject, '', true);
     } else {
       dump = Operator.dumpObject(semanticObject, '', false);
@@ -936,7 +949,6 @@ var Operator = {
         Operator.getSemanticData(window.frames[i], semanticArrays);
       }
     }
-    ufJS.getAllMicroformats(window.document, semanticArrays);
     try {
       if(RDFa.hasRDFa(window.document)) {
         if (!semanticArrays["RDFa"]) {
@@ -965,6 +977,9 @@ var Operator = {
 
     /* Get all semantic data from the web page */
     var semanticArrays = [];
+    for (i in Microformats) {
+      semanticArrays[i] = Microformats.get(i, content.document);
+    }
     Operator.getSemanticData(content, semanticArrays);
 
     var i, j, k;
@@ -1090,8 +1105,8 @@ var Operator = {
             }
             tempMenu = document.createElement("menu");
             
-//            if ((this.useDescriptiveNames) && (ufJSParser.microformats[microformat].description)) {
-//              tempItem.label = ufJSParser.microformats[microformat].description;
+//            if ((this.useDescriptiveNames) && (Microformats[microformat].description)) {
+//              tempItem.label = Microformats[microformat].description;
 //            } else {
               tempMenu.label = semanticType;
 //            }

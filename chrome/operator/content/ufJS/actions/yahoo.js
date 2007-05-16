@@ -1,4 +1,4 @@
-/*extern ufJS, ufJSActions, ufJSParser, openUILink */ 
+/* simpleEscape dateFromISO8601 localizeISO8601 iso8601FromDate */
 
 ufJSActions.actions.yahoo_maps = {
   description: "Find with Yahoo! Maps",
@@ -129,16 +129,16 @@ ufJSActions.actions.yahoo_calendar = {
         } else {
           date = hcalendar.dtstart;
         }
-        url += ufJS.simpleEscape(date.replace(/-/g,""));
+        url += Microformats.simpleEscape(date.replace(/-/g,""));
         if (time) {
-          url += ufJS.simpleEscape(time.replace(/:/g,""));
+          url += Microformats.simpleEscape(time.replace(/:/g,""));
         }
       }
       if (hcalendar.dtend) {
         var duration = "";
         var duration_num, hours, minutes;
-        var dtStartDate = ufJSParser.dateFromISO8601(ufJSParser.localizeISO8601(hcalendar.dtstart));
-        var dtEndDate = ufJSParser.dateFromISO8601(ufJSParser.localizeISO8601(hcalendar.dtend));
+        var dtStartDate = Microformats.dateFromISO8601(hcalendar.dtstart);
+        var dtEndDate = Microformats.dateFromISO8601(hcalendar.dtend);
         if (!dtEndDate.time) {
           dtEndDate.setDate(dtEndDate.getDate()-1);
         }
@@ -151,7 +151,7 @@ ufJSActions.actions.yahoo_calendar = {
         if (((dtEndDate.getTime() - dtStartDate.getTime()) > 24*60*60*1000) || !dtEndDate.time) {
           url += "&";
           url += "rend=%2b";
-          url += ufJSParser.iso8601FromDate(dtEndDate).replace(/-/g,"").replace(/:/g,"");
+          url += Microformats.iso8601FromDate(dtEndDate).replace(/-/g,"").replace(/:/g,"");
           if (dtEndDate.time && dtStartDate.time) {
             dtEndDate.time = false;
             var end = dtEndDate.getHours()*60 + dtEndDate.getMinutes();
@@ -187,7 +187,7 @@ ufJSActions.actions.yahoo_calendar = {
         }
       }
       url += "&";
-      url += "title=" + ufJS.simpleEscape(hcalendar.summary);
+      url += "title=" + Microformats.simpleEscape(hcalendar.summary);
       if (hcalendar.description) {
         url += "&";
         var s = hcalendar.description;
@@ -195,7 +195,7 @@ ufJSActions.actions.yahoo_calendar = {
         s = s.replace(/\<\/p>/gi, '%0D%0A%0D%0A');
         s	= s.replace(/\<.*?\>/gi, '');
         s	= s.replace(/^\s+/, '');
-        url += "DESC=" + ufJS.simpleEscape(s.substr(0,2048));
+        url += "DESC=" + Microformats.simpleEscape(s.substr(0,2048));
         if (s.length > 2048) {
           url += "...";
         }

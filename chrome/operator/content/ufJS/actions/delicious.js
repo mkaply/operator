@@ -1,5 +1,3 @@
-/*extern ufJS, ufJSActions, ufJSParser, openUILink */ 
-
 ufJSActions.actions.delicious_search_tags = {
   description: "Find bookmarks on del.icio.us",
   icon: "http://del.icio.us/favicon.ico",

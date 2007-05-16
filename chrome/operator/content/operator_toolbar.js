@@ -109,7 +109,7 @@ var Operator_Toolbar = {
           break;
         }
         if ((action) && (microformat) && (handler)) {
-          if (ufJSParser.microformats[microformat]) {
+          if (Microformats[microformat]) {
             button = document.createElement("toolbarbutton");
             button.setAttribute("disabled", "true");
             button.label = action;
@@ -121,8 +121,8 @@ var Operator_Toolbar = {
             if ((ufJSActions.actions[handler].scope.semantic[microformat]) && (ufJSActions.actions[handler].icon)) {
               button.style.listStyleImage = "url('" + ufJSActions.actions[handler].icon + "')";
             } else {
-              if (ufJSParser.microformats[microformat].icon) {
-                button.style.listStyleImage = "url('" + ufJSParser.microformats[microformat].icon + "')";
+              if (Microformats[microformat].icon) {
+                button.style.listStyleImage = "url('" + Microformats[microformat].icon + "')";
               } else {
                 button.style.listStyleImage = "url('chrome://operator/content/other.png')";
               }
@@ -149,11 +149,11 @@ var Operator_Toolbar = {
           break;
         }
         if (microformat) {
-          if (ufJSParser.microformats[microformat]) {
+          if (Microformats[microformat]) {
             button = document.createElement("toolbarbutton");
             button.setAttribute("disabled", "true");
-            if ((Operator.useDescriptiveNames) && (ufJSParser.microformats[microformat].description)) {
-              button.label = ufJSParser.microformats[microformat].description;
+            if ((Operator.useDescriptiveNames) && (Microformats[microformat].description)) {
+              button.label = Microformats[microformat].description;
             } else {
               button.label =  microformat;
             }
@@ -163,8 +163,8 @@ var Operator_Toolbar = {
             button.setAttribute("type", "menu");
             button.addEventListener("mouseover", Operator_Toolbar.mouseOver, false);
 
-            if (ufJSParser.microformats[microformat].icon) {
-              button.style.listStyleImage = "url('" + ufJSParser.microformats[microformat].icon + "')";
+            if (Microformats[microformat].icon) {
+              button.style.listStyleImage = "url('" + Microformats[microformat].icon + "')";
             } else {
               button.style.listStyleImage = "url('chrome://operator/content/other.png')";
             }

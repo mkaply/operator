@@ -1,5 +1,3 @@
-/*extern ufJS, ufJSActions, ufJSParser, openUILink */ 
-
 ufJSActions.actions.technorati_search_tags = {
   description: "Find blogs on technorati",
   icon: "http://technorati.com/favicon.ico",

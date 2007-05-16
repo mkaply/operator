@@ -252,7 +252,7 @@ var Operator_Options = {
   {
     var numMicroformats = 0;
     var i;
-    for (i in ufJSParser.microformats) {
+    for (i in Microformats) {
       numMicroformats++;
     }
 
@@ -293,7 +293,7 @@ var Operator_Options = {
     var microformatmenu = document.getElementById("microformats");
     var i, j;
     var add;
-    for (i in ufJSParser.microformats)
+    for (i in Microformats)
     {
       add = true;
       /* if it is not already in the list */

@@ -1,6 +1,13 @@
+if (Operator.useLoader) {
+  try {
+    Components.utils.import("rel:Microformats.js");
+    EXPORTED_SYMBOLS = ["xFolk"];
+  } catch (ex) {}
+}
+
 function xFolk(node) {
   if (node) {
-    ufJSParser.newMicroformat(this, node, "xFolk");
+    Microformats.parser.newMicroformat(this, node, "xFolk");
   }
 }
 xFolk.prototype.toString = function() {
@@ -9,7 +16,7 @@ xFolk.prototype.toString = function() {
   }
 }
 
-ufJSParser.microformats.xFolk = {
+var xFolk_definition = {
   version: "0.7",
   mfObject: xFolk,
   className: "xfolkentry",
@@ -26,7 +33,7 @@ ufJSParser.microformats.xFolk = {
             if (parentnode.getAttribute("title")) {
               return parentnode.getAttribute("title");
             } else {
-              return ufJSParser.defaultGetter(parentnode);
+              return Microformats.parser.defaultGetter(parentnode);
             }
           }
         },
@@ -45,3 +52,5 @@ ufJSParser.microformats.xFolk = {
     }
   }
 };
+
+Microformats.add("xFolk", xFolk_definition);

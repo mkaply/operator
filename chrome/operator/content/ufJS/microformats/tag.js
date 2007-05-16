@@ -1,17 +1,24 @@
+if (Operator.useLoader) {
+  try {
+    Components.utils.import("rel:Microformats.js");
+    EXPORTED_SYMBOLS = ["tag"];
+  } catch (ex) {}
+}
+
 function tag(node) {
   if (node) {
-    ufJSParser.newMicroformat(this, node, "tag");
+    Microformats.parser.newMicroformat(this, node, "tag");
   }
 }
 tag.prototype.toString = function() {
   return this.tag;
 }
 
-ufJSParser.microformats.tag = {
+var tag_definition = {
   version: "0.7",
   mfObject: tag,
   attributeName: "rel",
-  attributeValues: ["tag"],
+  attributeValues: "tag",
   properties: {
     "tag" : {
       virtual: true,
@@ -20,7 +27,7 @@ ufJSParser.microformats.tag = {
           var url_array = mfnode.getAttribute("href").split("/");
           for(var i=url_array.length-1; i > 0; i--) {
             if (url_array[i] !== "") {
-              return unescape(ufJSParser.microformats.tag.validTagName(url_array[i].replace(/\+/g, ' ')));
+              return unescape(Microformats.tag.validTagName(url_array[i].replace(/\+/g, ' ')));
             }
           }
         }
@@ -59,7 +66,7 @@ ufJSParser.microformats.tag = {
     return returnTag;
   },
   validate: function(node, error) {
-    var tag = ufJSParser.getMicroformatProperty(node, "tag", "tag");
+    var tag = Microformats.parser.getMicroformatProperty(node, "tag", "tag");
     if (!tag) {
       if (node.href) {
         var url_array = node.getAttribute("href").split("/");
@@ -81,3 +88,5 @@ ufJSParser.microformats.tag = {
     return true;
   }
 };
+
+Microformats.add("tag", tag_definition);

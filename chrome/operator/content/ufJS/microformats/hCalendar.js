@@ -1,6 +1,13 @@
+if (Operator.useLoader) {
+  try {
+    Components.utils.import("rel:Microformats.js");
+    EXPORTED_SYMBOLS = ["hCalendar"];
+  } catch (ex) {}
+}
+
 function hCalendar(node) {
   if (node) {
-    ufJSParser.newMicroformat(this, node, "hCalendar");
+    Microformats.parser.newMicroformat(this, node, "hCalendar");
   }
 }
 hCalendar.prototype.toString = function() {
@@ -8,11 +15,11 @@ hCalendar.prototype.toString = function() {
     /* If this microformat has an include pattern, put the */
     /* dtstart in parenthesis after the summary to differentiate */
     /* them. */
-    var summaries = ufJSParser.getElementsByClassName(this.node.origNode, "summary");
+    var summaries = Microformats.getElementsByClassName(this.node, "summary");
     if (summaries.length === 0) {
       if (this.summary) {
         if (this.dtstart) {
-          return this.summary + "(" + ufJSParser.dateFromISO8601(this.dtstart).toLocaleString() + ")";
+          return this.summary + "(" + Microformats.parser.dateFromISO8601(this.dtstart).toLocaleString() + ")";
         }
       }
     }
@@ -20,7 +27,7 @@ hCalendar.prototype.toString = function() {
   return this.summary;
 }
 
-ufJSParser.microformats.hCalendar = {
+var hCalendar_definition = {
   version: "0.7",
   mfObject: hCalendar,
   className: "vevent",
@@ -71,3 +78,5 @@ ufJSParser.microformats.hCalendar = {
     }
   }
 };
+
+Microformats.add("hCalendar", hCalendar_definition);

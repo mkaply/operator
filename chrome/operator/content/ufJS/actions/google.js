@@ -1,4 +1,4 @@
-/*extern ufJS, ufJSActions, ufJSParser, openUILink */ 
+/* localizeISO8601 */ 
 
 ufJSActions.actions.google_maps = {
   description: "Find with Google Maps",
@@ -104,7 +104,8 @@ ufJSActions.actions.google_calendar = {
           var offset = dtstart.lastIndexOf("-");
           /* If there is an offset and there is no Z, localize */
           if ((offset > T) || !dtstart.match("Z")) {
-            dtstart = ufJSParser.localizeISO8601(dtstart);
+            var dtStartDate = Microformats.dateFromISO8601(dtstart);
+            dtstart = Microformats.iso8601FromDate(dtStartDate);
           }
         }
         /* This will need to change if Google ever supports TZ offsets */
@@ -118,7 +119,8 @@ ufJSActions.actions.google_calendar = {
             var offset = dtend.lastIndexOf("-");
             /* If there is an offset and there is no Z, localize */
             if ((offset > T) || !dtend.match("Z")) {
-              dtend = ufJSParser.localizeISO8601(dtend);
+              var dtEndDate = Microformats.dateFromISO8601(dtend);
+              dtend = Microformats.iso8601FromDate(dtEndDate);
             }
           } else {
             if (!Operator.upcomingOrgBugFixed) {

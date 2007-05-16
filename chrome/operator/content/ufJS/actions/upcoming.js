@@ -1,5 +1,3 @@
-/*extern ufJS, ufJSActions, ufJSParser, openUILink */ 
-
 ufJSActions.actions.upcoming_search_tags = {
   description: "Find events on Upcoming.org",
   icon: "http://upcoming.org/favicon.ico",
