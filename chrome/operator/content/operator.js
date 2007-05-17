@@ -30,12 +30,12 @@ var Operator = {
     }
     var objScriptLoader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"].getService(Components.interfaces.mozIJSSubScriptLoader);
     if (typeof(Microformats) == "undefined") {
-      objScriptLoader.loadSubScript("chrome://operator/content/ufJS/Microformats.js");
-      Microformats.init(objScriptLoader, "chrome://operator/content/ufJS/");
+      objScriptLoader.loadSubScript("chrome://operator/content/Microformats/Microformats.js");
+      Microformats.init(objScriptLoader, "chrome://operator/content/Microformats/");
     }
 
-    objScriptLoader.loadSubScript("chrome://operator/content/ufJS/ufJSActions.js");
-    ufJSActions.init(objScriptLoader, "chrome://operator/content/ufJS/");
+    objScriptLoader.loadSubScript("chrome://operator/content/Microformats/ufJSActions.js");
+    ufJSActions.init(objScriptLoader, "chrome://operator/content/Microformats/");
     /* Don't assume we have RDF */
     try {
       objScriptLoader.loadSubScript("chrome://operator/content/RDFa/rdfa.js");

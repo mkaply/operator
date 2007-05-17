@@ -38,12 +38,12 @@ var Microformats = {
         var begin = stack[1].lastIndexOf("@", end)+1;
         var baseurl = stack[1].substring(begin, end);
 
-        ojl.loadSubScript(baseurl + "microformats/adr.js");
-        ojl.loadSubScript(baseurl + "microformats/hCard.js");
-        ojl.loadSubScript(baseurl + "microformats/hCalendar.js");
-        ojl.loadSubScript(baseurl + "microformats/tag.js");
-        ojl.loadSubScript(baseurl + "microformats/geo.js");
-        ojl.loadSubScript(baseurl + "microformats/xFolk.js");
+        ojl.loadSubScript(baseurl + "adr.js");
+        ojl.loadSubScript(baseurl + "hCard.js");
+        ojl.loadSubScript(baseurl + "hCalendar.js");
+        ojl.loadSubScript(baseurl + "tag.js");
+        ojl.loadSubScript(baseurl + "geo.js");
+        ojl.loadSubScript(baseurl + "xFolk.js");
       }
     }
   },
