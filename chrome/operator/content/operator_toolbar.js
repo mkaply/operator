@@ -59,22 +59,22 @@ var Operator_Toolbar = {
         if (semanticType) {
           button = document.createElement("toolbarbutton");
           button.setAttribute("disabled", "true");
-//          if ((Operator.useDescriptiveNames) && (ufJSParser.microformats[microformat].description)) {
-//            button.label = ufJSParser.microformats[microformat].description;
-//          } else {
+          if ((Operator.useDescriptiveNames) && (Microformats[semanticType]) && (Microformats[semanticType].description)) {
+            button.label = Microformats[semanticType].description;
+          } else {
             button.label =  semanticType;
-//          }
+          }
           button.setAttribute("label", button.label);
           button.setAttribute("origlabel", button.label);
 
           button.setAttribute("type", "menu");
           button.addEventListener("mouseover", Operator_Toolbar.mouseOver, false);
 
-//          if (ufJSParser.microformats[microformat].icon) {
-//            button.style.listStyleImage = "url('" + ufJSParser.microformats[microformat].icon + "')";
-//          } else {
+          if ((Microformats[semanticType]) && (Microformats[semanticType].icon)) {
+            button.style.listStyleImage = "url('" + Microformats[semanticType].icon + "')";
+          } else {
             button.style.listStyleImage = "url('chrome://operator/content/other.png')";
-//          }
+          }
 
           button.id = "operator-" + semanticType + "-toolbar-button";
           toolbar.insertBefore(button, document.getElementById("operator-spring"));

@@ -43,9 +43,9 @@ var Operator = {
 
     if (!options) {
       /* Operator specific parser stuff */
-//      Microformats.hCard.icon = "chrome://operator/content/hCard.png";
-//      Microformats.hCalendar.icon = "chrome://operator/content/hCalendar.png";
-//      Microformats.geo.icon = "chrome://operator/content/geo.png";
+      Microformats.hCard.icon = "chrome://operator/content/hCard.png";
+      Microformats.hCalendar.icon = "chrome://operator/content/hCalendar.png";
+      Microformats.geo.icon = "chrome://operator/content/geo.png";
 //      Microformats.tag.sort = true;
   
       objScriptLoader.loadSubScript("chrome://operator/content/operator_toolbar.js");
