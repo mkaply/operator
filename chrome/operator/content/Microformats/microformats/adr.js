@@ -1,4 +1,4 @@
-if (Operator.useLoader) {
+if (Components.utils.import) {
   try {
     Components.utils.import("rel:Microformats.js");
     EXPORTED_SYMBOLS = ["Address"];
@@ -10,6 +10,7 @@ function Address(node) {
     Microformats.parser.newMicroformat(this, node, "Address");
   }
 }
+
 Address.prototype.toString = function() {
   var address_text = "";
   if (this["post-office-box"]) {
@@ -32,7 +33,6 @@ Address.prototype.toString = function() {
 }
 
 var Address_definition = {
-  version: "0.7",
   mfObject: Address,
   className: "adr",
   properties: {

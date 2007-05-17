@@ -17,25 +17,19 @@ var Operator = {
   highlightedElement: null,
   highlightedElementOutlineStyle: null,
   timerID: null,
-  useLoader: false,
   init: function()
   {
     var options = false;
     if (window.location.href.match("operator_options")) {
       options = true;
     }
-    var objScriptLoader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"].getService(Components.interfaces.mozIJSSubScriptLoader);
-    if (this.useLoader) {
+    if (Components.utils.import) {
       try {
         Components.utils.import("rel:Microformats.js");
-        Components.utils.import("rel:adr.js");
-        Components.utils.import("rel:geo.js");
-        Components.utils.import("rel:hCard.js");
-        Components.utils.import("rel:tag.js");
-        Components.utils.import("rel:xFolk.js");
-        } catch (ex) {
-      }
-    } else {
+      } catch (ex) {}
+    }
+    var objScriptLoader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"].getService(Components.interfaces.mozIJSSubScriptLoader);
+    if (typeof(Microformats) == "undefined") {
       objScriptLoader.loadSubScript("chrome://operator/content/ufJS/Microformats.js");
       Microformats.init(objScriptLoader, "chrome://operator/content/ufJS/");
     }

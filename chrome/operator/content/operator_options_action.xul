@@ -9,7 +9,7 @@
   ondialogaccept="return Operator_Options.onActionOK()"
   onload="sizeToContent();Operator_Options.onActionLoad();"
   xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-  <script type="application/x-javascript" src="chrome://operator/content/operator.js"/>
+  <script type="application/x-javascript;version=1.7" src="chrome://operator/content/operator.js"/>
   <script type="application/x-javascript" src="chrome://operator/content/operator_options.js"/>
   <vbox>
     <label control="actions">&action.label;</label>

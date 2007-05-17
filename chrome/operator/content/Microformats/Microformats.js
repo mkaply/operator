@@ -3,10 +3,7 @@
 EXPORTED_SYMBOLS = ["Microformats"];
 
 var Microformats = {
-  hello: function() {
-    alert('hello');
-  },
-  version: "0.2",
+  inited: false,
   /* When a microformat is added, the name is placed in this list */
   list: [],
   /* Custom iterator so that microformats can be enumerated as */
@@ -17,23 +14,44 @@ var Microformats = {
       yield this.list[i];
     }
   },
-  init: function(ojl, baseurl) {
-    if (Components && !ojl) {
-      ojl = Components.classes["@mozilla.org/moz/jssubscript-loader;1"].
-                       getService(Components.interfaces.mozIJSSubScriptLoader);
-    }
-    if (ojl) {
-    Microformats.parser.init(ojl, baseurl);
-    ojl.loadSubScript(baseurl + "ufJSActions.js");
-      ufJSActions.init(ojl, baseurl);
-    }
+  init: function() {
+    if (!Microformats.inited) {
+      Microformats.inited = true
+      /* Try to import as components */
+      if (Components.utils.import) {
+        try {
+          Components.utils.import("rel:adr.js");
+          Components.utils.import("rel:geo.js");
+          Components.utils.import("rel:hCard.js");
+          Components.utils.import("rel:hCalendar.js");
+          Components.utils.import("rel:tag.js");
+          Components.utils.import("rel:xFolk.js");
+        } catch (ex) {}
+      }
+      /* If the import failed or we didn't import at all, load */
+      if (typeof(hCard) == "undefined") {
+        var ojl = Components.classes["@mozilla.org/moz/jssubscript-loader;1"].
+                             getService(Components.interfaces.mozIJSSubScriptLoader);
+        /* Find the location of the JS file we are in */
+        var stack = (new Error()).stack.split("\n");
+        var end = stack[1].indexOf("Microformats.js");
+        var begin = stack[1].lastIndexOf("@", end)+1;
+        var baseurl = stack[1].substring(begin, end);
 
+        ojl.loadSubScript(baseurl + "microformats/adr.js");
+        ojl.loadSubScript(baseurl + "microformats/hCard.js");
+        ojl.loadSubScript(baseurl + "microformats/hCalendar.js");
+        ojl.loadSubScript(baseurl + "microformats/tag.js");
+        ojl.loadSubScript(baseurl + "microformats/geo.js");
+        ojl.loadSubScript(baseurl + "microformats/xFolk.js");
+      }
+    }
   },
   /**
    * Retrieves microformats objects of the given type from a document
    * 
    * @param  name          The name of the microformat (required)
-   * @param  rootElement   The DOM element at which to start searching (optional - defaults to content.document)
+   * @param  rootElement   The DOM element at which to start searching (required)
    * @param  recurseFrames Whether or not to search child frames for microformats (optional - defaults to true)
    * @param  microformats  An array of microformat objects to which is added the results (optional)
    * @return A new array of microformat objects or the passed in microformat 
@@ -259,21 +277,6 @@ var Microformats = {
   },
   /* All parser specific function are contained in this object */
   parser: {
-  init: function(ojl, baseurl) {
-    if (Components && !ojl) {
-      ojl = Components.classes["@mozilla.org/moz/jssubscript-loader;1"].
-                       getService(Components.interfaces.mozIJSSubScriptLoader);
-    }
-    if (ojl) {
-      ojl.loadSubScript(baseurl + "microformats/adr.js");
-      ojl.loadSubScript(baseurl + "microformats/hCard.js");
-      ojl.loadSubScript(baseurl + "microformats/hCalendar.js");
-      ojl.loadSubScript(baseurl + "microformats/tag.js");
-      ojl.loadSubScript(baseurl + "microformats/geo.js");
-      ojl.loadSubScript(baseurl + "microformats/xFolk.js");
-    }
-  },
-
     /**
      * Uses the microformat patterns to decide what the correct text for a
      * given microformat property is. This includes looking at things like
@@ -281,7 +284,7 @@ var Microformats = {
      *
      * @param  propnode   The DOMNode to check
      * @param  parentnode The parent node of the property. If it is a subproperty,
-     *                    this is the parent property. If it is not, this is the
+     *                    this is the parent property node. If it is not, this is the
      *                    microformat node.
      * @return A string with the value of the property
      */
@@ -347,7 +350,7 @@ var Microformats = {
      *
      * @param  propnode   The DOMNode to check
      * @param  parentnode The parent node of the property. If it is a subproperty,
-     *                    this is the parent property. If it is not, this is the
+     *                    this is the parent property node. If it is not, this is the
      *                    microformat node.
      * @return A string with the normalized date.
      */
@@ -363,7 +366,7 @@ var Microformats = {
      *
      * @param  propnode   The DOMNode to check
      * @param  parentnode The parent node of the property. If it is a subproperty,
-     *                    this is the parent property. If it is not, this is the
+     *                    this is the parent property node. If it is not, this is the
      *                    microformat node.
      * @return A string with the fully qualified URI.
      */
@@ -387,7 +390,7 @@ var Microformats = {
      *
      * @param  propnode   The DOMNode to check
      * @param  parentnode The parent node of the property. If it is a subproperty,
-     *                    this is the parent property. If it is not, this is the
+     *                    this is the parent property node. If it is not, this is the
      *                    microformat node.
      * @return A string with the email address.
      */
@@ -408,7 +411,7 @@ var Microformats = {
      *
      * @param  propnode   The DOMNode to check
      * @param  parentnode The parent node of the property. If it is a subproperty,
-     *                    this is the parent property. If it is not, this is the
+     *                    this is the parent property node. If it is not, this is the
      *                    microformat node.
      * @return A string with the HTML including all tags.
      */
@@ -422,7 +425,7 @@ var Microformats = {
      * @param  prop       The microformat property in the definition
      * @param  propnode   The DOMNode to check
      * @param  parentnode The parent node of the property. If it is a subproperty,
-     *                    this is the parent property. If it is not, this is the
+     *                    this is the parent property node. If it is not, this is the
      *                    microformat node.
      * @return A string with the property value.
      */
@@ -887,8 +890,7 @@ var Microformats = {
    * @param  string ISO8601 formatted date
    * @return JavaScript date object that represents the ISO date. 
    */
-  dateFromISO8601: function(string)
-  {
+  dateFromISO8601: function dateFromISO8601(string) {
     var dateArray = string.match(/(\d\d\d\d)(?:-?(\d\d)(?:-?(\d\d)(?:[T ](\d\d)(?::?(\d\d)(?::?(\d\d)(?:\.(\d+))?)?)?(?:([-+Z])(?:(\d\d)(?::?(\d\d))?)?)?)?)?)?/);
   
     var date = new Date(dateArray[1], 0, 1);
@@ -945,10 +947,9 @@ var Microformats = {
    * 
    * @param  date        Javascript Date object
    * @param  punctuation true if the date should have -/:
-   * @return string with the iso date. 
+   * @return string with the ISO date. 
    */
-  iso8601FromDate: function(date, punctuation)
-  {
+  iso8601FromDate: function iso8601FromDate(date, punctuation) {
     var string = date.getFullYear().toString();
     if (punctuation) {
       string += "-";
@@ -1076,3 +1077,5 @@ var Microformats = {
     return returnElements;
   }
 };
+
+Microformats.init();

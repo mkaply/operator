@@ -1,4 +1,4 @@
-if (Operator.useLoader) {
+if (Components.utils.import) {
   try {
     Components.utils.import("rel:Microformats.js");
     EXPORTED_SYMBOLS = ["hCard"];

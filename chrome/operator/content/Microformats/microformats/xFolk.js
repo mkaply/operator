@@ -1,4 +1,4 @@
-if (Operator.useLoader) {
+if (Components.utils.import) {
   try {
     Components.utils.import("rel:Microformats.js");
     EXPORTED_SYMBOLS = ["xFolk"];
@@ -10,6 +10,7 @@ function xFolk(node) {
     Microformats.parser.newMicroformat(this, node, "xFolk");
   }
 }
+
 xFolk.prototype.toString = function() {
   if (this.taggedlink) {
     return this.taggedlink.title;
