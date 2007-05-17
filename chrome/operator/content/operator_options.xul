@@ -10,7 +10,7 @@
   xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
   onload="sizeToContent();Operator_Options.onPageLoad();"
 	ondialogaccept="Operator_Options.saveOptions()">
-  <script type="application/x-javascript" src="chrome://operator/content/operator.js"/>
+  <script type="application/x-javascript;version=1.7" src="chrome://operator/content/operator.js"/>
   <script type="application/x-javascript" src="chrome://operator/content/operator_options.js"/>
 
   <tabbox>
