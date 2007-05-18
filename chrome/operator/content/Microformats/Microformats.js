@@ -539,15 +539,17 @@ var Microformats = {
     newMicroformat: function(object, in_node, microformat) {
       /* check to see if we are even valid */
       if (!Microformats[microformat]) {
-        throw("Invalid microformat");
+        throw("Invalid microformat - " + microformat);
       }
-      if (Microformats[microformat].attributeName) {
-        if (!(in_node.getAttribute(Microformats[microformat].attributeName))) {
-          throw("Node is not a microformat (" + microformat + ")");
-        }
-      } else {
-        if (!(in_node.getAttribute('class').match("(^|\\s)" + Microformats[microformat].className + "(\\s|$)"))) {
-          throw("Node is not a microformat (" + microformat + ")");
+      if (in_node.ownerDocument) {
+        if (Microformats[microformat].attributeName) {
+          if (!(in_node.getAttribute(Microformats[microformat].attributeName))) {
+            throw("Node is not a microformat (" + microformat + ")");
+          }
+        } else {
+          if (!(in_node.getAttribute('class').match("(^|\\s)" + Microformats[microformat].className + "(\\s|$)"))) {
+            throw("Node is not a microformat (" + microformat + ")");
+          }
         }
       }
       var node = in_node;
