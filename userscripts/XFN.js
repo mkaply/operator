@@ -1,6 +1,13 @@
+if (Components.utils.import) {
+  try {
+    Components.utils.import("rel:Microformats.js");
+    EXPORTED_SYMBOLS = ["XFN"];
+  } catch (ex) {}
+}
+
 function XFN(node) {
   if (node) {
-    ufJSParser.newMicroformat(this, node, "XFN");
+    Microformats.parser.newMicroformat(this, node, "XFN");
   }
 }
 XFN.prototype.toString = function() {
@@ -9,134 +16,135 @@ XFN.prototype.toString = function() {
   var i;
   for (i in this) {
     if ((i != "text") && (i != "link")) {
-      if (!first) {
-        displayName += ",";
-      } else {
-        first = false;
+      if (this[i] == true) {
+        if (!first) {
+          displayName += ",";
+        } else {
+          first = false;
+        }
+        displayName += i;
       }
-      displayName += i;
     }
   }
   displayName += ")";
   return displayName;
 }
 
-ufJSParser.microformats.XFN = {
+XFN_definition = {
   version: "0.7",
   description: "XFN Relationship(s)",
   mfObject: XFN,
   attributeName: "rel",
-  attributeValues: ["contact","acquaintance","friend","met","co-worker",
-                    "colleague","co-resident","neighbor","child","parent",
-                    "sibling","spouse","kin","muse","crush","date",
-                    "sweetheart","me"],
+  attributeValues: "contact acquaintance friend met co-worker colleague " +
+                   "co-resident neighbor child parent sibling spouse kin " +
+                   "muse crush date sweetheart me",
   properties: {
     "contact" : {
       virtual: true,
       virtualGetter: function(propnode, mfnode, definition) {
-        return ufJSParser.microformats.XFN.getXFNStatus(propnode, "contact");
+        return XFN_definition.getXFNStatus(propnode, "contact");
       }
     },
     "acquaintance" : {
       virtual: true,
       virtualGetter: function(propnode, mfnode, definition) {
-        return ufJSParser.microformats.XFN.getXFNStatus(propnode, "acquaintance");  
+        return XFN_definition.getXFNStatus(propnode, "acquaintance");  
       }
     },
     "friend" : {
       virtual: true,
       virtualGetter: function(propnode, mfnode, definition) {
-        return ufJSParser.microformats.XFN.getXFNStatus(propnode, "friend");  
+        return XFN_definition.getXFNStatus(propnode, "friend");  
       }
     },
     "met" : {
       virtual: true,
       virtualGetter: function(propnode, mfnode, definition) {
-        return ufJSParser.microformats.XFN.getXFNStatus(propnode, "met");  
+        return XFN_definition.getXFNStatus(propnode, "met");  
       }
     },
     "co-worker" : {
       virtual: true,
       virtualGetter: function(propnode, mfnode, definition) {
-        return ufJSParser.microformats.XFN.getXFNStatus(propnode, "co-worker");  
+        return XFN_definition.getXFNStatus(propnode, "co-worker");  
       }
     },
     "colleague" : {
       virtual: true,
       virtualGetter: function(propnode, mfnode, definition) {
-        return ufJSParser.microformats.XFN.getXFNStatus(propnode, "colleague");  
+        return XFN_definition.getXFNStatus(propnode, "colleague");  
       }
     },
     "co-resident" : {
       virtual: true,
       virtualGetter: function(propnode, mfnode, definition) {
-        return ufJSParser.microformats.XFN.getXFNStatus(propnode, "co-resident");  
+        return XFN_definition.getXFNStatus(propnode, "co-resident");  
       }
     },
     "neighbor" : {
       virtual: true,
       virtualGetter: function(propnode, mfnode, definition) {
-        return ufJSParser.microformats.XFN.getXFNStatus(propnode, "neighbor");  
+        return XFN_definition.getXFNStatus(propnode, "neighbor");  
       }
     },
     "child" : {
       virtual: true,
       virtualGetter: function(propnode, mfnode, definition) {
-        return ufJSParser.microformats.XFN.getXFNStatus(propnode, "child");  
+        return XFN_definition.getXFNStatus(propnode, "child");  
       }
     },
     "parent" : {
       virtual: true,
       virtualGetter: function(propnode, mfnode, definition) {
-        return ufJSParser.microformats.XFN.getXFNStatus(propnode, "parent");  
+        return XFN_definition.getXFNStatus(propnode, "parent");  
       }
     },
     "sibling" : {
       virtual: true,
       virtualGetter: function(propnode, mfnode, definition) {
-        return ufJSParser.microformats.XFN.getXFNStatus(propnode, "sibling");  
+        return XFN_definition.getXFNStatus(propnode, "sibling");  
       }
     },
     "spouse" : {
       virtual: true,
       virtualGetter: function(propnode, mfnode, definition) {
-        return ufJSParser.microformats.XFN.getXFNStatus(propnode, "spouse");  
+        return XFN_definition.getXFNStatus(propnode, "spouse");  
       }
     },
     "kin" : {
       virtual: true,
       virtualGetter: function(propnode, mfnode, definition) {
-        return ufJSParser.microformats.XFN.getXFNStatus(propnode, "kin");  
+        return XFN_definition.getXFNStatus(propnode, "kin");  
       }
     },
     "muse" : {
       virtual: true,
       virtualGetter: function(propnode, mfnode, definition) {
-        return ufJSParser.microformats.XFN.getXFNStatus(propnode, "muse");  
+        return XFN_definition.getXFNStatus(propnode, "muse");  
       }
     },
     "crush" : {
       virtual: true,
       virtualGetter: function(propnode, mfnode, definition) {
-        return ufJSParser.microformats.XFN.getXFNStatus(propnode, "crush");  
+        return XFN_definition.getXFNStatus(propnode, "crush");  
       }
     },
     "date" : {
       virtual: true,
       virtualGetter: function(propnode, mfnode, definition) {
-        return ufJSParser.microformats.XFN.getXFNStatus(propnode, "date");  
+        return XFN_definition.getXFNStatus(propnode, "date");  
       }
     },
     "sweetheart" : {
       virtual: true,
       virtualGetter: function(propnode, mfnode, definition) {
-        return ufJSParser.microformats.XFN.getXFNStatus(propnode, "sweetheart");  
+        return XFN_definition.getXFNStatus(propnode, "sweetheart");  
       }
     },
     "me" : {
       virtual: true,
       virtualGetter: function(propnode, mfnode, definition) {
-        return ufJSParser.microformats.XFN.getXFNStatus(propnode, "me");  
+        return XFN_definition.getXFNStatus(propnode, "me");  
       }
     },
     "link" : {
@@ -160,3 +168,5 @@ ufJSParser.microformats.XFN = {
 if (ufJSActions.actions.goto_url) {
   ufJSActions.actions.goto_url.scope.semantic.XFN = "link";
 }
+
+Microformats.add("XFN", XFN_definition);
