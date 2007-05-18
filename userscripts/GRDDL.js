@@ -1,6 +1,13 @@
+if (Components.utils.import) {
+  try {
+    Components.utils.import("rel:Microformats.js");
+    EXPORTED_SYMBOLS = ["GRDDL"];
+  } catch (ex) {}
+}
+
 function GRDDL(node) {
   if (node) {
-    ufJSParser.newMicroformat(this, node, "GRDDL");
+    Microformats.parser.newMicroformat(this, node, "GRDDL");
   }
 }
 GRDDL.prototype.toString = function() {
@@ -11,20 +18,22 @@ GRDDL.prototype.toString = function() {
   }
 }
 
-ufJSParser.microformats.GRDDL = {
+GRDDL_definition = {
   version: "0.7",
   mfObject: GRDDL,
   attributeName: "rel",
-  attributeValues: ["transformation"],
+  attributeValues: "transformation",
   properties: {
     "transformation" : {
       virtual: true,
-      virtualGetter: function(propnode, mfnode, definition) {
+      virtualGetter: function(propnode) {
         return "foo";
       }
     }
   }
 };
+
+Microformats.add("GRDDL", GRDDL_definition);
 
 ufJSActions.actions.extract_rdf = {
   description: "Extract RDF",
