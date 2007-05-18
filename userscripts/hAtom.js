@@ -11,7 +11,7 @@ if (Components.utils.import) {
 
 function hFeed(node) {
   if (node) {
-    Microformats.parser.newMicroformat(this, node, "hFeed");
+    Microformats.parser.newMicroformat(this, node, "hAtom-hFeed");
   }
 }
 hFeed.prototype.toString = function() {
@@ -24,7 +24,7 @@ hFeed.prototype.toString = function() {
 
 function hEntry(node) {
   if (node) {
-    Microformats.parser.newMicroformat(this, node, "hEntry");
+    Microformats.parser.newMicroformat(this, node, "hAtom-hEntry");
   }
 }
 hEntry.prototype.toString = function() {
@@ -86,7 +86,7 @@ var hAtom_hEntry_definition = {
       virtual: true,
       datatype: "dateTime",
       virtualGetter: function(mfnode) {
-        return Microformat.parser.getMicroformatProperty(mfnode, "hEntry", "published");
+        return Microformats.parser.getMicroformatProperty(mfnode, "hAtom-hEntry", "published");
       }
     },
     "tag" : {
@@ -135,5 +135,5 @@ var hAtom_hFeed_definition = {
   }
 };
 
-Microformats.add("hEntry", hAtom_hEntry_definition);
-Microformats.add("hFeed", hAtom_hFeed_definition);
+Microformats.add("hAtom-hEntry", hAtom_hEntry_definition);
+Microformats.add("hAtom-hFeed", hAtom_hFeed_definition);
