@@ -685,7 +685,7 @@ var Operator = {
     }
     var curmenu = 0;
     while (mfNode) {
-      var mfNameString = Microformats.getMicroformatNamesFromNode(mfNode);
+      var mfNameString = Microformats.getNamesFromNode(mfNode);
       var mfNames = mfNameString.split(" ");
       var i;
       var actionmenu;
@@ -836,34 +836,6 @@ var Operator = {
     }
     return true;
   },
-  dumpObject: function(item, indent, recurse)
-  {
-    if (!indent) {
-      indent = "";
-    }
-    var i;
-    var toreturn = "";
-    var testArray = [];
-    
-    for (i in item)
-    {
-      if (testArray[i]) {
-        continue;
-      }
-      if (typeof item[i] == "object") {
-        if ((i != "node") && (i != "resolvedNode") && recurse) {
-          toreturn += indent + "object " + i + " { \n";
-          toreturn += this.dumpObject(item[i], indent + "\t", recurse);
-          toreturn += indent + "}\n";
-        }
-      } else {
-        if (item[i]) {
-          toreturn += indent + i + "=" + item[i] + "\n";
-        }
-      }
-    }
-    return toreturn;
-  },
   debug_alert: function(text)
   {
     if (!Operator.release) {
@@ -920,13 +892,9 @@ var Operator = {
     var error = {};
     /* XXX TODO cross semantic validation */
     var dump;
-    if (Microformats[semanticObjectType]) {
-      Microformats.parser.validate(semanticObject.node, semanticObjectType, error);
-      dump = Operator.dumpObject(semanticObject, '', true);
-    } else {
-      dump = Operator.dumpObject(semanticObject, '', false);
+    if (semanticObject.debug) {
+      dump = semanticObject.debug(semanticObject);
     }
-    
 
     window.openDialog("chrome://operator/content/operator_debug.xul","debug","chrome,centerscreen",
                       semanticObjectType,
