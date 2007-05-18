@@ -46,7 +46,7 @@ var Operator = {
       Microformats.hCard.icon = "chrome://operator/content/hCard.png";
       Microformats.hCalendar.icon = "chrome://operator/content/hCalendar.png";
       Microformats.geo.icon = "chrome://operator/content/geo.png";
-//      Microformats.tag.sort = true;
+      Microformats.tag.sort = true;
   
       objScriptLoader.loadSubScript("chrome://operator/content/operator_toolbar.js");
       objScriptLoader.loadSubScript("chrome://operator/content/operator_statusbar.js");
