@@ -105,8 +105,8 @@ var hCard_definition = {
       /*  Implied "n" Optimization */
       /* http://microformats.org/wiki/hcard#Implied_.22n.22_Optimization */
       virtualGetter: function(mfnode) {
-        var fn = ufJSParser.getMicroformatProperty(mfnode, "hCard", "fn");
-        var orgs = ufJSParser.getMicroformatProperty(mfnode, "hCard", "org");
+        var fn = Microformats.parser.getMicroformatProperty(mfnode, "hCard", "fn");
+        var orgs = Microformats.parser.getMicroformatProperty(mfnode, "hCard", "org");
         var given_name;
         var family_name;
         if (fn && (!orgs || (orgs.length > 1) || (fn != orgs[0]["organization-name"]))) {
