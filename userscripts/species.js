@@ -1,3 +1,10 @@
+if (Components.utils.import) {
+  try {
+    Components.utils.import("rel:Microformats.js");
+    EXPORTED_SYMBOLS = ["species"];
+  } catch (ex) {}
+}
+
 function species(node) {
   if (node) {
     ufJSParser.newMicroformat(this, node, "species");
@@ -7,7 +14,7 @@ species.prototype.toString = function() {
   return this.vernacular;
 }
 
-ufJSParser.microformats.species = {
+var species_definition = {
   version: "0.7",
   description: "Species",
   mfObject: species,
@@ -27,6 +34,8 @@ ufJSParser.microformats.species = {
     }
   }
 };
+
+Microformats.add("species", species_definition);
 
 ufJSActions.actions.wikispecies_search = {
   description: "Wikispecies",
