@@ -1,6 +1,14 @@
+if (Components.utils.import) {
+  try {
+    Components.utils.import("rel:Microformats.js");
+    Components.utils.import("rel:hCard.js");
+    EXPORTED_SYMBOLS = ["hResume"];
+  } catch (ex) {}
+}
+
 function hResume(node) {
   if (node) {
-    ufJSParser.newMicroformat(this, node, "hResume");
+    Microformats.parser.newMicroformat(this, node, "hResume");
   }
 }
 hResume.prototype.toString = function() {
@@ -9,7 +17,7 @@ hResume.prototype.toString = function() {
   }
 }
 
-ufJSParser.microformats.hResume = {
+hResume_definition = {
   version: "0.7.2",
   description: "Resume(s)",
   mfObject: hResume,
@@ -40,18 +48,18 @@ ufJSParser.microformats.hResume = {
 */
       datatype: "custom",
       customGetter: function(propnode) {
-        var experience = ufJSParser.createMicroformat(propnode, "hCalendar");
+        var experience = new hCard(propnode);
         var vcardnode;
         if (propnode.className.match("(^|\\s)" + "vcard" + "(\\s|$)")) {
           vcardnode = propnode;
         } else {
-          var vcards = ufJSParser.getElementsByClassName(propnode, "vcard");
+          var vcards = Microformats.getElementsByClassName(propnode, "vcard");
           if (vcards.length > 0) {
             vcardnode = vcards[0];
           }
         }
         if (vcardnode && experience) {
-          experience.vcard = ufJSParser.createMicroformat(vcardnode, "hCard");
+          experience.vcard = new hCard(vcardnode);
         }
         return experience;
       },
@@ -66,13 +74,13 @@ ufJSParser.microformats.hResume = {
       microformat: "hCard",
       virtualGetter: function(mfnode) {
         /* We didn't find a contact, so use the first vcard */
-        var vcards = ufJSParser.getElementsByClassName(mfnode, "vcard");
+        var vcards = Microformats.getElementsByClassName(mfnode, "vcard");
         if (vcards.length > 0) {
           var i;
           var noAffiliation = -1;
           for (var i =0; i < vcards.length; i++) {
             if (vcards[i].nodeName.toLowerCase() == "address") {
-              return ufJSParser.createMicroformat(vcards[i], "hCard");
+              return new hCard(vcards[i]);
             } else {
               if (noAffiliation < 0) {
                 if (!vcards[i].className.match("(^|\\s)" + "affiliation" + "(\\s|$)")) {
@@ -82,7 +90,7 @@ ufJSParser.microformats.hResume = {
             }
           }
           if (noAffiliation >= 0) {
-            return ufJSParser.createMicroformat(vcards[noAffiliation], "hCard");
+            return new hCard(vcards[noAffiliation]);
           }
         }
       }
@@ -90,3 +98,4 @@ ufJSParser.microformats.hResume = {
   }
 };
 
+Microformats.add("hResume", hResume_definition);
