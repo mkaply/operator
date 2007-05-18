@@ -1,8 +1,17 @@
 /* hAtom is kind of strange. I decided to separate it in to hFeed and hEntry */
 
+if (Components.utils.import) {
+  try {
+    Components.utils.import("rel:Microformats.js");
+    Components.utils.import("rel:hCard.js");
+    EXPORTED_SYMBOLS = ["hFeed"];
+    EXPORTED_SYMBOLS = ["hEntry"];
+  } catch (ex) {}
+}
+
 function hFeed(node) {
   if (node) {
-    ufJSParser.newMicroformat(this, node, "hFeed");
+    Microformats.parser.newMicroformat(this, node, "hFeed");
   }
 }
 hFeed.prototype.toString = function() {
@@ -15,14 +24,14 @@ hFeed.prototype.toString = function() {
 
 function hEntry(node) {
   if (node) {
-    ufJSParser.newMicroformat(this, node, "hEntry");
+    Microformats.parser.newMicroformat(this, node, "hEntry");
   }
 }
 hEntry.prototype.toString = function() {
   return this["entry-title"];
 }
 
-ufJSParser.microformats["hAtom-hEntry"] = {
+var hAtom_hEntry_definition = {
   version: "0.7",
   description: "Atom Entry(s)",
   mfObject: hEntry,
@@ -31,19 +40,14 @@ ufJSParser.microformats["hAtom-hEntry"] = {
     "author" : {
       plural: true,
       virtual: true,
-      virtualGetter: function(propnode, mfnode, definition) {
-        if (propnode == mfnode) {
-          /* Virtual case */
-          /* FIXME - THIS IS FIREFOX SPECIFIC */
-          /* check if ancestor is an address with author  */
+      virtualGetter: function(mfnode) {
+        /* FIXME - THIS IS FIREFOX SPECIFIC */
+        /* check if ancestor is an address with author  */
 //            var xpathExpression = "ancestor::*//address[contains(concat(' ', @class, ' '), ' author ') and contains(concat(' ', @class, ' '), ' vcard ')]";
-            var xpathExpression = "ancestor::*[.//address[contains(concat(' ', @class, ' '), ' author ') and contains(concat(' ', @class, ' '), ' vcard ')]][1]//address[contains(concat(' ', @class, ' '), ' author ') and contains(concat(' ', @class, ' '), ' vcard ')]";
-          var xpathResult = mfnode.ownerDocument.evaluate(xpathExpression, mfnode, null,  XPathResult.FIRST_ORDERED_NODE_TYPE, null);
-          if (xpathResult.singleNodeValue) {
-            return ufJSParser.createMicroformat(xpathResult.singleNodeValue, "hCard");
-          }
-        } else {
-          return ufJSParser.createMicroformat(propnode, "hCard");
+          var xpathExpression = "ancestor::*[.//address[contains(concat(' ', @class, ' '), ' author ') and contains(concat(' ', @class, ' '), ' vcard ')]][1]//address[contains(concat(' ', @class, ' '), ' author ') and contains(concat(' ', @class, ' '), ' vcard ')]";
+        var xpathResult = mfnode.ownerDocument.evaluate(xpathExpression, mfnode, null,  XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+        if (xpathResult.singleNodeValue) {
+          return new hCard(xpathResult.singleNodeValue);
         }
       }
     },
@@ -61,7 +65,7 @@ ufJSParser.microformats["hAtom-hEntry"] = {
     },
     "entry-title" : {
       virtual: true,
-      virtualGetter: function(propnode, mfnode, definition) {
+      virtualGetter: function(mfnode) {
           /*
   *  the first <h#> element in the Entry, or
   * the <title> of the page, if there is no enclosing Feed element, or
@@ -81,8 +85,8 @@ ufJSParser.microformats["hAtom-hEntry"] = {
     "updated" : {
       virtual: true,
       datatype: "dateTime",
-      virtualGetter: function(propnode, mfnode, definition) {
-        return ufJSParser.getMicroformatProperty(mfnode, "hAtom-hEntry", "published");
+      virtualGetter: function(mfnode) {
+        return Microformat.parser.getMicroformatProperty(mfnode, "hEntry", "published");
       }
     },
     "tag" : {
@@ -93,7 +97,7 @@ ufJSParser.microformats["hAtom-hEntry"] = {
   }
 };
 
-ufJSParser.microformats["hAtom-hFeed"] = {
+var hAtom_hFeed_definition = {
   version: "0.2",
   description: "Atom Feed(s)",
   mfObject: hFeed,
@@ -110,13 +114,13 @@ ufJSParser.microformats["hAtom-hFeed"] = {
       plural: true,
       rel: true,
       datatype: "custom",
-      customGetter: function(propnode, mfnode, definition) {
-        var tags = ufJSParser.getElementsByAttribute(mfnode, "rel", "tag");
+      customGetter: function(propnode) {
+        var tags = Microformats.getElementsByAttribute(mfnode, "rel", "tag");
         var tagArray = [];
         var i;
         var xpathExpression = "ancestor::*[contains(concat(' ', @class, ' '), ' hentry ')]";
         for (i = 0; i < tags.length; i++) {
-          var xpathResult = (mfnode.ownerDocument || mfnode).evaluate(xpathExpression, tags[i], null,  XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+          var xpathResult = (propnode.ownerDocument || propnode).evaluate(xpathExpression, tags[i], null,  XPathResult.FIRST_ORDERED_NODE_TYPE, null);
           if (xpathResult.singleNodeValue) {
             continue;
           } else {
@@ -131,3 +135,5 @@ ufJSParser.microformats["hAtom-hFeed"] = {
   }
 };
 
+Microformats.add("hEntry", hAtom_hEntry_definition);
+Microformats.add("hFeed", hAtom_hFeed_definition);

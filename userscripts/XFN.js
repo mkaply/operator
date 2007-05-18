@@ -30,7 +30,7 @@ XFN.prototype.toString = function() {
   return displayName;
 }
 
-XFN_definition = {
+var XFN_definition = {
   version: "0.7",
   description: "XFN Relationship(s)",
   mfObject: XFN,

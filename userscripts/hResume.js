@@ -17,7 +17,7 @@ hResume.prototype.toString = function() {
   }
 }
 
-hResume_definition = {
+var hResume_definition = {
   version: "0.7.2",
   description: "Resume(s)",
   mfObject: hResume,
