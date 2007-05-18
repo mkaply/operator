@@ -1,5 +1,3 @@
-/*extern ufJSParser, Components, XPathResult, ufJSActions, content */
-
 EXPORTED_SYMBOLS = ["Microformats"];
 
 var Microformats = {
@@ -14,6 +12,12 @@ var Microformats = {
       yield this.list[i];
     }
   },
+  /**
+   * Internal function to initialize microformats. First it tries to use the
+   * Component.utils.import method that will be in Firefox 3. If that fails,
+   * it looks for certain microformat definition files in the same directory
+   * as this JS file.
+   */
   init: function() {
     if (!Microformats.inited) {
       Microformats.inited = true
@@ -21,14 +25,25 @@ var Microformats = {
       if (Components.utils.import) {
         try {
           Components.utils.import("rel:adr.js");
+        } catch (ex) {}
+        try {
           Components.utils.import("rel:geo.js");
+        } catch (ex) {}
+        try {
           Components.utils.import("rel:hCard.js");
+        } catch (ex) {}
+        try {
           Components.utils.import("rel:hCalendar.js");
+        } catch (ex) {}
+        try {
           Components.utils.import("rel:tag.js");
+        } catch (ex) {}
+        try {
           Components.utils.import("rel:xFolk.js");
         } catch (ex) {}
       }
       /* If the import failed or we didn't import at all, load */
+      /* We'll use hCard as the touchstone */
       if (typeof(hCard) == "undefined") {
         var ojl = Components.classes["@mozilla.org/moz/jssubscript-loader;1"].
                              getService(Components.interfaces.mozIJSSubScriptLoader);
@@ -38,12 +53,24 @@ var Microformats = {
         var begin = stack[1].lastIndexOf("@", end)+1;
         var baseurl = stack[1].substring(begin, end);
 
-        ojl.loadSubScript(baseurl + "adr.js");
-        ojl.loadSubScript(baseurl + "hCard.js");
-        ojl.loadSubScript(baseurl + "hCalendar.js");
-        ojl.loadSubScript(baseurl + "tag.js");
-        ojl.loadSubScript(baseurl + "geo.js");
-        ojl.loadSubScript(baseurl + "xFolk.js");
+        try {
+          ojl.loadSubScript(baseurl + "adr.js");
+        } catch (ex) {}
+        try {
+          ojl.loadSubScript(baseurl + "hCard.js");
+        } catch (ex) {}
+        try {
+          ojl.loadSubScript(baseurl + "hCalendar.js");
+        } catch (ex) {}
+        try {
+          ojl.loadSubScript(baseurl + "tag.js");
+        } catch (ex) {}
+        try {
+          ojl.loadSubScript(baseurl + "geo.js");
+        } catch (ex) {}
+        try {
+          ojl.loadSubScript(baseurl + "xFolk.js");
+        } catch (ex) {}
       }
     }
   },
@@ -108,7 +135,7 @@ var Microformats = {
    * Counts microformats objects of the given type from a document
    * 
    * @param  name          The name of the microformat (required)
-   * @param  rootElement   The DOM element at which to start searching (optional - defaults to content.document)
+   * @param  rootElement   The DOM element at which to start searching (required)
    * @param  recurseFrames Whether or not to search child frames for microformats (optional - defaults to true)
    * @param  count         The current count
    * @return The new count
@@ -237,7 +264,7 @@ var Microformats = {
    * @return If the node is a microformat, a space separated list of microformat
    *         names, otherwise returns nothing
    */
-  getMicroformatNamesFromNode: function(node) {
+  getNamesFromNode: function(node) {
     var i;
     var microformatNames = [];
     var xpathExpression;
@@ -271,9 +298,47 @@ var Microformats = {
     }
     return microformatNames.join(" ");
   },
-  add: function add(microformat, microformatObject) {
-    Microformats[microformat] = microformatObject;
+  /**
+   * Outputs the contents of a microformat object for debug purposes.
+   *
+   * @param  microformatObject JavaScript object that represents a microformat
+   * @return string containing a visual representation of the contents of the microformat
+   */
+  debug: function debug(microformatObject) {
+    function dumpObject(item, indent)
+    {
+      if (!indent) {
+        indent = "";
+      }
+      var i;
+      var toreturn = "";
+      var testArray = [];
+      
+      for (i in item)
+      {
+        if (testArray[i]) {
+          continue;
+        }
+        if (typeof item[i] == "object") {
+          if ((i != "node") && (i != "resolvedNode")) {
+            toreturn += indent + "object " + i + " { \n";
+            toreturn += dumpObject(item[i], indent + "\t");
+            toreturn += indent + "}\n";
+          }
+        } else if (typeof item[i] != "function"){
+          if (item[i]) {
+            toreturn += indent + i + "=" + item[i] + "\n";
+          }
+        }
+      }
+      return toreturn;
+    }
+    return dumpObject(microformatObject);
+  },
+  add: function add(microformat, microformatDefinition) {
+    Microformats[microformat] = microformatDefinition;
     Microformats.list.push(microformat); 
+    microformatDefinition.mfObject.prototype.debug = function(microformatObject) {return Microformats.debug(microformatObject)};
   },
   /* All parser specific function are contained in this object */
   parser: {
@@ -452,7 +517,7 @@ var Microformats = {
           break;
         case "microformat":
           try {
-            result = new Microformats[prop.microformats].mfObject(node);
+            result = new Microformats[prop.microformat].mfObject(node);
           } catch (ex) {}
           if (result) {
             if (prop.microformat_property) {
