@@ -321,11 +321,15 @@ var Microformats = {
         }
         if (typeof item[i] == "object") {
           if ((i != "node") && (i != "resolvedNode")) {
-            toreturn += indent + "object " + i + " { \n";
+            if (item[i].semanticType) {
+              toreturn += indent + item[i].semanticType + " [" + i + "] { \n";
+            } else {
+              toreturn += indent + "object " + i + " { \n";
+            }
             toreturn += dumpObject(item[i], indent + "\t");
             toreturn += indent + "}\n";
           }
-        } else if (typeof item[i] != "function"){
+        } else if ((typeof item[i] != "function") && (i != "semanticType")) {
           if (item[i]) {
             toreturn += indent + i + "=" + item[i] + "\n";
           }
@@ -838,7 +842,17 @@ var Microformats = {
       }
       return property;
     },
-    /* This function takes care of includes and headers */
+    /**
+     * Internal parser API used to resolve includes and headers. Includes are
+     * resolved by simply cloning the node and replacing it in a clone of the
+     * original DOM node. Headers are resolved by creating a span and then copying
+     * the innerHTML and the class name.
+     *
+     * @param  in_mfnode The node to preProcess.
+     * @return If the node had includes or headers, a cloned node otherwise
+     *         the original node. You can check to see if the node was cloned
+     *         by looking for .origNode in the new node.
+     */
     preProcessMicroformat: function(in_mfnode) {
       var mfnode;
       var i;
