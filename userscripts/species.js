@@ -7,7 +7,7 @@ if (Components.utils.import) {
 
 function species(node) {
   if (node) {
-    ufJSParser.newMicroformat(this, node, "species");
+    Microformats.parser.newMicroformat(this, node, "species");
   }
 }
 species.prototype.toString = function() {
@@ -31,6 +31,11 @@ var species_definition = {
     "vernacular" : {
     },
     "binomial" : {
+    },
+    "genus" : {
+    },
+    "specific" : {
+       plural: true
     }
   }
 };
