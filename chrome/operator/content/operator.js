@@ -535,6 +535,7 @@ var Operator = {
           itemsadded++;
         } else {
           var error = {};
+          
           /* XXX TODO Validate needs to be more generic? Or do we only call it in the microformat case? */
           Microformats.parser.validate(items[j].node, semanticObjectType, error);
 
@@ -890,6 +891,9 @@ var Operator = {
     }
     
     var error = {};
+    /* XXX TODO Validate needs to be more generic? Or do we only call it in the microformat case? */
+    Microformats.parser.validate(semanticObject.node, semanticObjectType, error);
+
     /* XXX TODO cross semantic validation */
     var dump;
     if (semanticObject.debug) {
