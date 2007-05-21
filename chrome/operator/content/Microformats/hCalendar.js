@@ -11,7 +11,7 @@ function hCalendar(node) {
   }
 }
 hCalendar.prototype.toString = function() {
-  if (this.node.origNode) {
+  if (this.resolvedNode) {
     /* If this microformat has an include pattern, put the */
     /* dtstart in parenthesis after the summary to differentiate */
     /* them. */

@@ -11,7 +11,7 @@ function hCard(node) {
   }
 }
 hCard.prototype.toString = function() {
-  if (this.node.origNode) {
+  if (this.resolvedNode) {
     /* If this microformat has an include pattern, put the */
     /* organization-name in parenthesis after the fn to differentiate */
     /* them. */
