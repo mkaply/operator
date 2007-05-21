@@ -201,19 +201,19 @@ var Operator_Toolbar = {
       }
       if (menuitems[i].store_onDOMMenuItemActive) {
         newmenuitems[i].addEventListener("DOMMenuItemActive", menuitems[i].store_onDOMMenuItemActive, true);
+        numitems++;
       }
-      numitems++;
     }
     var menus = menu.getElementsByTagName("menu");
     var newmenus = newmenu.getElementsByTagName("menu");
     for(var i=0; i < menus.length; i++) {
       if (menus[i].store_onDOMMenuItemActive) {
         newmenus[i].addEventListener("DOMMenuItemActive", menus[i].store_onDOMMenuItemActive, true);
+        numitems++;
       }
       if (menus[i].store_onpopupshowing) {
         newmenus[i].addEventListener("popupshowing", menus[i].store_onpopupshowing, true);
       }
-      numitems++;
     }
 
     if (semanticAction) {
