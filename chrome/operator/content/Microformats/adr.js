@@ -13,21 +13,41 @@ function Address(node) {
 
 Address.prototype.toString = function() {
   var address_text = "";
-  if (this["post-office-box"]) {
-    address_text += this["post-office-box"];
-    address_text += " ";
-  }
+  var start_parens = false;
   if (this["street-address"]) {
     address_text += this["street-address"][0];
     address_text += " ";
   }
   if (this["locality"]) {
+    if (this["street-address"]) {
+      address_text += "(";
+      start_parens = true;
+    }
     address_text += this["locality"];
-    address_text += " ";
   }
   if (this["region"]) {
+    if ((this["street-address"]) && (!start_parens)) {
+      address_text += "(";
+      start_parens = true;
+    } else if (this["locality"]) {
+      address_text += ", ";
+    }
     address_text += this["region"];
-    address_text += " ";
+  }
+  if (this["country-name"]) {
+    if ((this["street-address"]) && (!start_parens)) {
+      address_text += "(";
+      start_parens = true;
+      address_text += this["country-name"];
+    } else if ((!this["locality"]) && (!this["region"])) {
+      address_text += this["country-name"];
+    } else if (((!this["locality"]) && (this["region"])) || ((this["locality"]) && (!this["region"]))) {
+      address_text += ", ";
+      address_text += this["country-name"];
+    }
+  }
+  if (start_parens) {
+    address_text += ")";
   }
   return address_text;
 }
