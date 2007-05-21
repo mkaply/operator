@@ -17,7 +17,7 @@ var Operator = {
   highlightedElement: null,
   highlightedElementOutlineStyle: null,
   timerID: null,
-  init: function()
+  init: function init()
   {
     var options = false;
     if (window.location.href.match("operator_options")) {
@@ -109,7 +109,7 @@ var Operator = {
     window.addEventListener("operator-sidebar-load", Operator_Sidebar.processSemanticData, false, true);
     
   },
-  startup: function()
+  startup: function startup()
   {
     
     var i,j;
@@ -298,7 +298,7 @@ var Operator = {
     var menu = document.getElementById("contentAreaContextMenu");
     menu.addEventListener("popupshowing", Operator.contextPopupShowing, false);
   },
-  shutdown: function()
+  shutdown: function shutdown()
   {
     this.prefBranch.removeObserver("", this);
     getBrowser().removeEventListener("pageshow", function(e) { Operator.onPageShow(e); }, true);
@@ -307,7 +307,7 @@ var Operator = {
     var menu = document.getElementById("contentAreaContextMenu");
     menu.removeEventListener("popupshowing", Operator.contextPopupShowing, false);
   },
-  observe: function(subject, topic, data)
+  observe: function observe(subject, topic, data)
   {
     if (topic != "nsPref:changed")
     {
@@ -363,7 +363,7 @@ var Operator = {
     }
   },
 
-  highlightCallbackGenerator: function(item)
+  highlightCallbackGenerator: function highlightCallbackGenerator(item)
   {
     return function(event) {
       if (Operator.highlightDOMNode(item)) {
@@ -373,7 +373,7 @@ var Operator = {
   },
 
   
-  actionCallbackGenerator: function(semanticObject, semanticObjectType, semanticAction)
+  actionCallbackGenerator: function actionCallbackGenerator(semanticObject, semanticObjectType, semanticAction)
   {
     return function(event) {
       var url;
@@ -382,7 +382,7 @@ var Operator = {
       }
     };
   },
-  actionAllCallbackGenerator: function(semanticArrays, semanticAction)
+  actionAllCallbackGenerator: function actionAllCallbackGenerator(semanticArrays, semanticAction)
   {
     return function(event) {
       var url;
@@ -392,7 +392,7 @@ var Operator = {
 
     };
   },
-  clickCallbackGenerator: function(semanticObject, semanticObjectType, semanticAction)
+  clickCallbackGenerator: function clickCallbackGenerator(semanticObject, semanticObjectType, semanticAction)
   {
     return function(event) {
       /* This is for middle click only */
@@ -407,7 +407,7 @@ var Operator = {
       }
     };
   },
-  clickAllCallbackGenerator: function(semanticArrays, semanticAction)
+  clickAllCallbackGenerator: function clickAllCallbackGenerator(semanticArrays, semanticAction)
   {
     return function(event) {
       /* This is for middle click only */
@@ -423,20 +423,20 @@ var Operator = {
     };
   },
 
-  sourceCallbackGenerator: function(formatname, item)
+  sourceCallbackGenerator: function sourceCallbackGenerator(formatname, item)
   {
     return function(event) {
       Operator.source(item, formatname);
     };
   },
 
-  errorCallbackGenerator: function(semanticObject, semanticObjectType)
+  errorCallbackGenerator: function errorCallbackGenerator(semanticObject, semanticObjectType)
   {
     return function(event) {
       Operator.error(semanticObject, semanticObjectType);
     };
   },
-  buildMenu: function(semanticObjects, semanticObjectType, semanticAction)
+  buildMenu: function buildMenu(semanticObjects, semanticObjectType, semanticAction)
   {
     var menu = null;
     var items;
@@ -566,7 +566,7 @@ var Operator = {
     }
     return menu;
   },
-  popupShowing: function(semanticObject, semanticObjectType, semanticAction)
+  popupShowing: function popupShowing(semanticObject, semanticObjectType, semanticAction)
   {
     return function(event) {
       if (event.target.childNodes.length == 0) {
@@ -574,7 +574,7 @@ var Operator = {
       }
     };
   },
-  attachActions: function(parentmenu, semanticObject, semanticObjectType, semanticAction)
+  attachActions: function attachActions(parentmenu, semanticObject, semanticObjectType, semanticAction)
   {
     var required;
     var menuitem;
@@ -627,7 +627,7 @@ var Operator = {
       parentmenu.addEventListener("click", parentmenu.store_onclick, true);
     }
   },
-  buildPopupMenu: function(semanticObject, semanticObjectType)
+  buildPopupMenu: function buildPopupMenu(semanticObject, semanticObjectType)
   {
     var menu = document.createElement("menupopup");
     var menuitem;
@@ -669,7 +669,7 @@ var Operator = {
     return menu;
   },
 
-  contextPopupShowing: function(event) {
+  contextPopupShowing: function contextPopupShowing(event) {
     gContextMenu.showItem("operator-menu-0", false);
     gContextMenu.showItem("operator-menu-1", false);
     gContextMenu.showItem("operator-menu-2", false);
@@ -714,7 +714,7 @@ var Operator = {
       mfNode = Microformats.getParent(mfNode);
     }
   },
-  highlightDOMNode: function(node)
+  highlightDOMNode: function highlightDOMNode(node)
   {
     if (Operator.highlightMicroformats) {
       if (node) {
@@ -737,19 +737,19 @@ var Operator = {
       return false;
     }
   },
-  mouseOver: function(event) {
+  mouseOver: function mouseOver(event) {
     var element = (event.target) ? event.target : event.srcElement;
     var mfNode = Microformats.isMicroformat(element);
     Operator.highlightDOMNode(mfNode);
   },
-  processSemanticDataDelayed: function(event)
+  processSemanticDataDelayed: function processSemanticDataDelayed(event)
   {
     if (Operator.timerID) {
       window.clearTimeout(Operator.timerID);
     }
     Operator.timerID = window.setTimeout(Operator.processSemanticData, 250);
   },
-  recursiveAddListeners: function(window)
+  recursiveAddListeners: function recursiveAddListeners(window)
   {
     if (window && window.frames.length > 0) {
       for (var i=0; i < window.frames.length; i++) {
@@ -763,7 +763,7 @@ var Operator = {
       window.document.addEventListener("DOMAttrModified", Operator.processSemanticDataDelayed, false);
     }
   },
-  recursiveRemoveListeners: function(window)
+  recursiveRemoveListeners: function recursiveRemoveListeners(window)
   {
     if (window && window.frames.length > 0) {
       for (var i=0; i < window.frames.length; i++) {
@@ -777,7 +777,7 @@ var Operator = {
       window.document.removeEventListener("DOMAttrModified", Operator.processSemanticDataDelayed, false);
     }
   },
-  onPageShow: function(event) 
+  onPageShow: function onPageShow(event) 
   {
     {
       /* This is required so that things work properly when pages are opened */
@@ -789,7 +789,7 @@ var Operator = {
     }
   },
   
-  onPageHide: function(event) 
+  onPageHide: function onPageHide(event) 
   {
     {
       /* This is required so that things work properly when pages are opened */
@@ -807,7 +807,7 @@ var Operator = {
   },
 
 
-  onTabChanged: function(event) 
+  onTabChanged: function onTabChanged(event) 
   {
     Operator.processSemanticDataDelayed();
   },
@@ -1062,6 +1062,27 @@ var Operator = {
         if (semanticType && semanticArrays[semanticType] && semanticArrays[semanticType].length > 0) {
           menu = Operator.buildMenu(semanticArrays[semanticType], semanticType);
           if (menu) {
+            var sep = false;
+            for (k in ufJSActions.actions) {
+              if (ufJSActions.actions[k].scope.semantic[semanticType]) {
+                if (ufJSActions.actions[k].doActionAll) {
+                  if (!sep) {
+                    var sep = document.createElement("menuseparator");
+                    menu.appendChild(sep);
+                    sep = true;
+                  }
+                  tempMenu = document.createElement("menuitem");
+                  tempMenu.label = ufJSActions.actions[k].descriptionAll;
+                  tempMenu.setAttribute("label", tempMenu.label);
+                  tempMenu.store_oncommand = Operator.actionAllCallbackGenerator(semanticArrays, k);
+                  tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
+                  tempMenu.store_onclick = Operator.clickAllCallbackGenerator(semanticArrays, k);
+                  tempMenu.addEventListener("click", tempMenu.store_onclick, true);
+                  menu.appendChild(tempMenu);
+                }
+              }
+            }
+
             if (!popup) {
              popup = document.createElement("menupopup");
             }
