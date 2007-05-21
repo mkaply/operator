@@ -11,33 +11,33 @@ ufJSActions.actions.google_maps = {
   },
   doAction: function(semanticObject, semanticObjectType) {
     var url;
-    if ((semanticObjectType == "hCard") || (semanticObjectType == "adr")) {
+    if ((semanticObjectType == "hCard") || (semanticObjectType == "Address")) {
       var adr;
       if (semanticObjectType == "hCard") {
-        adr = semanticObject.adr;
+        adr = semanticObject.adr[0];
       } else {
         adr = semanticObject;
       }
       if (adr) {
         url = "http://maps.google.com/maps?q=";
-        if (adr[0]["street-address"]) {
-          url += adr[0]["street-address"].join(", ");
+        if (adr["street-address"]) {
+          url += adr["street-address"].join(", ");
           url += ", ";
         }
-        if (adr[0].region) {
-          url += adr[0].region;
+        if (adr.region) {
+          url += adr.region;
           url += ", ";
         }
-        if (adr[0].locality) {
-          url += adr[0].locality;
+        if (adr.locality) {
+          url += adr.locality;
           url += ", ";
         }
-        if (adr[0]["postal-code"]) {
-          url += adr[0]["postal-code"];
+        if (adr["postal-code"]) {
+          url += adr["postal-code"];
           url += ", ";
         }
-        if (adr[0]["country-name"]) {
-          url += adr[0]["country-name"];
+        if (adr["country-name"]) {
+          url += adr["country-name"];
         }
         if (url.lastIndexOf(", ") == (url.length - ", ".length)) {
           url = url.substring(0, url.lastIndexOf(", "));

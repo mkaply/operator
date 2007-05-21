@@ -15,31 +15,31 @@ ufJSActions.actions.yahoo_maps = {
       var adr = semanticObject;
       if (adr) {
         url = "http://maps.yahoo.com/maps_result?";
-        if (adr[0]["street-address"]) {
-          url += "&addr=" + encodeURIComponent(adr[0]["street-address"]);
+        if (adr["street-address"]) {
+          url += "&addr=" + encodeURIComponent(adr["street-address"]);
         }
-        if ((adr[0].locality) || (adr[0].region) || (adr[0]["postal-code"])) {
+        if ((adr.locality) || (adr.region) || (adr["postal-code"])) {
           url += "&csz=";
-          if (adr[0].locality) {
-            url += encodeURIComponent(adr[0].locality);
-            if (adr[0].region) {
+          if (adr.locality) {
+            url += encodeURIComponent(adr.locality);
+            if (adr.region) {
               url += ", ";
-            } else if (adr[0]["postal-code"]) {
+            } else if (adr["postal-code"]) {
               url += " ";
             }
           }
-          if (adr[0].region) {
-            url += encodeURIComponent(adr[0].region);
-            if (adr[0]["postal-code"]) {
+          if (adr.region) {
+            url += encodeURIComponent(adr.region);
+            if (adr["postal-code"]) {
               url += " ";
             }
           }
-          if (adr[0]["postal-code"]) {
-            url += encodeURIComponent(adr[0]["postal-code"]);
+          if (adr["postal-code"]) {
+            url += encodeURIComponent(adr["postal-code"]);
           }
         }
-        if (adr[0]["country-name"]) {
-          url += "&country=" + encodeURIComponent(adr[0]["country-name"]);
+        if (adr["country-name"]) {
+          url += "&country=" + encodeURIComponent(adr["country-name"]);
         }
       }
     } else if (semanticObjectType == "geo") {
