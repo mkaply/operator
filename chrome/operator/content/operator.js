@@ -493,8 +493,10 @@ var Operator = {
       }
     }
     /* XXX TODO Need a better way to figure out sorting! */
-    if ((items.length > 1) && Microformats[semanticObjectType].sort) {
-      items = sorted_items;
+    if (Microformats[semanticObjectType]) {
+      if ((items.length > 1) && Microformats[semanticObjectType].sort) {
+        items = sorted_items;
+      }
     }
 
     var itemsadded = 0;
@@ -892,7 +894,9 @@ var Operator = {
     
     var error = {};
     /* XXX TODO Validate needs to be more generic? Or do we only call it in the microformat case? */
-    Microformats.parser.validate(semanticObject.node, semanticObjectType, error);
+    if (semanticObjectType != "RDFa") {
+      Microformats.parser.validate(semanticObject.node, semanticObjectType, error);
+    }
 
     /* XXX TODO cross semantic validation */
     var dump;
@@ -1064,8 +1068,24 @@ var Operator = {
         /* If the semantic item is in our array and has items in this documents,
            process it */
         if (semanticType && semanticArrays[semanticType] && semanticArrays[semanticType].length > 0) {
-          menu = Operator.buildMenu(semanticArrays[semanticType], semanticType);
+          var objectArray;
+          if (semanticType == "RDFa") {
+            objectArray = semanticArrays[semanticType][0].getObjects();
+          } else {
+            objectArray = semanticArrays[semanticType];
+          }
+          menu = Operator.buildMenu(objectArray, semanticType);
           if (menu) {
+            if ((Operator.debug) && (semanticType == "RDFa")) {
+              var sep = document.createElement("menuseparator");
+              menu.insertBefore(sep, menu.firstChild);
+              tempMenu = document.createElement("menuitem");
+              tempMenu.label = "View Model";
+              tempMenu.setAttribute("label", tempMenu.label);
+              tempMenu.store_oncommand = Operator.errorCallbackGenerator(semanticArrays[semanticType][0], semanticType);
+              tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
+              menu.insertBefore(tempMenu, menu.firstChild);
+            }
             var sep = false;
             for (k in ufJSActions.actions) {
               if (ufJSActions.actions[k].scope.semantic[semanticType]) {
@@ -1121,7 +1141,7 @@ var Operator = {
       tempMenu = document.createElement("menuitem");
       var optionsLabel = "Options";
       try {
-        optionsLabel = this.languageBundle.GetStringFromName("operatorOptions.label");
+        optionsLabel = Operator.languageBundle.GetStringFromName("operatorOptions.label");
       } catch (ex) {
         optionsLabel = "Options";
       }
