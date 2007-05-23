@@ -344,6 +344,16 @@ var Microformats = {
     Microformats.list.push(microformat); 
     microformatDefinition.mfObject.prototype.debug = function(microformatObject) {return Microformats.debug(microformatObject)};
   },
+  /* All action specific function are contained in this object */
+  actions: {
+    /* When an action is added, the name is placed in this list */
+    list: [],
+    add: function add(action, actionDefinition) {
+      Microformats.actions[action] = actionDefinition;
+      Microformats.actions.list.push(action); 
+    },
+  },
+
   /* All parser specific function are contained in this object */
   parser: {
     /**
@@ -358,7 +368,8 @@ var Microformats = {
      * @return A string with the value of the property
      */
     defaultGetter: function(propnode, parentnode) {
-      if (((propnode.nodeName.toLowerCase() == "abbr") || (propnode.nodeName.toLowerCase() == "html:abbr")) && (propnode.getAttribute("title"))) {
+      if (((((propnode.localName.toLowerCase() == "abbr") || (propnode.localName.toLowerCase() == "html:abbr")) && !propnode.namespaceURI) || 
+         ((propnode.localName.toLowerCase() == "abbr") && (propnode.namespaceURI == "http://www.w3.org/1999/xhtml"))) && (propnode.getAttribute("title"))) {
         return propnode.getAttribute("title");
       } else if ((propnode.nodeName.toLowerCase() == "img") && (propnode.getAttribute("alt"))) {
         return propnode.getAttribute("alt");
