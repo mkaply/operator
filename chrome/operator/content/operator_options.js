@@ -193,7 +193,7 @@ var Operator_Options = {
       } catch (ex) {
         break;
       }
-      listitem = actions.appendItem(ufJSActions.actions[action].description, action);
+      listitem = actions.appendItem(Operator.actions[action].description, action);
       i++;
     } while (1);
 
@@ -266,7 +266,7 @@ var Operator_Options = {
   {
     var numActions = 0;
     var i;
-    for (i in ufJSActions.actions) {
+    for (i in Operator.actions) {
       numActions++;
     }
 
@@ -352,7 +352,7 @@ var Operator_Options = {
     var actionmenu = document.getElementById("actions");
     var i, j;
     var add;
-    for (i in ufJSActions.actions)
+    for (i in Operator.actions)
     {
       add = true;
       /* if it is not already in the list */
@@ -364,7 +364,7 @@ var Operator_Options = {
         }
       }
       if ((add) || ((i == action) && (edit))) {
-        var menulistitem = actionmenu.appendItem(ufJSActions.actions[i].description, i);
+        var menulistitem = actionmenu.appendItem(Operator.actions[i].description, i);
         menulistitem.minWidth=actionmenu.width;
         if (i == action) {
           selectedItem = menulistitem;

@@ -17,6 +17,22 @@ var Operator = {
   highlightedElement: null,
   highlightedElementOutlineStyle: null,
   timerID: null,
+  /* Operator maintains its own list of actions that combines RDFa and microformats into one */
+  actions: {
+    /* When an action is added, the name is placed in this list */
+    list: [],
+    /* need to check for clash and combine semantic scope */
+    add: function add(action, actionDefinition) {
+      Operator.actions[action] = actionDefinition;
+      Operator.actions.list.push(action); 
+    },
+    __iterator__: function () {
+      var i;
+      for (i=0; i < this.list.length; i++) {
+        yield this.list[i];
+      }
+    },
+  },
   init: function init()
   {
     var options = false;
@@ -34,8 +50,7 @@ var Operator = {
       Microformats.init(objScriptLoader, "chrome://operator/content/Microformats/");
     }
 
-    objScriptLoader.loadSubScript("chrome://operator/content/Microformats/ufJSActions.js");
-    ufJSActions.init(objScriptLoader, "chrome://operator/content/Microformats/");
+    objScriptLoader.loadSubScript("chrome://operator/content/actions.js");
     /* Don't assume we have RDF */
     try {
       objScriptLoader.loadSubScript("chrome://operator/content/RDFa/rdfa.js");
@@ -67,10 +82,13 @@ var Operator = {
       } catch (ex) {
       }
     }
-    for (i in ufJSActions.actions)
+    for (i in Microformats.actions) {
+      Operator.actions.add(i, Microformats.actions[i]);
+    }
+    for (i in Operator.actions)
     {
       try {
-        ufJSActions.actions[i].description = languageBundle.GetStringFromName(i + ".description");
+        Operator.actions[i].description = "languageBundle.GetStringFromName(i + ".description");
       } catch (ex) {
       }
     }
@@ -377,7 +395,7 @@ var Operator = {
   {
     return function(event) {
       var url;
-      if (url = ufJSActions.actions[semanticAction].doAction(semanticObject, semanticObjectType)) {
+      if (url = Operator.actions[semanticAction].doAction(semanticObject, semanticObjectType)) {
         openUILink(url, event);
       }
     };
@@ -386,7 +404,7 @@ var Operator = {
   {
     return function(event) {
       var url;
-      if (url = ufJSActions.actions[semanticAction].doActionAll(semanticArrays)) {
+      if (url = Operator.actions[semanticAction].doActionAll(semanticArrays)) {
         openUILink(url, event);
       }
 
@@ -399,7 +417,7 @@ var Operator = {
       if (event.button == 1) {
         if (event.target.getAttribute("disabled") != "true") {
           var url;
-          if (url = ufJSActions.actions[semanticAction].doAction(semanticObject, semanticObjectType)) {
+          if (url = Operator.actions[semanticAction].doAction(semanticObject, semanticObjectType)) {
             openUILink(url, event);
           }
           closeMenus(event.target);
@@ -414,7 +432,7 @@ var Operator = {
       if (event.button == 1) {
         if (event.target.getAttribute("disabled") != "true") {
           var url;
-          if (url = ufJSActions.actions[semanticAction].doActionAll(semanticArrays)) {
+          if (url = Operator.actions[semanticAction].doActionAll(semanticArrays)) {
             openUILink(url, event);
           }
           closeMenus(event.target);
@@ -552,12 +570,12 @@ var Operator = {
     /* XXX TODO Action All */
     if (this.view === 0) {
     } else {
-      if (ufJSActions.actions[semanticAction].scope.semantic[semanticObjectType]) {
-        if ((ufJSActions.actions[semanticAction].doActionAll) && (itemsadded > 0)) {
+      if (Operator.actions[semanticAction].scope.semantic[semanticObjectType]) {
+        if ((Operator.actions[semanticAction].doActionAll) && (itemsadded > 0)) {
           var sep = document.createElement("menuseparator");
           menu.appendChild(sep);
           tempMenu = document.createElement("menuitem");
-          tempMenu.label = ufJSActions.actions[semanticAction].descriptionAll;
+          tempMenu.label = Operator.actions[semanticAction].descriptionAll;
           tempMenu.setAttribute("label", tempMenu.label);
           tempMenu.store_oncommand = Operator.actionAllCallbackGenerator(semanticObjects, semanticObjectType, semanticAction);
           tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
@@ -586,23 +604,23 @@ var Operator = {
       var submenu = parentmenu;
       var k;
       var addedAction = false;
-      for (k in ufJSActions.actions) {
-        if (!ufJSActions.actions[k].scope.semantic[semanticObjectType]) {
+      for (k in Operator.actions) {
+        if (!Operator.actions[k].scope.semantic[semanticObjectType]) {
           continue;
         }
-        if (ufJSActions.actions[k].scope.semantic[semanticObjectType] != semanticObjectType) {
-          required = semanticObject[ufJSActions.actions[k].scope.semantic[semanticObjectType]];
+        if (Operator.actions[k].scope.semantic[semanticObjectType] != semanticObjectType) {
+          required = semanticObject[Operator.actions[k].scope.semantic[semanticObjectType]];
           if (!required) {
             continue;
           }
         }
-        if (ufJSActions.actions[k].scope.url) {
-          if (!(content.document.location.href.match(ufJSActions.actions[k].scope.url))) {
+        if (Operator.actions[k].scope.url) {
+          if (!(content.document.location.href.match(Operator.actions[k].scope.url))) {
             continue;
           }
         }
         menuitem = document.createElement("menuitem");
-        menuitem.label = ufJSActions.actions[k].description;
+        menuitem.label = Operator.actions[k].description;
         menuitem.setAttribute("label", menuitem.label);
         menuitem.store_oncommand = this.actionCallbackGenerator(semanticObject, semanticObjectType, k);
         menuitem.addEventListener("command", menuitem.store_oncommand, true);
@@ -636,23 +654,23 @@ var Operator = {
     var menuitem;
     var required;
     var k;
-    for (k in ufJSActions.actions) {
-      if (!ufJSActions.actions[k].scope.semantic[semanticObjectType]) {
+    for (k in Operator.actions) {
+      if (!Operator.actions[k].scope.semantic[semanticObjectType]) {
         continue;
       }
-      if (ufJSActions.actions[k].scope.semantic[semanticObjectType] != semanticObjectType) {
-        required = semanticObject[ufJSActions.actions[k].scope.semantic[semanticObjectType]];
+      if (Operator.actions[k].scope.semantic[semanticObjectType] != semanticObjectType) {
+        required = semanticObject[Operator.actions[k].scope.semantic[semanticObjectType]];
         if (!required) {
           continue;
         }
       }
-      if (ufJSActions.actions[k].scope.url) {
-        if (!(content.document.location.href.match(ufJSActions.actions[k].scope.url))) {
+      if (Operator.actions[k].scope.url) {
+        if (!(content.document.location.href.match(Operator.actions[k].scope.url))) {
           continue;
         }
       }
       menuitem = document.createElement("menuitem");
-      menuitem.label = ufJSActions.actions[k].description;
+      menuitem.label = Operator.actions[k].description;
       menuitem.setAttribute("label", menuitem.label);
       menuitem.addEventListener("command", this.actionCallbackGenerator(semanticObject, semanticObjectType, k), true);
       menuitem.addEventListener("click", this.clickCallbackGenerator(semanticObject, semanticObjectType, k), true);
@@ -888,13 +906,13 @@ var Operator = {
     
     if (semanticObjectType == "hCard") {
       try {
-        vcfical = ufJSActions.actions.export_vcard.vCard(semanticObject);
+        vcfical = Operator.actions.export_vcard.vCard(semanticObject);
       } catch (ex) {}
       X2V = semanticObject.node;
     }
     if (semanticObjectType == "hCalendar") {
       try {
-        vcfical = ufJSActions.actions.export_icalendar.iCalendar(semanticObject, true, true);
+        vcfical = Operator.actions.export_icalendar.iCalendar(semanticObject, true, true);
       } catch (ex) {}
       X2V = semanticObject.node;
     }
@@ -976,15 +994,15 @@ var Operator = {
           break;
         }
 
-        for (j in ufJSActions.actions[action].scope.semantic) {
+        for (j in Operator.actions[action].scope.semantic) {
           if (semanticArrays[j]) {
             var objectArray;
             if (j == "RDFa") {
               /* Fill in objectArray by asking model for property */
               /* We actually need to loop through all RDFa models */
               /* and concatenate into one object array */
-              objectArray = semanticArrays[j][0].getObjectsWithProperty(ufJSActions.actions[action].scope.semantic[j]["property"],
-                                                                        ufJSActions.actions[action].scope.semantic[j]["defaultNS"]); 
+              objectArray = semanticArrays[j][0].getObjectsWithProperty(Operator.actions[action].scope.semantic[j]["property"],
+                                                                        Operator.actions[action].scope.semantic[j]["defaultNS"]); 
             } else {
               objectArray = semanticArrays[j];
             }
@@ -992,8 +1010,8 @@ var Operator = {
               /* Here we know we have objects that will work with this action */
               /* Create a menu that corresponds to the action? */
               /* Or postpone the creation until we are sure we have the first one? */
-              if ((ufJSActions.actions[action].scope.semantic[j] != j) && (j != "RDFa")) {
-                if (!objectArray[k][ufJSActions.actions[action].scope.semantic[j]]) {
+              if ((Operator.actions[action].scope.semantic[j] != j) && (j != "RDFa")) {
+                if (!objectArray[k][Operator.actions[action].scope.semantic[j]]) {
                   continue;
                 }
               }
@@ -1029,11 +1047,11 @@ var Operator = {
           }
         }
         if (menu) {
-          if ((ufJSActions.actions[action].doActionAll)) {
+          if ((Operator.actions[action].doActionAll)) {
             var sep = document.createElement("menuseparator");
             menu.appendChild(sep);
             tempMenu = document.createElement("menuitem");
-            tempMenu.label = ufJSActions.actions[action].descriptionAll;
+            tempMenu.label = Operator.actions[action].descriptionAll;
             tempMenu.setAttribute("label", tempMenu.label);
             tempMenu.store_oncommand = Operator.actionAllCallbackGenerator(semanticArrays, action);
             tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
@@ -1046,7 +1064,7 @@ var Operator = {
             popup = document.createElement("menupopup");
           }               
           tempMenu = document.createElement("menu");
-          tempMenu.label = ufJSActions.actions[action].description;
+          tempMenu.label = Operator.actions[action].description;
           tempMenu.setAttribute("label", tempMenu.label);
           popup.appendChild(tempMenu);
           if (menu.error === true) {
@@ -1094,16 +1112,16 @@ var Operator = {
               menu.insertBefore(tempMenu, menu.firstChild);
             }
             var sep = false;
-            for (k in ufJSActions.actions) {
-              if (ufJSActions.actions[k].scope.semantic[semanticType]) {
-                if (ufJSActions.actions[k].doActionAll) {
+            for (k in Operator.actions) {
+              if (Operator.actions[k].scope.semantic[semanticType]) {
+                if (Operator.actions[k].doActionAll) {
                   if (!sep) {
                     var sep = document.createElement("menuseparator");
                     menu.appendChild(sep);
                     sep = true;
                   }
                   tempMenu = document.createElement("menuitem");
-                  tempMenu.label = ufJSActions.actions[k].descriptionAll;
+                  tempMenu.label = Operator.actions[k].descriptionAll;
                   tempMenu.setAttribute("label", tempMenu.label);
                   tempMenu.store_oncommand = Operator.actionAllCallbackGenerator(semanticArrays, k);
                   tempMenu.addEventListener("command", tempMenu.store_oncommand, true);

@@ -26,14 +26,14 @@ var Operator_Toolbar = {
         }
         button = document.createElement("toolbarbutton");
         button.setAttribute("disabled", "true");
-        button.label = ufJSActions.actions[action].description;
+        button.label = Operator.actions[action].description;
         button.setAttribute("label", button.label);
-        button.setAttribute("origlabel", ufJSActions.actions[action].description);
+        button.setAttribute("origlabel", Operator.actions[action].description);
         button.setAttribute("type", "menu");
         button.addEventListener("mouseover", Operator_Toolbar.mouseOver, false);
 
-        if (ufJSActions.actions[action].icon) {
-          button.style.listStyleImage = "url('" + ufJSActions.actions[action].icon + "')";
+        if (Operator.actions[action].icon) {
+          button.style.listStyleImage = "url('" + Operator.actions[action].icon + "')";
         } else {
           button.style.listStyleImage = "url('chrome://operator/content/other.png')";
         }
@@ -118,8 +118,8 @@ var Operator_Toolbar = {
             button.setAttribute("type", "menu");
             button.addEventListener("mouseover", Operator_Toolbar.mouseOver, false);
 
-            if ((ufJSActions.actions[handler].scope.semantic[microformat]) && (ufJSActions.actions[handler].icon)) {
-              button.style.listStyleImage = "url('" + ufJSActions.actions[handler].icon + "')";
+            if ((Operator.actions[handler].scope.semantic[microformat]) && (Operator.actions[handler].icon)) {
+              button.style.listStyleImage = "url('" + Operator.actions[handler].icon + "')";
             } else {
               if (Microformats[microformat].icon) {
                 button.style.listStyleImage = "url('" + Microformats[microformat].icon + "')";
