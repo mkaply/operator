@@ -1,6 +1,24 @@
 /*extern Operator, Components, content */
 
 var RDFa = {
+  version: 0.8,
+  /* All action specific function are contained in this object */
+  actions: {
+    /* When an action is added, the name is placed in this list */
+    list: [],
+    add: function add(action, actionDefinition) {
+      if (actionDefinition.version == RDFa.version) {
+        RDFa.actions[action] = actionDefinition;
+        RDFa.actions.list.push(action);
+      }
+    },
+    __iterator__: function () {
+      var i;
+      for (i=0; i < this.list.length; i++) {
+        yield this.list[i];
+      }
+    },
+  },
   xpathExpression: "*[@about or contains(@rel,':') or contains(@rev,':') or @property or contains(@class,':')]",
   DEFAULT_NS:  { 
     dc:'http://purl.org/dc/elements/1.1/',

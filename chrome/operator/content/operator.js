@@ -23,8 +23,20 @@ var Operator = {
     list: [],
     /* need to check for clash and combine semantic scope */
     add: function add(action, actionDefinition) {
-      Operator.actions[action] = actionDefinition;
-      Operator.actions.list.push(action); 
+      if (!Operator.actions[action]) {
+        Operator.actions[action] = {};
+        Operator.actions[action].description = actionDefinition.description;
+        Operator.actions[action].descriptionAll = actionDefinition.descriptionAll;
+        Operator.actions[action].icon = actionDefinition.icon;
+        Operator.actions[action].scope = actionDefinition.scope;
+        if (actionDefinition.doActionAll) {
+          Operator.actions[action].doActionAll = true;
+        }
+        Operator.actions.list.push(action);
+      } else {
+        /* Assume everything else is good. Just get the new scope */
+        Operator.actions[action].scope.semantic["RDFa"] = actionDefinition.scope.semantic["RDFa"];
+      }
     },
     __iterator__: function () {
       var i;
@@ -49,12 +61,11 @@ var Operator = {
       objScriptLoader.loadSubScript("chrome://operator/content/Microformats/Microformats.js");
       Microformats.init(objScriptLoader, "chrome://operator/content/Microformats/");
     }
-
-    objScriptLoader.loadSubScript("chrome://operator/content/actions.js");
     /* Don't assume we have RDF */
     try {
       objScriptLoader.loadSubScript("chrome://operator/content/RDFa/rdfa.js");
     } catch (ex) {}
+    objScriptLoader.loadSubScript("chrome://operator/content/actions.js");
 
     if (!options) {
       /* Operator specific parser stuff */
@@ -84,6 +95,9 @@ var Operator = {
     }
     for (i in Microformats.actions) {
       Operator.actions.add(i, Microformats.actions[i]);
+    }
+    for (i in RDFa.actions) {
+      Operator.actions.add(i, RDFa.actions[i]);
     }
     for (i in Operator.actions)
     {
@@ -395,7 +409,12 @@ var Operator = {
   {
     return function(event) {
       var url;
-      if (url = Operator.actions[semanticAction].doAction(semanticObject, semanticObjectType)) {
+      if (semanticObjectType == "RDFa") {
+        url = RDFa.actions[semanticAction].doAction(semanticObject, semanticObjectType)
+      } else {
+        url = Microformats.actions[semanticAction].doAction(semanticObject, semanticObjectType)
+      }
+      if (url) {
         openUILink(url, event);
       }
     };
@@ -404,7 +423,12 @@ var Operator = {
   {
     return function(event) {
       var url;
-      if (url = Operator.actions[semanticAction].doActionAll(semanticArrays)) {
+      if (semanticObjectType == "RDFa") {
+        url = RDFa.actions[semanticAction].doActionAll(semanticArrays)
+      } else {
+        url = Microformats.actions[semanticAction].doActionAll(semanticArrays)
+      }
+      if (url) {
         openUILink(url, event);
       }
 
@@ -417,7 +441,12 @@ var Operator = {
       if (event.button == 1) {
         if (event.target.getAttribute("disabled") != "true") {
           var url;
-          if (url = Operator.actions[semanticAction].doAction(semanticObject, semanticObjectType)) {
+          if (semanticObjectType == "RDFa") {
+            url = RDFa.actions[semanticAction].doAction(semanticObject, semanticObjectType);
+          } else {
+            url = Microformats.actions[semanticAction].doAction(semanticObject, semanticObjectType)
+          }
+          if (url) {
             openUILink(url, event);
           }
           closeMenus(event.target);
@@ -432,7 +461,12 @@ var Operator = {
       if (event.button == 1) {
         if (event.target.getAttribute("disabled") != "true") {
           var url;
-          if (url = Operator.actions[semanticAction].doActionAll(semanticArrays)) {
+          if (semanticObjectType == "RDFa") {
+            url = RDFa.actions[semanticAction].doActionAll(semanticArrays)
+          } else {
+            url = Microformats.actions[semanticAction].doActionAll(semanticArrays)
+          }
+          if (url) {
             openUILink(url, event);
           }
           closeMenus(event.target);
@@ -906,13 +940,13 @@ var Operator = {
     
     if (semanticObjectType == "hCard") {
       try {
-        vcfical = Operator.actions.export_vcard.vCard(semanticObject);
+        vcfical = Microformat.actions.export_vcard.vCard(semanticObject);
       } catch (ex) {}
       X2V = semanticObject.node;
     }
     if (semanticObjectType == "hCalendar") {
       try {
-        vcfical = Operator.actions.export_icalendar.iCalendar(semanticObject, true, true);
+        vcfical = Microformat.actions.export_icalendar.iCalendar(semanticObject, true, true);
       } catch (ex) {}
       X2V = semanticObject.node;
     }

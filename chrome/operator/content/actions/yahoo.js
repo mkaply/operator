@@ -53,6 +53,7 @@ var yahoo_maps = {
 };
 
 var yahoo_search = {
+  version: 0.8,
   description: "Find with Yahoo! Search",
   icon: "http://www.yahoo.com/favicon.ico",
   scope: {
@@ -90,6 +91,7 @@ At the bottom of the edit screen you will see a panel with "*Want to
 tell others about this event?" *with the seed url for your event. */
 
 var yahoo_calendar = {
+  version: 0.8,
   description: "Add to Yahoo! Calendar",
   icon: "http://www.yahoo.com/favicon.ico",
   scope: {
@@ -238,6 +240,7 @@ var yahoo_calendar = {
 };
 
 var yahoo_contacts = {
+  version: 0.8,
   description: "Add to Yahoo! Contacts",
   icon: "http://www.yahoo.com/favicon.ico",
   scope: {
@@ -451,3 +454,6 @@ Microformats.actions.add("yahoo_maps", yahoo_maps);
 Microformats.actions.add("yahoo_search", yahoo_search);
 Microformats.actions.add("yahoo_calendar", yahoo_calendar);
 Microformats.actions.add("yahoo_contacts", yahoo_contacts);
+if (typeof(RDFa) != "undefined") { 
+  RDFa.actions.add("yahoo_contacts", yahoo_contacts);
+}
