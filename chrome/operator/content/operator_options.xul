@@ -7,7 +7,7 @@
 ]>
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 <?xml-stylesheet href="chrome://operator/content/ccklist.css" type="text/css"?>
-<?xml-stylesheet href="chrome://mozapps/skin/extensions/about.css" type="text/css"?> 
+<?xml-stylesheet href="chrome://operator/content/about.css" type="text/css"?> 
 <dialog 
   title="&operatorOptions.label;"
 	orient="vertical"
@@ -60,14 +60,14 @@
       <vbox id="clientBox" flex="1">
         <label id="extensionName" crop="right">Operator</label>
         <label id="extensionVersion" crop="right">0.8a</label>
-        <description id="extensionDescription" class="indent">The Semantic Web in Action</description>
+        <description id="extensionDescription">The Semantic Web in Action</description>
     
         <label id="extensionCreatorLabel" class="sectionTitle">&creator.label;</label>
-        <hbox id="creatorBox" class="indent">
+        <hbox id="creatorBox">
           <label id="extensionCreator" flex="1" crop="right">Michael Kaply (IBM)</label>
         </hbox>
         <label id="extensionContributors" class="sectionTitle">&contributors.label;</label>
-        <vbox flex="1" id="contributorsBox" class="indent">
+        <vbox flex="1" id="contributorsBox">
         <label class="contributor">Andy Mitchell</label>
         <label class="contributor">Elias Torres (IBM)</label>
         <label class="contributor">Alex Faaborg</label>
