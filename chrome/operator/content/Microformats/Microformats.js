@@ -27,51 +27,46 @@ var Microformats = {
           Components.utils.import("rel:adr.js");
         } catch (ex) {}
         try {
-          Components.utils.import("rel:geo.js");
-        } catch (ex) {}
-        try {
           Components.utils.import("rel:hCard.js");
         } catch (ex) {}
         try {
           Components.utils.import("rel:hCalendar.js");
         } catch (ex) {}
-        try {
-          Components.utils.import("rel:tag.js");
-        } catch (ex) {}
-        try {
-          Components.utils.import("rel:xFolk.js");
-        } catch (ex) {}
       }
       /* If the import failed or we didn't import at all, load */
       /* We'll use hCard as the touchstone */
-      if (typeof(hCard) == "undefined") {
-        var ojl = Components.classes["@mozilla.org/moz/jssubscript-loader;1"].
-                             getService(Components.interfaces.mozIJSSubScriptLoader);
-        /* Find the location of the JS file we are in */
-        var stack = (new Error()).stack.split("\n");
-        var end = stack[1].indexOf("Microformats.js");
-        var begin = stack[1].lastIndexOf("@", end)+1;
-        var baseurl = stack[1].substring(begin, end);
+      var ojl = Components.classes["@mozilla.org/moz/jssubscript-loader;1"].
+                           getService(Components.interfaces.mozIJSSubScriptLoader);
+      /* Find the location of the JS file we are in */
+      var stack = (new Error()).stack.split("\n");
+      var end = stack[1].indexOf("Microformats.js");
+      var begin = stack[1].lastIndexOf("@", end)+1;
+      var baseurl = stack[1].substring(begin, end);
 
+      if (typeof(Address) == "undefined") {
         try {
           ojl.loadSubScript(baseurl + "adr.js");
         } catch (ex) {}
+      }
+      if (typeof(hCard) == "undefined") {
         try {
           ojl.loadSubScript(baseurl + "hCard.js");
         } catch (ex) {}
+      }
+      if (typeof(hCalendar) == "undefined") {
         try {
           ojl.loadSubScript(baseurl + "hCalendar.js");
         } catch (ex) {}
-        try {
-          ojl.loadSubScript(baseurl + "tag.js");
-        } catch (ex) {}
-        try {
-          ojl.loadSubScript(baseurl + "geo.js");
-        } catch (ex) {}
-        try {
-          ojl.loadSubScript(baseurl + "xFolk.js");
-        } catch (ex) {}
       }
+      try {
+        ojl.loadSubScript(baseurl + "tag.js");
+      } catch (ex) {}
+      try {
+        ojl.loadSubScript(baseurl + "geo.js");
+      } catch (ex) {}
+      try {
+        ojl.loadSubScript(baseurl + "xFolk.js");
+      } catch (ex) {}
     }
   },
   /**
@@ -351,6 +346,12 @@ var Microformats = {
     add: function add(action, actionDefinition) {
       Microformats.actions[action] = actionDefinition;
       Microformats.actions.list.push(action); 
+    },
+    __iterator__: function () {
+      var i;
+      for (i=0; i < this.list.length; i++) {
+        yield this.list[i];
+      }
     },
   },
 
