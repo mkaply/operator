@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE operator_options SYSTEM "chrome://operator/locale/operator_options.dtd">
+<!DOCTYPE operator_options [
+<!ENTITY % operatorDTD SYSTEM "chrome://operator/locale/operator_options.dtd">
+%operatorDTD;
+<!ENTITY % aboutDTD SYSTEM "chrome://mozapps/locale/extensions/about.dtd">
+%aboutDTD;
+]>
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 <?xml-stylesheet href="chrome://operator/content/ccklist.css" type="text/css"?>
+<?xml-stylesheet href="chrome://mozapps/skin/extensions/about.css" type="text/css"?> 
 <dialog 
   title="&operatorOptions.label;"
 	orient="vertical"
@@ -19,6 +25,7 @@
 		  <tab label="&microformats.label;"/>
       <tab label="&actions.label;"/>
       <tab label="&userscripts.label;"/>
+      <tab label="About"/>
 	  </tabs>
 	  <tabpanels>
       <tabpanel>
@@ -48,6 +55,24 @@
       </tabpanel>
       <tabpanel>
       <box class="ccklist" id="userscripts" buttons="new,delete" new="Operator_Options.onNewUserScript();" edit="Operator_Options.onEditUserScript();" ondelete="Operator_Options.onDeleteUserScript();"/>
+      </tabpanel>
+      <tabpanel>
+      <vbox id="clientBox" flex="1">
+        <label id="extensionName" crop="right">Operator</label>
+        <label id="extensionVersion" crop="right">0.8a</label>
+        <description id="extensionDescription" class="indent">The Semantic Web in Action</description>
+    
+        <label id="extensionCreatorLabel" class="sectionTitle">&creator.label;</label>
+        <hbox id="creatorBox" class="indent">
+          <label id="extensionCreator" flex="1" crop="right">Michael Kaply (IBM)</label>
+        </hbox>
+        <label id="extensionContributors" class="sectionTitle">&contributors.label;</label>
+        <vbox flex="1" id="contributorsBox" class="indent">
+        <label class="contributor">Andy Mitchell</label>
+        <label class="contributor">Elias Torres (IBM)</label>
+        <label class="contributor">Alex Faaborg</label>
+        </vbox>
+      </vbox>
       </tabpanel>
     </tabpanels>
   </tabbox>
