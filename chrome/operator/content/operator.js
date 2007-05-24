@@ -88,7 +88,7 @@ var Operator = {
     for (i in Operator.actions)
     {
       try {
-        Operator.actions[i].description = "languageBundle.GetStringFromName(i + ".description");
+        Operator.actions[i].description = languageBundle.GetStringFromName(i + ".description");
       } catch (ex) {
       }
     }
