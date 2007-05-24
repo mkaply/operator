@@ -1,4 +1,5 @@
-ufJSActions.actions.yedda_search_tags = {
+var yedda_search_tags = {
+  version: 0.8,
   description: "Find answers on Yedda",
   icon: "http://yedda.com/favicon.ico",
   scope: {
@@ -12,3 +13,5 @@ ufJSActions.actions.yedda_search_tags = {
     }
   }
 };
+
+Microformats.actions.add("yedda_search_tags", yedda_search_tags);

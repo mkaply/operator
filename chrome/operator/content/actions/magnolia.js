@@ -1,4 +1,5 @@
-ufJSActions.actions.magnolia_search_tags = {
+var magnolia_search_tags = {
+  version: 0.8,
   description: "Find bookmarks on Ma.gnolia",
   icon: "http://ma.gnolia.com/favicon.ico",
   scope: {
@@ -13,7 +14,8 @@ ufJSActions.actions.magnolia_search_tags = {
   }
 };
 
-ufJSActions.actions.magnolia_bookmark = {
+var magnolia_bookmark = {
+  version: 0.8,
   description: "Bookmark with Ma.gnolia",
   icon: "http://ma.gnolia.com/favicon.ico",
   scope: {
@@ -46,3 +48,5 @@ ufJSActions.actions.magnolia_bookmark = {
   }
 };
 
+Microformats.actions.add("magnolia_search_tags", magnolia_search_tags);
+Microformats.actions.add("magnolia_bookmark", magnolia_bookmark);

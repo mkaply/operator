@@ -1,4 +1,5 @@
-ufJSActions.actions.technorati_search_tags = {
+var technorati_search_tags = {
+  version: 0.8,
   description: "Find blogs on technorati",
   icon: "http://technorati.com/favicon.ico",
   scope: {
@@ -12,3 +13,5 @@ ufJSActions.actions.technorati_search_tags = {
     }
   }
 };
+
+Microformats.actions.add("technorati_search_tags", technorati_search_tags);

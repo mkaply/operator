@@ -1,4 +1,5 @@
-ufJSActions.actions.youtube_search_tags = {
+var youtube_search_tags = {
+  version: 0.8,
   description: "Find videos on YouTube",
   icon: "http://youtube.com/favicon.ico",
   scope: {
@@ -12,3 +13,5 @@ ufJSActions.actions.youtube_search_tags = {
     }
   }
 };
+
+Microformats.actions.add("youtube_search_tags", youtube_search_tags);

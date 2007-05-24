@@ -1,4 +1,5 @@
-ufJSActions.actions.upcoming_search_tags = {
+var upcoming_search_tags = {
+  version: 0.8,
   description: "Find events on Upcoming.org",
   icon: "http://upcoming.org/favicon.ico",
   scope: {
@@ -12,3 +13,5 @@ ufJSActions.actions.upcoming_search_tags = {
     }
   }
 };
+
+Microformats.actions.add("upcoming_search_tags", upcoming_search_tags);

@@ -1,4 +1,5 @@
-ufJSActions.actions.export_vcard = {
+var export_vcard = {
+  version: 0.8,
   description: "Export Contact",
   descriptionAll: "Export All",
   scope: {
@@ -22,7 +23,7 @@ ufJSActions.actions.export_vcard = {
       fos.init(file, -1, -1, false);
 
       for (var j =0; j < semanticArrays["hCard"].length; j++) {
-        var vcf = ufJSActions.actions.export_vcard.vCard(semanticArrays["hCard"][j]);
+        var vcf = this.vCard(semanticArrays["hCard"][j]);
         if (vcf) {
           fos.write(vcf, vcf.length);
         }
@@ -49,7 +50,7 @@ ufJSActions.actions.export_vcard = {
   doAction: function(semanticObject, semanticObjectType) {
     var url;
     if (semanticObjectType == "hCard") {
-      var vcf = ufJSActions.actions.export_vcard.vCard(semanticObject);
+      var vcf = this.vCard(semanticObject);
       var file = Components.classes["@mozilla.org/file/directory_service;1"].
                             getService(Components.interfaces.nsIProperties).
                             get("TmpD", Components.interfaces.nsIFile);
@@ -264,7 +265,8 @@ ufJSActions.actions.export_vcard = {
   }
 };
 
-ufJSActions.actions.export_icalendar = {
+var export_icalendar = {
+  version: 0.8,
   description: "Export Event",
   descriptionAll: "Export All",
   scope: {
@@ -275,7 +277,7 @@ ufJSActions.actions.export_icalendar = {
   doAction: function(semanticObject, semanticObjectType) {
     var url;
     if (semanticObjectType == "hCalendar") {
-      var ics = ufJSActions.actions.export_icalendar.iCalendar(semanticObject, true, true);
+      var ics = this.iCalendar(semanticObject, true, true);
       var file = Components.classes["@mozilla.org/file/directory_service;1"].
                             getService(Components.interfaces.nsIProperties).
                             get("TmpD", Components.interfaces.nsIFile);
@@ -333,7 +335,7 @@ ufJSActions.actions.export_icalendar = {
           footer = false;
         }
         if (semanticArrays["hCalendar"][j]['dtstart']) {
-          ics = ufJSActions.actions.export_icalendar.iCalendar(semanticArrays["hCalendar"][j], header, footer);
+          ics = this.iCalendar(semanticArrays["hCalendar"][j], header, footer);
           if (ics) {
             fos.write(ics, ics.length);
           }
@@ -514,7 +516,9 @@ ufJSActions.actions.export_icalendar = {
     return ics;
   }
 };
-ufJSActions.actions.export_kml = {
+
+var export_kml = {
+  version: 0.8,
   description: "Export as KML",
   descriptionAll: "Export All",
   scope: {
@@ -575,3 +579,6 @@ ufJSActions.actions.export_kml = {
   }
 };
 
+Microformats.actions.add("export_vcard", export_vcard);
+Microformats.actions.add("export_icalendar", export_icalendar);
+Microformats.actions.add("export_kml", export_kml);

@@ -1,17 +1,18 @@
 /* simpleEscape dateFromISO8601 localizeISO8601 iso8601FromDate */
 
-ufJSActions.actions.yahoo_maps = {
+var yahoo_maps = {
+  version: 0.8,
   description: "Find with Yahoo! Maps",
   icon: "http://www.yahoo.com/favicon.ico",
   scope: {
     semantic: {
-      "Address" : "Address",
+      "adr" : "adr",
       "geo" : "geo"
     }
   },
   doAction: function(semanticObject, semanticObjectType) {
     var url;
-    if (semanticObjectType == "Address") {
+    if (semanticObjectType == "adr") {
       var adr = semanticObject;
       if (adr) {
         url = "http://maps.yahoo.com/maps_result?";
@@ -51,7 +52,7 @@ ufJSActions.actions.yahoo_maps = {
   }
 };
 
-ufJSActions.actions.yahoo_search = {
+var yahoo_search = {
   description: "Find with Yahoo! Search",
   icon: "http://www.yahoo.com/favicon.ico",
   scope: {
@@ -62,7 +63,6 @@ ufJSActions.actions.yahoo_search = {
   },
   doAction: function(semanticObject, semanticObjectType) {
     var searchstring;
-    var action = ufJSActions.actions.yahoo_search;
     if (semanticObjectType == "hReview") {
       var hreview = semanticObject;
       if (hreview.item.summary) {
@@ -71,7 +71,7 @@ ufJSActions.actions.yahoo_search = {
         searchstring = hreview.item.fn;
       }
     } else {
-      searchstring = semanticObject[action.scope.semantic[semanticObjectType]];
+      searchstring = semanticObject[this.scope.semantic[semanticObjectType]];
     }
     if (searchstring) {
       return "http://search.yahoo.com/search?p=" + encodeURIComponent(searchstring);
@@ -89,7 +89,7 @@ calendar.yahoo.com, create an event, and then click on it again to edit.
 At the bottom of the edit screen you will see a panel with "*Want to 
 tell others about this event?" *with the seed url for your event. */
 
-ufJSActions.actions.yahoo_calendar = {
+var yahoo_calendar = {
   description: "Add to Yahoo! Calendar",
   icon: "http://www.yahoo.com/favicon.ico",
   scope: {
@@ -237,7 +237,7 @@ ufJSActions.actions.yahoo_calendar = {
   }
 };
 
-ufJSActions.actions.yahoo_contact = {
+var yahoo_contacts = {
   description: "Add to Yahoo! Contacts",
   icon: "http://www.yahoo.com/favicon.ico",
   scope: {
@@ -447,3 +447,7 @@ ufJSActions.actions.yahoo_contact = {
     37 Class
     */
 
+Microformats.actions.add("yahoo_maps", yahoo_maps);
+Microformats.actions.add("yahoo_search", yahoo_search);
+Microformats.actions.add("yahoo_calendar", yahoo_calendar);
+Microformats.actions.add("yahoo_contacts", yahoo_contacts);

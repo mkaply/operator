@@ -1,4 +1,5 @@
-ufJSActions.actions["30boxes_calendar"] = {
+var thirty_boxes_calendar = {
+  version: 0.8,
   description: "Add to 30 Boxes",
   icon: "http://30boxes.com/favicon.ico",
   scope: {
@@ -92,3 +93,5 @@ ufJSActions.actions["30boxes_calendar"] = {
     return url;
   }
 };
+
+Microformats.actions.add("30boxes_calendar", thirty_boxes_calendar);

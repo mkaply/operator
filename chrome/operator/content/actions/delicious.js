@@ -1,4 +1,5 @@
-ufJSActions.actions.delicious_search_tags = {
+var delicious_search_tags = {
+  version: 0.8,
   description: "Find bookmarks on del.icio.us",
   icon: "http://del.icio.us/favicon.ico",
   scope: {
@@ -13,7 +14,8 @@ ufJSActions.actions.delicious_search_tags = {
   }
 };
 
-ufJSActions.actions.delicious_bookmark = {
+var delicious_bookmark = {
+  version: 0.8,
   description: "Bookmark with del.icio.us",
   icon: "http://del.icio.us/favicon.ico",
   scope: {
@@ -49,3 +51,5 @@ ufJSActions.actions.delicious_bookmark = {
   }
 };
 
+Microformats.actions.add("delicious_search_tags", delicious_search_tags);
+Microformats.actions.add("delicious_bookmark", delicious_bookmark);

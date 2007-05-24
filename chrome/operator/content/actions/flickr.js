@@ -1,4 +1,5 @@
-ufJSActions.actions.flickr_search_tags = {
+var flickr_search_tags = {
+  version: 0.8,
   description: "Find photos on flickr",
   icon: "http://flickr.com/favicon.ico",
   scope: {
@@ -14,3 +15,5 @@ ufJSActions.actions.flickr_search_tags = {
     }
   }
 };
+
+Microformats.actions.add("flickr_search_tags", flickr_search_tags);

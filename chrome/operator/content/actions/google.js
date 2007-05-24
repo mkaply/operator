@@ -1,17 +1,18 @@
 /* localizeISO8601 */ 
 
-ufJSActions.actions.google_maps = {
+var google_maps = {
+  version: 0.8,
   description: "Find with Google Maps",
   icon: "http://www.google.com/favicon.ico",
   scope: {
     semantic: {
       "geo" : "geo",
-      "Address" : "Address"
+      "adr" : "adr"
     }
   },
   doAction: function(semanticObject, semanticObjectType) {
     var url;
-    if ((semanticObjectType == "hCard") || (semanticObjectType == "Address")) {
+    if ((semanticObjectType == "hCard") || (semanticObjectType == "adr")) {
       var adr;
       if (semanticObjectType == "hCard") {
         adr = semanticObject.adr[0];
@@ -52,7 +53,8 @@ ufJSActions.actions.google_maps = {
   }
 };
 
-ufJSActions.actions.google_search = {
+var google_search = {
+  version: 0.8,
   description: "Find with Google Search",
   icon: "http://www.google.com/favicon.ico",
   scope: {
@@ -63,7 +65,6 @@ ufJSActions.actions.google_search = {
   },
   doAction: function(semanticObject, semanticObjectType) {
     var searchstring;
-    var action = ufJSActions.actions.google_search;
     if (semanticObjectType == "hReview") {
       var hreview = semanticObject;
       if (hreview.item.summary) {
@@ -72,7 +73,7 @@ ufJSActions.actions.google_search = {
         searchstring = hreview.item.fn;
       }
     } else {
-      searchstring = semanticObject[action.scope.semantic[semanticObjectType]];
+      searchstring = semanticObject[this.scope.semantic[semanticObjectType]];
     }
     if (searchstring) {
       return  "http://www.google.com/search?q=" + encodeURIComponent(searchstring);
@@ -80,7 +81,8 @@ ufJSActions.actions.google_search = {
   }
 };
 
-ufJSActions.actions.google_calendar = {
+var google_calendar = {
+  version: 0.8,
   description: "Add to Google Calendar",
   icon: "http://www.google.com/calendar/images/favicon.ico",
   scope: {
@@ -197,3 +199,6 @@ ufJSActions.actions.google_calendar = {
   }
 };
 
+Microformats.actions.add("google_maps", google_maps);
+Microformats.actions.add("google_search", google_search);
+Microformats.actions.add("google_calendar", google_calendar);
