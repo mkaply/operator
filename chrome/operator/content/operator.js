@@ -742,8 +742,15 @@ var Operator = {
   },
   mouseOver: function mouseOver(event) {
     var element = (event.target) ? event.target : event.srcElement;
-    var mfNode = Microformats.isMicroformat(element);
-    Operator.highlightDOMNode(mfNode);
+    var mfNode;
+    if (Microformats.isMicroformat(element)) {
+      mfNode = element;
+    } else {
+      mfNode = Microformats.getParent(element);
+    }
+    if (mfNode) {
+      Operator.highlightDOMNode(mfNode);
+    }
   },
   processSemanticDataDelayed: function processSemanticDataDelayed(event)
   {
