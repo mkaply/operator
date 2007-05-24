@@ -94,7 +94,7 @@ var RDFa = {
         for(var r = 0; r < rels.length; r++) {
           var rel = RDFa.expandURI(rels[r], ctx);
           if(node.hasAttribute("href")) {
-            model.addResource(ctx[ctx.length-1].about,rel,node.getAttribute("href"));
+            model.addResource(ctx[ctx.length-1].about,rel,RDFa.expandURI(node.getAttribute("href"),ctx));
           } else {
             model.addResource(ctx[ctx.length-2].about,rel,ctx[ctx.length-1].about);
           }
@@ -132,7 +132,7 @@ var RDFa = {
       return null;
     }
 
-    if(prefixed[0] == "[" && prefixed.endsWith("]")) {
+    if(prefixed[0] == "[" && prefixed[prefixed.length-1] == "]") {
       prefixed = prefixed.substr(1,prefixed.length-2);
       if(prefixed.length === 0) {
         // generate bnode
@@ -254,8 +254,8 @@ RDFa.Resource = function(_s, _model) {
   };
   this.equals = function(obj) {
     try {
-      if(obj.url !== undefined) {
-         if(obj.model === obj.model && obj.index == s) {
+      if(obj.$url !== undefined) {
+         if(obj.$model === obj.$model && obj.$index == s) {
            return true; 
          }
       }
@@ -264,9 +264,9 @@ RDFa.Resource = function(_s, _model) {
     }
     return false;
   };
-  this.__defineGetter__("url", function() { return model.$uris[s]; });
-  this.__defineGetter__("model", function() { return model; });
-  this.__defineGetter__("index", function() { return s; });
+  this.__defineGetter__("$url", function() { return model.$uris[s]; });
+  this.__defineGetter__("$model", function() { return model; });
+  this.__defineGetter__("$index", function() { return s; });
 };
 
 RDFa.Literal = function(_value, _type, _lang, _model) {
@@ -301,7 +301,8 @@ RDFa.Model = function() {
 
   var triples = [];
   var subjects = {};
-  var properties = [];
+  var properties = {};
+  var objects = {};
   var namespaces = {};
   var uris_map = {};
   var uris_arr = [];
@@ -315,6 +316,8 @@ RDFa.Model = function() {
   this.__defineGetter__("literals", function() { return literals_arr; });
   this.__defineGetter__("$uris_ns", function() { return uris_ns; });
   this.__defineGetter__("$uris_map", function() { return uris_map; });
+  this.__defineGetter__("$objects", function() { return objects; });
+  this.__defineGetter__("$properties", function() { return properties; });
   this.__defineGetter__("namespaces", function() { return namespaces; });
   this.setNamespace = function(prefix, url) {
     namespaces[prefix] = url;
@@ -361,26 +364,33 @@ RDFa.Model = function() {
     this.add(this.createResource(s),this.createResource(p),this.createResource(o));
   };
   this.add = function(s, p, o) {
-    if(subjects[s.index] === undefined) {
-      subjects[s.index] = {};
+    if(subjects[s.$index] === undefined) {
+      subjects[s.$index] = {};
     }
-    if(subjects[s.index][p.index] === undefined) {
-      subjects[s.index][p.index] = [];
+    if(subjects[s.$index][p.$index] === undefined) {
+      subjects[s.$index][p.$index] = [];
     }
-    var existing = subjects[s.index][p.index];
+    var existing = subjects[s.$index][p.$index];
 
     for(var i = 0; i < existing.length; i++) {
         if(triples[existing[i]][2].equals(o)) {
             return;
         }
     } 
-    var index = triples.push([s.index,p.index,o]);
-    subjects[s.index][p.index].push(index-1);
+    var index = triples.push([s.$index,p.$index,o]);
+    subjects[s.$index][p.$index].push(index-1);
 
-    if(properties[p.index] === undefined) {
-      properties[p.index] = [];
+    if(properties[p.$index] === undefined) {
+      properties[p.$index] = [];
     }
-    properties[p.index].push(index-1);
+    properties[p.$index].push(index-1);
+
+    if(o.$url) {
+      if(objects[o.$index] === undefined) {
+        objects[o.$index] = [];
+      }
+      objects[o.$index].push(index-1);
+    }
   };
   this.getObject = function(s) {
     if(subjects[s] === undefined) {
@@ -409,6 +419,15 @@ RDFa.Model = function() {
     }
     return [];
   };
+  this.getObjects = function() {
+    var objects = [];
+    for(var i in subjects) { 
+      if(uris_arr[i].indexOf("_:") === 0) { continue; }
+      var newObj = new RDFa.SemanticObject(this, uris_arr[i]);
+      objects.push(newObj); 
+    } 
+    return objects;
+  };
   this.getProperty = function(s, p) {
     if(uris_map[s] !== undefined) {
       s = uris_map[s];
@@ -433,7 +452,7 @@ RDFa.Model = function() {
     if(subjects[s] !== undefined && subjects) {
       var props = [];
       var ts = subjects[s];
-      for(x in ts) {
+      for(var x in ts) {
         props.push(new RDFa.Resource(x, this));
       }
       return props;
@@ -442,7 +461,7 @@ RDFa.Model = function() {
   };
   this.getSubjects = function() {
     var results = [];
-    for(i in subjects) { 
+    for(var i in subjects) { 
       if(uris_arr[i].indexOf("_:") === 0) { continue; }
       results.push(uris_arr[i]);
     } 
@@ -465,6 +484,125 @@ RDFa.Model = function() {
     var tindex = (t !== undefined) ? this.indexURI(t) : null;
     return new RDFa.Literal(index, tindex, lang, this);
   };
+  this.dump = function() {
+    var turtle = "";
+    for(var prefix in namespaces) {
+      if(prefix != '_default_') {
+        turtle += "@prefix " + prefix + ": " + "<" + namespaces[prefix] + "> .\n"
+      }
+    }
+
+    if(namespaces['_default_'] !== undefined) {
+      turtle += "@prefix : " + "<" + namespaces['_default_'] + "> .\n"
+    }
+
+    if (turtle.length > 0) turtle += "\n";
+
+    var inverted_ns = {};
+    for(var prefix in namespaces) {
+        inverted_ns[namespaces[prefix]] = prefix;
+    }
+
+    var context = { seen : [] , subjects : [], suppress : false };
+
+    for(var s in subjects) { 
+      context.subjects.push(s);
+    } 
+
+    while(context.subjects.length > 0) {
+      turtle += this.dumpSubject(context.subjects[0], 1, context);
+    }
+
+    return turtle;
+  };
+  this.debug = this.dump;
+
+  this.dumpSubject = function (s, depth, context, anon) {
+    if(depth === undefined) {
+        depth = 0;
+    }
+    if(uris_map[s] !== undefined) {
+      s = uris_map[s];
+    }
+    if(context === undefined) {
+      context = { seen : [], subjects : [] };
+    }
+    if(context.seen[s] !== undefined) {
+      throw new Error("A cycle has been detected in the graph");
+    }
+    if(anon === undefined) {
+      anon = false;
+    }
+    var turtle = !anon ? "<" + uris_arr[s] + ">\n" : "";
+    var props = this.enumProperties(uris_arr[s]);
+    for(var p = 0; p < props.length; p++) {
+      var prop_name = this.prettyURI(props[p].$url);
+      var values = this.getProperty(uris_arr[s],props[p].$url);
+      for(var v = 0; v < values.length; v++) {
+          turtle += RDFa.Utilities.string_repeat(" ", depth * 2);
+          if(values[v].$url) {
+            if(values[v].$url.indexOf("_:") === 0 
+                && objects[values[v].$index].length == 1 
+                && triples[objects[values[v].$index]][0] == s) {
+              turtle += prop_name + " [ \n" + this.dumpSubject(values[v].$url, depth+1, context, true) + "\n" + RDFa.Utilities.string_repeat(" ", depth * 2) + "]";
+            } else {
+              turtle += prop_name + " " + this.prettyURI(values[v].$url);
+            }
+          } else {
+              var append = "";
+              if(values[v].$type !== undefined && values[v].$type != null) {
+                 append += "^^" + this.prettyURI(values[v].$type);
+              } else if(values[v].$lang !== undefined && values[v].$lang != null) {
+                 append += "@" + values[v].$lang;
+              } 
+              turtle += prop_name + " \"" + values[v].toString() + "\"" + append;
+          }
+          if((p == props.length -1) && (v == values.length -1)) {
+            if(!anon) {
+              turtle += " .\n\n";
+            }
+          } else {
+            turtle += " ;\n";
+          }
+      }
+    }
+    context.seen[s] = true;
+    for(var xx = 0; xx < context.subjects.length; xx++) {
+      if(context.subjects[xx] == s) {
+        context.subjects.splice(xx, 1);
+      }
+    }
+    return turtle;
+  };
+  this.prettyURI = function(uri) {
+
+      var prefix_found = undefined;
+      var prefix_ns = undefined;
+      for(var prefix in namespaces) {
+          if(uri.indexOf(namespaces[prefix]) == 0) {
+              prefix_found = prefix;
+              prefix_ns = namespaces[prefix];
+              break;
+          }
+      }
+
+      if(prefix_found === undefined) {
+        for(var prefix in RDFa.DEFAULT_NS) {
+            if(uri.indexOf(RDFa.DEFAULT_NS[prefix]) == 0) {
+                prefix_found = prefix;
+                prefix_ns = RDFa.DEFAULT_NS[prefix];
+                break;
+            }
+        }
+      }
+
+      var prefixed = "<" + uri + ">";
+      if(prefix_found !== undefined) {
+          prefixed = (prefix_found != '_default_') ? prefix_found : "";
+          prefixed += ":" + uri.substring(prefix_ns.length);
+      }
+      return prefixed;
+  };
 };
 
 RDFa.SemanticProperty = function (_prop, _name, _parent) {
@@ -480,9 +618,9 @@ RDFa.SemanticProperty = function (_prop, _name, _parent) {
 
   function init() {
     var results = _this.model.getProperty(parent.subject, prop);
-    for(r in results) {
-      if(results[r].url !== undefined && _this.model.hasSubject(results[r].url)) {
-        var child = new RDFa.SemanticObject(_this.model, results[r].url);
+    for(var r in results) {
+      if(results[r].$url !== undefined && _this.model.hasSubject(results[r].$url)) {
+        var child = new RDFa.SemanticObject(_this.model, results[r].$url);
         child.namespaces = parent.namespaces;
         RDFa.Utilities.rebind.apply(child, [child.subject]);
         subproperties.push(child); 
@@ -562,9 +700,30 @@ RDFa.SemanticObject = function (_model, _subject) {
  
     return this.subject;
   };
+  this.dump = function() {
+    return this.model.dumpSubject(_subject,1);
+  }
+  this.debug = this.dump;
 };
 
 RDFa.Utilities = {
+  log : function() {
+//    if (console) console.log.apply(null, arguments);
+  },
+  debug : function() {
+//    if (console) console.debug.apply(null, arguments);
+  },
+  warn : function() {
+//    if (console) console.warn.apply(null, arguments);
+  },
+  info : function() {
+//    if (console) console.info.apply(null, arguments);
+  },
+  string_repeat : function(str, n) {
+   var s = "";
+   while (--n >= 0) s += str;
+   return s
+  },
   getter : function (obj) { 
     return function() {
         return obj;
@@ -574,23 +733,23 @@ RDFa.Utilities = {
     return null;
   },
   rebind : function(subject) {
-    for(p in this.namespaces) {
+    for(var p in this.namespaces) {
         var base = '';
         if(p != '_default_') {
             base = p + "_";
         }
         var props = this.model.enumProperties(subject);
         for(var i = 0; i < props.length; i++) {
-          var u = props[i].url;
+          var u = props[i].$url;
           if(u.indexOf(this.namespaces[p]) !== 0) {
             continue;
           }
           var name = base + u.substring(this.namespaces[p].length);
           var objects  = this.model.getProperty(subject, u);
           var all_objects = true;
-          for(o in objects) {
-            if(objects[o].url !== undefined) {
-              if(this.model.hasSubject(objects[o].url)) {
+          for(var o in objects) {
+            if(objects[o].$url !== undefined) {
+              if(this.model.hasSubject(objects[o].$url)) {
                 continue;
               }
             }
@@ -598,7 +757,7 @@ RDFa.Utilities = {
             break;
           }
           if(all_objects) {
-            var child = new RDFa.SemanticObject(this.model, objects[0].url);
+            var child = new RDFa.SemanticObject(this.model, objects[0].$url);
             child.namespaces = this.namespaces;
             RDFa.Utilities.rebind.apply(child, [child.subject]);
             this.__defineGetter__(name, RDFa.Utilities.getter(child));
@@ -649,9 +808,9 @@ RDFa.TestSuite = {
         model.addLiteral(s1, ns.foaf("family_name"), "Adida");
         model.addLiteral(s1, ns.foaf("nick"), "Ben");
 
-        model.addResource(s1, ns.foaf("knows"), "http://www.w3.org/People/djweitzner/foaf#DJW");
-        model.addResource(s1, ns.foaf("knows"), "http://www.w3.org/People/Berners-Lee/card#i");
-        model.addResource(s1, ns.foaf("knows"), "http://www.w3.org/People/EM/contact#me");
+        model.addResource(s1, ns.foaf("knows"), s2);
+        model.addResource(s1, ns.foaf("knows"), s3);
+        model.addResource(s1, ns.foaf("knows"), s4);
 
         model.addResource(s1, ns.foaf("office"), b1);
         model.addResource(b1, ns.foaf("address"), b2);
@@ -692,6 +851,152 @@ RDFa.TestSuite = {
         this.assertTrue(s2, y.knows.$all[0].toString());
         this.assertTrue(s3, y.knows.$all[1].toString());
         this.assertTrue(s4, y.knows.$all[2].toString());
+    },
+    function() {
+        var ns = RDFa.TestSuite.ns;
+        var model = new RDFa.Model();
+        var s1 = "http://example.org/card.xhtml#i";
+        var s2 = "http://www.w3.org/People/djweitzner/foaf#DJW";
+        var s3 = "http://www.w3.org/People/Berners-Lee/card#i";
+        var s4 = "http://www.w3.org/People/EM/contact#me";
+        var b1 = "_:div0";
+        var b2 = "_:span0";
+        var b3 = "_:div1";
+
+        model.addResource(s1, ns.rdf("type"), ns.foaf("Person"));
+        model.addLiteral(s1, ns.foaf("givenname"), "Ben");
+        model.addLiteral(s1, ns.foaf("family_name"), "Adida");
+        model.addLiteral(s1, ns.foaf("nick"), "Ben");
+
+        model.addResource(s1, ns.foaf("knows"), s2);
+        model.addResource(s1, ns.foaf("knows"), s3);
+        model.addResource(s1, ns.foaf("knows"), s4);
+
+        model.addResource(s1, ns.foaf("office"), b1);
+        model.addResource(b1, ns.foaf("address"), b2);
+
+        model.addLiteral(b2, ns.foaf("street"), "32 Vassar Street");
+        model.addLiteral(b2, ns.foaf("country"), "USA");
+
+        model.addResource(s1, ns.foaf("met"), s2);
+        model.addResource(s1, ns.foaf("met"), s3);
+        model.addResource(s1, ns.foaf("met"), s4);
+        
+        model.setNamespace("foaf", ns.foaf(""));
+        
+        model.dump();
+    },
+    function() {
+        var ns = RDFa.TestSuite.ns;
+        var model = new RDFa.Model();
+        var s1 = "http://example.org/card.xhtml#i";
+        var s2 = "http://www.w3.org/People/djweitzner/foaf#DJW";
+        var s3 = "http://www.w3.org/People/Berners-Lee/card#i";
+        var s4 = "http://www.w3.org/People/EM/contact#me";
+        var b1 = "_:div0";
+        var b2 = "_:span0";
+        var b3 = "_:div1";
+
+        model.addResource(s1, ns.rdf("type"), ns.foaf("Person"));
+        model.addLiteral(s1, ns.foaf("givenname"), "Ben");
+        model.addLiteral(s1, ns.foaf("family_name"), "Adida");
+        model.addLiteral(s1, ns.foaf("nick"), "Ben");
+
+        model.addResource(s1, ns.foaf("knows"), s2);
+        model.addResource(s1, ns.foaf("knows"), s3);
+        model.addResource(s1, ns.foaf("knows"), s4);
+
+        model.addResource(s1, ns.foaf("office2"), b1);
+        model.addResource(s1, ns.foaf("office"), b1);
+        model.addResource(b1, ns.foaf("address"), b2);
+
+        model.addLiteral(b2, ns.foaf("street"), "32 Vassar Street");
+        model.addLiteral(b2, ns.foaf("country"), "USA");
+
+        model.addResource(s1, ns.foaf("met"), s2);
+        model.addResource(s1, ns.foaf("met"), s3);
+        model.addResource(s1, ns.foaf("met"), s4);
+        
+        model.setNamespace("foaf", ns.foaf(""));
+        
+        model.dump();
+    },
+    function() {
+        var ns = RDFa.TestSuite.ns;
+        var model = new RDFa.Model();
+        var s1 = "http://example.org/card.xhtml#i";
+        var s2 = "http://www.w3.org/People/djweitzner/foaf#DJW";
+        var s3 = "http://www.w3.org/People/Berners-Lee/card#i";
+        var s4 = "http://www.w3.org/People/EM/contact#me";
+        var b1 = "_:div0";
+        var b2 = "_:span0";
+        var b3 = "_:div1";
+
+        model.addResource(s1, ns.rdf("type"), ns.foaf("Person"));
+        model.addResource(s1, ns.foaf("office2"), b1);
+        model.addResource(s1, ns.foaf("office"), b1);
+        model.addResource(b1, ns.foaf("address"), b2);
+        model.addResource(b2, ns.foaf("address"), b1);
+        
+        model.setNamespace("foaf", ns.foaf(""));
+        
+        model.dump();
+    },
+    function() {
+        var ns = RDFa.TestSuite.ns;
+        var model = new RDFa.Model();
+        var s1 = "http://example.org/card.xhtml#i";
+        var s2 = "http://www.w3.org/People/djweitzner/foaf#DJW";
+        var s3 = "http://www.w3.org/People/Berners-Lee/card#i";
+        var s4 = "http://www.w3.org/People/EM/contact#me";
+        var b1 = "_:div0";
+        var b2 = "_:span0";
+        var b3 = "_:div1";
+
+        model.addResource(s1, ns.rdf("type"), ns.foaf("Person"));
+        model.addResource(s1, ns.foaf("office2"), b1);
+        model.addResource(s1, ns.foaf("office"), b1);
+        model.addResource(b1, ns.foaf("address"), b2);
+        model.addResource(b2, ns.foaf("address"), b1);
+        
+        model.setNamespace("_default_", ns.foaf(""));
+        
+        model.dump();
+    },
+    function() {
+        var ns = RDFa.TestSuite.ns;
+        var model = new RDFa.Model();
+        var s1 = "http://example.org/card.xhtml#i";
+        var s2 = "http://www.w3.org/People/djweitzner/foaf#DJW";
+        var s3 = "http://www.w3.org/People/Berners-Lee/card#i";
+        var s4 = "http://www.w3.org/People/EM/contact#me";
+        var b1 = "_:div0";
+        var b2 = "_:span0";
+
+        model.addResource(s1, ns.rdf("type"), ns.foaf("Person"));
+        model.addLiteral(s1, ns.foaf("givenname"), "Ben");
+        model.addLiteral(s1, ns.foaf("family_name"), "Adida");
+        model.addLiteral(s1, ns.foaf("nick"), "Ben");
+        model.addLiteral(s1, "http://example.org/ns/foo", "Ben");
+
+        model.addResource(s1, ns.foaf("knows"), s2);
+        model.addResource(s1, ns.foaf("knows"), s3);
+        model.addResource(s1, ns.foaf("knows"), s4);
+
+        model.addResource(s1, ns.foaf("office"), b1);
+        model.addResource(b1, ns.foaf("address"), b2);
+
+        model.addLiteral(b2, ns.foaf("street"), "32 Vassar Street");
+        model.addLiteral(b2, ns.foaf("street2"), "MIT CSAIL Room 32G-694");
+        model.addLiteral(b2, ns.foaf("city"), "Cambridge");
+        model.addLiteral(b2, ns.foaf("postalCode"), "02139");
+        model.addLiteral(b2, ns.foaf("country"), "USA");
+
+        model.setNamespace("_default_", ns.foaf(""));
+        
+        var x = model.subjects[0];
+        var y = new RDFa.SemanticObject(model, x);
+        y.dump();
     },
     function() {
         var ns = RDFa.TestSuite.ns;
@@ -757,6 +1062,15 @@ RDFa.TestSuite = {
         model.addResource(s1, ns.foaf("knows"), b1);
     
         this.assertTrue(1, model.triples.length);
+    },
+    function() {
+        var ns = RDFa.TestSuite.ns;
+
+        if(document && document.location.href.indexOf("rdfa-test.html") == -1) return;
+        
+        var model = RDFa.parse(document);
+
+        RDFa.Utilities.log(model.dump());
     },
     function() {
         var ns = RDFa.TestSuite.ns;
