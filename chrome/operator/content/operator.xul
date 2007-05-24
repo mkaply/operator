@@ -4,7 +4,7 @@
 
 <!DOCTYPE operator SYSTEM "chrome://operator/locale/operator.dtd">
 
-<overlay id="microformats" 
+<overlay id="operator" 
          xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
   <script type="application/x-javascript;version=1.7" src="chrome://operator/content/operator.js"/>
