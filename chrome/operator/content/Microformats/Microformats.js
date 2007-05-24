@@ -1,6 +1,7 @@
 EXPORTED_SYMBOLS = ["Microformats"];
 
 var Microformats = {
+  version: 0.8,
   inited: false,
   /* When a microformat is added, the name is placed in this list */
   list: [],
@@ -344,8 +345,10 @@ var Microformats = {
     /* When an action is added, the name is placed in this list */
     list: [],
     add: function add(action, actionDefinition) {
-      Microformats.actions[action] = actionDefinition;
-      Microformats.actions.list.push(action); 
+      if (actionDefinition.version == Microformats.version) {
+        Microformats.actions[action] = actionDefinition;
+        Microformats.actions.list.push(action);
+      }
     },
     __iterator__: function () {
       var i;
