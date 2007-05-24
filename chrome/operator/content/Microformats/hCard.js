@@ -36,7 +36,7 @@ var hCard_definition = {
     "adr" : {
       plural: true,
       datatype: "microformat",
-      microformat: "Address"
+      microformat: "adr"
     },
     "agent" : {
       plural: true

@@ -1,17 +1,17 @@
 if (Components.utils.import) {
   try {
     Components.utils.import("rel:Microformats.js");
-    EXPORTED_SYMBOLS = ["Address"];
+    EXPORTED_SYMBOLS = ["adr"];
   } catch (ex) {}
 }
 
-function Address(node) {
+function adr(node) {
   if (node) {
-    Microformats.parser.newMicroformat(this, node, "Address");
+    Microformats.parser.newMicroformat(this, node, "adr");
   }
 }
 
-Address.prototype.toString = function() {
+adr.prototype.toString = function() {
   var address_text = "";
   var start_parens = false;
   if (this["street-address"]) {
@@ -52,8 +52,8 @@ Address.prototype.toString = function() {
   return address_text;
 }
 
-var Address_definition = {
-  mfObject: Address,
+var adr_definition = {
+  mfObject: adr,
   className: "adr",
   properties: {
     "type" : {
@@ -78,4 +78,4 @@ var Address_definition = {
   }
 };
 
-Microformats.add("Address", Address_definition);
+Microformats.add("adr", adr_definition);
