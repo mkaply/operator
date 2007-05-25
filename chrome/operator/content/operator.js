@@ -330,7 +330,7 @@ var Operator = {
       } else {
         url = Microformats.actions[semanticAction].doAction(semanticObject, semanticObjectType)
       }
-      if (url) {
+      if ((url) && (url != true)) {
         openUILink(url, event);
       }
     };
@@ -340,7 +340,7 @@ var Operator = {
     return function(event) {
       var url;
       url = Microformats.actions[semanticAction].doActionAll(semanticArrays)
-      if (url) {
+      if ((url) && (url != true)) {
         openUILink(url, event);
       }
 
@@ -358,7 +358,7 @@ var Operator = {
           } else {
             url = Microformats.actions[semanticAction].doAction(semanticObject, semanticObjectType)
           }
-          if (url) {
+          if ((url) && (url != true)) {
             openUILink(url, event);
           }
           closeMenus(event.target);
@@ -374,7 +374,7 @@ var Operator = {
         if (event.target.getAttribute("disabled") != "true") {
           var url;
           url = Microformats.actions[semanticAction].doActionAll(semanticArrays)
-          if (url) {
+          if ((url) && (url != true)) {
             openUILink(url, event);
           }
           closeMenus(event.target);
@@ -551,7 +551,14 @@ var Operator = {
           continue;
         }
         if (Operator.actions[k].scope.semantic[semanticObjectType] != semanticObjectType) {
-          required = semanticObject[Operator.actions[k].scope.semantic[semanticObjectType]];
+          var reqprop = semanticObject[Operator.actions[k].scope.semantic[semanticObjectType]];
+          var required;
+          if (req.indexOf(".") != -1) {
+            var props = reqprop.split(".");
+            required = semanticObject[props[0]][props[1]];
+          } else {
+            required = semanticObject[reqprop];
+          }
           if (!required) {
             continue;
           }
@@ -954,7 +961,19 @@ var Operator = {
               /* Create a menu that corresponds to the action? */
               /* Or postpone the creation until we are sure we have the first one? */
               if ((Operator.actions[action].scope.semantic[j] != j) && (j != "RDFa")) {
-                if (!objectArray[k][Operator.actions[action].scope.semantic[j]]) {
+                
+                
+                
+                
+                var reqprop = Operator.actions[action].scope.semantic[j]
+                var required;
+                if (reqprop.indexOf(".") != -1) {
+                  var props = reqprop.split(".");
+                  required = objectArray[k][props[0]][props[1]];
+                } else {
+                  required = objectArray[k][reqprop];
+                }
+                if (!required) {
                   continue;
                 }
               }

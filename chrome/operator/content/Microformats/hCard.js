@@ -28,7 +28,7 @@ hCard.prototype.toString = function() {
 }
 
 var hCard_definition = {
-  version: "0.7",
+  version: "0.8",
   mfObject: hCard,
   className: "vcard",
   required: ["fn"],

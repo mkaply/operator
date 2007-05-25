@@ -9,10 +9,7 @@ var firefox_bookmark = {
     semantic: {
       "hCard" : "hCard",
       "hCalendar" : "hCalendar",
-      "hResume" : "hResume",
-      "hReview" : "hReview",
       "xFolk" : "taggedlink",
-      "hAtom" : "hAtom"
     }
   },
   doAction: function(semanticObject, semanticObjectType) {
@@ -23,15 +20,15 @@ var firefox_bookmark = {
         name = semanticObject.taggedlink.title;
       }
       description = semanticObject.description;
-    } else if (semanticObjectType == "hAtom") {
-      name = semanticObject['entry-title'];
-      url = semanticObject.bookmark.link;
     } else {
       var serializer = new XMLSerializer();
       var xmlString = serializer.serializeToString(semanticObject.resolvedNode);
       url = "data:text/html;charset=utf8," + xmlString;
       name = semanticObject.toString();
     }
+    firefox_bookmark.bookmark(name, url, description);
+  },
+  bookmark: function(name, url, description) {
     var dArgs = {
       name: name,
       url: url,

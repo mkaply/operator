@@ -337,9 +337,11 @@ var Microformats = {
   },
   add: function add(microformat, microformatDefinition) {
     /* We always replace an existing definition with the new one */
-    Microformats[microformat] = microformatDefinition;
-    Microformats.list.push(microformat); 
-    microformatDefinition.mfObject.prototype.debug = function(microformatObject) {return Microformats.debug(microformatObject)};
+    if (microformatDefinition.version == Microformats.version) {
+      Microformats[microformat] = microformatDefinition;
+      Microformats.list.push(microformat); 
+      microformatDefinition.mfObject.prototype.debug = function(microformatObject) {return Microformats.debug(microformatObject)};
+    }
   },
   /* All action specific function are contained in this object */
   actions: {
@@ -347,10 +349,26 @@ var Microformats = {
     list: [],
     add: function add(action, actionDefinition) {
       if (actionDefinition.version == Microformats.version) {
-        if (!Microformats.actions.list[action]) {
+        if (!Microformats.actions[action]) {
           Microformats.actions[action] = actionDefinition;
           Microformats.actions.list.push(action);
         } else {
+          /* Copy the scope */
+          for (i in actionDefinition.scope.semantic) {
+            Microformats.actions[action].scope.semantic[i] = actionDefinition.scope.semantic[i];
+          }
+          /* If there is a doAction, chain it in */
+          if (actionDefinition.doAction) {
+            var doAction = function(semanticObject, semanticObjectType) {
+              var ret = actionDefinition.doAction(semanticObject, semanticObjectType);
+              if (!ret) {
+                return doAction.actionOld(semanticObject, semanticObjectType);
+              }
+              return ret;
+            }
+            doAction.actionOld = Microformats.actions[action].doAction
+            Microformats.actions[action].doAction = doAction;
+          }
         }
       }
     },

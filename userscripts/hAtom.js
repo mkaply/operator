@@ -32,7 +32,7 @@ hEntry.prototype.toString = function() {
 }
 
 var hAtom_hEntry_definition = {
-  version: "0.7",
+  version: "0.8",
   description: "Atom Entry(s)",
   mfObject: hEntry,
   className: "hentry",
@@ -98,7 +98,7 @@ var hAtom_hEntry_definition = {
 };
 
 var hAtom_hFeed_definition = {
-  version: "0.2",
+  version: "0.8",
   description: "Atom Feed(s)",
   mfObject: hFeed,
   className: "hfeed",
@@ -137,3 +137,23 @@ var hAtom_hFeed_definition = {
 
 Microformats.add("hAtom-hEntry", hAtom_hEntry_definition);
 Microformats.add("hAtom-hFeed", hAtom_hFeed_definition);
+
+var hatom_firefox_bookmark = {
+  version: 0.8,
+  scope: {
+    semantic: {
+      "hAtom-hEntry" : "hAtom-hEntry",
+    }
+  },
+  doAction: function(semanticObject, semanticObjectType) {
+    if (semanticObjectType == "hAtom-hEntry") {
+      name = semanticObject['entry-title'];
+      url = semanticObject.bookmark.link;
+      Microformats.actions.firefox_bookmark.bookmark(name, url);
+      return true;
+    }
+  }
+};
+
+Microformats.actions.add("firefox_bookmark", hatom_firefox_bookmark);
+

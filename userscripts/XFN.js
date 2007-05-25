@@ -31,7 +31,7 @@ XFN.prototype.toString = function() {
 }
 
 var XFN_definition = {
-  version: "0.7",
+  version: "0.8",
   description: "XFN Relationship(s)",
   mfObject: XFN,
   attributeName: "rel",

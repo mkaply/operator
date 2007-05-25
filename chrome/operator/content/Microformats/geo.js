@@ -41,7 +41,7 @@ geo.prototype.toString = function() {
 }
 
 var geo_definition = {
-  version: "0.7",
+  version: "0.8",
   mfObject: geo,
   className: "geo",
   required: ["latitude","longitude"],

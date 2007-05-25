@@ -33,6 +33,7 @@ hReview.prototype.toString = function() {
 }
 
 var hReview_definition = {
+  version: 0.8,
   description: "Review(s)",
   mfObject: hReview,
   className: "hreview",
@@ -155,3 +156,35 @@ var hReview_definition = {
 };
 
 Microformats.add("hReview", hReview_definition);
+
+var hreview_firefox_bookmark = {
+  version: 0.8,
+  scope: {
+    semantic: {
+      "hReview" : "hReview",
+    }
+  }
+};
+
+var hreview_google_search = {
+  version: 0.8,
+  scope: {
+    semantic: {
+      "hReview" : "item.fn"
+    }
+  }
+};
+
+var hreview_yahoo_search = {
+  version: 0.8,
+  scope: {
+    semantic: {
+      "hReview" : "item.fn"
+    }
+  }
+};
+
+Microformats.actions.add("firefox_bookmark", hreview_firefox_bookmark);
+Microformats.actions.add("google_search", hreview_google_search);
+Microformats.actions.add("yahoo_search", hreview_yahoo_search);
+

@@ -18,7 +18,7 @@ hResume.prototype.toString = function() {
 }
 
 var hResume_definition = {
-  version: "0.7.2",
+  version: "0.8",
   description: "Resume(s)",
   mfObject: hResume,
   className: "hresume",
@@ -99,3 +99,35 @@ var hResume_definition = {
 };
 
 Microformats.add("hResume", hResume_definition);
+
+var hresume_firefox_bookmark = {
+  version: 0.8,
+  scope: {
+    semantic: {
+      "hResume" : "hResume",
+    }
+  }
+};
+
+var hresume_google_search = {
+  version: 0.8,
+  scope: {
+    semantic: {
+      "hResume" : "contact.fn"
+    }
+  }
+};
+
+var hresume_yahoo_search = {
+  version: 0.8,
+  scope: {
+    semantic: {
+      "hResume" : "contact.fn"
+    }
+  }
+};
+
+Microformats.actions.add("firefox_bookmark", hresume_firefox_bookmark);
+Microformats.actions.add("google_search", hresume_google_search);
+Microformats.actions.add("yahoo_search", hresume_yahoo_search);
+

@@ -58,21 +58,16 @@ var yahoo_search = {
   icon: "http://www.yahoo.com/favicon.ico",
   scope: {
     semantic: {
-      "hReview" : "hReview",
-      "hResume" : "contact.fn"
     }
   },
   doAction: function(semanticObject, semanticObjectType) {
     var searchstring;
-    if (semanticObjectType == "hReview") {
-      var hreview = semanticObject;
-      if (hreview.item.summary) {
-        searchstring = hreview.item.summary;
-      } else if (hreview.item.fn) {
-        searchstring = hreview.item.fn;
-      }
+    var property = this.scope.semantic[semanticObjectType];
+    if (property.indexOf(".") != -1) {
+      var props = property.split(".");
+      searchstring = semanticObject[props[0]][props[1]];
     } else {
-      searchstring = semanticObject[this.scope.semantic[semanticObjectType]];
+      searchstring = semanticObject[property];
     }
     if (searchstring) {
       return "http://search.yahoo.com/search?p=" + encodeURIComponent(searchstring);

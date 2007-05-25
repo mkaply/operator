@@ -19,7 +19,7 @@ GRDDL.prototype.toString = function() {
 }
 
 GRDDL_definition = {
-  version: "0.7",
+  version: "0.8",
   mfObject: GRDDL,
   attributeName: "rel",
   attributeValues: "transformation",
