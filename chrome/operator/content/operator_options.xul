@@ -22,7 +22,7 @@
   <tabbox>
 	  <tabs>
 		  <tab label="&general.label;"/>
-		  <tab label="&microformats.label;"/>
+		  <tab label="&dataformats.label;"/>
       <tab label="&actions.label;"/>
       <tab label="&userscripts.label;"/>
       <tab label="About"/>
@@ -33,9 +33,9 @@
           <groupbox>
             <caption label="&displayStyle.label;"/>
             <vbox>
-              <radiogroup id="view" onselect="Operator_Options.doMicroformatEnabling();">
+              <radiogroup id="view" onselect="Operator_Options.doDataformatEnabling();">
                 <radio label="&actions.label;" value="1"/>
-                <radio label="&microformats.label;" value="0"/>
+                <radio label="&dataformats.label;" value="0"/>
                  <checkbox id="useDescriptiveNames" class="indent" label="&useDescriptiveNames.label;"/>
               </radiogroup>
             </vbox>
@@ -48,7 +48,7 @@
         </vbox>
       </tabpanel>
       <tabpanel>
-      <box class="ccklist" id="microformats" disablenew="Operator_Options.disableNewMicroformat();" new="Operator_Options.onNewMicroformat();" edit="Operator_Options.onEditMicroformat();"/>
+      <box class="ccklist" id="dataformats" disablenew="Operator_Options.disableNewDataformat();" new="Operator_Options.onNewDataformat();" edit="Operator_Options.onEditDataformat();"/>
       </tabpanel>
       <tabpanel>
       <box class="ccklist" id="actions" disablenew="Operator_Options.disableNewAction();" new="Operator_Options.onNewAction();" edit="Operator_Options.onEditAction();"/>

@@ -13,16 +13,16 @@ var Operator_Options = {
     this.checkAndSetBoolPref("highlightMicroformats", document.getElementById("highlightMicroformats").checked);
     this.checkAndSetBoolPref("removeDuplicates", document.getElementById("removeDuplicates").checked);
     this.checkAndSetBoolPref("observeDOMAttrModified", document.getElementById("observeDOMAttrModified").checked);
-    var microformats = document.getElementById("microformats");
-    for (i=0; i < microformats.getRowCount(); i++) {
-      var label = microformats.getItemAtIndex(i).label;
-      this.checkAndSetCharPref("microformat" + (i+1), label); 
+    var dataformats = document.getElementById("dataformats");
+    for (i=0; i < dataformats.getRowCount(); i++) {
+      var label = dataformats.getItemAtIndex(i).label;
+      this.checkAndSetCharPref("dataformat" + (i+1), label); 
     }
     
     var haveMorePrefs = true;
     do {
       try {
-        this.prefBranch.clearUserPref("microformat" + (i+1));
+        this.prefBranch.clearUserPref("dataformat" + (i+1));
       }
       catch (ex)
       {
@@ -46,20 +46,6 @@ var Operator_Options = {
       {
         haveMorePrefs = false;
       }
-      try {
-        this.prefBranch.clearUserPref("action" + (i+1) + ".microformat");
-      }
-      catch (ex)
-      {
-        haveMorePrefs = false;
-      }
-      try {
-        this.prefBranch.clearUserPref("action" + (i+1) + ".handler");
-      }
-      catch (ex)
-      {
-        haveMorePrefs = false;
-      }
       i++;
     }
     while (haveMorePrefs);
@@ -68,27 +54,13 @@ var Operator_Options = {
 
   checkAndSetIntPref: function(pref, value)
   {
-    var prefValue;
-    try {
-      prefValue = this.prefBranch.getIntPref(pref);
-    } catch (ex)
-    {
-      prefValue = undefined;
-    }
-    if (prefValue != value) {
+    if (Operator[pref] != value) {
       this.prefBranch.setIntPref(pref, value);
     }
   },
   checkAndSetBoolPref: function(pref, value)
   {
-    var prefValue;
-    try {
-      prefValue = this.prefBranch.getBoolPref(pref);
-    } catch (ex)
-    {
-      prefValue = undefined;
-    }
-    if (prefValue != value) {
+    if (Operator[pref] != value) {
       this.prefBranch.setBoolPref(pref, value);
     }
   },
@@ -106,24 +78,6 @@ var Operator_Options = {
     }
   },
 
-  checkAndSetComplexPref: function(pref, value)
-  {
-    var prefValue;
-    try {
-      prefValue = this.prefBranch.getComplexValue(pref, Components.interfaces.nsISupportsString).data;
-    } catch (ex)
-    {
-      prefValue = undefined;
-    }
-    if (prefValue != value) {
-      var str = Components.classes["@mozilla.org/supports-string;1"].
-                           createInstance(Components.interfaces.nsISupportsString);
-      str.data = value;
-      this.prefBranch.setComplexValue(pref, Components.interfaces.nsISupportsString, str);
-    }
-  },
-
-                             
   onPageLoad: function() 
   {
     this.prefBranch = Components.classes["@mozilla.org/preferences-service;1"].
@@ -135,51 +89,70 @@ var Operator_Options = {
     try {
       view = this.prefBranch.getIntPref("view");
     } catch (ex) {
+      view = Operator.view;
     }
     document.getElementById("view").value = view;
 
+    var useDescriptiveNames;
     try {
-      document.getElementById("useDescriptiveNames").checked = this.prefBranch.getBoolPref("useDescriptiveNames");
+      useDescriptiveNames = this.prefBranch.getBoolPref("useDescriptiveNames");
     } catch (ex) {
+      useDescriptiveNames = Operator.useDescriptiveNames;
     }
+    document.getElementById("useDescriptiveNames").checked = useDescriptiveNames;
 
+    var debug;
     try {
-      document.getElementById("debug").checked = this.prefBranch.getBoolPref("debug");
+      debug = this.prefBranch.getBoolPref("debug");
     } catch (ex) {
+      debug = Operator.debug;
     }
+    document.getElementById("debug").checked = debug;
 
+    var statusbar;
     try {
-      document.getElementById("statusbar").checked = this.prefBranch.getBoolPref("statusbar");
+      statusbar = this.prefBranch.getBoolPref("statusbar");
     } catch (ex) {
+      statusbar = Operator.statusbar;
     }
+    document.getElementById("statusbar").checked = statusbar;
 
+    var highlightMicroformats;
     try {
-      document.getElementById("highlightMicroformats").checked = this.prefBranch.getBoolPref("highlightMicroformats");
+      highlightMicroformats = this.prefBranch.getBoolPref("highlightMicroformats");
     } catch (ex) {
+      highlightMicroformats = Operator.highlightMicroformats;
     }
+    document.getElementById("highlightMicroformats").checked = highlightMicroformats;
 
+    var removeDuplicates;
     try {
-      document.getElementById("removeDuplicates").checked = this.prefBranch.getBoolPref("removeDuplicates");
+      removeDuplicates = this.prefBranch.getBoolPref("removeDuplicates");
     } catch (ex) {
+      removeDuplicates = Operator.removeDuplicates
     }
+      document.getElementById("removeDuplicates").checked = removeDuplicates;
 
+    var observeDOMAttrModified;
     try {
-      document.getElementById("observeDOMAttrModified").checked = this.prefBranch.getBoolPref("observeDOMAttrModified");
+      observeDOMAttrModified = this.prefBranch.getBoolPref("observeDOMAttrModified");
     } catch (ex) {
+      observeDOMAttrModified = Operator.observeDOMAttrModified
     }
+    document.getElementById("observeDOMAttrModified").checked = observeDOMAttrModified;
   
     var i=1;
-    var microformats = document.getElementById("microformats");
-    var microformat, handler;
+    var dataformats = document.getElementById("dataformats");
+    var dataformat, handler;
     var listitem;
     do {
       try {
-        microformat = this.prefBranch.getCharPref("microformat" + i);
+        dataformat = this.prefBranch.getCharPref("dataformat" + i);
       } catch (ex) {
         break;
       }
-      if (microformat) {
-        listitem = microformats.appendItem(microformat);
+      if (dataformat) {
+        listitem = dataformats.appendItem(dataformat);
       }
       i++;
     } while (1);
@@ -201,7 +174,7 @@ var Operator_Options = {
     var file = Components.classes["@mozilla.org/file/directory_service;1"].
                           getService(Components.interfaces.nsIProperties).
                           get("ProfD", Components.interfaces.nsILocalFile);
-    file.append("microformats");
+    file.append("operator");
     
     if (file.exists() && file.isDirectory()) {
       var e = file.directoryEntries;
@@ -219,7 +192,7 @@ var Operator_Options = {
     }
   },
   
-  doMicroformatEnabling: function()
+  doDataformatEnabling: function()
   {
     if (document.getElementById('view').value == "1") {
       document.getElementById('useDescriptiveNames').setAttribute('disabled', 'true');
@@ -228,14 +201,14 @@ var Operator_Options = {
     }
   },
   
-  onNewMicroformat: function()
+  onNewDataformat: function()
   {
-    window.openDialog("chrome://operator/content/operator_options_microformat.xul","newmicroformat","chrome,centerscreen,modal");
+    window.openDialog("chrome://operator/content/operator_options_dataformat.xul","newdataformat","chrome,centerscreen,modal");
   },
   
-  onEditMicroformat: function()
+  onEditDataformat: function()
   {
-    window.openDialog("chrome://operator/content/operator_options_microformat.xul","editmicroformat","chrome,centerscreen,modal");
+    window.openDialog("chrome://operator/content/operator_options_dataformat.xul","editdataformat","chrome,centerscreen,modal");
   },
   
   onNewAction: function()
@@ -248,15 +221,15 @@ var Operator_Options = {
     window.openDialog("chrome://operator/content/operator_options_action.xul","editaction","chrome,centerscreen,modal");
   },
   
-  disableNewMicroformat: function()
+  disableNewDataformat: function()
   {
-    var numMicroformats = 0;
+    var numDataformats = 0;
     var i;
-    for (i in Microformats) {
-      numMicroformats++;
+    for (i=0; i< Operator.dataformats.length; i++) {
+      numDataformats++;
     }
 
-    if (document.getElementById("microformats").getRowCount() == numMicroformats) {
+    if (document.getElementById("dataformats").getRowCount() == numDataformats) {
       return true;
     }
     return false;
@@ -276,62 +249,61 @@ var Operator_Options = {
     return false;
   },
   
-  /* microformat dialog */
+  /* dataformat dialog */
   
   
-  onMicroformatLoad: function()
+  onDataformatLoad: function()
   {
-    var microformat = null;
+    var dataformat = null;
     var selectedItem = null;
     var edit = false;
-    var microformats = window.opener.document.getElementById("microformats");
-    if (window.name == 'editmicroformat') {
+    var dataformats = window.opener.document.getElementById("dataformats");
+    if (window.name == 'editdataformat') {
       edit = true;
-      microformat = microformats.selectedItem.label;
+      dataformat = dataformats.selectedItem.label;
     }
   
-    var microformatmenu = document.getElementById("microformats");
+    var dataformatmenu = document.getElementById("dataformats");
     var i, j;
     var add;
-    for (i in Microformats)
-    {
+    for (i=0; i< Operator.dataformats.length; i++) {
       add = true;
       /* if it is not already in the list */
-      for (j=0; j < microformats.getRowCount(); j++) {
-        var item = microformats.getItemAtIndex(j);
-        if (item.label == i) {
+      for (j=0; j < dataformats.getRowCount(); j++) {
+        var item = dataformats.getItemAtIndex(j);
+        if (item.label == Operator.dataformats[i]) {
           add = false;
           break;
         }
       }
-      if ((add) || ((i == microformat) && (edit))) {
-        var menulistitem = microformatmenu.appendItem(i);
-        menulistitem.minWidth=microformatmenu.width;
-        if (i == microformat) {
+      if ((add) || ((Operator.dataformats[i] == dataformat) && (edit))) {
+        var menulistitem = dataformatmenu.appendItem(Operator.dataformats[i]);
+        menulistitem.minWidth=dataformatmenu.width;
+        if (Operator.dataformats[i] == dataformat) {
           selectedItem = menulistitem;
         }
       }
       
     }
   
-    if (window.name == 'editmicroformat') {
-      microformatmenu.selectedItem = selectedItem;
+    if (window.name == 'editdataformat') {
+      dataformatmenu.selectedItem = selectedItem;
     } else {
-      microformatmenu.selectedIndex = 0;
+      dataformatmenu.selectedIndex = 0;
     }
     sizeToContent();
   },
   
-  onMicroformatOK: function()
+  onDataformatOK: function()
   {
-    var microformats = window.opener.document.getElementById("microformats");
-    var microformat = document.getElementById("microformats").selectedItem.label;
+    var dataformats = window.opener.document.getElementById("dataformats");
+    var dataformat = document.getElementById("dataformats").selectedItem.label;
   
-    if (window.name == 'newmicroformat') {
-      var listitem = microformats.appendItem(microformat);
+    if (window.name == 'newdataformat') {
+      var listitem = dataformats.appendItem(dataformat);
     } else {
-      var selectedItem = microformats.selectedItem;
-      selectedItem.label = microformat;
+      var selectedItem = dataformats.selectedItem;
+      selectedItem.label = dataformat;
     }
   },
   
@@ -407,8 +379,8 @@ var Operator_Options = {
         var dest = Components.classes["@mozilla.org/file/directory_service;1"].
                               getService(Components.interfaces.nsIProperties).
                               get("ProfD", Components.interfaces.nsILocalFile);
-        dest.append("microformats");
-        /* check if microformats exists and if not, create it */
+        dest.append("operator");
+        /* check if dataformats exists and if not, create it */
         try {
           var destfile = dest.clone();
           destfile.append(fp.file.leafName);
@@ -443,7 +415,7 @@ var Operator_Options = {
       var dest = Components.classes["@mozilla.org/file/directory_service;1"].
                             getService(Components.interfaces.nsIProperties).
                             get("ProfD", Components.interfaces.nsILocalFile);
-      dest.append("microformats");
+      dest.append("operator");
       dest.append(listbox.selectedItem.label);
       try {
         dest.remove(true);

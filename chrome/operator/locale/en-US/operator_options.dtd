@@ -1,7 +1,7 @@
 <!ENTITY  operatorOptions.label            "Operator Options">
 <!ENTITY  general.label                    "General">
-<!ENTITY  microformats.label               "Microformats">
-<!ENTITY  microformat.label                "Microformat">
+<!ENTITY  dataformats.label                "Data formats">
+<!ENTITY  dataformat.label                 "Data format">
 <!ENTITY  actions.label                    "Actions">
 <!ENTITY  action.label                     "Action">
 <!ENTITY  handler.label                    "Handler">

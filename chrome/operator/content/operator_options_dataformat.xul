@@ -2,18 +2,18 @@
 <!DOCTYPE operator_options_microformat SYSTEM "chrome://operator/locale/operator_options.dtd">
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 <dialog
-  title="&microformat.label;"
+  title="&dataformat.label;"
 	orient="vertical"
 	autostretch="always"
   buttons="accept,cancel"
-  ondialogaccept="return Operator_Options.onMicroformatOK()"
-  onload="sizeToContent();Operator_Options.onMicroformatLoad();"
+  ondialogaccept="return Operator_Options.onDataformatOK()"
+  onload="sizeToContent();Operator_Options.onDataformatLoad();"
   xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
   <script type="application/x-javascript;version=1.7" src="chrome://operator/content/operator.js"/>
   <script type="application/x-javascript" src="chrome://operator/content/operator_options.js"/>
   <vbox>
-    <label control="microformats">&microformat.label;</label>
-    <menulist id="microformats">
+    <label control="dataformats">&dataformat.label;</label>
+    <menulist id="dataformats">
       <menupopup/>
     </menulist>
   </vbox>

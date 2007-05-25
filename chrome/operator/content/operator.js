@@ -1,7 +1,5 @@
-/*extern ufJS, ufJSParser, ufJSActions, Microformats, Components, Operator_Statusbar, Operator_Toolbar, Operator_ToolbarButton, getBrowser, content, HTMLDocument, XMLSerializer, Operator_Sidebar, closeMenus, gContextMenu, openUILink, XSLTProcessor */
-
 var Operator = {
-  microformats: {},
+  dataformats: [],
   prefBranch: null,
   debug: false,
   official: true,
@@ -11,6 +9,7 @@ var Operator = {
   useDescriptiveNames: false,
   removeDuplicates: true,
   observeDOMAttrModified: false,
+  statusbar: false,
   batchPrefChanges: false,
   customizeDone: false,
   languageBundle: null,
@@ -34,8 +33,11 @@ var Operator = {
         }
         Operator.actions.list.push(action);
       } else {
+        var i;
+        for (i in actionDefinition.scope.semantic) {
         /* Assume everything else is good. Just get the new scope */
-        Operator.actions[action].scope.semantic["RDFa"] = actionDefinition.scope.semantic["RDFa"];
+          Operator.actions[action].scope.semantic[i] = actionDefinition.scope.semantic[i];
+        }
       }
     },
     __iterator__: function () {
@@ -85,7 +87,7 @@ var Operator = {
     this.languageBundle = bundleService.createBundle("chrome://operator/locale/operator.properties");
 
     var languageBundle = bundleService.createBundle("chrome://operator/locale/microformats.properties");
-    var i;
+    var i, j;
     for (i in Microformats)
     {
       try {
@@ -110,7 +112,7 @@ var Operator = {
     var file = Components.classes["@mozilla.org/file/directory_service;1"].
                           getService(Components.interfaces.nsIProperties).
                           get("ProfD", Components.interfaces.nsILocalFile);
-    file.append("microformats");
+    file.append("operator");
     
     if (file.exists() && file.isDirectory()) {
       var e = file.directoryEntries;
@@ -130,161 +132,42 @@ var Operator = {
         }
       }
     }
-
-    if (options) {
-      return;
+    
+    for (i in Microformats) {
+      Operator.dataformats.push(i);
+    }
+    if (typeof(RDFa) != "undefined") {
+      Operator.dataformats.push("RDFa");
+    }
+    if (typeof(eRDF) != "undefined") {
+      Operator.dataformats.push("eRDF");
     }
 
-    
-    window.addEventListener("load", function(e)   { Operator.startup(); }, false);
-    window.addEventListener("unload", function(e) { Operator.shutdown(); }, false);
-    window.addEventListener("operator-sidebar-load", Operator_Sidebar.processSemanticData, false, true);
-    
-  },
-  startup: function startup()
-  {
-    
-    var i,j;
+    /* preference stuff */
     this.prefBranch = Components.classes["@mozilla.org/preferences-service;1"].
                                  getService(Components.interfaces.nsIPrefService).
                                  getBranch("extensions.operator.");
-    var newcount = { value: 0 };
+    /* Just delete the really old prefs if we find them */
+    var prefBranchOld = Components.classes["@mozilla.org/preferences-service;1"].
+                                   getService(Components.interfaces.nsIPrefService).
+                                   getBranch("extensions.operator_toolbar.");
+    var oldcount = { value: 0 };
     try {
-      this.prefBranch.getChildList("", newcount);
-    } catch (ex) {}
-    /* that nine is an attempt to handle the 0.5 to 0.6 failure case and fix it */
-    if ((newcount.value === 0) || (newcount.value == 9) || (newcount.value == 10)) {
-      var action;
-      /* check for old prefs and migrate them if they are there */
-      var prefBranchOld = Components.classes["@mozilla.org/preferences-service;1"].
-                                     getService(Components.interfaces.nsIPrefService).
-                                     getBranch("extensions.operator_toolbar.");
-      var oldcount = { value: 0 };
-      try {
-        var prefArray = prefBranchOld.getChildList("", oldcount);
-      } catch (ex) {
-      }
-      if (oldcount.value > 0) {
-        try {
-        for (i = 0; i < oldcount.value; i++) {
-          switch (prefBranchOld.getPrefType(prefArray[i])) {
-            case Components.interfaces.nsIPrefBranch.PREF_STRING:
-              this.prefBranch.setCharPref(prefArray[i], prefBranchOld.getCharPref(prefArray[i]));
-              break;
-            case Components.interfaces.nsIPrefBranch.PREF_INT:
-              this.prefBranch.setIntPref(prefArray[i], prefBranchOld.getIntPref(prefArray[i]));
-              break;
-            case Components.interfaces.nsIPrefBranch.PREF_BOOL:
-              this.prefBranch.setBoolPref(prefArray[i], prefBranchOld.getBoolPref(prefArray[i]));
-              break;
-          }
-        }
-        } catch (ex) {
-        }
-        prefBranchOld.deleteBranch("");
-      } else {
-        /* Set initial prefs. We can't do this in an extension prefs.js 
-           because we want to cerate default toolbar items that might get
-           deleted */
-        this.prefBranch.setIntPref("view", 1);
-        this.prefBranch.setBoolPref("useDescriptiveNames", false);
-        this.prefBranch.setBoolPref("debug", false);
-        this.prefBranch.setBoolPref("statusbar", false);
-        this.prefBranch.setBoolPref("highlightMicroformats", false);
-        this.prefBranch.setBoolPref("upcomingOrgBugFixed", false);
-        this.prefBranch.setBoolPref("removeDuplicates", true);
-        this.prefBranch.setBoolPref("observeDOMAttrModified", false);
-        j = 1;
-        for (i in Microformats)
-        {
-          if (Microformats[i].description) {
-            this.prefBranch.setCharPref("microformat" + (j), i);
-            j++;
-          }
-        }
-        i = 1;
-        var microformat;
-        var handler;
-        do {
-          try {
-            action = this.languageBundle.GetStringFromName("action" + i);
-            microformat = this.languageBundle.GetStringFromName("action" + i + ".microformat");
-            handler = this.languageBundle.GetStringFromName("action" + i + ".handler");
-            this.prefBranch.setCharPref("action" + i, action);
-            this.prefBranch.setCharPref("action" + i + ".microformat", microformat);
-            this.prefBranch.setCharPref("action" + i + ".handler", handler);
-            i++;
-          } catch (ex) {
-            break;
-          }
-        }
-        while(1);
-      }
+      var prefArray = prefBranchOld.getChildList("", oldcount);
+    } catch (ex) {
     }
-    try {
-      var displayAllHandlers = this.prefBranch.getBoolPref("displayAllHandlers");
-      i = 1;
-      do {
-        try {
-          action = Operator.prefBranch.getComplexValue("action" + i, Components.interfaces.nsISupportsString).data;
-          microformat = Operator.prefBranch.getCharPref("action" + i + ".microformat");
-          handler = Operator.prefBranch.getCharPref("action" + i + ".handler");
-          
-          switch (microformat) {
-            case "hCalendar":
-              switch (handler) {
-                case "yahoo":
-                case "google":
-                  Operator.prefBranch.setCharPref("action" + i + ".handler", handler + "_calendar");
-                  break;
-                case "export":
-                  Operator.prefBranch.setCharPref("action" + i + ".handler", handler + "_icalendar");
-                  break;
-              }
-              break; 
-            case "hCard":
-              switch (handler) {
-                case "yahoo":
-                  Operator.prefBranch.setCharPref("action" + i + ".handler", handler + "_contact");
-                  break;
-                case "export":
-                  Operator.prefBranch.setCharPref("action" + i + ".handler", handler + "_vcard");
-                  break;
-              }
-              break; 
-            case "hResume":
-            case "hReview":
-              if ((handler == "google") || (handler == "yahoo")) {
-                Operator.prefBranch.setCharPref("action" + i + ".handler", handler + "_search");
-              }
-              break;
-            case "tag":
-              if ((handler == "delicious") || (handler == "flickr") ||
-                  (handler == "upcoming") || (handler == "technorati") ||
-                  (handler == "yedda") || (handler == "magnolia")) {
-                Operator.prefBranch.setCharPref("action" + i + ".handler", handler + "_search_tags");
-              }
-              break; 
-            case "xfolk":
-              if ((handler == "delicious") || (handler == "magnolia")) {
-                Operator.prefBranch.setCharPref("action" + i + ".handler", handler + "_bookmark");
-              }
-              break;
-          }
-        } catch (ex) {
-          break;
-        }
-        i++;
-      } while (1);
-      for (i in Microformats) {
-        try {
-          Operator.prefBranch.clearUserPref(i + ".defaultHandler");
-        } catch (ex) {}
-      }
-
-      Operator.prefBranch.clearUserPref("displayAllHandlers");
-
-    } catch (ex) {}
+    if (oldcount.value > 0) {
+      prefBranchOld.deleteBranch("");
+    }
+    /* Check for ***PREFERENCE*** and if we find it, just wipe wll preferences */
+    /* microformats1 */
+    /* SET DEFAULT PREFS, mainly list of actions and list of microformats */
+    /* don't set other prefs unless they are saved */
+    j = 1;
+    for (i=0; i< Operator.dataformats.length; i++) {
+      this.prefBranch.setCharPref("dataformat" + (j), Operator.dataformats[i]);
+      j++;
+    }
     
     this.prefBranch.QueryInterface(Components.interfaces.nsIPrefBranch2);
     this.prefBranch.addObserver("", this, false);
@@ -314,13 +197,24 @@ var Operator = {
       this.view = this.prefBranch.getIntPref("view");
     } catch (ex) {}
     try {
-      var statusbar = this.prefBranch.getBoolPref("statusbar");
-      if (statusbar) {
-        Operator_Statusbar.show();
-      } else {
-        Operator_Statusbar.hide();
-      }
-    } catch (ex) {
+      this.statusbar = this.prefBranch.getBoolPref("statusbar");
+    } catch (ex) {}
+
+    if (options) {
+      return;
+    }
+
+    window.addEventListener("load", function(e)   { Operator.startup(); }, false);
+    window.addEventListener("unload", function(e) { Operator.shutdown(); }, false);
+    window.addEventListener("operator-sidebar-load", Operator_Sidebar.processSemanticData, false, true);
+    
+  },
+  startup: function startup()
+  {
+    /* Window specific stuff */
+    if (this.statusbar) {
+      Operator_Statusbar.show();
+    } else {
       Operator_Statusbar.hide();
     }
     Operator_Toolbar.create();
@@ -382,9 +276,11 @@ var Operator = {
     }
     if (data == "statusbar") {
       if (this.prefBranch.getBoolPref("statusbar")) {
+        this.statusbar = true;
         Operator_Statusbar.show();
       } else {
         Operator_Statusbar.hide();
+        this.statusbar = false;
       }
       return;
     }
@@ -724,6 +620,7 @@ var Operator = {
     return menu;
   },
 
+  /* This only works with microformats */
   contextPopupShowing: function contextPopupShowing(event) {
     gContextMenu.showItem("operator-menu-0", false);
     gContextMenu.showItem("operator-menu-1", false);
@@ -792,6 +689,7 @@ var Operator = {
       return false;
     }
   },
+  /* This only works with microformats */
   mouseOver: function mouseOver(event) {
     var element = (event.target) ? event.target : event.srcElement;
     var mfNode;
@@ -1022,7 +920,6 @@ var Operator = {
       i = 1;
       do {
         try {
-//          var action = Operator.prefBranch.getComplexValue("action" + i, Components.interfaces.nsISupportsString).data;
           action = Operator.prefBranch.getCharPref("action" + i);
         } catch (ex) {
           break;
@@ -1120,7 +1017,7 @@ var Operator = {
       do {
         /* Get the active semantic items from preferences */
         try {
-          semanticType = Operator.prefBranch.getCharPref("microformat" + i);
+          semanticType = Operator.prefBranch.getCharPref("dataformat" + i);
         } catch (ex) {
           break;
         }
@@ -1171,11 +1068,11 @@ var Operator = {
             }
             tempMenu = document.createElement("menu");
             
-//            if ((this.useDescriptiveNames) && (Microformats[microformat].description)) {
-//              tempItem.label = Microformats[microformat].description;
-//            } else {
-              tempMenu.label = semanticType;
-//            }
+            if ((this.useDescriptiveNames) && Microformats[microformat] && Microformats[microformat].description) {
+              tempItem.label = Microformats[microformat].description;
+             } else {
+               tempMenu.label = semanticType;
+            }
             tempMenu.setAttribute("label", tempMenu.label);
 
             popup.appendChild(tempMenu);

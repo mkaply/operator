@@ -52,7 +52,7 @@ var Operator_Toolbar = {
       i = 1;
       do {
         try {
-          semanticType = Operator.prefBranch.getCharPref("microformat" + i);
+          semanticType = Operator.prefBranch.getCharPref("dataformat" + i);
         } catch (ex) {
           break;
         }
@@ -144,7 +144,7 @@ var Operator_Toolbar = {
       i = 1;
       do {
         try {
-          microformat = Operator.prefBranch.getCharPref("microformat" + i);
+          microformat = Operator.prefBranch.getCharPref("dataformat" + i);
         } catch (ex) {
           break;
         }

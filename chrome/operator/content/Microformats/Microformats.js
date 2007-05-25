@@ -336,6 +336,7 @@ var Microformats = {
     return dumpObject(microformatObject);
   },
   add: function add(microformat, microformatDefinition) {
+    /* We always replace an existing definition with the new one */
     Microformats[microformat] = microformatDefinition;
     Microformats.list.push(microformat); 
     microformatDefinition.mfObject.prototype.debug = function(microformatObject) {return Microformats.debug(microformatObject)};
@@ -346,8 +347,11 @@ var Microformats = {
     list: [],
     add: function add(action, actionDefinition) {
       if (actionDefinition.version == Microformats.version) {
-        Microformats.actions[action] = actionDefinition;
-        Microformats.actions.list.push(action);
+        if (!Microformats.actions.list[action]) {
+          Microformats.actions[action] = actionDefinition;
+          Microformats.actions.list.push(action);
+        } else {
+        }
       }
     },
     __iterator__: function () {
@@ -586,7 +590,7 @@ var Microformats = {
       object.resolvedNode = node; 
       object.semanticType = microformat;
     },
-    getMicroformatPropertyGenerator: function(node, name, property, microformat)
+    getMicroformatPropertyGenerator: function getMicroformatPropertyGenerator(node, name, property, microformat)
     {
       return function() {
         var result = Microformats.parser.getMicroformatProperty(node, name, property);
@@ -597,7 +601,7 @@ var Microformats = {
         }
       };
     },
-    getMicroformatProperty: function(in_mfnode, mfname, propname) {
+    getMicroformatProperty: function getMicroformatProperty(in_mfnode, mfname, propname) {
       var i, j, k;
       var result;
       var mfnode = in_mfnode;
