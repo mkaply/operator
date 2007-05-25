@@ -551,9 +551,9 @@ var Operator = {
           continue;
         }
         if (Operator.actions[k].scope.semantic[semanticObjectType] != semanticObjectType) {
-          var reqprop = semanticObject[Operator.actions[k].scope.semantic[semanticObjectType]];
+          var reqprop = Operator.actions[k].scope.semantic[semanticObjectType];
           var required;
-          if (req.indexOf(".") != -1) {
+          if (reqprop.indexOf(".") != -1) {
             var props = reqprop.split(".");
             required = semanticObject[props[0]][props[1]];
           } else {
