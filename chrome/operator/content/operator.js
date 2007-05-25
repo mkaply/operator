@@ -95,19 +95,6 @@ var Operator = {
       } catch (ex) {
       }
     }
-    for (i in Microformats.actions) {
-      Operator.actions.add(i, Microformats.actions[i]);
-    }
-    for (i in RDFa.actions) {
-      Operator.actions.add(i, RDFa.actions[i]);
-    }
-    for (i in Operator.actions)
-    {
-      try {
-        Operator.actions[i].description = languageBundle.GetStringFromName(i + ".description");
-      } catch (ex) {
-      }
-    }
     
     var file = Components.classes["@mozilla.org/file/directory_service;1"].
                           getService(Components.interfaces.nsIProperties).
@@ -130,6 +117,20 @@ var Operator = {
             alert("Unable to load " + f.leafName + "\n\n" + "(" + ex.message + ")");
           }
         }
+      }
+    }
+
+    for (i in Microformats.actions) {
+      Operator.actions.add(i, Microformats.actions[i]);
+    }
+    for (i in RDFa.actions) {
+      Operator.actions.add(i, RDFa.actions[i]);
+    }
+    for (i in Operator.actions)
+    {
+      try {
+        Operator.actions[i].description = languageBundle.GetStringFromName(i + ".description");
+      } catch (ex) {
       }
     }
     
@@ -188,9 +189,6 @@ var Operator = {
 
       
     
-    this.prefBranch.QueryInterface(Components.interfaces.nsIPrefBranch2);
-    this.prefBranch.addObserver("", this, false);
-
     try {
       this.debug = this.prefBranch.getBoolPref("debug");
     } catch (ex) {}
@@ -230,6 +228,9 @@ var Operator = {
   },
   startup: function startup()
   {
+    this.prefBranch.QueryInterface(Components.interfaces.nsIPrefBranch2);
+    this.prefBranch.addObserver("", this, false);
+
     /* Window specific stuff */
     if (this.statusbar) {
       Operator_Statusbar.show();
@@ -1078,11 +1079,11 @@ var Operator = {
              popup = document.createElement("menupopup");
             }
             tempMenu = document.createElement("menu");
-            
-            if ((this.useDescriptiveNames) && Microformats[microformat] && Microformats[microformat].description) {
-              tempItem.label = Microformats[microformat].description;
+
+            if ((Operator.useDescriptiveNames) && Microformats[semanticType] && Microformats[semanticType].description) {
+              tempMenu.label = Microformats[semanticType].description;
              } else {
-               tempMenu.label = semanticType;
+              tempMenu.label = semanticType;
             }
             tempMenu.setAttribute("label", tempMenu.label);
 
