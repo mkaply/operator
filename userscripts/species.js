@@ -42,7 +42,8 @@ var species_definition = {
 
 Microformats.add("species", species_definition);
 
-ufJSActions.actions.wikispecies_search = {
+var wikispecies_search = {
+  version: 0.8,
   description: "Wikispecies",
   icon: "http://species.wikimedia.org/favicon.ico",
   scope: {
@@ -57,3 +58,4 @@ ufJSActions.actions.wikispecies_search = {
   }
 };
 
+Microformats.actions.add("wikispecies_search", wikispecies_search);

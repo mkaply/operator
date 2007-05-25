@@ -1,4 +1,5 @@
-ufJSActions.actions.corkd_search_tags = {
+var corkd_search_tags = {
+  version: 0.8,
   description: "Find wines on Cork'd",
   icon: "http://corkd.com/favicon.ico",
   scope: {
@@ -13,3 +14,5 @@ ufJSActions.actions.corkd_search_tags = {
     }
   }
 };
+
+Microformats.actions.add("corkd_search_tags", corkd_search_tags);

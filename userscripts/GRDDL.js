@@ -35,7 +35,8 @@ GRDDL_definition = {
 
 Microformats.add("GRDDL", GRDDL_definition);
 
-ufJSActions.actions.extract_rdf = {
+var extract_rdf = {
+  version: 0.8,
   description: "Extract RDF",
   scope: {
     semantic: {
@@ -57,3 +58,4 @@ ufJSActions.actions.extract_rdf = {
   }
 };
 
+Microformats.actions.add("extract_rdf", extract_rdf);

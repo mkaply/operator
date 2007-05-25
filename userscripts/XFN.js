@@ -165,8 +165,8 @@ var XFN_definition = {
   }
 };
 
-if (ufJSActions.actions.goto_url) {
-  ufJSActions.actions.goto_url.scope.semantic.XFN = "link";
-}
+//if (ufJSActions.actions.goto_url) {
+//  ufJSActions.actions.goto_url.scope.semantic.XFN = "link";
+//}
 
 Microformats.add("XFN", XFN_definition);

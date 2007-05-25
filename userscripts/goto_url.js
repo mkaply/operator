@@ -1,6 +1,5 @@
-/*extern ufJS, ufJSActions, ufJSParser, openUILink */ 
-
-ufJSActions.actions.goto_url = {
+var goto_url = {
+  version: 0.8,
   description: "Go to web page",
   scope: {
     semantic: {
@@ -10,7 +9,13 @@ ufJSActions.actions.goto_url = {
     }
   },
   doAction: function(semanticObject, semanticObjectType) {
-    var action = ufJSActions.actions.goto_url;
-    return semanticObject[action.scope.semantic[semanticObjectType]];
+    var url = semanticObject[this.scope.semantic[semanticObjectType]];
+    if (url instanceof Array) {
+      return url[0];
+    } else {
+      return url;
+    }
   } 
 };
+
+Microformats.actions.add("goto_url", goto_url);
