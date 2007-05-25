@@ -10,10 +10,12 @@ var goto_url = {
   },
   doAction: function(semanticObject, semanticObjectType) {
     var url = semanticObject[this.scope.semantic[semanticObjectType]];
-    if (url instanceof Array) {
-      return url[0];
-    } else {
-      return url;
+    if (url) {
+      if (url instanceof Array) {
+        return url[0];
+      } else {
+        return url;
+      }
     }
   } 
 };
