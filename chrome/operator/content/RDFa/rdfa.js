@@ -298,8 +298,8 @@ RDFa.Literal = function(_value, _type, _lang, _model) {
   };
   this.equals = function(obj) {
     try {
-      if(obj.value !== undefined) {
-         if(obj.model === obj.model && obj.index == s) {
+      if(obj.$value !== undefined) {
+         if(obj.$model === obj.$model && obj.$index == value) {
            return true; 
          }
       }
@@ -411,10 +411,13 @@ RDFa.Model = function() {
     }
   };
   this.getObject = function(s) {
+    if(uris_map[s] !== undefined) {
+      s = uris_map[s];
+    }
     if(subjects[s] === undefined) {
       return null;
     }
-    return new RDFa.SemanticObject(s, model);
+    return new RDFa.SemanticObject(this, s);
   };
   this.getObjectsWithProperty = function(p, ns) {
     if(uris_map[p] !== undefined) {
@@ -684,6 +687,7 @@ RDFa.SemanticObject = function (_model, _subject) {
 
   this.getNamespaceList = function() {
     var props = this.model.enumProperties(this.subject);
+    var ns_stats = {};
     for(var j = 0; j < props.length; j++) {
       var ns = this.model.getUriNs(props[j]); 
       ns_stats[ns] = 1;
@@ -938,6 +942,22 @@ RDFa.TestSuite = {
         model.setNamespace("foaf", ns.foaf(""));
         
         model.dump();
+    },
+    function() {
+        var ns = RDFa.TestSuite.ns;
+        var model = new RDFa.Model();
+        var s1 = "http://example.org/card.xhtml#i";
+
+        model.addLiteral(s1, ns.foaf("givenname"), "Ben");
+        model.addLiteral(s1, ns.foaf("nick"), "Elias");
+
+        var x = model.subjects[0];
+        var props1 = model.getProperty(x, ns.foaf("givenname"));
+        var props2 = model.getProperty(x, ns.foaf("nick"));
+        var props3 = model.getProperty(x, ns.foaf("givenname"));
+        
+        this.assert(props1[0].equals(props3[0]));
+        this.assert(!props1[0].equals(props2[0]));
     },
     function() {
         var ns = RDFa.TestSuite.ns;
