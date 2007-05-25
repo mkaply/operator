@@ -161,13 +161,32 @@ var Operator = {
     }
     /* Check for ***PREFERENCE*** and if we find it, just wipe wll preferences */
     /* microformats1 */
-    /* SET DEFAULT PREFS, mainly list of actions and list of microformats */
-    /* don't set other prefs unless they are saved */
-    j = 1;
-    for (i=0; i< Operator.dataformats.length; i++) {
-      this.prefBranch.setCharPref("dataformat" + (j), Operator.dataformats[i]);
-      j++;
+    try {
+      this.prefBranch.getCharPref("microformat1");
+      /* If we got here, we have old stuff */
+      this.prefBranch.deleteBranch("");
+    } catch (ex) {}
+    var newcount = { value: 0 };
+    try {
+      this.prefBranch.getChildList("", newcount);
+    } catch (ex) {
     }
+    if (newcount.value == 0) {
+      j = 1;
+      for (i=0; i< Operator.dataformats.length; i++) {
+        this.prefBranch.setCharPref("dataformat" + (j), Operator.dataformats[i]);
+        j++;
+      }
+      
+      this.prefBranch.setCharPref("action1", "export_vcard");
+      this.prefBranch.setCharPref("action2", "google_calendar");
+      this.prefBranch.setCharPref("action3", "google_maps");
+      this.prefBranch.setCharPref("action4", "flickr_search_tags");
+      this.prefBranch.setCharPref("action5", "delicious_search_tags");
+      this.prefBranch.setCharPref("action6", "technorati_search_tags");
+    }
+
+      
     
     this.prefBranch.QueryInterface(Components.interfaces.nsIPrefBranch2);
     this.prefBranch.addObserver("", this, false);
@@ -319,11 +338,7 @@ var Operator = {
   {
     return function(event) {
       var url;
-      if (semanticObjectType == "RDFa") {
-        url = RDFa.actions[semanticAction].doActionAll(semanticArrays)
-      } else {
-        url = Microformats.actions[semanticAction].doActionAll(semanticArrays)
-      }
+      url = Microformats.actions[semanticAction].doActionAll(semanticArrays)
       if (url) {
         openUILink(url, event);
       }
@@ -357,11 +372,7 @@ var Operator = {
       if (event.button == 1) {
         if (event.target.getAttribute("disabled") != "true") {
           var url;
-          if (semanticObjectType == "RDFa") {
-            url = RDFa.actions[semanticAction].doActionAll(semanticArrays)
-          } else {
-            url = Microformats.actions[semanticAction].doActionAll(semanticArrays)
-          }
+          url = Microformats.actions[semanticAction].doActionAll(semanticArrays)
           if (url) {
             openUILink(url, event);
           }
