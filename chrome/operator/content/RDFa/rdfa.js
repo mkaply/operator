@@ -681,7 +681,9 @@ RDFa.SemanticObject = function (_model, _subject) {
 
   this.namespaces = {};
   this.model = _model;
+  var model = _model;
   this.subject = _subject;
+  var subject = _subject;
 
 
   if(!this.model.hasSubject(this.subject)) {
@@ -729,6 +731,8 @@ RDFa.SemanticObject = function (_model, _subject) {
     return this.model.dumpSubject(_subject,1);
   }
   this.debug = this.dump;
+  this.__defineGetter__("$model", function() { return model; });
+  this.__defineGetter__("$subject", function() { return subject; });
 };
 
 RDFa.Utilities = {
