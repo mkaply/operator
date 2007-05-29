@@ -94,4 +94,4 @@ var thirty_boxes_calendar = {
   }
 };
 
-SemanticActions.actions.add("30boxes_calendar", thirty_boxes_calendar);
+SemanticActions.add("30boxes_calendar", thirty_boxes_calendar);

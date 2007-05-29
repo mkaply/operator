@@ -322,11 +322,7 @@ var Operator = {
   {
     return function(event) {
       var url;
-      if (semanticObjectType == "RDFa") {
-        url = RDFa.actions[semanticAction].doAction(semanticObject, semanticObjectType)
-      } else {
-        url = Microformats.actions[semanticAction].doAction(semanticObject, semanticObjectType)
-      }
+      url = SemanticActions[semanticAction].doAction(semanticObject, semanticObjectType)
       if ((url) && (url != true)) {
         openUILink(url, event);
       }
@@ -336,7 +332,7 @@ var Operator = {
   {
     return function(event) {
       var url;
-      url = Microformats.actions[semanticAction].doActionAll(semanticArrays)
+      url = SemanticActions[semanticAction].doActionAll(semanticArrays)
       if ((url) && (url != true)) {
         openUILink(url, event);
       }
@@ -350,11 +346,7 @@ var Operator = {
       if (event.button == 1) {
         if (event.target.getAttribute("disabled") != "true") {
           var url;
-          if (semanticObjectType == "RDFa") {
-            url = RDFa.actions[semanticAction].doAction(semanticObject, semanticObjectType);
-          } else {
-            url = Microformats.actions[semanticAction].doAction(semanticObject, semanticObjectType)
-          }
+          url = SemanticActions[semanticAction].doAction(semanticObject, semanticObjectType)
           if ((url) && (url != true)) {
             openUILink(url, event);
           }
@@ -370,7 +362,7 @@ var Operator = {
       if (event.button == 1) {
         if (event.target.getAttribute("disabled") != "true") {
           var url;
-          url = Microformats.actions[semanticAction].doActionAll(semanticArrays)
+          url = SemanticActions[semanticAction].doActionAll(semanticArrays)
           if ((url) && (url != true)) {
             openUILink(url, event);
           }
@@ -854,13 +846,13 @@ var Operator = {
     
     if (semanticObjectType == "hCard") {
       try {
-        vcfical = Microformats.actions.export_vcard.vCard(semanticObject);
+        vcfical = SemanticActions.export_vcard.vCard(semanticObject);
       } catch (ex) {}
       X2V = semanticObject.node;
     }
     if (semanticObjectType == "hCalendar") {
       try {
-        vcfical = Microformats.actions.export_icalendar.iCalendar(semanticObject, true, true);
+        vcfical = SemanticActions.export_icalendar.iCalendar(semanticObject, true, true);
       } catch (ex) {}
       X2V = semanticObject.node;
     }

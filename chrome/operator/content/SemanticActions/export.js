@@ -522,8 +522,7 @@ var export_icalendar = {
 
 var export_kml = {
   version: 0.8,
-  description: "Export as KML",
-  descriptionAll: "Export All",
+  description: "Export KML",
   scope: {
     semantic: {
       "geo" : "geo"
