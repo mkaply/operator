@@ -539,7 +539,7 @@ var Operator = {
         if (!Operator.actions[k].scope.semantic[semanticObjectType]) {
           continue;
         }
-        if (Operator.actions[k].scope.semantic[semanticObjectType] != semanticObjectType) {
+        if ((Operator.actions[k].scope.semantic[semanticObjectType] != semanticObjectType)  && (semanticObjectType != "RDFa")) {
           var reqprop = Operator.actions[k].scope.semantic[semanticObjectType];
           var required;
           if (reqprop.indexOf(".") != -1) {
@@ -555,6 +555,13 @@ var Operator = {
         if (Operator.actions[k].scope.url) {
           if (!(content.document.location.href.match(Operator.actions[k].scope.url))) {
             continue;
+          }
+        }
+        if (semanticObjectType == "RDFa") {
+          if ((semanticObject.$model.getProperty(semanticObject.$subject, Operator.actions[k].scope.semantic[semanticObjectType]["property"])).length == 0) {
+            continue;
+          } else {
+            semanticObject.setDefaultNS(Operator.actions[k].scope.semantic[semanticObjectType]["defaultNS"]);
           }
         }
         menuitem = document.createElement("menuitem");
