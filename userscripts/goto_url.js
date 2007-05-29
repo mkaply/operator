@@ -5,7 +5,8 @@ var goto_url = {
     semantic: {
       "hCard" : "url",
       "hCalendar" : "url",
-      "hAtom-hEntry" : "bookmark.link"
+      "hAtom-hEntry" : "bookmark.link",
+      "XFN" : "link"
     }
   },
   doAction: function(semanticObject, semanticObjectType) {
