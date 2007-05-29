@@ -260,6 +260,9 @@ var export_vcard = {
     if (hcard.logo) {
       vcf += "LOGO;VALUE=uri:" + hcard.logo + crlf;
     }
+    if (hcard.label) {
+      vcf += "LABEL:" + hcard.label + crlf;
+    }
     vcf += "END:VCARD" + crlf;
     return vcf;
   }
