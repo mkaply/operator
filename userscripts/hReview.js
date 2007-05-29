@@ -184,7 +184,7 @@ var hreview_yahoo_search = {
   }
 };
 
-Microformats.actions.add("firefox_bookmark", hreview_firefox_bookmark);
-Microformats.actions.add("google_search", hreview_google_search);
-Microformats.actions.add("yahoo_search", hreview_yahoo_search);
+SemanticActions.add("firefox_bookmark", hreview_firefox_bookmark);
+SemanticActions.add("google_search", hreview_google_search);
+SemanticActions.add("yahoo_search", hreview_yahoo_search);
 

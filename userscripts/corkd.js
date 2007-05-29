@@ -15,4 +15,4 @@ var corkd_search_tags = {
   }
 };
 
-Microformats.actions.add("corkd_search_tags", corkd_search_tags);
+SemanticActions.add("corkd_search_tags", corkd_search_tags);

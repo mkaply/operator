@@ -127,7 +127,7 @@ var hresume_yahoo_search = {
   }
 };
 
-Microformats.actions.add("firefox_bookmark", hresume_firefox_bookmark);
-Microformats.actions.add("google_search", hresume_google_search);
-Microformats.actions.add("yahoo_search", hresume_yahoo_search);
+SemanticActions.add("firefox_bookmark", hresume_firefox_bookmark);
+SemanticActions.add("google_search", hresume_google_search);
+SemanticActions.add("yahoo_search", hresume_yahoo_search);
 

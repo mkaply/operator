@@ -58,4 +58,4 @@ var extract_rdf = {
   }
 };
 
-Microformats.actions.add("extract_rdf", extract_rdf);
+SemanticActions.add("extract_rdf", extract_rdf);

@@ -13,7 +13,7 @@ var liveclipboard = {
     var xmlString = "<?xml version=\"1.0\" encoding=\"utf-8\" ?><liveclipboard version=\"0.92\"" + " xmlns:lc=\"http://www.microsoft.com/schemas/liveclipboard\">";
     xmlString += "<lc:data>";
     xmlString += "<lc:format type=\"";
-    xmlString += ufJSParser.microformats[semanticObjectType].className;
+    xmlString += Microformats[semanticObjectType].className;
     xmlString += "\" contenttype=\"application/xhtml+xml\">";
     xmlString += "<lc:item>";
     var serializer = new XMLSerializer();
@@ -28,4 +28,4 @@ var liveclipboard = {
   }
 };
 
-Microformats.actions.add("liveclipboard", liveclipboard);
+SemanticActions.add("liveclipboard", liveclipboard);

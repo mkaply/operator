@@ -149,11 +149,11 @@ var hatom_firefox_bookmark = {
     if (semanticObjectType == "hAtom-hEntry") {
       name = semanticObject['entry-title'];
       url = semanticObject.bookmark.link;
-      Microformats.actions.firefox_bookmark.bookmark(name, url);
+      SemanticActions.firefox_bookmark.bookmark(name, url);
       return true;
     }
   }
 };
 
-Microformats.actions.add("firefox_bookmark", hatom_firefox_bookmark);
+SemanticActions.add("firefox_bookmark", hatom_firefox_bookmark);
 

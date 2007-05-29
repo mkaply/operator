@@ -10,7 +10,7 @@ var bluetooth_vcard = {
   },
   doAction: function(semanticObject, semanticObjectType) {
     if (semanticObjectType == "hCard") {
-      var vcf = Microformats.actions.export_vcard.vCard(semanticObject);
+      var vcf = SemanticActions.export_vcard.vCard(semanticObject);
       var file = Components.classes["@mozilla.org/file/directory_service;1"].
                             getService(Components.interfaces.nsIProperties).
                             get("TmpD", Components.interfaces.nsIFile);
@@ -55,7 +55,7 @@ var bluetooth_icalendar = {
   },
   doAction: function(semanticObject, semanticObjectType) {
     if (semanticObjectType == "hCalendar") {
-      var ics = Microformats.actions.export_icalendar.iCalendar(semanticObject);
+      var ics = SemanticActions.export_icalendar.iCalendar(semanticObject);
       var file = Components.classes["@mozilla.org/file/directory_service;1"].
                             getService(Components.interfaces.nsIProperties).
                             get("TmpD", Components.interfaces.nsIFile);
@@ -91,5 +91,5 @@ var bluetooth_icalendar = {
   }
 };
 
-Microformats.actions.add("bluetooth_vcard", bluetooth_vcard);
-Microformats.actions.add("bluetooth_icalendar", bluetooth_icalendar);
+SemanticActions.add("bluetooth_vcard", bluetooth_vcard);
+SemanticActions.add("bluetooth_icalendar", bluetooth_icalendar);

@@ -58,4 +58,4 @@ var wikispecies_search = {
   }
 };
 
-Microformats.actions.add("wikispecies_search", wikispecies_search);
+SemanticActions.add("wikispecies_search", wikispecies_search);

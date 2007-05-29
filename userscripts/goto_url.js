@@ -27,4 +27,4 @@ var goto_url = {
   } 
 };
 
-Microformats.actions.add("goto_url", goto_url);
+SemanticActions.add("goto_url", goto_url);
