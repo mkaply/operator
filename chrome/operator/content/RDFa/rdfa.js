@@ -36,7 +36,7 @@ var RDFa = {
   },
   parse: function(rootElement)
   {
-    var bnodes = {nodes:[], counter:[]};
+    var bnodes = {nodes:[], names:[], counter:[]};
     var model = new RDFa.Model();
 
     if(!RDFa.hasRDFa(rootElement)) {
@@ -72,7 +72,7 @@ var RDFa = {
         for(var p = 0; p < properties.length; p++) {
           var expandedProperty = RDFa.expandURI(properties[p],ctx);
           // now extract the content
-          var datatype;
+          var datatype = undefined;
           var content = "";
           if(node.hasAttribute("datatype")) {
             datatype = node.getAttribute("datatype").replace(/^\s+|\s+$/, '');
@@ -246,12 +246,15 @@ var RDFa = {
   },
   generateBNodeName: function(e, bnodes)
   {
-    if(bnodes.nodes[e]) { return bnodes.nodes[e]; }
+    var foundNode = bnodes.nodes.indexOf(e);
+    if(foundNode > -1) { return bnodes.names[foundNode]; }
     
     var name = e.nodeName.toLowerCase();
-    bnodes.counter[name] = !bnodes.counter[name] ? 0 : bnodes.counter[name] + 1;
-    bnodes.nodes[e] = "_:" + name + bnodes.counter[name];
-    return bnodes.nodes[e]; 
+    var nodeIndex = bnodes.nodes.push(e);
+    nodeIndex--;
+    bnodes.counter[name] = bnodes.counter[name] === undefined ? 0 : bnodes.counter[name] + 1;
+    bnodes.names[nodeIndex] = "_:" + name + bnodes.counter[name];
+    return bnodes.names[nodeIndex]; 
     
   },
   isAncestor: function(ancestor, descendant)
