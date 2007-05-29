@@ -857,13 +857,13 @@ var Operator = {
     
     if (semanticObjectType == "hCard") {
       try {
-        vcfical = Microformat.actions.export_vcard.vCard(semanticObject);
+        vcfical = Microformats.actions.export_vcard.vCard(semanticObject);
       } catch (ex) {}
       X2V = semanticObject.node;
     }
     if (semanticObjectType == "hCalendar") {
       try {
-        vcfical = Microformat.actions.export_icalendar.iCalendar(semanticObject, true, true);
+        vcfical = Microformats.actions.export_icalendar.iCalendar(semanticObject, true, true);
       } catch (ex) {}
       X2V = semanticObject.node;
     }
