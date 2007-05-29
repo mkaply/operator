@@ -777,7 +777,7 @@ var Operator = {
 
   onTabChanged: function onTabChanged(event) 
   {
-    Operator.processSemanticDataDelayed();
+    Operator.processSemanticData();
   },
   /* This function compares the strings in two objects to see if they are equal */
   areEqualObjects: function(object1, object2)
