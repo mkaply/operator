@@ -166,7 +166,9 @@ var Operator_Options = {
       } catch (ex) {
         break;
       }
-      listitem = actions.appendItem(Operator.actions[action].description, action);
+      if (Operator.actions[action]) {
+        listitem = actions.appendItem(Operator.actions[action].description, action);
+      }
       i++;
     } while (1);
 

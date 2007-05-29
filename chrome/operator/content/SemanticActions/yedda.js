@@ -14,4 +14,4 @@ var yedda_search_tags = {
   }
 };
 
-Microformats.actions.add("yedda_search_tags", yedda_search_tags);
+SemanticActions.add("yedda_search_tags", yedda_search_tags);

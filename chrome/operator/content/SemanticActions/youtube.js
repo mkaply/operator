@@ -14,4 +14,4 @@ var youtube_search_tags = {
   }
 };
 
-Microformats.actions.add("youtube_search_tags", youtube_search_tags);
+SemanticActions.add("youtube_search_tags", youtube_search_tags);

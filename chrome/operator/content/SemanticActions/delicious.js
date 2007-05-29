@@ -51,5 +51,5 @@ var delicious_bookmark = {
   }
 };
 
-Microformats.actions.add("delicious_search_tags", delicious_search_tags);
-Microformats.actions.add("delicious_bookmark", delicious_bookmark);
+SemanticActions.add("delicious_search_tags", delicious_search_tags);
+SemanticActions.add("delicious_bookmark", delicious_bookmark);

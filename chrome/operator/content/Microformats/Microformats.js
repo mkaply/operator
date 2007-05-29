@@ -343,43 +343,6 @@ var Microformats = {
       microformatDefinition.mfObject.prototype.debug = function(microformatObject) {return Microformats.debug(microformatObject)};
     }
   },
-  /* All action specific function are contained in this object */
-  actions: {
-    /* When an action is added, the name is placed in this list */
-    list: [],
-    add: function add(action, actionDefinition) {
-      if (actionDefinition.version == Microformats.version) {
-        if (!Microformats.actions[action]) {
-          Microformats.actions[action] = actionDefinition;
-          Microformats.actions.list.push(action);
-        } else {
-          /* Copy the scope */
-          for (i in actionDefinition.scope.semantic) {
-            Microformats.actions[action].scope.semantic[i] = actionDefinition.scope.semantic[i];
-          }
-          /* If there is a doAction, chain it in */
-          if (actionDefinition.doAction) {
-            var doAction = function(semanticObject, semanticObjectType) {
-              var ret = actionDefinition.doAction(semanticObject, semanticObjectType);
-              if (!ret) {
-                return doAction.actionOld(semanticObject, semanticObjectType);
-              }
-              return ret;
-            }
-            doAction.actionOld = Microformats.actions[action].doAction
-            Microformats.actions[action].doAction = doAction;
-          }
-        }
-      }
-    },
-    __iterator__: function () {
-      var i;
-      for (i=0; i < this.list.length; i++) {
-        yield this.list[i];
-      }
-    },
-  },
-
   /* All parser specific function are contained in this object */
   parser: {
     /**

@@ -67,7 +67,7 @@ var Operator = {
     try {
       objScriptLoader.loadSubScript("chrome://operator/content/RDFa/rdfa.js");
     } catch (ex) {}
-    objScriptLoader.loadSubScript("chrome://operator/content/actions.js");
+    objScriptLoader.loadSubScript("chrome://operator/content/SemanticActions/SemanticActions.js");
 
     if (!options) {
       /* Operator specific parser stuff */
@@ -120,11 +120,8 @@ var Operator = {
       }
     }
 
-    for (i in Microformats.actions) {
-      Operator.actions.add(i, Microformats.actions[i]);
-    }
-    for (i in RDFa.actions) {
-      Operator.actions.add(i, RDFa.actions[i]);
+    for (i in SemanticActions) {
+      Operator.actions.add(i, SemanticActions[i]);
     }
     for (i in Operator.actions)
     {

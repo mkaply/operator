@@ -14,4 +14,4 @@ var technorati_search_tags = {
   }
 };
 
-Microformats.actions.add("technorati_search_tags", technorati_search_tags);
+SemanticActions.add("technorati_search_tags", technorati_search_tags);

@@ -16,4 +16,4 @@ var flickr_search_tags = {
   }
 };
 
-Microformats.actions.add("flickr_search_tags", flickr_search_tags);
+SemanticActions.add("flickr_search_tags", flickr_search_tags);

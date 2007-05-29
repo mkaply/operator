@@ -194,6 +194,6 @@ var google_calendar = {
   }
 };
 
-Microformats.actions.add("google_maps", google_maps);
-Microformats.actions.add("google_search", google_search);
-Microformats.actions.add("google_calendar", google_calendar);
+SemanticActions.add("google_maps", google_maps);
+SemanticActions.add("google_search", google_search);
+SemanticActions.add("google_calendar", google_calendar);

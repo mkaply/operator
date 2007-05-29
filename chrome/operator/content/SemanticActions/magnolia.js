@@ -48,5 +48,5 @@ var magnolia_bookmark = {
   }
 };
 
-Microformats.actions.add("magnolia_search_tags", magnolia_search_tags);
-Microformats.actions.add("magnolia_bookmark", magnolia_bookmark);
+SemanticActions.add("magnolia_search_tags", magnolia_search_tags);
+SemanticActions.add("magnolia_bookmark", magnolia_bookmark);

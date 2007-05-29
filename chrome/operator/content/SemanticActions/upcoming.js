@@ -14,4 +14,4 @@ var upcoming_search_tags = {
   }
 };
 
-Microformats.actions.add("upcoming_search_tags", upcoming_search_tags);
+SemanticActions.add("upcoming_search_tags", upcoming_search_tags);

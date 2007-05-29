@@ -582,6 +582,6 @@ var export_kml = {
   }
 };
 
-Microformats.actions.add("export_vcard", export_vcard);
-Microformats.actions.add("export_icalendar", export_icalendar);
-Microformats.actions.add("export_kml", export_kml);
+SemanticActions.add("export_vcard", export_vcard);
+SemanticActions.add("export_icalendar", export_icalendar);
+SemanticActions.add("export_kml", export_kml);

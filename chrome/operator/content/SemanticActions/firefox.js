@@ -49,4 +49,4 @@ var firefox_bookmark = {
   }
 };
 
-Microformats.actions.add("firefox_bookmark", firefox_bookmark);
+SemanticActions.add("firefox_bookmark", firefox_bookmark);

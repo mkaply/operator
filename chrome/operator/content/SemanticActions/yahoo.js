@@ -445,10 +445,7 @@ var yahoo_contacts = {
     37 Class
     */
 
-Microformats.actions.add("yahoo_maps", yahoo_maps);
-Microformats.actions.add("yahoo_search", yahoo_search);
-Microformats.actions.add("yahoo_calendar", yahoo_calendar);
-Microformats.actions.add("yahoo_contacts", yahoo_contacts);
-if (typeof(RDFa) != "undefined") { 
-  RDFa.actions.add("yahoo_contacts", yahoo_contacts);
-}
+SemanticActions.add("yahoo_maps", yahoo_maps);
+SemanticActions.add("yahoo_search", yahoo_search);
+SemanticActions.add("yahoo_calendar", yahoo_calendar);
+SemanticActions.add("yahoo_contacts", yahoo_contacts);
