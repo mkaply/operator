@@ -750,13 +750,10 @@ var Operator = {
   /* This function compares the strings in two objects to see if they are equal */
   areEqualObjects: function areEqualObjects(object1, object2)
   {
-    if (object1.__count__ != object2.__count__) {
+    if (object1.__count__ != object1.__count__) {
       return false;
     }
     for (var i in object1) {
-      if (!object2[i]) {
-        return false;
-      }
       if (object1[i] instanceof String) {
         if (object1[i] == object2[i]) {
           continue;
@@ -768,6 +765,7 @@ var Operator = {
       } else {
         continue;
       }
+      alert('false2');
       return false;
     }
     return true;
