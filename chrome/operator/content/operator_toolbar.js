@@ -3,6 +3,7 @@
 var Operator_Toolbar = {
   create: function()
   {
+    var button, action;
     var i;
     var toolbar = document.getElementById("operator-toolbar");
     var toolbarbuttons = toolbar.getElementsByTagName("toolbarbutton");
@@ -41,8 +42,6 @@ var Operator_Toolbar = {
         toolbar.insertBefore(button, document.getElementById("operator-spring"));
         var node = document.getAnonymousElementByAttribute(button, "class", "toolbarbutton-icon");
         node.style.opacity = 0.3;
-        node.style.width = "16px";
-        node.style.height = "16px";
         i++;
       } while (1)
     }
@@ -80,8 +79,6 @@ var Operator_Toolbar = {
           toolbar.insertBefore(button, document.getElementById("operator-spring"));
           var node = document.getAnonymousElementByAttribute(button, "class", "toolbarbutton-icon");
           node.style.opacity = 0.3;
-          node.style.width = "16px";
-          node.style.height = "16px";
         }
         i++;
       } while (1);
@@ -90,98 +87,6 @@ var Operator_Toolbar = {
 
     return;
     
-    
-    var useActions = (Operator.view == 1);
-    
-    var microformat;
-    var button;
-    var handler;
-    var popup;
-    if (useActions) {
-      i = 1;
-      do {
-        var action;
-        try {
-          action = Operator.prefBranch.getComplexValue("action" + i, Components.interfaces.nsISupportsString).data;
-          microformat = Operator.prefBranch.getCharPref("action" + i + ".microformat");
-          handler = Operator.prefBranch.getCharPref("action" + i + ".handler");
-        } catch (ex) {
-          break;
-        }
-        if ((action) && (microformat) && (handler)) {
-          if (Microformats[microformat]) {
-            button = document.createElement("toolbarbutton");
-            button.setAttribute("disabled", "true");
-            button.label = action;
-            button.setAttribute("label", button.label);
-            button.setAttribute("origlabel", action);
-            button.setAttribute("type", "menu");
-            button.addEventListener("mouseover", Operator_Toolbar.mouseOver, false);
-
-            if ((Operator.actions[handler].scope.semantic[microformat]) && (Operator.actions[handler].icon)) {
-              button.style.listStyleImage = "url('" + Operator.actions[handler].icon + "')";
-            } else {
-              if (Microformats[microformat].icon) {
-                button.style.listStyleImage = "url('" + Microformats[microformat].icon + "')";
-              } else {
-                button.style.listStyleImage = "url('chrome://operator/content/other.png')";
-              }
-            }
-            button.id = "operator-" + microformat + "-" + handler + "-toolbar-button";
-            toolbar.insertBefore(button, document.getElementById("operator-spring"));
-            var node = document.getAnonymousElementByAttribute(button, "class", "toolbarbutton-icon");
-            node.style.opacity = 0.3;
-            node.style.width = "16px";
-            node.style.height = "16px";
-          }
-        } else {
-          break;
-        }
-        i++;
-      } while (1);
-
-    } else {
-      i = 1;
-      do {
-        try {
-          microformat = Operator.prefBranch.getCharPref("dataformat" + i);
-        } catch (ex) {
-          break;
-        }
-        if (microformat) {
-          if (Microformats[microformat]) {
-            button = document.createElement("toolbarbutton");
-            button.setAttribute("disabled", "true");
-            if ((Operator.useDescriptiveNames) && (Microformats[microformat].description)) {
-              button.label = Microformats[microformat].description;
-            } else {
-              button.label =  microformat;
-            }
-            button.setAttribute("label", button.label);
-            button.setAttribute("origlabel", button.label);
-
-            button.setAttribute("type", "menu");
-            button.addEventListener("mouseover", Operator_Toolbar.mouseOver, false);
-
-            if (Microformats[microformat].icon) {
-              button.style.listStyleImage = "url('" + Microformats[microformat].icon + "')";
-            } else {
-              button.style.listStyleImage = "url('chrome://operator/content/other.png')";
-            }
-
-            button.id = "operator-" + microformat + "-toolbar-button";
-            toolbar.insertBefore(button, document.getElementById("operator-spring"));
-            var node = document.getAnonymousElementByAttribute(button, "class", "toolbarbutton-icon");
-            node.style.opacity = 0.3;
-            node.style.width = "16px";
-            node.style.height = "16px";
-          }
-        } else {
-          break;
-        }
-        i++;
-      } while (1);
-    }
   },
 
   addButtonMenu: function(menu, semanticObjectType, semanticAction)
@@ -249,8 +154,6 @@ var Operator_Toolbar = {
         toolbarbuttons[i].setAttribute("disabled", "true");
         var node = document.getAnonymousElementByAttribute(toolbarbuttons[i], "class", "toolbarbutton-icon");
         node.style.opacity = 0.3;
-        node.style.width = "16px";
-        node.style.height = "16px";
       }
     }
   },
@@ -276,9 +179,7 @@ var Operator_Toolbar = {
         if (toolbarbuttons[i].numitems > 0) {
           toolbarbuttons[i].setAttribute("disabled", "false");
           var node = document.getAnonymousElementByAttribute(toolbarbuttons[i], "class", "toolbarbutton-icon");
-          node.style.opacity = 1.0;
-          node.style.width = "16px";
-          node.style.height = "16px";
+          node.style.opacity = 0.99;
         }
       }
     }
