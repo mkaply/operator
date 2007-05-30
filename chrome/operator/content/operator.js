@@ -184,8 +184,6 @@ var Operator = {
       this.prefBranch.setCharPref("action6", "technorati_search_tags");
     }
 
-      
-    
     try {
       this.debug = this.prefBranch.getBoolPref("debug");
     } catch (ex) {}
@@ -580,7 +578,7 @@ var Operator = {
           submenu.appendChild(menuitem);
         }
         menuitem = document.createElement("menuitem");
-        menuitem.label = "Debug";
+        menuitem.label = Operator.languageBundle.GetStringFromName("debug.label");
         menuitem.setAttribute("label", menuitem.label);
         menuitem.store_oncommand = this.errorCallbackGenerator(semanticObject, semanticObjectType);
         menuitem.addEventListener("command", menuitem.store_oncommand, true);
@@ -591,6 +589,13 @@ var Operator = {
       parentmenu.addEventListener("command", parentmenu.store_oncommand, true);
       parentmenu.store_onclick = this.clickCallbackGenerator(semanticObject, semanticObjectType, semanticAction);
       parentmenu.addEventListener("click", parentmenu.store_onclick, true);
+    }
+    if ((!addedAction) && (!this.debug)) {
+      menuitem = document.createElement("menuitem");
+      menuitem.label = Operator.languageBundle.GetStringFromName("noActions.label");
+      menuitem.setAttribute("label", menuitem.label);
+      menuitem.setAttribute("disabled", true);
+      submenu.appendChild(menuitem);
     }
   },
   buildPopupMenu: function buildPopupMenu(semanticObject, semanticObjectType)
@@ -626,7 +631,7 @@ var Operator = {
       menuitem = document.createElement("menuseparator");
       menu.appendChild(menuitem);
       menuitem = document.createElement("menuitem");
-      menuitem.label = "Debug";
+      menuitem.label = Operator.languageBundle.GetStringFromName("debug.label");
       menuitem.setAttribute("label", menuitem.label);
       menuitem.addEventListener("command", this.errorCallbackGenerator(semanticObject, semanticObjectType), true);
       menu.appendChild(menuitem);
@@ -1122,13 +1127,7 @@ var Operator = {
       tempMenu = document.createElement("menuseparator");
       popup.appendChild(tempMenu);
       tempMenu = document.createElement("menuitem");
-      var optionsLabel = "Options";
-      try {
-        optionsLabel = Operator.languageBundle.GetStringFromName("operatorOptions.label");
-      } catch (ex) {
-        optionsLabel = "Options";
-      }
-      tempMenu.setAttribute("label", optionsLabel);
+      tempMenu.setAttribute("label", Operator.languageBundle.GetStringFromName("operatorOptions.label"));
       tempMenu.label = action;
       tempMenu.store_oncommand = function() {window.openDialog('chrome://operator/content/operator_options.xul','options','chrome,centerscreen,modal');};
       tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
