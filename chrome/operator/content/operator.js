@@ -748,7 +748,7 @@ var Operator = {
     Operator.processSemanticData();
   },
   /* This function compares the strings in two objects to see if they are equal */
-  areEqualObjects: function(object1, object2)
+  areEqualObjects: function areEqualObjects(object1, object2)
   {
     if (object1.__count__ != object2.__count__) {
       return false;
@@ -772,13 +772,13 @@ var Operator = {
     }
     return true;
   },
-  debug_alert: function(text)
+  debug_alert: function debug_alert(text)
   {
     if (!Operator.release) {
       window.openDialog("chrome://operator/content/operator_debug.xul","alert","chrome,centerscreen,modal", "Alert", text);
     }
   },
-  console_message: function(text, line_number)
+  console_message: function console_message(text, line_number)
   {
     var consoleService = Components.classes["@mozilla.org/consoleservice;1"].
                                     getService(Components.interfaces.nsIConsoleService);
@@ -791,7 +791,7 @@ var Operator = {
                      null, 0, 0);
     consoleService.logMessage(scriptError);
   },
-  lineNumberFromDOMNode: function(node)
+  lineNumberFromDOMNode: function lineNumberFromDOMNode(node)
   {
     var serializer = new XMLSerializer();
     var source = serializer.serializeToString(content.document);
@@ -802,7 +802,7 @@ var Operator = {
     var lines = less_source.split("\n");
     return lines.length;
   },
-  error: function(semanticObject, semanticObjectType)
+  error: function error(semanticObject, semanticObjectType)
   {
     var serializer = new XMLSerializer();
     var xmlString;
@@ -845,7 +845,7 @@ var Operator = {
                       vcfical,
                       X2V);
   },
-  getSemanticData: function(window, semanticArrays)
+  getSemanticData: function getSemanticData(window, semanticArrays)
   {
     if (window && window.frames.length > 0) {
       for (var i=0; i < window.frames.length; i++) {
@@ -865,7 +865,7 @@ var Operator = {
   },
   /* This is the heavy lifter for Operator. It goes through the document
      looking for semantic data and creates the menus and buttons */
-  processSemanticData: function()
+  processSemanticData: function processSemanticData()
   {
     /* Reset the timer we're using to batch processing */
     Operator.timerID = null;
@@ -1099,7 +1099,7 @@ var Operator = {
       Operator_Toolbar.enable();
     }
   },
-  simpleEscape: function(s)
+  simpleEscape: function simpleEscape(s)
   {
     s = s.replace(/\&/g, '%26');
     s = s.replace(/\#/g, '%23');
