@@ -1,6 +1,7 @@
 var delicious_search_tags = {
   version: 0.8,
   description: "Find bookmarks on del.icio.us",
+  shortDescription: "del.icio.us",
   icon: "http://del.icio.us/favicon.ico",
   scope: {
     semantic: {
@@ -17,6 +18,7 @@ var delicious_search_tags = {
 var delicious_bookmark = {
   version: 0.8,
   description: "Bookmark with del.icio.us",
+  shortDescription: "del.icio.us (+)",
   icon: "http://del.icio.us/favicon.ico",
   scope: {
     semantic: {

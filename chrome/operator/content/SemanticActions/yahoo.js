@@ -3,6 +3,7 @@
 var yahoo_maps = {
   version: 0.8,
   description: "Find with Yahoo! Maps",
+  shortDescription: "Yahoo! Maps",
   icon: "http://www.yahoo.com/favicon.ico",
   scope: {
     semantic: {
@@ -55,6 +56,7 @@ var yahoo_maps = {
 var yahoo_search = {
   version: 0.8,
   description: "Find with Yahoo! Search",
+  shortDescription: "Yahoo! Search",
   icon: "http://www.yahoo.com/favicon.ico",
   scope: {
     semantic: {
@@ -88,6 +90,7 @@ tell others about this event?" *with the seed url for your event. */
 var yahoo_calendar = {
   version: 0.8,
   description: "Add to Yahoo! Calendar",
+  shortDescription: "Yahoo! Calendar (+)",
   icon: "http://www.yahoo.com/favicon.ico",
   scope: {
     semantic: {
@@ -139,7 +142,7 @@ var yahoo_calendar = {
         if (!dtEndDate.time) {
           dtEndDate.setDate(dtEndDate.getDate()-1);
         }
-        if (!Operator.upcomingOrgBugFixed) {
+        if (!Operator.upcomingBugFixed) {
           if (content.document.location.href.indexOf("http://upcoming.yahoo.com") == 0) {
             dtEndDate.setDate(dtEndDate.getDate()+1);
           }
@@ -237,6 +240,7 @@ var yahoo_calendar = {
 var yahoo_contacts = {
   version: 0.8,
   description: "Add to Yahoo! Contacts",
+  shortDescription: "Yahoo! Contacts (+)",
   icon: "http://www.yahoo.com/favicon.ico",
   scope: {
     semantic: {

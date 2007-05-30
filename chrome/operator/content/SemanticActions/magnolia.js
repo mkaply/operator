@@ -1,6 +1,7 @@
 var magnolia_search_tags = {
   version: 0.8,
   description: "Find bookmarks on Ma.gnolia",
+  shortDescription: "Ma.gnolia",
   icon: "http://ma.gnolia.com/favicon.ico",
   scope: {
     semantic: {
@@ -17,6 +18,7 @@ var magnolia_search_tags = {
 var magnolia_bookmark = {
   version: 0.8,
   description: "Bookmark with Ma.gnolia",
+  shortDescription: "Ma.gnolia (+)",
   icon: "http://ma.gnolia.com/favicon.ico",
   scope: {
     semantic: {

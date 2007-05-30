@@ -480,7 +480,7 @@ var export_icalendar = {
         time = hcalendar.dtend.substr(T);
       } else {
         date = hcalendar.dtend;
-        if (!Operator.upcomingOrgBugFixed) {
+        if (!Operator.upcomingBugFixed) {
           if (content.document.location.href.indexOf("http://upcoming.yahoo.com") == 0) {
             date = date.replace(/-/g, "");
             date = (parseInt(date)+1).toString();

@@ -1,6 +1,7 @@
 var flickr_search_tags = {
   version: 0.8,
   description: "Find photos on flickr",
+  shortDescription: "flickr",
   icon: "http://flickr.com/favicon.ico",
   scope: {
     semantic: {

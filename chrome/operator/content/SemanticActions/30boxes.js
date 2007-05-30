@@ -1,6 +1,7 @@
 var thirty_boxes_calendar = {
   version: 0.8,
   description: "Add to 30 Boxes",
+  shortDescription: "30 Boxes (+)",
   icon: "http://30boxes.com/favicon.ico",
   scope: {
     semantic: {
@@ -46,7 +47,7 @@ var thirty_boxes_calendar = {
           if (!dtEndDate.time) {
             dtEndDate.setDate(dtEndDate.getDate()-1);
           }
-          if (!Operator.upcomingOrgBugFixed) {
+          if (!Operator.upcomingBugFixed) {
             if (content.document.location.href.indexOf("http://upcoming.yahoo.com") == 0) {
               dtEndDate.setDate(dtEndDate.getDate()+1);
             }

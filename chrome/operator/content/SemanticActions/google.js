@@ -3,6 +3,7 @@
 var google_maps = {
   version: 0.8,
   description: "Find with Google Maps",
+  shortDescription: "Google Maps",
   icon: "http://www.google.com/favicon.ico",
   scope: {
     semantic: {
@@ -56,6 +57,7 @@ var google_maps = {
 var google_search = {
   version: 0.8,
   description: "Find with Google Search",
+  shortDescription: "Google Search",
   icon: "http://www.google.com/favicon.ico",
   scope: {
     semantic: {
@@ -79,6 +81,7 @@ var google_search = {
 var google_calendar = {
   version: 0.8,
   description: "Add to Google Calendar",
+  shortDescription: "Google Calendar (+)",
   icon: "http://www.google.com/calendar/images/favicon.ico",
   scope: {
     semantic: {
@@ -120,7 +123,7 @@ var google_calendar = {
               dtend = Microformats.iso8601FromDate(dtEndDate);
             }
           } else {
-            if (!Operator.upcomingOrgBugFixed) {
+            if (!Operator.upcomingBugFixed) {
               if (content.document.location.href.indexOf("http://upcoming.yahoo.com") == 0) {
                 dtend = dtend.replace(/-/g, "");
                 dtend = (parseInt(dtend)+1).toString();

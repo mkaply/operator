@@ -1,6 +1,7 @@
 var youtube_search_tags = {
   version: 0.8,
   description: "Find videos on YouTube",
+  shortDescription: "YouTube",
   icon: "http://youtube.com/favicon.ico",
   scope: {
     semantic: {
