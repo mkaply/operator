@@ -599,13 +599,6 @@ var Operator = {
       submenu.appendChild(menuitem);
     }
   },
-  buildPopupMenu: function buildPopupMenu(semanticObject, semanticObjectType)
-  {
-    var menu = document.createElement("menupopup");
-    Operator.attachActions(menu, semanticObject, semanticObjectType);
-    return menu;
-  },
-
   /* This only works with microformats */
   contextPopupShowing: function contextPopupShowing(event) {
     gContextMenu.showItem("operator-menu-0", false);
@@ -629,7 +622,8 @@ var Operator = {
       var actionmenu;
       var shown_separator = false;
       for (i=0; i < mfNames.length; i++) {
-        actionmenu = Operator.buildPopupMenu(new Microformats[mfNames[i]].mfObject(mfNode), mfNames[i]);
+        actionmenu = document.createElement("menupopup");
+        Operator.attachActions(actionmenu, new Microformats[mfNames[i]].mfObject(mfNode), mfNames[i]);
         if (actionmenu.childNodes.length > 0) {
           if (!shown_separator) {
             gContextMenu.showItem("operator-separator", true);
