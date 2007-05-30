@@ -542,7 +542,9 @@ var Operator = {
           var required;
           if (reqprop.indexOf(".") != -1) {
             var props = reqprop.split(".");
-            required = semanticObject[props[0]][props[1]];
+            if (semanticObject[props[0]]) {
+              required = semanticObject[props[0]][props[1]];
+            }
           } else {
             required = semanticObject[reqprop];
           }
@@ -970,7 +972,9 @@ var Operator = {
                 var required;
                 if (reqprop.indexOf(".") != -1) {
                   var props = reqprop.split(".");
-                  required = objectArray[k][props[0]][props[1]];
+                  if (objectArray[k][props[0]]) {
+                    required = objectArray[k][props[0]][props[1]];
+                  }
                 } else {
                   required = objectArray[k][reqprop];
                 }
