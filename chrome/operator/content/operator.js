@@ -528,8 +528,12 @@ var Operator = {
   {
     var required;
     var menuitem;
-    if (this.view === 0) {
-      
+    if (semanticAction) {
+      parentmenu.store_oncommand = this.actionCallbackGenerator(semanticObject, semanticObjectType, semanticAction);
+      parentmenu.addEventListener("command", parentmenu.store_oncommand, true);
+      parentmenu.store_onclick = this.clickCallbackGenerator(semanticObject, semanticObjectType, semanticAction);
+      parentmenu.addEventListener("click", parentmenu.store_onclick, true);
+    } else {
       var submenu = parentmenu;
       var k;
       var addedAction = false;
@@ -586,11 +590,6 @@ var Operator = {
         menuitem.addEventListener("command", menuitem.store_oncommand, true);
         submenu.appendChild(menuitem);
       }
-    } else {
-      parentmenu.store_oncommand = this.actionCallbackGenerator(semanticObject, semanticObjectType, semanticAction);
-      parentmenu.addEventListener("command", parentmenu.store_oncommand, true);
-      parentmenu.store_onclick = this.clickCallbackGenerator(semanticObject, semanticObjectType, semanticAction);
-      parentmenu.addEventListener("click", parentmenu.store_onclick, true);
     }
     if ((!addedAction) && (!this.debug)) {
       menuitem = document.createElement("menuitem");
@@ -603,42 +602,7 @@ var Operator = {
   buildPopupMenu: function buildPopupMenu(semanticObject, semanticObjectType)
   {
     var menu = document.createElement("menupopup");
-    var menuitem;
-    var required;
-    var k;
-    for (k in Operator.actions) {
-      if (!Operator.actions[k].scope.semantic[semanticObjectType]) {
-        continue;
-      }
-      if (Operator.actions[k].scope.semantic[semanticObjectType] != semanticObjectType) {
-        required = semanticObject[Operator.actions[k].scope.semantic[semanticObjectType]];
-        if (!required) {
-          continue;
-        }
-      }
-      if (Operator.actions[k].scope.url) {
-        if (!(content.document.location.href.match(Operator.actions[k].scope.url))) {
-          continue;
-        }
-      }
-      menuitem = document.createElement("menuitem");
-      menuitem.label = Operator.actions[k].description;
-      menuitem.setAttribute("label", menuitem.label);
-      menuitem.addEventListener("command", this.actionCallbackGenerator(semanticObject, semanticObjectType, k), true);
-      menuitem.addEventListener("click", this.clickCallbackGenerator(semanticObject, semanticObjectType, k), true);
-      menu.appendChild(menuitem);
-
-    }
-    if (this.debug) {
-      menuitem = document.createElement("menuseparator");
-      menu.appendChild(menuitem);
-      menuitem = document.createElement("menuitem");
-      menuitem.label = Operator.languageBundle.GetStringFromName("debug.label");
-      menuitem.setAttribute("label", menuitem.label);
-      menuitem.addEventListener("command", this.errorCallbackGenerator(semanticObject, semanticObjectType), true);
-      menu.appendChild(menuitem);
-    }
-
+    Operator.attachActions(menu, semanticObject, semanticObjectType);
     return menu;
   },
 
@@ -964,10 +928,6 @@ var Operator = {
               /* Create a menu that corresponds to the action? */
               /* Or postpone the creation until we are sure we have the first one? */
               if ((Operator.actions[action].scope.semantic[j] != j) && (j != "RDFa")) {
-                
-                
-                
-                
                 var reqprop = Operator.actions[action].scope.semantic[j]
                 var required;
                 if (reqprop.indexOf(".") != -1) {
