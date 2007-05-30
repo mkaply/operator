@@ -140,7 +140,7 @@ var yahoo_calendar = {
           dtEndDate.setDate(dtEndDate.getDate()-1);
         }
         if (!Operator.upcomingOrgBugFixed) {
-          if (content.document.location.href.indexOf("http://upcoming.org") == 0) {
+          if (content.document.location.href.indexOf("http://upcoming.yahoo.com") == 0) {
             dtEndDate.setDate(dtEndDate.getDate()+1);
           }
         }

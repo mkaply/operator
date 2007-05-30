@@ -481,7 +481,7 @@ var export_icalendar = {
       } else {
         date = hcalendar.dtend;
         if (!Operator.upcomingOrgBugFixed) {
-          if (content.document.location.href.indexOf("http://upcoming.org") == 0) {
+          if (content.document.location.href.indexOf("http://upcoming.yahoo.com") == 0) {
             date = date.replace(/-/g, "");
             date = (parseInt(date)+1).toString();
           }

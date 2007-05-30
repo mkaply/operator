@@ -121,7 +121,7 @@ var google_calendar = {
             }
           } else {
             if (!Operator.upcomingOrgBugFixed) {
-              if (content.document.location.href.indexOf("http://upcoming.org") == 0) {
+              if (content.document.location.href.indexOf("http://upcoming.yahoo.com") == 0) {
                 dtend = dtend.replace(/-/g, "");
                 dtend = (parseInt(dtend)+1).toString();
               }
