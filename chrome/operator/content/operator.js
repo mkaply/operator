@@ -558,7 +558,11 @@ var Operator = {
         }
       }
       menuitem = document.createElement("menuitem");
-      menuitem.label = Operator.actions[k].description;
+      if (Operator.useShortDescriptions && Operator.actions[k].shortDescription) {
+        menuitem.label = Operator.actions[k].shortDescription;
+      } else {
+        menuitem.label = Operator.actions[k].description;
+      }
       menuitem.setAttribute("label", menuitem.label);
       menuitem.store_oncommand = this.actionCallbackGenerator(semanticObject, semanticObjectType, k);
       menuitem.addEventListener("command", menuitem.store_oncommand, true);
@@ -970,7 +974,11 @@ var Operator = {
             popup = document.createElement("menupopup");
           }               
           tempMenu = document.createElement("menu");
-          tempMenu.label = Operator.actions[action].description;
+          if (Operator.useShortDescriptions && Operator.actions[action].shortDescription) {
+            tempMenu.label = Operator.actions[action].shortDescription;
+          } else {
+            tempMenu.label = Operator.actions[action].description;
+          }
           tempMenu.setAttribute("label", tempMenu.label);
           popup.appendChild(tempMenu);
           if (menu.error === true) {
