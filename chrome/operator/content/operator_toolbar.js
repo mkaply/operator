@@ -27,9 +27,14 @@ var Operator_Toolbar = {
         }
         button = document.createElement("toolbarbutton");
         button.setAttribute("disabled", "true");
-        button.label = Operator.actions[action].description;
+        if (Operator.useShortDescriptions && Operator.actions[action].shortDescription) {
+          button.label = Operator.actions[action].shortDescription;
+          button.setAttribute("origlabel", Operator.actions[action].shortDescription);
+        } else {
+          button.label = Operator.actions[action].description;
+          button.setAttribute("origlabel", Operator.actions[action].description);
+        }
         button.setAttribute("label", button.label);
-        button.setAttribute("origlabel", Operator.actions[action].description);
         button.setAttribute("type", "menu");
         button.addEventListener("mouseover", Operator_Toolbar.mouseOver, false);
 

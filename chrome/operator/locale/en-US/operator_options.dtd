@@ -8,6 +8,7 @@
 <!ENTITY  defaultHandler.label             "Default Handler">
 <!ENTITY  displayStyle.label               "Display style">
 <!ENTITY  useDescriptiveNames.label        "Use descriptive names">
+<!ENTITY  useShortDescriptions.label       "Use short descriptions">
 <!ENTITY  highlightMicroformats.label      "Highlight Microformats (test feature)">
 <!ENTITY  removeDuplicates.label           "Remove duplicates (might impact performance)">
 <!ENTITY  debug.label                      "Debug mode">

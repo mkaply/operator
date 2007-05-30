@@ -10,6 +10,7 @@ var Operator = {
   removeDuplicates: true,
   observeDOMAttrModified: false,
   statusbar: false,
+  useShortDescriptions: false,
   batchPrefChanges: false,
   customizeDone: false,
   languageBundle: null,
@@ -22,23 +23,8 @@ var Operator = {
     list: [],
     /* need to check for clash and combine semantic scope */
     add: function add(action, actionDefinition) {
-      if (!Operator.actions[action]) {
-        Operator.actions[action] = {};
-        Operator.actions[action].description = actionDefinition.description;
-        Operator.actions[action].descriptionAll = actionDefinition.descriptionAll;
-        Operator.actions[action].icon = actionDefinition.icon;
-        Operator.actions[action].scope = actionDefinition.scope;
-        if (actionDefinition.doActionAll) {
-          Operator.actions[action].doActionAll = true;
-        }
-        Operator.actions.list.push(action);
-      } else {
-        var i;
-        for (i in actionDefinition.scope.semantic) {
-        /* Assume everything else is good. Just get the new scope */
-          Operator.actions[action].scope.semantic[i] = actionDefinition.scope.semantic[i];
-        }
-      }
+      Operator.actions[action] = actionDefinition;
+      Operator.actions.list.push(action);
     },
     __iterator__: function () {
       var i;
@@ -211,6 +197,9 @@ var Operator = {
     try {
       this.statusbar = this.prefBranch.getBoolPref("statusbar");
     } catch (ex) {}
+    try {
+      this.useShortDescriptions = this.prefBranch.getBoolPref("useShortDescriptions");
+    } catch (ex) {}
 
     if (options) {
       return;
@@ -288,6 +277,9 @@ var Operator = {
     }
     if (data == "view") {
       this.view = this.prefBranch.getIntPref("view");
+    }
+    if (data == "useShortDescriptions") {
+      this.useShortDescriptions = this.prefBranch.getBoolPref("useShortDescriptions");
     }
     if (data == "statusbar") {
       if (this.prefBranch.getBoolPref("statusbar")) {

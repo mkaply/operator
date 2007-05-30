@@ -8,6 +8,7 @@ var Operator_Options = {
     this.prefBranch.setBoolPref("batchPrefChanges", true);
     this.checkAndSetIntPref("view", document.getElementById("view").value);
     this.checkAndSetBoolPref("useDescriptiveNames", document.getElementById("useDescriptiveNames").checked);
+    this.checkAndSetBoolPref("useShortDescriptions", document.getElementById("useShortDescriptions").checked);
     this.checkAndSetBoolPref("debug", document.getElementById("debug").checked);
     this.checkAndSetBoolPref("statusbar", document.getElementById("statusbar").checked);
     this.checkAndSetBoolPref("highlightMicroformats", document.getElementById("highlightMicroformats").checked);
@@ -100,6 +101,14 @@ var Operator_Options = {
       useDescriptiveNames = Operator.useDescriptiveNames;
     }
     document.getElementById("useDescriptiveNames").checked = useDescriptiveNames;
+
+    var useShortDescriptions;
+    try {
+      useShortDescriptions = this.prefBranch.getBoolPref("useShortDescriptions");
+    } catch (ex) {
+      useShortDescriptions = Operator.useShortDescriptions;
+    }
+    document.getElementById("useShortDescriptions").checked = useShortDescriptions;
 
     var debug;
     try {
@@ -198,8 +207,10 @@ var Operator_Options = {
   {
     if (document.getElementById('view').value == "1") {
       document.getElementById('useDescriptiveNames').setAttribute('disabled', 'true');
+      document.getElementById('useShortDescriptions').setAttribute('disabled', 'false');
     } else {
       document.getElementById('useDescriptiveNames').setAttribute('disabled', 'false');
+      document.getElementById('useShortDescriptions').setAttribute('disabled', 'true');
     }
   },
   
