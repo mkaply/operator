@@ -115,7 +115,7 @@ var hAtom_hFeed_definition = {
       rel: true,
       datatype: "custom",
       customGetter: function(propnode) {
-        var tags = Microformats.getElementsByAttribute(mfnode, "rel", "tag");
+        var tags = Microformats.getElementsByAttribute(propnode, "rel", "tag");
         var tagArray = [];
         var i;
         var xpathExpression = "ancestor::*[contains(concat(' ', @class, ' '), ' hentry ')]";
@@ -142,7 +142,7 @@ var hatom_firefox_bookmark = {
   version: 0.8,
   scope: {
     semantic: {
-      "hAtom-hEntry" : "hAtom-hEntry",
+      "hAtom-hEntry" : "bookmark.link",
     }
   },
   doAction: function(semanticObject, semanticObjectType) {
