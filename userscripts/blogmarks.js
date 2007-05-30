@@ -3,6 +3,7 @@
 var blogmarks_search_tags = {
   version: 0.8,
   description: "Find bookmarks on BlogMarks",
+  shortDescription: "BlogMarks",
   icon: "http://blogmarks.net/favicon.ico",
   scope: {
     semantic: {
