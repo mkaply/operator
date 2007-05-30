@@ -923,6 +923,9 @@ var Microformats = {
       var dateArray = string.match(/(\d\d\d\d)(?:-?(\d\d)(?:-?(\d\d)(?:[T ](\d\d)(?::?(\d\d)(?::?(\d\d)(?:\.(\d+))?)?)?(?:([-+Z])(?:(\d\d)(?::?(\d\d))?)?)?)?)?)?/);
   
       var dateString;
+      if (!dateArray) {
+        return;
+      }
       if (dateArray[1]) {
         dateString = dateArray[1];
         if (dateArray[2]) {
