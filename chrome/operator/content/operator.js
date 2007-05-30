@@ -683,7 +683,7 @@ var Operator = {
     if (Operator.timerID) {
       window.clearTimeout(Operator.timerID);
     }
-    Operator.timerID = window.setTimeout(Operator.processSemanticData, 250);
+    Operator.timerID = window.setTimeout(Operator.processSemanticData, 100);
   },
   recursiveAddListeners: function recursiveAddListeners(window)
   {
