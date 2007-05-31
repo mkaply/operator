@@ -32,7 +32,7 @@ hEntry.prototype.toString = function() {
 }
 
 var hAtom_hEntry_definition = {
-  version: "0.8",
+  mfVersion: 0.8,
   description: "Atom Entry(s)",
   mfObject: hEntry,
   className: "hentry",
@@ -98,7 +98,7 @@ var hAtom_hEntry_definition = {
 };
 
 var hAtom_hFeed_definition = {
-  version: "0.8",
+  mfVersion: 0.8,
   description: "Atom Feed(s)",
   mfObject: hFeed,
   className: "hfeed",

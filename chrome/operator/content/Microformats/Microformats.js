@@ -337,7 +337,7 @@ var Microformats = {
   },
   add: function add(microformat, microformatDefinition) {
     /* We always replace an existing definition with the new one */
-    if (microformatDefinition.version == Microformats.version) {
+    if (microformatDefinition.mfVersion == Microformats.version) {
       Microformats[microformat] = microformatDefinition;
       Microformats.list.push(microformat); 
       microformatDefinition.mfObject.prototype.debug = function(microformatObject) {return Microformats.debug(microformatObject)};

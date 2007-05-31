@@ -15,7 +15,7 @@ species.prototype.toString = function() {
 }
 
 var species_definition = {
-  version: "0.7",
+  mfVersion: 0.8,
   description: "Species",
   mfObject: species,
   className: "biota",

@@ -33,7 +33,7 @@ hReview.prototype.toString = function() {
 }
 
 var hReview_definition = {
-  version: 0.8,
+  mfVersion: 0.8,
   description: "Review(s)",
   mfObject: hReview,
   className: "hreview",

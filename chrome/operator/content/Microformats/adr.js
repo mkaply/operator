@@ -53,7 +53,7 @@ adr.prototype.toString = function() {
 }
 
 var adr_definition = {
-  version: 0.8,
+  mfVersion: 0.8,
   mfObject: adr,
   className: "adr",
   properties: {

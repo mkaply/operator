@@ -15,7 +15,7 @@ tag.prototype.toString = function() {
 }
 
 var tag_definition = {
-  version: "0.8",
+  mfVersion: 0.8,
   mfObject: tag,
   attributeName: "rel",
   attributeValues: "tag",

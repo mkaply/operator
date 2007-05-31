@@ -28,7 +28,7 @@ hCalendar.prototype.toString = function() {
 }
 
 var hCalendar_definition = {
-  version: "0.8",
+  mfVersion: 0.8,
   mfObject: hCalendar,
   className: "vevent",
   required: ["summary"],
