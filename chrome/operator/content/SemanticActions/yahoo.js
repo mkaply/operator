@@ -244,30 +244,11 @@ var yahoo_contacts = {
   scope: {
     semantic: {
       "hCard" : "hCard",
-      "RDFa" :  {
-        property : "http://xmlns.com/foaf/0.1/givenname",
-        defaultNS : "http://xmlns.com/foaf/0.1/"
-      }
     }
   },
   doAction: function(semanticObject, semanticObjectType) {
     var url;
-    if (semanticObjectType == "RDFa") {
-      var i, j, k;
-      var RDFa = semanticObject;
-      url = "http://address.yahoo.com/?";
-      if (RDFa.family_name) {
-        url += "ln=" + RDFa.family_name + "&";
-      }
-      if (RDFa.givenname) {
-        url += "fn=" + RDFa.givenname + "&";
-      }
-      if (RDFa.homepage) {
-        url += "pu=" + RDFa.homepage + "&";
-      }
-      url += "A=C";
-      return url;
-    } else if (semanticObjectType == "hCard") {
+    if (semanticObjectType == "hCard") {
       var i, j, k;
       var hcard = semanticObject;
       url = "http://address.yahoo.com/?";
