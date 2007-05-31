@@ -952,7 +952,6 @@ var Operator = {
                 tempMenu.addEventListener("DOMMenuItemActive", tempMenu.store_onDOMMenuItemActive, true);
                 menu.appendChild(tempMenu);
               }
-              tempMenu = null;
             }
           }
         }
@@ -987,6 +986,7 @@ var Operator = {
           tempMenu.appendChild(menu);
 
           Operator_Toolbar.addButtonMenu(menu, null, action);
+          tempMenu = null;
         }
         menu = null;
         i++;
