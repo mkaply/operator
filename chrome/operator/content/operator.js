@@ -72,12 +72,11 @@ var Operator = {
                                    getService(Components.interfaces.nsIStringBundleService);
     this.languageBundle = bundleService.createBundle("chrome://operator/locale/operator.properties");
 
-    var languageBundle = bundleService.createBundle("chrome://operator/locale/microformats.properties");
     var i, j;
     for (i in Microformats)
     {
       try {
-        Microformats[i].description = languageBundle.GetStringFromName(i + ".description");
+        Microformats[i].description = this.languageBundle.GetStringFromName(i + ".description");
       } catch (ex) {
       }
     }
@@ -112,7 +111,7 @@ var Operator = {
     for (i in Operator.actions)
     {
       try {
-        Operator.actions[i].description = languageBundle.GetStringFromName(i + ".description");
+        Operator.actions[i].description = this.languageBundle.GetStringFromName(i + ".description");
       } catch (ex) {
       }
     }
