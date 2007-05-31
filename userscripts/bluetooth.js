@@ -40,7 +40,7 @@ var bluetooth_vcard = {
         args.push("/Applications/Utilities/Bluetooth File Exchange.app");
         args.push(file.path);
         process.run(false, args, args.length);
-        return;
+        return true;
       }
     }
   }
@@ -87,7 +87,7 @@ var bluetooth_icalendar = {
         args.push("/Applications/Utilities/Bluetooth File Exchange.app");
         args.push(file.path);
         process.run(false, args, args.length);
-        return;
+        return true;
       }
     }
   }
