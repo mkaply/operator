@@ -939,7 +939,7 @@ var Operator = {
               } else if (Operator.debug) {
                 tempMenu = document.createElement("menuitem");
                 /* L10N */
-                tempMenu.label = "Invalid - select for more details";
+                tempMenu.label = Operator.languageBundle.GetStringFromName("invalid.label");;
                 tempMenu.setAttribute("label", tempMenu.label);
                 tempMenu.store_oncommand = Operator.errorCallbackGenerator(objectArray[k], j);
                 tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
