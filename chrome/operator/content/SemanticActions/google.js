@@ -1,7 +1,6 @@
 /* localizeISO8601 */ 
 
 var google_maps = {
-  version: 0.8,
   description: "Find with Google Maps",
   shortDescription: "Google Maps",
   icon: "http://www.google.com/favicon.ico",
@@ -55,7 +54,6 @@ var google_maps = {
 };
 
 var google_search = {
-  version: 0.8,
   description: "Find with Google Search",
   shortDescription: "Google Search",
   icon: "http://www.google.com/favicon.ico",
@@ -79,7 +77,6 @@ var google_search = {
 };
 
 var google_calendar = {
-  version: 0.8,
   description: "Add to Google Calendar",
   shortDescription: "Google Calendar (+)",
   icon: "http://www.google.com/calendar/images/favicon.ico",

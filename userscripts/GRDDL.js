@@ -36,7 +36,6 @@ GRDDL_definition = {
 Microformats.add("GRDDL", GRDDL_definition);
 
 var extract_rdf = {
-  version: 0.8,
   description: "Extract RDF",
   scope: {
     semantic: {

@@ -1,5 +1,4 @@
 var goto_url = {
-  version: 0.8,
   description: "Go to web page",
   shortDescription: "Web page",
   scope: {

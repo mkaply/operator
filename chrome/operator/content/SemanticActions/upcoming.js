@@ -1,5 +1,4 @@
 var upcoming_search_tags = {
-  version: 0.8,
   description: "Find events on Upcoming",
   shortDescription: "Upcoming",
   icon: "http://upcoming.yahoo.com/favicon.ico",

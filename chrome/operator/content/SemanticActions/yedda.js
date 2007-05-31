@@ -1,5 +1,4 @@
 var yedda_search_tags = {
-  version: 0.8,
   description: "Find answers on Yedda",
   shortDescription: "Yedda",
   icon: "http://yedda.com/favicon.ico",

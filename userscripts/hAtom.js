@@ -139,7 +139,6 @@ Microformats.add("hAtom-hEntry", hAtom_hEntry_definition);
 Microformats.add("hAtom-hFeed", hAtom_hFeed_definition);
 
 var hatom_firefox_bookmark = {
-  version: 0.8,
   scope: {
     semantic: {
       "hAtom-hEntry" : "bookmark.link",

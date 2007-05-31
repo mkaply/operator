@@ -1,7 +1,6 @@
 /*extern ufJS, ufJSActions, ufJSParser, openUILink */ 
 
 var bluetooth_vcard = {
-  version: 0.8,
   description: "Send to Bluetooth Device",
   shortDescription: "Bluetooth (VCF)",
   scope: {
@@ -47,7 +46,6 @@ var bluetooth_vcard = {
 };
 
 var bluetooth_icalendar = {
-  version: 0.8,
   description: "Send to Bluetooth Device",
   shortDescription: "Bluetooth (ICS)",
   scope: {

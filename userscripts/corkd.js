@@ -1,5 +1,4 @@
 var corkd_search_tags = {
-  version: 0.8,
   description: "Find wines on Cork'd",
   shortDescription: "Cork'd",
   icon: "http://corkd.com/favicon.ico",

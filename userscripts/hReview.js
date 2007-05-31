@@ -158,7 +158,6 @@ var hReview_definition = {
 Microformats.add("hReview", hReview_definition);
 
 var hreview_firefox_bookmark = {
-  version: 0.8,
   scope: {
     semantic: {
       "hReview" : "hReview",
@@ -167,7 +166,6 @@ var hreview_firefox_bookmark = {
 };
 
 var hreview_google_search = {
-  version: 0.8,
   scope: {
     semantic: {
       "hReview" : "item.fn"
@@ -176,7 +174,6 @@ var hreview_google_search = {
 };
 
 var hreview_yahoo_search = {
-  version: 0.8,
   scope: {
     semantic: {
       "hReview" : "item.fn"

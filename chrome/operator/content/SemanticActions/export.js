@@ -1,5 +1,4 @@
 var export_vcard = {
-  version: 0.8,
   description: "Export Contact",
   descriptionAll: "Export All",
   scope: {
@@ -269,7 +268,6 @@ var export_vcard = {
 };
 
 var export_icalendar = {
-  version: 0.8,
   description: "Export Event",
   descriptionAll: "Export All",
   scope: {
@@ -521,7 +519,6 @@ var export_icalendar = {
 };
 
 var export_kml = {
-  version: 0.8,
   description: "Export KML",
   scope: {
     semantic: {

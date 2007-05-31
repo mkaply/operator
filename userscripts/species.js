@@ -43,7 +43,6 @@ var species_definition = {
 Microformats.add("species", species_definition);
 
 var wikispecies_search = {
-  version: 0.8,
   description: "Search Wikispecies",
   shortDescription: "Wikispecies",
   icon: "http://species.wikimedia.org/favicon.ico",

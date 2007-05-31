@@ -1,5 +1,4 @@
 var liveclipboard = {
-  version: 0.8,
   description: "Copy with Live Clipboard",
   shortDescription: "Live Clipboard",
   icon: "data:image/png;base64," +

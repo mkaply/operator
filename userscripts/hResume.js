@@ -101,7 +101,6 @@ var hResume_definition = {
 Microformats.add("hResume", hResume_definition);
 
 var hresume_firefox_bookmark = {
-  version: 0.8,
   scope: {
     semantic: {
       "hResume" : "hResume",
@@ -110,7 +109,6 @@ var hresume_firefox_bookmark = {
 };
 
 var hresume_google_search = {
-  version: 0.8,
   scope: {
     semantic: {
       "hResume" : "contact.fn"
@@ -119,7 +117,6 @@ var hresume_google_search = {
 };
 
 var hresume_yahoo_search = {
-  version: 0.8,
   scope: {
     semantic: {
       "hResume" : "contact.fn"

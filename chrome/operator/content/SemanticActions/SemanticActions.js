@@ -43,27 +43,25 @@ var SemanticActions = {
   /* When an action is added, the name is placed in this list */
   list: [],
   add: function add(action, actionDefinition) {
-    if (actionDefinition.version == SemanticActions.version) {
-      if (!SemanticActions[action]) {
-        SemanticActions[action] = actionDefinition;
-        SemanticActions.list.push(action);
-      } else {
-        /* Copy the scope */
-        for (i in actionDefinition.scope.semantic) {
-          SemanticActions[action].scope.semantic[i] = actionDefinition.scope.semantic[i];
-        }
-        /* If there is a doAction, chain it in */
-        if (actionDefinition.doAction) {
-          var doAction = function(semanticObject, semanticObjectType) {
-            var ret = actionDefinition.doAction(semanticObject, semanticObjectType);
-            if (!ret) {
-              return doAction.actionOld(semanticObject, semanticObjectType);
-            }
-            return ret;
+    if (!SemanticActions[action]) {
+      SemanticActions[action] = actionDefinition;
+      SemanticActions.list.push(action);
+    } else {
+      /* Copy the scope */
+      for (i in actionDefinition.scope.semantic) {
+        SemanticActions[action].scope.semantic[i] = actionDefinition.scope.semantic[i];
+      }
+      /* If there is a doAction, chain it in */
+      if (actionDefinition.doAction) {
+        var doAction = function(semanticObject, semanticObjectType) {
+          var ret = actionDefinition.doAction(semanticObject, semanticObjectType);
+          if (!ret) {
+            return doAction.actionOld(semanticObject, semanticObjectType);
           }
-          doAction.actionOld = SemanticActions[action].doAction
-          SemanticActions[action].doAction = doAction;
+          return ret;
         }
+        doAction.actionOld = SemanticActions[action].doAction
+        SemanticActions[action].doAction = doAction;
       }
     }
   },

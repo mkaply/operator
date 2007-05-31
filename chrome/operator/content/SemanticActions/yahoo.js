@@ -1,7 +1,6 @@
 /* simpleEscape dateFromISO8601 localizeISO8601 iso8601FromDate */
 
 var yahoo_maps = {
-  version: 0.8,
   description: "Find with Yahoo! Maps",
   shortDescription: "Yahoo! Maps",
   icon: "http://www.yahoo.com/favicon.ico",

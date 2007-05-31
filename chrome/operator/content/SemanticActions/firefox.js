@@ -1,7 +1,6 @@
 /* These are actions that will only work in Firefox */ 
 
 var firefox_bookmark = {
-  version: 0.8,
   description: "Bookmark with Firefox",
   shortDescription: "Bookmark",
   icon: "data:image/png;base64," +
