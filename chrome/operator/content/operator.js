@@ -317,11 +317,11 @@ var Operator = {
       }
     };
   },
-  actionAllCallbackGenerator: function actionAllCallbackGenerator(semanticArrays, semanticAction)
+  actionAllCallbackGenerator: function actionAllCallbackGenerator(semanticArrays, semanticAction, semanticObjectType)
   {
     return function(event) {
       var url;
-      url = SemanticActions[semanticAction].doActionAll(semanticArrays)
+      url = SemanticActions[semanticAction].doActionAll(semanticArrays, semanticObjectType)
       if ((url) && (url != true)) {
         openUILink(url, event);
       }
@@ -344,14 +344,14 @@ var Operator = {
       }
     };
   },
-  clickAllCallbackGenerator: function clickAllCallbackGenerator(semanticArrays, semanticAction)
+  clickAllCallbackGenerator: function clickAllCallbackGenerator(semanticArrays, semanticAction, semanticObjectType)
   {
     return function(event) {
       /* This is for middle click only */
       if (event.button == 1) {
         if (event.target.getAttribute("disabled") != "true") {
           var url;
-          url = SemanticActions[semanticAction].doActionAll(semanticArrays)
+          url = SemanticActions[semanticAction].doActionAll(semanticArrays, semanticObjectType)
           if ((url) && (url != true)) {
             openUILink(url, event);
           }
@@ -490,26 +490,6 @@ var Operator = {
       }
     }
     
-    /* XXX TODO Action All */
-    if (this.view === 0) {
-    } else {
-      if (Operator.actions[semanticAction].scope) {
-        if (Operator.actions[semanticAction].scope.semantic[semanticObjectType]) {
-          if ((Operator.actions[semanticAction].doActionAll) && (itemsadded > 0)) {
-            var sep = document.createElement("menuseparator");
-            menu.appendChild(sep);
-            tempMenu = document.createElement("menuitem");
-            tempMenu.label = Operator.actions[semanticAction].descriptionAll;
-            tempMenu.setAttribute("label", tempMenu.label);
-            tempMenu.store_oncommand = Operator.actionAllCallbackGenerator(semanticObjects, semanticObjectType, semanticAction);
-            tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
-            tempMenu.store_onclick = Operator.clickAllCallbackGenerator(semanticObjects, semanticObjectType, semanticAction);
-            tempMenu.addEventListener("click", tempMenu.store_onclick, true);
-            menu.appendChild(tempMenu);
-          }
-        }
-      }
-    }
     return menu;
   },
   popupShowing: function popupShowing(semanticObject, semanticObjectType)
@@ -1046,9 +1026,9 @@ var Operator = {
                     tempMenu = document.createElement("menuitem");
                     tempMenu.label = Operator.actions[k].descriptionAll;
                     tempMenu.setAttribute("label", tempMenu.label);
-                    tempMenu.store_oncommand = Operator.actionAllCallbackGenerator(semanticArrays, k);
+                    tempMenu.store_oncommand = Operator.actionAllCallbackGenerator(semanticArrays, k, semanticType);
                     tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
-                    tempMenu.store_onclick = Operator.clickAllCallbackGenerator(semanticArrays, k);
+                    tempMenu.store_onclick = Operator.clickAllCallbackGenerator(semanticArrays, k, semanticType);
                     tempMenu.addEventListener("click", tempMenu.store_onclick, true);
                     menu.appendChild(tempMenu);
                   }
