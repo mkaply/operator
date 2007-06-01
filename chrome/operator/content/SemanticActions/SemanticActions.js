@@ -48,8 +48,10 @@ var SemanticActions = {
       SemanticActions.list.push(action);
     } else {
       /* Copy the scope */
-      for (i in actionDefinition.scope.semantic) {
-        SemanticActions[action].scope.semantic[i] = actionDefinition.scope.semantic[i];
+      if (actionDefinition.scope) {
+        for (i in actionDefinition.scope.semantic) {
+          SemanticActions[action].scope.semantic[i] = actionDefinition.scope.semantic[i];
+        }
       }
       /* If there is a doAction, chain it in */
       if (actionDefinition.doAction) {
@@ -62,6 +64,12 @@ var SemanticActions = {
         }
         doAction.actionOld = SemanticActions[action].doAction
         SemanticActions[action].doAction = doAction;
+      }
+      /* If there is a doActionAll, we have to replace the one we have */
+      /* We'll replace the descriptionAll as well */
+      if (actionDefinition.doActionAll) {
+        SemanticActions[action].doActionAll = actionDefinition.doActionAll;
+        SemanticActions[action].descriptionAll = actionDefinition.descriptionAll;
       }
     }
   },
