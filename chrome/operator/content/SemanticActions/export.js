@@ -7,7 +7,7 @@ var export_vcard = {
     }
   },
   /* doActionAll gets ALL of the semantic Object arrays */
-  doActionAll: function(semanticArrays) {
+  doActionAll: function(semanticArrays, semanticObjectType) {
     var url;
     if (semanticArrays["hCard"].length > 0) {
       var file = Components.classes["@mozilla.org/file/directory_service;1"].
@@ -309,7 +309,7 @@ var export_icalendar = {
     return url;
   },
   /* doActionAll gets ALL of the semantic Object arrays */
-  doActionAll: function(semanticArrays) {
+  doActionAll: function(semanticArrays, semanticObjectType) {
     var url;
     if (semanticArrays["hCalendar"].length > 0) {
       var file = Components.classes["@mozilla.org/file/directory_service;1"].
