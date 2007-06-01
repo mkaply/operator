@@ -153,7 +153,6 @@ var Operator_Options = {
     var i=1;
     var dataformats = document.getElementById("dataformats");
     var dataformat, handler;
-    var listitem;
     do {
       try {
         dataformat = this.prefBranch.getCharPref("dataformat" + i);
@@ -161,7 +160,7 @@ var Operator_Options = {
         break;
       }
       if (dataformat) {
-        listitem = dataformats.appendItem(dataformat);
+        dataformats.appendItem(dataformat);
       }
       i++;
     } while (1);
@@ -176,7 +175,20 @@ var Operator_Options = {
         break;
       }
       if (Operator.actions[action]) {
-        listitem = actions.appendItem(Operator.actions[action].description, action);
+        var listitemText;
+        if (Operator.actions[action].doAction) {
+          if (Operator.actions[action].description) {
+            listitemText = Operator.actions[action].description;
+          }
+        } else if (Operator.actions[action].doActionAll) {
+          if (Operator.actions[action].descriptionAll) {
+            listitemText = Operator.actions[action].descriptionAll;
+          }
+        }
+        if (!listitemText) {
+          listitemText = action;
+        }
+        actions.appendItem(listitemText, action);
       }
       i++;
     } while (1);
@@ -197,7 +209,7 @@ var Operator_Options = {
                                        getService(Components.interfaces.nsIIOService).
                                        getProtocolHandler("file").
                                        QueryInterface(Components.interfaces.nsIFileProtocolHandler);
-          listitem = userscripts.appendItem(f.leafName, "");
+          userscripts.appendItem(f.leafName, "");
         }
       }
     }
@@ -349,13 +361,25 @@ var Operator_Options = {
         }
       }
       if ((add) || ((i == action) && (edit))) {
-        var menulistitem = actionmenu.appendItem(Operator.actions[i].description, i);
+        var listitemText;
+        if (Operator.actions[i].doAction) {
+          if (Operator.actions[i].description) {
+            listitemText = Operator.actions[i].description;
+          }
+        } else if (Operator.actions[i].doActionAll) {
+          if (Operator.actions[i].descriptionAll) {
+            listitemText = Operator.actions[i].descriptionAll;
+          }
+        }
+        if (!listitemText) {
+          listitemText = i;
+        }
+        var menulistitem = actionmenu.appendItem(listitemText, i);
         menulistitem.minWidth=actionmenu.width;
         if (i == action) {
           selectedItem = menulistitem;
         }
       }
-      
     }
   
     if (window.name == 'editaction') {
