@@ -493,18 +493,20 @@ var Operator = {
     /* XXX TODO Action All */
     if (this.view === 0) {
     } else {
-      if (Operator.actions[semanticAction].scope.semantic[semanticObjectType]) {
-        if ((Operator.actions[semanticAction].doActionAll) && (itemsadded > 0)) {
-          var sep = document.createElement("menuseparator");
-          menu.appendChild(sep);
-          tempMenu = document.createElement("menuitem");
-          tempMenu.label = Operator.actions[semanticAction].descriptionAll;
-          tempMenu.setAttribute("label", tempMenu.label);
-          tempMenu.store_oncommand = Operator.actionAllCallbackGenerator(semanticObjects, semanticObjectType, semanticAction);
-          tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
-          tempMenu.store_onclick = Operator.clickAllCallbackGenerator(semanticObjects, semanticObjectType, semanticAction);
-          tempMenu.addEventListener("click", tempMenu.store_onclick, true);
-          menu.appendChild(tempMenu);
+      if (Operator.actions[semanticAction].scope) {
+        if (Operator.actions[semanticAction].scope.semantic[semanticObjectType]) {
+          if ((Operator.actions[semanticAction].doActionAll) && (itemsadded > 0)) {
+            var sep = document.createElement("menuseparator");
+            menu.appendChild(sep);
+            tempMenu = document.createElement("menuitem");
+            tempMenu.label = Operator.actions[semanticAction].descriptionAll;
+            tempMenu.setAttribute("label", tempMenu.label);
+            tempMenu.store_oncommand = Operator.actionAllCallbackGenerator(semanticObjects, semanticObjectType, semanticAction);
+            tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
+            tempMenu.store_onclick = Operator.clickAllCallbackGenerator(semanticObjects, semanticObjectType, semanticAction);
+            tempMenu.addEventListener("click", tempMenu.store_onclick, true);
+            menu.appendChild(tempMenu);
+          }
         }
       }
     }
@@ -526,6 +528,9 @@ var Operator = {
     var k;
     var addedAction = false;
     for (k in Operator.actions) {
+      if (!Operator.actions[k].scope) {
+        continue;
+      }
       if (!Operator.actions[k].scope.semantic[semanticObjectType]) {
         continue;
       }
@@ -760,7 +765,6 @@ var Operator = {
       } else {
         continue;
       }
-      alert('false2');
       return false;
     }
     return true;
@@ -894,80 +898,85 @@ var Operator = {
           break;
         }
 
-        for (j in Operator.actions[action].scope.semantic) {
-          if (semanticArrays[j]) {
-            var objectArray;
-            if (j == "RDFa") {
-              /* Fill in objectArray by asking model for property */
-              /* We actually need to loop through all RDFa models */
-              /* and concatenate into one object array */
-              objectArray = semanticArrays[j][0].getObjectsWithProperty(Operator.actions[action].scope.semantic[j]["property"],
-                                                                        Operator.actions[action].scope.semantic[j]["defaultNS"]); 
-            } else {
-              objectArray = semanticArrays[j];
-            }
-            for (k=0; k < objectArray.length; k++) {
-              /* Here we know we have objects that will work with this action */
-              /* Create a menu that corresponds to the action? */
-              /* Or postpone the creation until we are sure we have the first one? */
-              if ((Operator.actions[action].scope.semantic[j] != j) && (j != "RDFa")) {
-                var reqprop = Operator.actions[action].scope.semantic[j]
-                var required;
-                if (reqprop.indexOf(".") != -1) {
-                  var props = reqprop.split(".");
-                  if (objectArray[k][props[0]]) {
-                    required = objectArray[k][props[0]][props[1]];
+        if (Operator.actions[action].scope) {
+          for (j in Operator.actions[action].scope.semantic) {
+            if (semanticArrays[j]) {
+              var objectArray;
+              if (j == "RDFa") {
+                /* Fill in objectArray by asking model for property */
+                /* We actually need to loop through all RDFa models */
+                /* and concatenate into one object array */
+                objectArray = semanticArrays[j][0].getObjectsWithProperty(Operator.actions[action].scope.semantic[j]["property"],
+                                                                          Operator.actions[action].scope.semantic[j]["defaultNS"]); 
+              } else {
+                objectArray = semanticArrays[j];
+              }
+              for (k=0; k < objectArray.length; k++) {
+                /* Here we know we have objects that will work with this action */
+                /* Create a menu that corresponds to the action? */
+                /* Or postpone the creation until we are sure we have the first one? */
+                if ((Operator.actions[action].scope.semantic[j] != j) && (j != "RDFa")) {
+                  var reqprop = Operator.actions[action].scope.semantic[j]
+                  var required;
+                  if (reqprop.indexOf(".") != -1) {
+                    var props = reqprop.split(".");
+                    if (objectArray[k][props[0]]) {
+                      required = objectArray[k][props[0]][props[1]];
+                    }
+                  } else {
+                    required = objectArray[k][reqprop];
                   }
-                } else {
-                  required = objectArray[k][reqprop];
+                  if (!required) {
+                    continue;
+                  }
                 }
-                if (!required) {
-                  continue;
+                if (!menu) {
+                  menu = document.createElement("menupopup");
                 }
-              }
-              if (!menu) {
-                menu = document.createElement("menupopup");
-              }
-              if (objectArray[k].toString()) {
-                tempMenu = document.createElement("menuitem");
-                tempMenu.label = objectArray[k].toString();
-                tempMenu.setAttribute("label", tempMenu.label);
-                tempMenu.store_oncommand = Operator.actionCallbackGenerator(objectArray[k], j, action);
-                tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
-                tempMenu.store_onclick = Operator.clickCallbackGenerator(objectArray[k], j, action);
-                tempMenu.addEventListener("click", tempMenu.store_onclick, true);
-              } else if (Operator.debug) {
-                tempMenu = document.createElement("menuitem");
-                /* L10N */
-                tempMenu.label = Operator.languageBundle.GetStringFromName("invalid.label");;
-                tempMenu.setAttribute("label", tempMenu.label);
-                tempMenu.store_oncommand = Operator.errorCallbackGenerator(objectArray[k], j);
-                tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
-                tempMenu.style.fontWeight = "bold";
-                menu.error = true;
-              }
-              if (tempMenu) {
-                tempMenu.store_onDOMMenuItemActive = Operator.highlightCallbackGenerator(objectArray[k].node);
-                tempMenu.addEventListener("DOMMenuItemActive", tempMenu.store_onDOMMenuItemActive, true);
-                menu.appendChild(tempMenu);
+                if (objectArray[k].toString()) {
+                  tempMenu = document.createElement("menuitem");
+                  tempMenu.label = objectArray[k].toString();
+                  tempMenu.setAttribute("label", tempMenu.label);
+                  tempMenu.store_oncommand = Operator.actionCallbackGenerator(objectArray[k], j, action);
+                  tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
+                  tempMenu.store_onclick = Operator.clickCallbackGenerator(objectArray[k], j, action);
+                  tempMenu.addEventListener("click", tempMenu.store_onclick, true);
+                } else if (Operator.debug) {
+                  tempMenu = document.createElement("menuitem");
+                  /* L10N */
+                  tempMenu.label = Operator.languageBundle.GetStringFromName("invalid.label");;
+                  tempMenu.setAttribute("label", tempMenu.label);
+                  tempMenu.store_oncommand = Operator.errorCallbackGenerator(objectArray[k], j);
+                  tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
+                  tempMenu.style.fontWeight = "bold";
+                  menu.error = true;
+                }
+                if (tempMenu) {
+                  tempMenu.store_onDOMMenuItemActive = Operator.highlightCallbackGenerator(objectArray[k].node);
+                  tempMenu.addEventListener("DOMMenuItemActive", tempMenu.store_onDOMMenuItemActive, true);
+                  menu.appendChild(tempMenu);
+                }
               }
             }
           }
         }
-        if (menu) {
-          if ((Operator.actions[action].doActionAll)) {
+        if ((Operator.actions[action].doActionAll)) {
+          if (!menu) {
+            menu = document.createElement("menupopup");
+          } else {
             var sep = document.createElement("menuseparator");
             menu.appendChild(sep);
-            tempMenu = document.createElement("menuitem");
-            tempMenu.label = Operator.actions[action].descriptionAll;
-            tempMenu.setAttribute("label", tempMenu.label);
-            tempMenu.store_oncommand = Operator.actionAllCallbackGenerator(semanticArrays, action);
-            tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
-            tempMenu.store_onclick = Operator.clickAllCallbackGenerator(semanticArrays, action);
-            tempMenu.addEventListener("click", tempMenu.store_onclick, true);
-            menu.appendChild(tempMenu);
           }
-
+          tempMenu = document.createElement("menuitem");
+          tempMenu.label = Operator.actions[action].descriptionAll;
+          tempMenu.setAttribute("label", tempMenu.label);
+          tempMenu.store_oncommand = Operator.actionAllCallbackGenerator(semanticArrays, action);
+          tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
+          tempMenu.store_onclick = Operator.clickAllCallbackGenerator(semanticArrays, action);
+          tempMenu.addEventListener("click", tempMenu.store_onclick, true);
+          menu.appendChild(tempMenu);
+        }
+        if (menu) {
           if (!popup) {
             popup = document.createElement("menupopup");
           }               
@@ -1026,21 +1035,23 @@ var Operator = {
             }
             var sep = false;
             for (k in Operator.actions) {
-              if (Operator.actions[k].scope.semantic[semanticType]) {
-                if (Operator.actions[k].doActionAll) {
-                  if (!sep) {
-                    var sep = document.createElement("menuseparator");
-                    menu.appendChild(sep);
-                    sep = true;
+              if (Operator.actions[k].scope) {
+                if (Operator.actions[k].scope.semantic[semanticType]) {
+                  if (Operator.actions[k].doActionAll) {
+                    if (!sep) {
+                      var sep = document.createElement("menuseparator");
+                      menu.appendChild(sep);
+                      sep = true;
+                    }
+                    tempMenu = document.createElement("menuitem");
+                    tempMenu.label = Operator.actions[k].descriptionAll;
+                    tempMenu.setAttribute("label", tempMenu.label);
+                    tempMenu.store_oncommand = Operator.actionAllCallbackGenerator(semanticArrays, k);
+                    tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
+                    tempMenu.store_onclick = Operator.clickAllCallbackGenerator(semanticArrays, k);
+                    tempMenu.addEventListener("click", tempMenu.store_onclick, true);
+                    menu.appendChild(tempMenu);
                   }
-                  tempMenu = document.createElement("menuitem");
-                  tempMenu.label = Operator.actions[k].descriptionAll;
-                  tempMenu.setAttribute("label", tempMenu.label);
-                  tempMenu.store_oncommand = Operator.actionAllCallbackGenerator(semanticArrays, k);
-                  tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
-                  tempMenu.store_onclick = Operator.clickAllCallbackGenerator(semanticArrays, k);
-                  tempMenu.addEventListener("click", tempMenu.store_onclick, true);
-                  menu.appendChild(tempMenu);
                 }
               }
             }
