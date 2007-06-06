@@ -27,9 +27,9 @@ var Operator_Statusbar = {
               newmenus[i].addEventListener("popupshowing", menus[i].store_onpopupshowing, true);
             }
           }
-          document.getElementById("operator-statusbar").appendChild(newmenu);
+          document.getElementById("operator-statusbarpanel").appendChild(newmenu);
         } else {
-          document.getElementById("operator-statusbar").appendChild(menu);
+          document.getElementById("operator-statusbarpanel").appendChild(menu);
         }
         return true;
       }
@@ -39,7 +39,7 @@ var Operator_Statusbar = {
   clearPopup: function()
   {
     if (!this.isHidden()) {
-      var statusbar = document.getElementById("operator-statusbar");
+      var statusbar = document.getElementById("operator-statusbarpanel");
       while (statusbar.firstChild) {
         statusbar.removeChild(statusbar.firstChild);
       }
@@ -49,29 +49,27 @@ var Operator_Statusbar = {
   disable: function()
   {
     if (!this.isHidden()) {
-      document.getElementById("operator-statusbar").setAttribute("disabled", "true");
-      document.getElementById("operator-statusbar").src="chrome://operator/content/operator_small_disabled.png";
+      document.getElementById("operator-statusbarpanel").setAttribute("disabled", "true");
     }
   },
   enable: function()
   {
     if (!this.isHidden()) {
-      document.getElementById("operator-statusbar").setAttribute("disabled", "false");
-      document.getElementById("operator-statusbar").src="chrome://operator/content/operator_small.png";
+      document.getElementById("operator-statusbarpanel").setAttribute("disabled", "false");
     }
   },
   hide: function()
   {
-    document.getElementById("operator-statusbar").hidden = true;
+    document.getElementById("operator-statusbarpanel").hidden = true;
   },
   show: function()
   {
-    document.getElementById("operator-statusbar").hidden = false;
+    document.getElementById("operator-statusbarpanel").hidden = false;
     this.clearPopup();
   },
   isHidden: function()
   {
-    return document.getElementById("operator-statusbar").hidden;
+    return document.getElementById("operator-statusbarpanel").hidden;
   }
 };
 
