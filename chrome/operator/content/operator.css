@@ -1,5 +1,29 @@
 @namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
 
+#operator-urlbar-icon, #operator-urlbar-icon > .button-box,
+#operator-urlbar-icon:hover:active > .button-box {
+  padding: 0px;
+  margin: 0px;
+  border: 0px; 
+  background-color: transparent;
+}
+
+#operator-urlbar-icon > hbox > .button-menu-dropmarker,
+#operator-urlbar-icon > hbox > .button-text {
+  display: none;
+}
+
+#operator-urlbar-icon {
+  -moz-binding: url("chrome://global/content/bindings/button.xml#menu");
+  -moz-appearance: none; 
+  min-width: 0px; 
+  margin-right: 1px !important;
+}
+
+#operator-urlbar-icon[microformats] {
+  list-style-image: url("chrome://operator/content/operator_small.png");
+}
+
 #operator-toolbar-button {
    list-style-image: url("chrome://operator/content/operator.png");
 }
@@ -20,6 +44,14 @@ toolbar[iconsize="small"] #operator-toolbar-button:hover {
    list-style-image: url("chrome://operator/content/operator_small.png");
 }
 toolbar[iconsize="small"] #operator-toolbar-button[disabled="true"] {
+   list-style-image: url("chrome://operator/content/operator_small_disabled.png");
+}
+
+#operator-statusbarpanel {
+   list-style-image: url("chrome://operator/content/operator_small.png");
+}
+
+#operator-statusbarpanel[disabled="true"] {
    list-style-image: url("chrome://operator/content/operator_small_disabled.png");
 }
 
