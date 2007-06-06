@@ -65,6 +65,7 @@ var Operator = {
       objScriptLoader.loadSubScript("chrome://operator/content/operator_toolbar.js");
       objScriptLoader.loadSubScript("chrome://operator/content/operator_statusbar.js");
       objScriptLoader.loadSubScript("chrome://operator/content/operator_toolbar_button.js");
+      objScriptLoader.loadSubScript("chrome://operator/content/operator_urlbar_button.js");
 //      objScriptLoader.loadSubScript("chrome://operator/content/operator_toolbar_buttons.js");
       objScriptLoader.loadSubScript("chrome://operator/content/operator_sidebar.js");
     }
@@ -108,11 +109,21 @@ var Operator = {
     for (i in SemanticActions) {
       Operator.actions.add(i, SemanticActions[i]);
     }
+
+    var curLocale = "en-US";
+    try {
+      curLocale = prefs.getCharPref("general.useragent.locale");
+    }
+    catch (e) {}
+
     for (i in Operator.actions)
     {
       try {
         Operator.actions[i].description = this.languageBundle.GetStringFromName(i + ".description");
       } catch (ex) {
+        if (Operator.actions[i].description[curLocale]) {
+          Operator.actions[i].description = Operator.actions[i].description[curLocale];
+        }
       }
     }
     
@@ -655,7 +666,9 @@ var Operator = {
       mfNode = Microformats.getParent(element);
     }
     if (mfNode) {
+//      mfNode.style.cursor = "url(http://microformats.org/favicon.ico), pointer";
       Operator.highlightDOMNode(mfNode);
+    } else {
     }
   },
   processSemanticDataDelayed: function processSemanticDataDelayed(event)
@@ -678,6 +691,13 @@ var Operator = {
     if (Operator.observeDOMAttrModified) {
       window.document.addEventListener("DOMAttrModified", Operator.processSemanticDataDelayed, false);
     }
+/*
+    var icon = window.document.createElement("img");
+    icon.setAttribute("id","operator-mouseover-icon");
+    icon.setAttribute("style","position:absolute;left:0px;top:0px;width:16px;height:16px;");
+    icon.setAttribute("src","chrome://operator/content/operator_small.png");
+ 	  window.document.body.appendChild(icon);
+*/
   },
   recursiveRemoveListeners: function recursiveRemoveListeners(window)
   {
@@ -716,7 +736,7 @@ var Operator = {
         Operator_Toolbar.disable();
         Operator_Toolbar.clearPopups();
         Operator_Statusbar.disable();
-        Operator_ToolbarButton.disable();
+        document.getElementById("operator-urlbar-icon").removeAttribute("microformats");
       }
       Operator.recursiveRemoveListeners(content);
     }
@@ -851,14 +871,22 @@ var Operator = {
     Operator_Toolbar.clearPopups();
     Operator_Statusbar.clearPopup();
     Operator_ToolbarButton.clearPopup();
+    Operator_URLbarButton.clearPopup();
     Operator_Toolbar.disable();
-    Operator_Statusbar.disable();
     Operator_ToolbarButton.disable();
+    Operator_Statusbar.disable();
 
     /* Get all semantic data from the web page */
     var semanticArrays = [];
+    var haveMicroformats;
     for (i in Microformats) {
       semanticArrays[i] = Microformats.get(i, content.document);
+      if (semanticArrays[i].length > 0) {
+        haveMicroformats = true;
+      }
+    }
+    if (haveMicroformats) {
+      document.getElementById("operator-urlbar-icon").setAttribute("microformats", "true");
     }
     Operator.getSemanticData(content, semanticArrays);
 
@@ -1083,6 +1111,9 @@ var Operator = {
       if (!Operator_Statusbar.isHidden()) {
         Operator_Statusbar.enable();
         Operator_Statusbar.addPopup(popup, clonePopup);
+      }
+      if (!Operator_URLbarButton.isHidden()) {
+        Operator_URLbarButton.addPopup(popup, clonePopup);
       }
       Operator_Toolbar.enable();
     }
