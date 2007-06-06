@@ -27,7 +27,7 @@ var tag_definition = {
           var url_array = mfnode.getAttribute("href").split("/");
           for(var i=url_array.length-1; i > 0; i--) {
             if (url_array[i] !== "") {
-              return unescape(Microformats.tag.validTagName(url_array[i].replace(/\+/g, ' ')));
+              return decodeURIComponent(Microformats.tag.validTagName(url_array[i].replace(/\+/g, ' ')));
             }
           }
         }
