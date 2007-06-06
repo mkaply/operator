@@ -15,7 +15,7 @@ function geo(node) {
 }
 geo.prototype.toString = function() {
   if (this.latitude && this.longitude) {
-    var s = this.node.textContent;
+    var s = Microformats.parser.defaultGetter(this.node);
   
     /* FIXME - THIS IS FIREFOX SPECIFIC */
     /* check if geo is contained in a vcard */
@@ -36,7 +36,11 @@ geo.prototype.toString = function() {
         return hcal.summary;
       }
     }
-    return s;
+    if (s) {
+      return s;
+    } else {
+      return this.latitude + ", " + this.longitude;
+    }
   }
 }
 
