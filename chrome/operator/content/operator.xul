@@ -8,7 +8,14 @@
          xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
   <script type="application/x-javascript;version=1.7" src="chrome://operator/content/operator.js"/>
-
+  <hbox id="urlbar-icons">
+    <button insertbefore="feed-button"
+     type="menu"
+     style="-moz-user-focus: none"
+     class="plain"
+     id="operator-urlbar-icon">
+    </button>
+  </hbox>
   <toolbox id="navigator-toolbox">
     <toolbar accesskey="&operatorToolbar.accesskey;" class="chromeclass-toolbar" collapsed="false"
      context="toolbar-context-menu"
@@ -25,8 +32,7 @@
 </toolbox>
  <statusbar id="status-bar">
    <statusbarpanel class="statusbarpanel-menu-iconic" disabled="true"
-     id="operator-statusbar"
-     src="chrome://operator/content/operator_small_disabled.png"
+     id="operator-statusbarpanel"
    />
  </statusbar>
  	<toolbarpalette id="BrowserToolbarPalette">
