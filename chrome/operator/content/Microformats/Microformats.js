@@ -557,7 +557,7 @@ var Microformats = {
         }
       }
       var node = in_node;
-      if (Microformats[microformat].className) {
+      if ((Microformats[microformat].className) && (in_node.ownerDocument)) {
         node = Microformats.parser.preProcessMicroformat(in_node);
       }
   
@@ -586,7 +586,7 @@ var Microformats = {
       var i, j, k;
       var result;
       var mfnode = in_mfnode;
-      if (!in_mfnode.origNode && Microformats[mfname].className) {
+      if (!in_mfnode.origNode && Microformats[mfname].className && in_mfnode.ownerDocument) {
         mfnode = Microformats.parser.preProcessMicroformat(in_mfnode);
       }
       var foundProps = false;
