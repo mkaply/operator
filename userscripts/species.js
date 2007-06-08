@@ -11,7 +11,19 @@ function species(node) {
   }
 }
 species.prototype.toString = function() {
-  return this.vernacular;
+  if (this.vernacular) {
+    return this.vernacular;
+  } else if (this.binomial) {
+    return this.binomial;
+  } else if (this.binominal) {
+    return this.binominal;
+  } else if (this.variety) {
+    return this.variety;
+  } else if (this.cultivar) {
+    return this.cultivar;
+  } else if (this.breed) {
+    return this.breed;
+  }
 }
 
 var species_definition = {
@@ -32,7 +44,15 @@ var species_definition = {
     },
     "binomial" : {
     },
+    "binominal" : {
+    },
     "genus" : {
+    },
+    "variety" : {
+    },
+    "cultivar" : {
+    },
+    "breed" : {
     },
     "specific" : {
        plural: true
