@@ -23,6 +23,18 @@ species.prototype.toString = function() {
     return this.cultivar;
   } else if (this.breed) {
     return this.breed;
+  } else if (this.genus) {
+    return this.genus;
+  } else if (this.family) {
+    return this.family;
+  } else if (this.order) {
+    return this.order;
+  } else if (this["class"]) {
+    return this["class"];
+  } else if (this.phylum) {
+    return this.phylum;
+  } else if (this.kingdom) {
+    return this.kingdom;
   }
 }
 
@@ -35,6 +47,12 @@ var species_definition = {
     "domain" : {
     },
     "kingdom" : {
+    },
+    "phylum" : {
+    },
+    "order" : {
+    },
+    "taxoclass" : {
     },
     "subkingdom" : {
     },
