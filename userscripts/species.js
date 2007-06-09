@@ -50,7 +50,17 @@ var species_definition = {
     },
     "phylum" : {
     },
+    "subphylum" : {
+    },
     "order" : {
+    },
+    "superorder" : {
+    },
+    "suborder" : {
+    },
+    "infraorder" : {
+    },
+    "parvorder" : {
     },
     "taxoclass" : {
     },
@@ -71,6 +81,18 @@ var species_definition = {
     "cultivar" : {
     },
     "breed" : {
+    },
+    "class" : {
+    },
+    "subclass" : {
+    },
+    "infraclass" : {
+    },
+    "family" : {
+    },
+    "superfamily" : {
+    },
+    "subfamily" : {
     },
     "specific" : {
        plural: true
