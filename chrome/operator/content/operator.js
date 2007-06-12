@@ -41,14 +41,14 @@ var Operator = {
     }
     if (Components.utils.import) {
       try {
-        Components.utils.import("rel:Microformats.js");
+        Components.utils.import("resource://gre/modules/Microformats.js");
       } catch (ex) {}
     }
     var objScriptLoader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"].getService(Components.interfaces.mozIJSSubScriptLoader);
     if (typeof(Microformats) == "undefined") {
       objScriptLoader.loadSubScript("chrome://operator/content/Microformats/Microformats.js");
-      Microformats.init(objScriptLoader, "chrome://operator/content/Microformats/");
     }
+    objScriptLoader.loadSubScript("chrome://operator/content/Microformats/xFolk.js");
     /* Don't assume we have RDF */
     try {
       objScriptLoader.loadSubScript("chrome://operator/content/RDFa/rdfa.js");
@@ -685,11 +685,13 @@ var Operator = {
         Operator.recursiveAddListeners(window.frames[i]);
       }
     }
-    window.document.addEventListener("mouseover", Operator.mouseOver, false);
-    window.document.addEventListener("DOMNodeInserted", Operator.processSemanticDataDelayed, false);
-    window.document.addEventListener("DOMNodeRemoved", Operator.processSemanticDataDelayed, false);
-    if (Operator.observeDOMAttrModified) {
-      window.document.addEventListener("DOMAttrModified", Operator.processSemanticDataDelayed, false);
+    if (window) {
+      window.document.addEventListener("mouseover", Operator.mouseOver, false);
+      window.document.addEventListener("DOMNodeInserted", Operator.processSemanticDataDelayed, false);
+      window.document.addEventListener("DOMNodeRemoved", Operator.processSemanticDataDelayed, false);
+      if (Operator.observeDOMAttrModified) {
+        window.document.addEventListener("DOMAttrModified", Operator.processSemanticDataDelayed, false);
+      }
     }
 /*
     var icon = window.document.createElement("img");
@@ -706,11 +708,13 @@ var Operator = {
         Operator.recursiveRemoveListeners(window.frames[i]);
       }
     }
-    window.document.removeEventListener("mouseover", Operator.mouseOver, false);
-    window.document.removeEventListener("DOMNodeInserted", Operator.processSemanticDataDelayed, false);
-    window.document.removeEventListener("DOMNodeRemoved", Operator.processSemanticDataDelayed, false);
-    if (Operator.observeDOMAttrModified) {
-      window.document.removeEventListener("DOMAttrModified", Operator.processSemanticDataDelayed, false);
+    if (window) {
+      window.document.removeEventListener("mouseover", Operator.mouseOver, false);
+      window.document.removeEventListener("DOMNodeInserted", Operator.processSemanticDataDelayed, false);
+      window.document.removeEventListener("DOMNodeRemoved", Operator.processSemanticDataDelayed, false);
+      if (Operator.observeDOMAttrModified) {
+        window.document.removeEventListener("DOMAttrModified", Operator.processSemanticDataDelayed, false);
+      }
     }
   },
   onPageShow: function onPageShow(event) 
