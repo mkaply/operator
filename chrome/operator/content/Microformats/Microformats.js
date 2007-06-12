@@ -1,8 +1,7 @@
-EXPORTED_SYMBOLS = ["Microformats"];
+EXPORTED_SYMBOLS = ["Microformats", "adr", "tag", "hCard", "hCalendar", "geo"];
 
 var Microformats = {
   version: 0.8,
-  inited: false,
   /* When a microformat is added, the name is placed in this list */
   list: [],
   /* Custom iterator so that microformats can be enumerated as */
@@ -11,63 +10,6 @@ var Microformats = {
     var i;
     for (i=0; i < this.list.length; i++) {
       yield this.list[i];
-    }
-  },
-  /**
-   * Internal function to initialize microformats. First it tries to use the
-   * Component.utils.import method that will be in Firefox 3. If that fails,
-   * it looks for certain microformat definition files in the same directory
-   * as this JS file.
-   */
-  init: function() {
-    if (!Microformats.inited) {
-      Microformats.inited = true
-      /* Try to import as components */
-      if (Components.utils.import) {
-        try {
-          Components.utils.import("rel:adr.js");
-        } catch (ex) {}
-        try {
-          Components.utils.import("rel:hCard.js");
-        } catch (ex) {}
-        try {
-          Components.utils.import("rel:hCalendar.js");
-        } catch (ex) {}
-      }
-      /* If the import failed or we didn't import at all, load */
-      /* We'll use hCard as the touchstone */
-      var ojl = Components.classes["@mozilla.org/moz/jssubscript-loader;1"].
-                           getService(Components.interfaces.mozIJSSubScriptLoader);
-      /* Find the location of the JS file we are in */
-      var stack = (new Error()).stack.split("\n");
-      var end = stack[1].indexOf("Microformats.js");
-      var begin = stack[1].lastIndexOf("@", end)+1;
-      var baseurl = stack[1].substring(begin, end);
-
-      if (typeof(Address) == "undefined") {
-        try {
-          ojl.loadSubScript(baseurl + "adr.js");
-        } catch (ex) {}
-      }
-      if (typeof(hCard) == "undefined") {
-        try {
-          ojl.loadSubScript(baseurl + "hCard.js");
-        } catch (ex) {}
-      }
-      if (typeof(hCalendar) == "undefined") {
-        try {
-          ojl.loadSubScript(baseurl + "hCalendar.js");
-        } catch (ex) {}
-      }
-      try {
-        ojl.loadSubScript(baseurl + "tag.js");
-      } catch (ex) {}
-      try {
-        ojl.loadSubScript(baseurl + "geo.js");
-      } catch (ex) {}
-      try {
-        ojl.loadSubScript(baseurl + "xFolk.js");
-      } catch (ex) {}
     }
   },
   /**
@@ -963,7 +905,7 @@ var Microformats = {
         }
       }
       return dateString;
-    },
+    }
   },
   /**
    * Converts an ISO8601 date into a JavaScript date object, honoring the TZ
@@ -1162,4 +1104,525 @@ var Microformats = {
   }
 };
 
-Microformats.init();
+function adr(node) {
+  if (node) {
+    Microformats.parser.newMicroformat(this, node, "adr");
+  }
+}
+
+adr.prototype.toString = function() {
+  var address_text = "";
+  var start_parens = false;
+  if (this["street-address"]) {
+    address_text += this["street-address"][0];
+    address_text += " ";
+  }
+  if (this["locality"]) {
+    if (this["street-address"]) {
+      address_text += "(";
+      start_parens = true;
+    }
+    address_text += this["locality"];
+  }
+  if (this["region"]) {
+    if ((this["street-address"]) && (!start_parens)) {
+      address_text += "(";
+      start_parens = true;
+    } else if (this["locality"]) {
+      address_text += ", ";
+    }
+    address_text += this["region"];
+  }
+  if (this["country-name"]) {
+    if ((this["street-address"]) && (!start_parens)) {
+      address_text += "(";
+      start_parens = true;
+      address_text += this["country-name"];
+    } else if ((!this["locality"]) && (!this["region"])) {
+      address_text += this["country-name"];
+    } else if (((!this["locality"]) && (this["region"])) || ((this["locality"]) && (!this["region"]))) {
+      address_text += ", ";
+      address_text += this["country-name"];
+    }
+  }
+  if (start_parens) {
+    address_text += ")";
+  }
+  return address_text;
+}
+
+var adr_definition = {
+  mfVersion: 0.8,
+  mfObject: adr,
+  className: "adr",
+  properties: {
+    "type" : {
+      plural: true,
+      types: ["work", "home", "pref", "postal", "dom", "intl", "parcel"]
+    },
+    "post-office-box" : {
+    },
+    "street-address" : {
+      plural: true,
+    },
+    "extended-address" : {
+    },
+    "locality" : {
+    },
+    "region" : {
+    },
+    "postal-code" : {
+    },
+    "country-name" : {
+    }
+  }
+};
+
+Microformats.add("adr", adr_definition);
+
+function hCard(node) {
+  if (node) {
+    Microformats.parser.newMicroformat(this, node, "hCard");
+  }
+}
+hCard.prototype.toString = function() {
+  if (this.resolvedNode) {
+    /* If this microformat has an include pattern, put the */
+    /* organization-name in parenthesis after the fn to differentiate */
+    /* them. */
+    var fns = Microformats.getElementsByClassName(this.node, "fn");
+    if (fns.length === 0) {
+      if (this.fn) {
+        if (this.org[0]["organization-name"] && (this.fn != this.org[0]["organization-name"])) {
+          return this.fn + " (" + this.org[0]["organization-name"] + ")";
+        }
+      }
+    }
+  }
+  return this.fn;
+}
+
+var hCard_definition = {
+  mfVersion: 0.8,
+  mfObject: hCard,
+  className: "vcard",
+  required: ["fn"],
+  properties: {
+    "adr" : {
+      plural: true,
+      datatype: "microformat",
+      microformat: "adr"
+    },
+    "agent" : {
+      plural: true
+    },
+    "bday" : {
+      datatype: "dateTime"
+    },
+    "class" : {},
+    "category" : {
+      plural: true,
+      datatype: "microformat",
+      microformat: "tag",
+      microformat_property: "tag"
+    },
+    "email" : {
+      subproperties: {
+        "type" : {
+          plural: true,
+          types: ["internet", "x400", "pref"]
+        },
+        "value" : {
+          datatype: "email",
+          virtual: true
+        }
+      },
+      plural: true   
+    },
+    "fn" : {
+      required: true
+    },
+    "geo" : {
+      value: "geo",
+      datatype: "microformat",
+      microformat: "geo"
+    },
+    "key" : {
+      plural: true
+    },
+    "label" : {
+      plural: true
+    },
+    "logo" : {
+      plural: true,
+      datatype: "anyURI"
+    },
+    "mailer" : {
+      plural: true
+    },
+    "n" : {
+      subproperties: {
+        "honorific-prefix" : {
+          plural: true
+        },
+        "given-name" : {
+        },
+        "additional-name" : {
+          plural: true
+        },
+        "family-name" : {
+        },
+        "honorific-suffix" : {
+          plural: true
+        }
+      },
+      virtual: true,
+      /*  Implied "n" Optimization */
+      /* http://microformats.org/wiki/hcard#Implied_.22n.22_Optimization */
+      virtualGetter: function(mfnode) {
+        var fn = Microformats.parser.getMicroformatProperty(mfnode, "hCard", "fn");
+        var orgs = Microformats.parser.getMicroformatProperty(mfnode, "hCard", "org");
+        var given_name;
+        var family_name;
+        if (fn && (!orgs || (orgs.length > 1) || (fn != orgs[0]["organization-name"]))) {
+          var fns = fn.split(" ");
+          if (fns.length === 2) {
+            if (fns[0].charAt(fns[0].length-1) == ',') {
+              given_name = fns[1];
+              family_name = fns[0].substr(0, fns[0].length-1);
+            } else if (fns[1].length == 1) {
+              given_name = fns[1];
+              family_name = fns[0];
+            } else if ((fns[1].length == 2) && (fns[1].charAt(fns[1].length-1) == '.')) {
+              given_name = fns[1];
+              family_name = fns[0];
+            } else {
+              given_name = fns[0];
+              family_name = fns[1];
+            }
+            return {"given-name" : given_name, "family-name" : family_name};
+          }
+        }
+      }
+    },
+    "nickname" : {
+      plural: true,
+      virtual: true,
+      /* Implied "nickname" Optimization */
+      /* http://microformats.org/wiki/hcard#Implied_.22nickname.22_Optimization */
+      virtualGetter: function(mfnode) {
+        var fn = Microformats.parser.getMicroformatProperty(mfnode, "hCard", "fn");
+        var orgs = Microformats.parser.getMicroformatProperty(mfnode, "hCard", "org");
+        var given_name;
+        var family_name;
+        if (fn && (!orgs || (orgs.length) > 1 || (fn != orgs[0]["organization-name"]))) {
+          var fns = fn.split(" ");
+          if (fns.length === 1) {
+            return [fns[0]];
+          }
+        }
+        return;
+      }
+    },
+    "note" : {
+      plural: true,
+      datatype: "HTML"
+    },
+    "org" : {
+      subproperties: {
+        "organization-name" : {
+        },
+        "organization-unit" : {
+          plural: true
+        }
+      },
+      plural: true,
+      implied: "organization-name"
+    },
+    "photo" : {
+      plural: true,
+      datatype: "anyURI"
+    },
+    "rev" : {
+      datatype: "dateTime"
+    },
+    "role" : {
+      plural: true
+    },
+    "sequence" : {
+    },
+    "sort-string" : {
+    },
+    "sound" : {
+      plural: true
+    },
+    "title" : {
+      plural: true
+    },
+    "tel" : {
+      subproperties: {
+        "type" : {
+          plural: true,
+          types: ["msg", "home", "work", "pref", "voice", "fax", "cell", "video", "pager", "bbs", "car", "isdn", "pcs"]
+        },
+        "value" : {
+        }
+      },
+      plural: true,
+      implied: "value"
+    },
+    "tz" : {
+    },
+    "uid" : {
+      datatype: "anyURI"
+    },
+    "url" : {
+      plural: true,
+      datatype: "anyURI"
+    }
+  }
+};
+
+Microformats.add("hCard", hCard_definition);
+
+function hCalendar(node) {
+  if (node) {
+    Microformats.parser.newMicroformat(this, node, "hCalendar");
+  }
+}
+hCalendar.prototype.toString = function() {
+  if (this.resolvedNode) {
+    /* If this microformat has an include pattern, put the */
+    /* dtstart in parenthesis after the summary to differentiate */
+    /* them. */
+    var summaries = Microformats.getElementsByClassName(this.node, "summary");
+    if (summaries.length === 0) {
+      if (this.summary) {
+        if (this.dtstart) {
+          return this.summary + "(" + Microformats.parser.dateFromISO8601(this.dtstart).toLocaleString() + ")";
+        }
+      }
+    }
+  }
+  return this.summary;
+}
+
+var hCalendar_definition = {
+  mfVersion: 0.8,
+  mfObject: hCalendar,
+  className: "vevent",
+  required: ["summary"],
+  properties: {
+    "category" : {
+      plural: true,
+      datatype: "microformat",
+      microformat: "tag",
+      microformat_property: "tag"
+    },
+    "class" : {
+      types: ["public", "private", "confidential"]
+    },
+    "description" : {
+      datatype: "HTML"
+    },
+    "dtstart" : {
+      datatype: "dateTime"
+    },
+    "dtend" : {
+      datatype: "dateTime"
+    },
+    "dtstamp" : {
+      datatype: "dateTime"
+    },
+    "duration" : {
+    },
+    "location" : {
+      datatype: "microformat",
+      microformat: "hCard"
+    },
+    "status" : {
+      types: ["tentative", "confirmed", "cancelled"]
+    },
+    "summary" : {},
+    "transp" : {
+      types: ["opaque", "transparent"]
+    },
+    "uid" : {
+      datatype: "anyURI"
+    },
+    "url" : {
+      datatype: "anyURI"
+    },
+    "last-modified" : {
+      datatype: "dateTime"
+    }
+  }
+};
+
+Microformats.add("hCalendar", hCalendar_definition);
+
+function geo(node) {
+  if (node) {
+    Microformats.parser.newMicroformat(this, node, "geo");
+  }
+}
+geo.prototype.toString = function() {
+  if (this.latitude && this.longitude) {
+    var s = Microformats.parser.defaultGetter(this.node);
+  
+    /* FIXME - THIS IS FIREFOX SPECIFIC */
+    /* check if geo is contained in a vcard */
+    var xpathExpression = "ancestor::*[contains(concat(' ', @class, ' '), ' vcard ')]";
+    var xpathResult = this.node.ownerDocument.evaluate(xpathExpression, this.node, null,  Components.interfaces.nsIDOMXPathResult.FIRST_ORDERED_NODE_TYPE, null);
+    if (xpathResult.singleNodeValue) {
+      var hcard = new hCard(xpathResult.singleNodeValue);
+      if (hcard.fn) {
+        return hcard.fn;
+      }
+    }
+    /* check if geo is contained in a vevent */
+    xpathExpression = "ancestor::*[contains(concat(' ', @class, ' '), ' vevent ')]";
+    xpathResult = this.node.ownerDocument.evaluate(xpathExpression, this.node, null,  Components.interfaces.nsIDOMXPathResult.FIRST_ORDERED_NODE_TYPE, xpathResult);
+    if (xpathResult.singleNodeValue) {
+      var hcal = new hCalendar(xpathResult.singleNodeValue);
+      if (hcal.summary) {
+        return hcal.summary;
+      }
+    }
+    if (s) {
+      return s;
+    } else {
+      return this.latitude + ", " + this.longitude;
+    }
+  }
+}
+
+var geo_definition = {
+  mfVersion: 0.8,
+  mfObject: geo,
+  className: "geo",
+  required: ["latitude","longitude"],
+  properties: {
+    "latitude" : {
+      datatype: "float",
+      virtual: true,
+      /* This will only be called in the virtual case */
+      virtualGetter: function(mfnode) {
+        var value = Microformats.parser.defaultGetter(mfnode);
+        var latlong;
+        if (value.match(';')) {
+          latlong = value.split(';');
+          if (latlong[0]) {
+            return parseFloat(latlong[0]);
+          }
+        }
+      },
+    },
+    "longitude" : {
+      datatype: "float",
+      virtual: true,
+      /* This will only be called in the virtual case */
+      virtualGetter: function(mfnode) {
+        var value = Microformats.parser.defaultGetter(mfnode);
+        var latlong;
+        if (value.match(';')) {
+          latlong = value.split(';');
+          if (latlong[1]) {
+            return parseFloat(latlong[1]);
+          }
+        }
+      }
+    }
+  }
+};
+
+Microformats.add("geo", geo_definition);
+
+function tag(node) {
+  if (node) {
+    Microformats.parser.newMicroformat(this, node, "tag");
+  }
+}
+tag.prototype.toString = function() {
+  return this.tag;
+}
+
+var tag_definition = {
+  mfVersion: 0.8,
+  mfObject: tag,
+  attributeName: "rel",
+  attributeValues: "tag",
+  properties: {
+    "tag" : {
+      virtual: true,
+      virtualGetter: function(mfnode) {
+        if (mfnode.href) {
+          var url_array = mfnode.getAttribute("href").split("/");
+          for(var i=url_array.length-1; i > 0; i--) {
+            if (url_array[i] !== "") {
+              var tag
+              if (tag = Microformats.tag.validTagName(url_array[i].replace(/\+/g, ' '))) {
+                return decodeURIComponent(tag);
+              }
+            }
+          }
+        }
+      }
+    },
+    "link" : {
+      virtual: true,
+      datatype: "anyURI"
+    },
+    "text" : {
+      virtual: true
+    }
+  },
+  validTagName: function(tag)
+  {
+    var returnTag = tag;
+    if (tag.indexOf('?') != -1) {
+      if (tag.indexOf('?') === 0) {
+        return false;
+      } else {
+        returnTag = tag.substr(0, tag.indexOf('?'));
+      }
+    }
+    if (tag.indexOf('#') != -1) {
+      if (tag.indexOf('#') === 0) {
+        return false;
+      } else {
+        returnTag = tag.substr(0, tag.indexOf('#'));
+      }
+    }
+    if (tag.indexOf('.html') != -1) {
+      if (tag.indexOf('.html') == tag.length - 5) {
+        return false;
+      }
+    }
+    return returnTag;
+  },
+  validate: function(node, error) {
+    var tag = Microformats.parser.getMicroformatProperty(node, "tag", "tag");
+    if (!tag) {
+      if (node.href) {
+        var url_array = node.getAttribute("href").split("/");
+        for(var i=url_array.length-1; i > 0; i--) {
+          if (url_array[i] !== "") {
+            if (error) {
+              error.message = "Invalid tag name (" + url_array[i] + ")";
+            }
+            return false;
+          }
+        }
+      } else {
+        if (error) {
+          error.message = "No href specified on tag";
+        }
+        return false;
+      }
+    }
+    return true;
+  }
+};
+
+Microformats.add("tag", tag_definition);
