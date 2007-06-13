@@ -11,6 +11,7 @@ var yedda_search_tags = {
     if (semanticObject.tag) {
       return "http://yedda.com/questions/tags/" + encodeURIComponent(semanticObject.tag) + "?source=operator";
     }
+    return null;
   }
 };
 

@@ -11,6 +11,7 @@ var magnolia_search_tags = {
     if (semanticObject.tag) {
       return "http://ma.gnolia.com/tags/" + encodeURIComponent(semanticObject.tag);
     }
+    return null;
   }
 };
 

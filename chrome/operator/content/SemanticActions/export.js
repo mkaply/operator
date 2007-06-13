@@ -3,7 +3,7 @@ var export_vcard = {
   descriptionAll: "Export All",
   scope: {
     semantic: {
-      "hCard" : "hCard",
+      "hCard" : "hCard"
     }
   },
   /* doActionAll gets ALL of the semantic Object arrays */
@@ -37,7 +37,7 @@ var export_vcard = {
                     .getService(Components.interfaces.nsIXULRuntime)
                     .OS == "Darwin") {
         f.launch();
-        return;
+        return null;
       }
       url = Components.classes["@mozilla.org/network/io-service;1"].
                        getService(Components.interfaces.nsIIOService).
@@ -70,7 +70,7 @@ var export_vcard = {
                     .getService(Components.interfaces.nsIXULRuntime)
                     .OS == "Darwin") {
         f.launch();
-        return;
+        return null;
       }
       url = Components.classes["@mozilla.org/network/io-service;1"].
                        getService(Components.interfaces.nsIIOService).
@@ -299,7 +299,7 @@ var export_icalendar = {
                     .getService(Components.interfaces.nsIXULRuntime)
                     .OS == "Darwin") {
         f.launch();
-        return;
+        return null;
       }
       url = Components.classes["@mozilla.org/network/io-service;1"].
                        getService(Components.interfaces.nsIIOService).
@@ -352,7 +352,7 @@ var export_icalendar = {
                     .getService(Components.interfaces.nsIXULRuntime)
                     .OS == "Darwin") {
         f.launch();
-        return;
+        return null;
       }
       url = Components.classes["@mozilla.org/network/io-service;1"].
                        getService(Components.interfaces.nsIIOService).
@@ -567,7 +567,7 @@ var export_kml = {
                     .getService(Components.interfaces.nsIXULRuntime)
                     .OS == "Darwin") {
         f.launch();
-        return;
+        return null;
       }
       url = Components.classes["@mozilla.org/network/io-service;1"].
                        getService(Components.interfaces.nsIIOService).

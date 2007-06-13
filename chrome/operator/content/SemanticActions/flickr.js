@@ -13,6 +13,7 @@ var flickr_search_tags = {
       var tag = semanticObject.tag.replace(/ /g, '+');
       return "http://flickr.com/photos/tags/" + encodeURIComponent(tag);
     }
+    return null;
   }
 };
 

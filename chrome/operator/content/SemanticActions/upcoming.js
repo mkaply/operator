@@ -11,6 +11,7 @@ var upcoming_search_tags = {
     if (semanticObject.tag) {
       return "http://upcoming.yahoo.com/tag/" + encodeURIComponent(semanticObject.tag);
     }
+    return null;
   }
 };
 

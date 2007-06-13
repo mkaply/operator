@@ -11,6 +11,7 @@ var technorati_search_tags = {
     if (semanticObject.tag) {
       return "http://technorati.com/tag/" + encodeURIComponent(semanticObject.tag);
     }
+    return null;
   }
 };
 

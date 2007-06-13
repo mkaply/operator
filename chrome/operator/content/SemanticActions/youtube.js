@@ -11,6 +11,7 @@ var youtube_search_tags = {
     if (semanticObject.tag) {
       return("http://youtube.com/results?search_query=" + encodeURIComponent(semanticObject.tag));
     }
+    return null;
   }
 };
 
