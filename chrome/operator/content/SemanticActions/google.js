@@ -73,6 +73,7 @@ var google_search = {
     if (searchstring) {
       return  "http://www.google.com/search?q=" + encodeURIComponent(searchstring);
     }
+    return null;
   }
 };
 

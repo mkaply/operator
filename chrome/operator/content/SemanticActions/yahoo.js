@@ -73,6 +73,7 @@ var yahoo_search = {
     if (searchstring) {
       return "http://search.yahoo.com/search?p=" + encodeURIComponent(searchstring);
     }
+    return null;
   }
 };
 
@@ -243,7 +244,7 @@ var yahoo_contacts = {
   icon: "http://www.yahoo.com/favicon.ico",
   scope: {
     semantic: {
-      "hCard" : "hCard",
+      "hCard" : "hCard"
     }
   },
   doAction: function(semanticObject, semanticObjectType) {

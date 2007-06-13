@@ -11,6 +11,7 @@ var delicious_search_tags = {
     if (semanticObject.tag) {
       return "http://del.icio.us/tag/" + encodeURIComponent(semanticObject.tag);
     }
+    return null;
   }
 };
 

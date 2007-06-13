@@ -40,7 +40,7 @@ var RDFa = {
     var model = new RDFa.Model();
 
     if(!RDFa.hasRDFa(rootElement)) {
-      return;
+      return null;
     }
 
     var ctx = [RDFa.createContext(rootElement.documentElement || rootElement.ownerDocument.documentElement)];

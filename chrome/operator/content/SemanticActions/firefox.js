@@ -9,7 +9,7 @@ var firefox_bookmark = {
     semantic: {
       "hCard" : "hCard",
       "hCalendar" : "hCalendar",
-      "xFolk" : "taggedlink",
+      "xFolk" : "taggedlink"
     }
   },
   doAction: function(semanticObject, semanticObjectType) {
