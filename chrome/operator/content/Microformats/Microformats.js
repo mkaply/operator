@@ -309,18 +309,7 @@ var Microformats = {
       } else if ((propnode.nodeName.toLowerCase() == "area") && (propnode.getAttribute("alt"))) {
         return propnode.getAttribute("alt");
       } else {
-        var values;
-        /* This is ugly. Some cases (email and tel for hCard) are called value */
-        /* but can also use value-excerpting. This handles that */
-        if (parentnode && propnode.getAttribute('class').match("(^|\\s)" + "value" + "(\\s|$)")) {
-          var parent_values = Microformats.getElementsByClassName(parentnode, "value");
-          if (parent_values.length > 1) {
-            values = parent_values;
-          }
-        }
-        if (!values) {
-          values = Microformats.getElementsByClassName(propnode, "value");
-        }
+        var values = Microformats.getElementsByClassName(propnode, "value");
         if (values.length > 0) {
           var value = "";
           for (var j=0;j<values.length;j++) {
@@ -397,6 +386,24 @@ var Microformats = {
       }
     },
     /**
+     * Used to specifically retrieve a telephone number in a microformat node.
+     * Basically this is to handle weird value excerpting
+     *
+     * @param  propnode   The DOMNode to check
+     * @param  parentnode The parent node of the property. If it is a subproperty,
+     *                    this is the parent property node. If it is not, this is the
+     *                    microformat node.
+     * @return A string with the telephone number
+     */
+    telGetter: function(propnode, parentnode) {
+      /* Special case - if this node is a value, use the parent node to get all the values */
+      if (propnode.getAttribute('class').match("(^|\\s)" + "value" + "(\\s|$)")) {
+        return Microformats.parser.defaultGetter(parentnode, parentnode);
+      } else {
+        return Microformats.parser.defaultGetter(propnode, parentnode);
+      }
+    },
+    /**
      * Used to specifically retrieve an email address in a microformat node.
      * This includes at an href, as well as removing subject if specified and
      * the mailto prefix.
@@ -416,7 +423,12 @@ var Microformats = {
           return unescape(mailto.substring("mailto:".length));
         }
       } else {
-        return Microformats.parser.defaultGetter(propnode, parentnode);
+        /* Special case - if this node is a value, use the parent node to get all the values */
+        if (propnode.getAttribute('class').match("(^|\\s)" + "value" + "(\\s|$)")) {
+          return Microformats.parser.defaultGetter(parentnode, parentnode);
+        } else {
+          return Microformats.parser.defaultGetter(propnode, parentnode);
+        }
       }
     },
     /**
@@ -453,6 +465,9 @@ var Microformats = {
           break;
         case "email":
           result = Microformats.parser.emailGetter(node, parentnode);
+          break;
+        case "tel":
+          result = Microformats.parser.telGetter(node, parentnode);
           break;
         case "HTML":
           result = Microformats.parser.HTMLGetter(node, parentnode);
@@ -1368,6 +1383,7 @@ var hCard_definition = {
           types: ["msg", "home", "work", "pref", "voice", "fax", "cell", "video", "pager", "bbs", "car", "isdn", "pcs"]
         },
         "value" : {
+          datatype: "tel",
         }
       },
       plural: true,
