@@ -754,6 +754,9 @@ var Operator = {
   /* This function compares the strings in two objects to see if they are equal */
   areEqualObjects: function areEqualObjects(object1, object2)
   {
+    if (!object1 || !object2) {
+      return false;
+    }
     if (object1.__count__ != object1.__count__) {
       return false;
     }
