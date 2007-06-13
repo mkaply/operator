@@ -3,7 +3,6 @@
 if (Components.utils.import) {
   try {
     Components.utils.import("resource://gre/modules/Microformats.js");
-    Components.utils.import("resource://gre/modules/hCard.js");
     EXPORTED_SYMBOLS = ["hFeed"];
     EXPORTED_SYMBOLS = ["hEntry"];
   } catch (ex) {}

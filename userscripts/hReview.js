@@ -1,8 +1,6 @@
 if (Components.utils.imort) {
   try {
     Components.utils.import("resource://gre/modules/Microformats.js");
-    Components.utils.import("resource://gre/modules/hCard.js");
-    Components.utils.import("resource://gre/modules/hCalendar.js");
     var EXPORTED_SYMBOLS = ["hReview"];
   } catch (ex) {}
 }
