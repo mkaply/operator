@@ -7,9 +7,9 @@ var Operator_Debug = {
     if (!Operator_Debug.X2VLoaded) {
       document.getElementById('x2v').value =  "...loading...";
       var url;
-      if (window.title == "hCard") {
+      if (document.title == "hCard") {
         url = "http://suda.co.uk/projects/microformats/hcard/POST/";
-      } else if (window.title == "hCalendar") {
+      } else if (document.title == "hCalendar") {
         url = "http://suda.co.uk/projects/microformats/hcalendar/POST/";
       }
       var item = document.getElementById('x2v').item;
@@ -28,7 +28,9 @@ var Operator_Debug = {
             document.getElementById('x2v').value = request.responseText;
             Operator_Debug.X2VLoaded = true;
           } else {
-            document.getElementById('x2v').value = "Error loading X2V";
+            if (document) {
+              document.getElementById('x2v').value = "Error loading X2V";
+            }
           }
         }
       }
@@ -38,7 +40,7 @@ var Operator_Debug = {
   onPageLoad: function(window_args) 
   {
     var tabbox = document.getElementById('debug.tabs');
-    window.title=window_args[0];
+    document.title=window_args[0];
     if (window_args[0] == "Alert") {
       document.getElementById('error.tab').label = "Info";
     }
