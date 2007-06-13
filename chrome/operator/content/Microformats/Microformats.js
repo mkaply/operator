@@ -1562,6 +1562,9 @@ function tag(node) {
   }
 }
 tag.prototype.toString = function() {
+//  if (!this.tag) {
+//    return this.text;
+//  }
   return this.tag;
 }
 
@@ -1575,7 +1578,10 @@ var tag_definition = {
       virtual: true,
       virtualGetter: function(mfnode) {
         if (mfnode.href) {
-          var url_array = mfnode.getAttribute("href").split("/");
+          var ioService = Components.classes["@mozilla.org/network/io-service;1"].
+                                     getService(Components.interfaces.nsIIOService);
+          var uri = ioService.newURI(mfnode.href, null, null);
+          var url_array = uri.path.split("/");
           for(var i=url_array.length-1; i > 0; i--) {
             if (url_array[i] !== "") {
               var tag
@@ -1585,6 +1591,7 @@ var tag_definition = {
             }
           }
         }
+        return null;
       }
     },
     "link" : {
