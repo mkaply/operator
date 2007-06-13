@@ -17,7 +17,7 @@ var RDFa = {
       for (i=0; i < this.list.length; i++) {
         yield this.list[i];
       }
-    },
+    }
   },
   xpathExpression: "*[@about or contains(@rel,':') or contains(@rev,':') or @property or contains(@class,':')]",
   DEFAULT_NS:  { 
@@ -351,6 +351,7 @@ RDFa.Model = function() {
     if(uris_ns[uri] !== undefined) {
       return uris_arr[uris_ns[uri]];
     }
+    return null;
   };
   this.indexURI = function(uri) {
     if(uri && uri !== undefined && typeof(uri) == 'object' && uri.length && uri.length == 2) {

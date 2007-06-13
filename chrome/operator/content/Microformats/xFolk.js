@@ -1,7 +1,7 @@
 if (Components.utils.import) {
   try {
     Components.utils.import("resource://gre/modules/Microformats.js");
-    EXPORTED_SYMBOLS = ["xFolk"];
+    var EXPORTED_SYMBOLS = ["xFolk"];
   } catch (ex) {}
 }
 
@@ -15,6 +15,7 @@ xFolk.prototype.toString = function() {
   if (this.taggedlink) {
     return this.taggedlink.title;
   }
+  return null;
 }
 
 var xFolk_definition = {
@@ -42,7 +43,7 @@ var xFolk_definition = {
           datatype: "anyURI",
           virtual: true
         }
-      },
+      }
     },
     "tag" : {
       plural: true,
