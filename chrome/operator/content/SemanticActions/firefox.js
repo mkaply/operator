@@ -29,23 +29,28 @@ var firefox_bookmark = {
     firefox_bookmark.bookmark(name, url, description);
   },
   bookmark: function(name, url, description) {
-    var dArgs = {
-      name: name,
-      url: url,
-      charset: "",
-      bWebPanel: false,
-      description: description
-    };
-    var ADD_BM_DIALOG_FEATURES = "centerscreen,chrome,dialog,resizable,";
-      
-    if (navigator.platform.search(/mac/i) > -1) {
-      ADD_BM_DIALOG_FEATURES += "modal";
+    if (PlacesUtils) {
+     PlacesUtils.showMinimalAddBookmarkUI(url, name, description);
     } else {
-      ADD_BM_DIALOG_FEATURES += "dependent";
+      var dArgs = {
+        name: name,
+        url: url,
+        charset: "",
+        bWebPanel: false,
+        description: description
+      };
+      var ADD_BM_DIALOG_FEATURES = "centerscreen,chrome,dialog,resizable,";
+        
+      if (navigator.platform.search(/mac/i) > -1) {
+        ADD_BM_DIALOG_FEATURES += "modal";
+      } else {
+        ADD_BM_DIALOG_FEATURES += "dependent";
+      }
+  
+      alert(PlacesUtils);
+      window.openDialog("chrome://browser/content/bookmarks/addBookmark2.xul", "",
+                        ADD_BM_DIALOG_FEATURES, dArgs);
     }
-
-    window.openDialog("chrome://browser/content/bookmarks/addBookmark2.xul", "",
-                      ADD_BM_DIALOG_FEATURES, dArgs);
   }
 };
 
