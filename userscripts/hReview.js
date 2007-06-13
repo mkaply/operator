@@ -1,17 +1,21 @@
-if (Components.utils.import) {
+if (Components.utils.imort) {
   try {
-    Components.utils.import("rel:Microformats.js");
-    Components.utils.import("rel:hCard.js");
-    Components.utils.import("rel:hCalendar.js");
-    EXPORTED_SYMBOLS = ["hReview"];
+    Components.utils.import("resource://gre/modules/Microformats.js");
+    Components.utils.import("resource://gre/modules/hCard.js");
+    Components.utils.import("resource://gre/modules/hCalendar.js");
+    var EXPORTED_SYMBOLS = ["hReview"];
   } catch (ex) {}
 }
 
 function hReview(node) {
   if (node) {
+    if (Components && Components.utils.import) {
+      Components.utils.import("resource://gre/modules/Microformats.js");
+    }
     Microformats.parser.newMicroformat(this, node, "hReview");
   }
 }
+
 hReview.prototype.toString = function() {
   var fn;
   if (this.item) {
@@ -30,6 +34,7 @@ hReview.prototype.toString = function() {
       return fn;
     }
   }
+  return null;
 }
 
 var hReview_definition = {
@@ -84,7 +89,7 @@ var hReview_definition = {
         for (var i in item) {
           return item;
         }
-        return;
+        return null;
       }
     },
     "rating" : {
@@ -149,9 +154,8 @@ var hReview_definition = {
         error.message = errormsg;
       }
       return false;
-    } else {
-      return true;
     }
+    return true;
   }
 };
 

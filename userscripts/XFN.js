@@ -1,6 +1,6 @@
 if (Components.utils.import) {
   try {
-    Components.utils.import("rel:Microformats.js");
+    Components.utils.import("resource://gre/modules/Microformats.js");
     EXPORTED_SYMBOLS = ["XFN"];
   } catch (ex) {}
 }

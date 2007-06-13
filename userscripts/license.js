@@ -1,6 +1,8 @@
 if (Components.utils.import) {
   try {
-    Components.utils.import("rel:Microformats.js");
+    Components.utils.import("resource://gre/modules/Microformats.js");
+    Components.utils.import("resource://gre/modules/hCard.js");
+    Components.utils.import("resource://gre/modules/hCalendar.js");
     EXPORTED_SYMBOLS = ["license"];
   } catch (ex) {}
 }

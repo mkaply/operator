@@ -1,6 +1,6 @@
 if (Components.utils.import) {
   try {
-    Components.utils.import("rel:Microformats.js");
+    Components.utils.import("resource://gre/modules/Microformats.js");
     EXPORTED_SYMBOLS = ["species"];
   } catch (ex) {}
 }
@@ -25,14 +25,36 @@ species.prototype.toString = function() {
     return this.breed;
   } else if (this.genus) {
     return this.genus;
+  } else if (this.subfamily) {
+    return this.subfamily;
   } else if (this.family) {
     return this.family;
+  } else if (this.superfamily) {
+    return this.superfamily;
+  } else if (this.parvorder) {
+    return this.parvorder;
+  } else if (this.infraorder) {
+    return this.infraorder;
+  } else if (this.suborder) {
+    return this.suborder;
   } else if (this.order) {
     return this.order;
-  } else if (this["class"]) {
-    return this["class"];
+  } else if (this.superorder) {
+    return this.superorder;
+  } else if (this.infraclass) {
+    return this.infraclass;
+  } else if (this.subclass) {
+    return this.subclass;
+  } else if (this.taxoclass) {
+    return this.taxoclass;
+  } else if (this.subphylum) {
+    return this.subphylum;
   } else if (this.phylum) {
     return this.phylum;
+  } else if (this.superphylum) {
+    return this.superphylum;
+  } else if (this.subkingdom) {
+    return this.subkingdom;
   } else if (this.kingdom) {
     return this.kingdom;
   }

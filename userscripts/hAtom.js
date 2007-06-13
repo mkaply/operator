@@ -2,8 +2,8 @@
 
 if (Components.utils.import) {
   try {
-    Components.utils.import("rel:Microformats.js");
-    Components.utils.import("rel:hCard.js");
+    Components.utils.import("resource://gre/modules/Microformats.js");
+    Components.utils.import("resource://gre/modules/hCard.js");
     EXPORTED_SYMBOLS = ["hFeed"];
     EXPORTED_SYMBOLS = ["hEntry"];
   } catch (ex) {}
