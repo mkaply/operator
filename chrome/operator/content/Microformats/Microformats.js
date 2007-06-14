@@ -1473,7 +1473,105 @@ var hCalendar_definition = {
     },
     "last-modified" : {
       datatype: "dateTime"
-    }
+    },
+    "rrule" : {
+      subproperties: {
+        "interval" : {
+          virtual: true,
+          /* This will only be called in the virtual case */
+          virtualGetter: function(mfnode) {
+            return Microformats.hCalendar.properties.rrule.retrieve(mfnode, "interval");
+          }
+        },
+        "freq" : {
+          virtual: true,
+          /* This will only be called in the virtual case */
+          virtualGetter: function(mfnode) {
+            return Microformats.hCalendar.properties.rrule.retrieve(mfnode, "freq");
+          }
+        },
+        "bysecond" : {
+          virtual: true,
+          /* This will only be called in the virtual case */
+          virtualGetter: function(mfnode) {
+            return Microformats.hCalendar.properties.rrule.retrieve(mfnode, "bysecond");
+          }
+        },
+        "byminute" : {
+          virtual: true,
+          /* This will only be called in the virtual case */
+          virtualGetter: function(mfnode) {
+            return Microformats.hCalendar.properties.rrule.retrieve(mfnode, "byminute");
+          }
+        },
+        "byhour" : {
+          virtual: true,
+          /* This will only be called in the virtual case */
+          virtualGetter: function(mfnode) {
+            return Microformats.hCalendar.properties.rrule.retrieve(mfnode, "byhour");
+          }
+        },
+        "bymonthday" : {
+          virtual: true,
+          /* This will only be called in the virtual case */
+          virtualGetter: function(mfnode) {
+            return Microformats.hCalendar.properties.rrule.retrieve(mfnode, "bymonthday");
+          }
+        },
+        "byyearday" : {
+          virtual: true,
+          /* This will only be called in the virtual case */
+          virtualGetter: function(mfnode) {
+            return Microformats.hCalendar.properties.rrule.retrieve(mfnode, "byyearday");
+          }
+        },
+        "byweekno" : {
+          virtual: true,
+          /* This will only be called in the virtual case */
+          virtualGetter: function(mfnode) {
+            return Microformats.hCalendar.properties.rrule.retrieve(mfnode, "byweekno");
+          }
+        },
+        "bymonth" : {
+          virtual: true,
+          /* This will only be called in the virtual case */
+          virtualGetter: function(mfnode) {
+            return Microformats.hCalendar.properties.rrule.retrieve(mfnode, "bymonth");
+          }
+        },
+        "byday" : {
+          virtual: true,
+          /* This will only be called in the virtual case */
+          virtualGetter: function(mfnode) {
+            return Microformats.hCalendar.properties.rrule.retrieve(mfnode, "byday");
+          }
+        },
+        "until" : {
+          virtual: true,
+          /* This will only be called in the virtual case */
+          virtualGetter: function(mfnode) {
+            return Microformats.hCalendar.properties.rrule.retrieve(mfnode, "until");
+          }
+        },
+        "count" : {
+          virtual: true,
+          /* This will only be called in the virtual case */
+          virtualGetter: function(mfnode) {
+            return Microformats.hCalendar.properties.rrule.retrieve(mfnode, "count");
+          }
+        },
+      },
+      retrieve: function(mfnode, property) {
+        var value = Microformats.parser.defaultGetter(mfnode);
+        var rrule;
+        rrule = value.split(';');
+        for (var i=0; i < rrule.length; i++) {
+          if (rrule[i].match(property)) {
+            return rrule[i].split('=')[1];
+          }
+        }
+      },
+    },
   }
 };
 
