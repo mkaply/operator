@@ -488,6 +488,7 @@ var Operator = {
         }
         menu.appendChild(tempMenu);
         itemsadded++;
+        delete(semanticObjects[j].displayName);
       } else {
         var error = {};
         
@@ -924,14 +925,10 @@ var Operator = {
                 objectArray = semanticArrays[j][0].getObjectsWithProperty(Operator.actions[action].scope.semantic[j]["property"],
                                                                           Operator.actions[action].scope.semantic[j]["defaultNS"]); 
               } else {
-                if (semanticArrays[j].length > 1) {
-                  if ((Microformats[j]) && Microformats[j].sort) {
-                    objectArray = Operator.sortUnique(semanticArrays[j], true, Operator.removeDuplicates);
-                  } else {
-                    objectArray = Operator.sortUnique(semanticArrays[j], false, Operator.removeDuplicates);
-                  }
+                if ((Microformats[j]) && Microformats[j].sort) {
+                  objectArray = Operator.sortUnique(semanticArrays[j], true, Operator.removeDuplicates);
                 } else {
-                  objectArray = semanticArrays[j];
+                  objectArray = Operator.sortUnique(semanticArrays[j], false, Operator.removeDuplicates);
                 }
               }
               for (k=0; k < objectArray.length; k++) {
