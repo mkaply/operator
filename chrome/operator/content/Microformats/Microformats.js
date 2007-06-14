@@ -1486,8 +1486,13 @@ function geo(node) {
 }
 geo.prototype.toString = function() {
   if (this.latitude && this.longitude) {
-    var s = Microformats.parser.defaultGetter(this.node);
-  
+    var s;
+    if ((this.node.localName.toLowerCase() != "abbr") && (this.node.localName.toLowerCase() == "html:abbr")) {
+      s = Microformats.parser.defaultGetter(this.node);
+    } else {
+      s = this.node.textContent;
+    }
+
     /* FIXME - THIS IS FIREFOX SPECIFIC */
     /* check if geo is contained in a vcard */
     var xpathExpression = "ancestor::*[contains(concat(' ', @class, ' '), ' vcard ')]";
