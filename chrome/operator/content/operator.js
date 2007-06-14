@@ -385,119 +385,115 @@ var Operator = {
       Operator.error(semanticObject, semanticObjectType);
     };
   },
-  buildMenu: function buildMenu(semanticObjects, semanticObjectType, semanticAction)
+  sortUnique: function (semanticObjects, sort, unique)
   {
-    var menu = null;
-    var items;
-    
-    items = [];
-    var displayname;
-    var j, m;
-    for (j=0; j < semanticObjects.length; j++) {
-      items[j] = {} ;
-      items[j].node = semanticObjects[j].node;
-      items[j].object = semanticObjects[j];
-      displayname = items[j].object.toString();
-      if (displayname) {
-        items[j].displayname = displayname;
-        items[j].error = false;
-      } else {
-        items[j].displayname = "Invalid - select for more details";
-        items[j].error = true;
-      }
-    }
-    var sorted_items = items.slice();
-    if (items.length > 1) {
-      sorted_items = sorted_items.sort(
-        function (a,b) {
-          if (a.displayname.toLowerCase() < b.displayname.toLowerCase()) {
+    var i, j;
+    /* Create duplicate of the semanticObject array */
+    var tempArray = semanticObjects.slice();
+    /* Sort the temporary array */
+    tempArray = tempArray.sort(
+      function (a,b) {
+        if (a.toString() && b.toString()) {
+          if (a.toString().toLowerCase() < b.toString().toLowerCase()) {
             return -1;
           }
-          if (a.displayname.toLowerCase() > b.displayname.toLowerCase()) {
+          if (a.toString().toLowerCase() > b.toString().toLowerCase()) {
             return 1;
           }
-          return 0;
         }
-      );
-      /* remove duplicates */
-      j=1;
-      if (this.removeDuplicates) {
-        while (sorted_items[j]) {
-          if ((sorted_items[j].displayname == sorted_items[j-1].displayname) && (sorted_items[j].error === false)) {
-            if (Operator.areEqualObjects(sorted_items[j].object, sorted_items[j-1].object)) {
-              for (m = 0; m < items.length; m++) {
-                if (items[m].node == sorted_items[j].node) {
-                  items[m].duplicate = true;
-                }
-//                break;
-              }
-              sorted_items.splice(j,1);
+        return 0;
+      }
+    );
+    if (unique) {
+      /* Find the duplicates in the original array and remove them */
+      i=1;
+      var spliced;
+      while (tempArray[i]) {
+        if (tempArray[i].toString() == tempArray[i-1].toString()) {
+          if (Operator.areEqualObjects(tempArray[i], tempArray[i-1])) {
+            if (sort) {
+              tempArray.splice(i, 1);
+              spliced = true;
             } else {
-              j++;
+              semanticObjects.splice(semanticObjects.indexOf(tempArray[i]),1);
             }
-          } else {
-            j++;
           }
         }
+        if (!spliced) {
+          i++;
+        } else {
+          spliced = false;
+        }
       }
     }
-    /* XXX TODO Need a better way to figure out sorting! */
-    if (Microformats[semanticObjectType]) {
-      if ((items.length > 1) && Microformats[semanticObjectType].sort) {
-        items = sorted_items;
+    if (sort) {
+      return tempArray;
+    }
+    return semanticObjects;
+  },
+  buildMenu: function buildMenu(semanticObjects, semanticObjectType, semanticAction)
+  {
+    if (semanticObjects.length > 1) {
+      if ((Microformats[semanticObjectType]) && Microformats[semanticObjectType].sort) {
+        semanticObjects = Operator.sortUnique(semanticObjects, true, Operator.removeDuplicates);
+      } else {
+        semanticObjects = Operator.sortUnique(semanticObjects, false, Operator.removeDuplicates);
       }
     }
+    var menu = null;
 
     var itemsadded = 0;
     var tempMenu;
     var menuitem;
-    for (j=0; j < items.length; j++) {
-      if (!items[j].duplicate) {
-        if (!items[j].error || this.debug) {
-          if (!menu) {
-            menu = document.createElement("menupopup");
-          }
-          if ((this.view === 0) && (!items[j].error)) {
-            tempMenu = document.createElement("menu");
-          } else {
-            tempMenu = document.createElement("menuitem");
-          }
-          tempMenu.store_onDOMMenuItemActive = this.highlightCallbackGenerator(items[j].node);
-          tempMenu.addEventListener("DOMMenuItemActive", tempMenu.store_onDOMMenuItemActive, true);
-          tempMenu.setAttribute("label", items[j].displayname);
-          tempMenu.label = items[j].displayname;
-          if (items[j].error) {
-            tempMenu.store_oncommand = this.errorCallbackGenerator(items[j].object, semanticObjectType);
-            tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
-            tempMenu.style.fontWeight = "bold";
-            menu.error = true;
-          } else {
-            /* NOT ACTIONS */
-            if (this.view === 0) {
-              var submenu = document.createElement("menupopup");
-              tempMenu.appendChild(submenu);
-              tempMenu.store_onpopupshowing = this.popupShowing(items[j].object, semanticObjectType);
-              tempMenu.addEventListener("popupshowing", tempMenu.store_onpopupshowing, false);
-            } else {
-              tempMenu.store_oncommand = this.actionCallbackGenerator(items[j].object, semanticObjectType, semanticAction);
-              tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
-              tempMenu.store_onclick = this.clickCallbackGenerator(items[j].object, semanticObjectType, semanticAction);
-              tempMenu.addEventListener("click", tempMenu.store_onclick, true);
-            }
-          }
-          menu.appendChild(tempMenu);
-          itemsadded++;
+    for (j=0; j < semanticObjects.length; j++) {
+      if (!semanticObjects[j].toString() || this.debug) {
+        if (!menu) {
+          menu = document.createElement("menupopup");
+        }
+        if ((this.view === 0) && (semanticObjects[j].toString())) {
+          tempMenu = document.createElement("menu");
         } else {
-          var error = {};
-          
-          /* XXX TODO Validate needs to be more generic? Or do we only call it in the microformat case? */
-          Microformats.parser.validate(items[j].node, semanticObjectType, error);
+          tempMenu = document.createElement("menuitem");
+        }
+        tempMenu.store_onDOMMenuItemActive = this.highlightCallbackGenerator(semanticObjects[j].node);
+        tempMenu.addEventListener("DOMMenuItemActive", tempMenu.store_onDOMMenuItemActive, true);
+        if (semanticObjects[j].toString()) {
+          tempMenu.label = semanticObjects[j].toString();
+        } else {
+          tempMenu.label = "Invalid - select for more details";
+        }
+        tempMenu.setAttribute("label", tempMenu.label);
+        if (!semanticObjects[j].toString()) {
+          tempMenu.store_oncommand = this.errorCallbackGenerator(semanticObjects[j], semanticObjectType);
+          tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
+          tempMenu.style.fontWeight = "bold";
+          menu.error = true;
+        } else {
+          /* NOT ACTIONS */
+          if (this.view === 0) {
+            var submenu = document.createElement("menupopup");
+            tempMenu.appendChild(submenu);
+            tempMenu.store_onpopupshowing = this.popupShowing(semanticObjects[j], semanticObjectType);
+            tempMenu.addEventListener("popupshowing", tempMenu.store_onpopupshowing, false);
+          } else {
+            tempMenu.store_oncommand = this.actionCallbackGenerator(semanticObjects[j], semanticObjectType, semanticAction);
+            tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
+            tempMenu.store_onclick = this.clickCallbackGenerator(semanticObjects[j], semanticObjectType, semanticAction);
+            tempMenu.addEventListener("click", tempMenu.store_onclick, true);
+          }
+        }
+        menu.appendChild(tempMenu);
+        itemsadded++;
+      } else {
+        var error = {};
+        
+        /* XXX TODO Validate needs to be more generic? Or do we only call it in the microformat case? */
+        Microformats.parser.validate(items[j].node, semanticObjectType, error);
 
-          Operator.console_message(error.message, Operator.lineNumberFromDOMNode(items[j].node));
+        Operator.console_message(error.message, Operator.lineNumberFromDOMNode(items[j].node));
 //          if (typeof Firebug != "undefined") {
 //            Firebug.Console.log(Operator.microformats[microformat].getError(items[j].node), items[j].node);
 //          }
-        }
       }
     }
     
@@ -924,7 +920,15 @@ var Operator = {
                 objectArray = semanticArrays[j][0].getObjectsWithProperty(Operator.actions[action].scope.semantic[j]["property"],
                                                                           Operator.actions[action].scope.semantic[j]["defaultNS"]); 
               } else {
-                objectArray = semanticArrays[j];
+                if (semanticArrays[j].length > 1) {
+                  if ((Microformats[j]) && Microformats[j].sort) {
+                    objectArray = Operator.sortUnique(semanticArrays[j], true, Operator.removeDuplicates);
+                  } else {
+                    objectArray = Operator.sortUnique(semanticArrays[j], false, Operator.removeDuplicates);
+                  }
+                } else {
+                  objectArray = semanticArrays[j];
+                }
               }
               for (k=0; k < objectArray.length; k++) {
                 /* Here we know we have objects that will work with this action */
