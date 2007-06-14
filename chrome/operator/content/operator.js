@@ -387,17 +387,23 @@ var Operator = {
   },
   sortUnique: function (semanticObjects, sort, unique)
   {
+    for (i=0; i < semanticObjects.length; i++) {
+      semanticObjects[i].displayName = semanticObjects[i].toString();
+    }
+    if ((!sort && !unique) || (semanticObjects.length <= 1)) {
+      return semanticObjects;
+    }
     var i, j;
     /* Create duplicate of the semanticObject array */
     var tempArray = semanticObjects.slice();
     /* Sort the temporary array */
     tempArray = tempArray.sort(
       function (a,b) {
-        if (a.toString() && b.toString()) {
-          if (a.toString().toLowerCase() < b.toString().toLowerCase()) {
+        if (a.displayName && b.displayName) {
+          if (a.displayName.toLowerCase() < b.displayName.toLowerCase()) {
             return -1;
           }
-          if (a.toString().toLowerCase() > b.toString().toLowerCase()) {
+          if (a.displayName.toLowerCase() > b.displayName.toLowerCase()) {
             return 1;
           }
         }
@@ -409,7 +415,7 @@ var Operator = {
       i=1;
       var spliced;
       while (tempArray[i]) {
-        if (tempArray[i].toString() == tempArray[i-1].toString()) {
+        if (tempArray[i].displayName == tempArray[i-1].displayName) {
           if (Operator.areEqualObjects(tempArray[i], tempArray[i-1])) {
             if (sort) {
               tempArray.splice(i, 1);
@@ -433,12 +439,10 @@ var Operator = {
   },
   buildMenu: function buildMenu(semanticObjects, semanticObjectType, semanticAction)
   {
-    if (semanticObjects.length > 1) {
-      if ((Microformats[semanticObjectType]) && Microformats[semanticObjectType].sort) {
-        semanticObjects = Operator.sortUnique(semanticObjects, true, Operator.removeDuplicates);
-      } else {
-        semanticObjects = Operator.sortUnique(semanticObjects, false, Operator.removeDuplicates);
-      }
+    if ((Microformats[semanticObjectType]) && Microformats[semanticObjectType].sort) {
+      semanticObjects = Operator.sortUnique(semanticObjects, true, Operator.removeDuplicates);
+    } else {
+      semanticObjects = Operator.sortUnique(semanticObjects, false, Operator.removeDuplicates);
     }
     var menu = null;
 
@@ -446,24 +450,24 @@ var Operator = {
     var tempMenu;
     var menuitem;
     for (j=0; j < semanticObjects.length; j++) {
-      if (!semanticObjects[j].toString() || this.debug) {
+      if (semanticObjects[j].displayName || this.debug) {
         if (!menu) {
           menu = document.createElement("menupopup");
         }
-        if ((this.view === 0) && (semanticObjects[j].toString())) {
+        if ((this.view === 0) && (semanticObjects[j].displayName)) {
           tempMenu = document.createElement("menu");
         } else {
           tempMenu = document.createElement("menuitem");
         }
         tempMenu.store_onDOMMenuItemActive = this.highlightCallbackGenerator(semanticObjects[j].node);
         tempMenu.addEventListener("DOMMenuItemActive", tempMenu.store_onDOMMenuItemActive, true);
-        if (semanticObjects[j].toString()) {
-          tempMenu.label = semanticObjects[j].toString();
+        if (semanticObjects[j].displayName) {
+          tempMenu.label = semanticObjects[j].displayName;
         } else {
           tempMenu.label = "Invalid - select for more details";
         }
         tempMenu.setAttribute("label", tempMenu.label);
-        if (!semanticObjects[j].toString()) {
+        if (!semanticObjects[j].displayName) {
           tempMenu.store_oncommand = this.errorCallbackGenerator(semanticObjects[j], semanticObjectType);
           tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
           tempMenu.style.fontWeight = "bold";
