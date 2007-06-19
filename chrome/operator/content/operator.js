@@ -318,21 +318,21 @@ var Operator = {
   },
 
   
-  actionCallbackGenerator: function actionCallbackGenerator(semanticObject, semanticObjectType, semanticAction)
+  actionCallbackGenerator: function actionCallbackGenerator(semanticObject, semanticObjectType, semanticAction, propertyIndex)
   {
     return function(event) {
       var url;
-      url = SemanticActions[semanticAction].doAction(semanticObject, semanticObjectType)
+      url = SemanticActions[semanticAction].doAction(semanticObject, semanticObjectType, propertyIndex)
       if ((url) && (url != true)) {
         openUILink(url, event);
       }
     };
   },
-  actionAllCallbackGenerator: function actionAllCallbackGenerator(semanticArrays, semanticAction, semanticObjectType)
+  actionAllCallbackGenerator: function actionAllCallbackGenerator(semanticArrays, semanticAction, semanticObjectType, propertyIndex)
   {
     return function(event) {
       var url;
-      url = SemanticActions[semanticAction].doActionAll(semanticArrays, semanticObjectType)
+      url = SemanticActions[semanticAction].doActionAll(semanticArrays, semanticObjectType, propertyIndex)
       if ((url) && (url != true)) {
         openUILink(url, event);
       }
@@ -898,7 +898,7 @@ var Operator = {
     }
     Operator.getSemanticData(content, semanticArrays);
 
-    var i, j, k;
+    var i, j, k, m;
     var popup, menu, tempMenu, action;
 
     /* Actions */
@@ -931,13 +931,14 @@ var Operator = {
                   objectArray = Operator.sortUnique(semanticArrays[j], false, Operator.removeDuplicates);
                 }
               }
+              var required;
               for (k=0; k < objectArray.length; k++) {
                 /* Here we know we have objects that will work with this action */
                 /* Create a menu that corresponds to the action? */
                 /* Or postpone the creation until we are sure we have the first one? */
+                required = null;
                 if ((Operator.actions[action].scope.semantic[j] != j) && (j != "RDFa")) {
                   var reqprop = Operator.actions[action].scope.semantic[j]
-                  var required;
                   if (reqprop.indexOf(".") != -1) {
                     var props = reqprop.split(".");
                     if (objectArray[k][props[0]]) {
@@ -954,13 +955,39 @@ var Operator = {
                   menu = document.createElement("menupopup");
                 }
                 if (objectArray[k].toString()) {
-                  tempMenu = document.createElement("menuitem");
-                  tempMenu.label = objectArray[k].toString();
-                  tempMenu.setAttribute("label", tempMenu.label);
-                  tempMenu.store_oncommand = Operator.actionCallbackGenerator(objectArray[k], j, action);
-                  tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
-                  tempMenu.store_onclick = Operator.clickCallbackGenerator(objectArray[k], j, action);
-                  tempMenu.addEventListener("click", tempMenu.store_onclick, true);
+                  if ((required instanceof Array) && (required.length > 1))  {
+                    for (m=0; m < required.length; m++) {
+                      tempMenu = document.createElement("menuitem");
+                      if (Operator.actions[action].getActionName) {
+                        tempMenu.label = Operator.actions[action].getActionName(objectArray[k], j, m);
+                      } else {
+                        tempMenu.label = objectArray[k].toString();
+                      }
+                      if (tempMenu.label) {
+                        tempMenu.setAttribute("label", tempMenu.label);
+                        tempMenu.store_oncommand = Operator.actionCallbackGenerator(objectArray[k], j, action, m);
+                        tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
+                        tempMenu.store_onclick = Operator.clickCallbackGenerator(objectArray[k], j, action, m);
+                        tempMenu.addEventListener("click", tempMenu.store_onclick, true);
+                        tempMenu.store_onDOMMenuItemActive = Operator.highlightCallbackGenerator(objectArray[k].node);
+                        tempMenu.addEventListener("DOMMenuItemActive", tempMenu.store_onDOMMenuItemActive, true);
+                        menu.appendChild(tempMenu);
+                      }
+                    }
+                    tempMenu = null;
+                  } else {
+                    tempMenu = document.createElement("menuitem");
+                    if (Operator.actions[action].getActionName) {
+                        tempMenu.label = Operator.actions[action].getActionName(objectArray[k], j);
+                    } else {
+                      tempMenu.label = objectArray[k].toString();
+                    }
+                    tempMenu.setAttribute("label", tempMenu.label);
+                    tempMenu.store_oncommand = Operator.actionCallbackGenerator(objectArray[k], j, action);
+                    tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
+                    tempMenu.store_onclick = Operator.clickCallbackGenerator(objectArray[k], j, action);
+                    tempMenu.addEventListener("click", tempMenu.store_onclick, true);
+                  }
                 } else if (Operator.debug) {
                   tempMenu = document.createElement("menuitem");
                   /* L10N */
