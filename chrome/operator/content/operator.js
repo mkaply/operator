@@ -517,8 +517,10 @@ var Operator = {
     var required;
     var menuitem;
     var submenu = parentmenu;
-    var k;
+    var k, m;
     var addedAction = false;
+    var required;
+    var menupopup;
     for (k in Operator.actions) {
       if (!Operator.actions[k].scope) {
         continue;
@@ -526,9 +528,9 @@ var Operator = {
       if (!Operator.actions[k].scope.semantic[semanticObjectType]) {
         continue;
       }
+      required = null;
       if ((Operator.actions[k].scope.semantic[semanticObjectType] != semanticObjectType)  && (semanticObjectType != "RDFa")) {
         var reqprop = Operator.actions[k].scope.semantic[semanticObjectType];
-        var required;
         if (reqprop.indexOf(".") != -1) {
           var props = reqprop.split(".");
           if (semanticObject[props[0]]) {
@@ -553,17 +555,47 @@ var Operator = {
           semanticObject.setDefaultNS(Operator.actions[k].scope.semantic[semanticObjectType]["defaultNS"]);
         }
       }
-      menuitem = document.createElement("menuitem");
+      if ((required instanceof Array) && (required.length > 1))  {
+        menupopup = document.createElement("menupopup");
+        for (m=0; m < required.length; m++) {
+          tempMenu = document.createElement("menuitem");
+          if (Operator.actions[k].getActionName) {
+            tempMenu.label = Operator.actions[k].getActionName(semanticObject, semanticObjectType, m);
+          } else {
+            tempMenu.label = semanticObject.toString();
+          }
+          if (tempMenu.label) {
+            tempMenu.setAttribute("label", tempMenu.label);
+            tempMenu.store_oncommand = Operator.actionCallbackGenerator(semanticObject, semanticObjectType, k, m);
+            tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
+            tempMenu.store_onclick = Operator.clickCallbackGenerator(semanticObject, semanticObjectType, k, m);
+            tempMenu.addEventListener("click", tempMenu.store_onclick, true);
+            tempMenu.store_onDOMMenuItemActive = Operator.highlightCallbackGenerator(semanticObject.node);
+            tempMenu.addEventListener("DOMMenuItemActive", tempMenu.store_onDOMMenuItemActive, true);
+            menupopup.appendChild(tempMenu);
+          }
+        }
+      }
+      if (menupopup) {
+        menuitem = document.createElement("menu");
+      } else {
+        menuitem = document.createElement("menuitem");
+      }
       if (Operator.useShortDescriptions && Operator.actions[k].shortDescription) {
         menuitem.label = Operator.actions[k].shortDescription;
       } else {
         menuitem.label = Operator.actions[k].description;
       }
       menuitem.setAttribute("label", menuitem.label);
-      menuitem.store_oncommand = this.actionCallbackGenerator(semanticObject, semanticObjectType, k);
-      menuitem.addEventListener("command", menuitem.store_oncommand, true);
-      menuitem.store_onclick = this.clickCallbackGenerator(semanticObject, semanticObjectType, k);
-      menuitem.addEventListener("click", menuitem.store_onclick, true);
+      if (!menupopup) {
+        menuitem.store_oncommand = this.actionCallbackGenerator(semanticObject, semanticObjectType, k);
+        menuitem.addEventListener("command", menuitem.store_oncommand, true);
+        menuitem.store_onclick = this.clickCallbackGenerator(semanticObject, semanticObjectType, k);
+        menuitem.addEventListener("click", menuitem.store_onclick, true);
+      }
+      if (menupopup) {
+        menuitem.appendChild(menupopup);
+      }
       submenu.appendChild(menuitem);
       addedAction = true;
     }
