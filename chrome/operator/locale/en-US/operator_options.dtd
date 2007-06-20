@@ -13,5 +13,6 @@
 <!ENTITY  removeDuplicates.label           "Remove duplicates (might impact performance)">
 <!ENTITY  debug.label                      "Debug mode">
 <!ENTITY  statusbar.label                  "Display icon in status bar">
+<!ENTITY  urlbar.label                     "Display icon on location bar">
 <!ENTITY  userscripts.label                "User Scripts">
 <!ENTITY  observeDOMAttrModified.label     "Observe all page changes (will impact performance)">

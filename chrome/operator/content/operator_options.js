@@ -11,6 +11,7 @@ var Operator_Options = {
     this.checkAndSetBoolPref("useShortDescriptions", document.getElementById("useShortDescriptions").checked);
     this.checkAndSetBoolPref("debug", document.getElementById("debug").checked);
     this.checkAndSetBoolPref("statusbar", document.getElementById("statusbar").checked);
+    this.checkAndSetBoolPref("urlbar", document.getElementById("urlbar").checked);
     this.checkAndSetBoolPref("highlightMicroformats", document.getElementById("highlightMicroformats").checked);
     this.checkAndSetBoolPref("removeDuplicates", document.getElementById("removeDuplicates").checked);
     this.checkAndSetBoolPref("observeDOMAttrModified", document.getElementById("observeDOMAttrModified").checked);
@@ -125,6 +126,14 @@ var Operator_Options = {
       statusbar = Operator.statusbar;
     }
     document.getElementById("statusbar").checked = statusbar;
+    
+    var urlbar;
+    try {
+      urlbar = this.prefBranch.getBoolPref("urlbar");
+    } catch (ex) {
+      urlbar = Operator.urlbar;
+    }
+    document.getElementById("urlbar").checked = urlbar;
 
     var highlightMicroformats;
     try {

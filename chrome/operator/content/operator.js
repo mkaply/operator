@@ -10,6 +10,7 @@ var Operator = {
   removeDuplicates: true,
   observeDOMAttrModified: false,
   statusbar: false,
+  urlbar: false,
   useShortDescriptions: false,
   batchPrefChanges: false,
   customizeDone: false,
@@ -208,6 +209,9 @@ var Operator = {
       this.statusbar = this.prefBranch.getBoolPref("statusbar");
     } catch (ex) {}
     try {
+      this.urlbar = this.prefBranch.getBoolPref("urlbar");
+    } catch (ex) {}
+    try {
       this.useShortDescriptions = this.prefBranch.getBoolPref("useShortDescriptions");
     } catch (ex) {}
 
@@ -290,6 +294,9 @@ var Operator = {
     }
     if (data == "useShortDescriptions") {
       this.useShortDescriptions = this.prefBranch.getBoolPref("useShortDescriptions");
+    }
+    if (data == "urlbar") {
+      this.urlbar = this.prefBranch.getBoolPref("urlbar");
     }
     if (data == "statusbar") {
       if (this.prefBranch.getBoolPref("statusbar")) {
@@ -493,9 +500,9 @@ var Operator = {
         var error = {};
         
         /* XXX TODO Validate needs to be more generic? Or do we only call it in the microformat case? */
-        Microformats.parser.validate(items[j].node, semanticObjectType, error);
+        Microformats.parser.validate(semanticObjects[j].node, semanticObjectType, error);
 
-        Operator.console_message(error.message, Operator.lineNumberFromDOMNode(items[j].node));
+        Operator.console_message(error.message, Operator.lineNumberFromDOMNode(semanticObjects[j].node));
 //          if (typeof Firebug != "undefined") {
 //            Firebug.Console.log(Operator.microformats[microformat].getError(items[j].node), items[j].node);
 //          }
@@ -915,6 +922,9 @@ var Operator = {
     Operator_Toolbar.disable();
     Operator_ToolbarButton.disable();
     Operator_Statusbar.disable();
+    if (!Operator.urlbar) {
+      document.getElementById("operator-urlbar-icon").removeAttribute("microformats");
+    }
 
     /* Get all semantic data from the web page */
     var semanticArrays = [];
@@ -925,7 +935,7 @@ var Operator = {
         haveMicroformats = true;
       }
     }
-    if (haveMicroformats) {
+    if (haveMicroformats && Operator.urlbar) {
       document.getElementById("operator-urlbar-icon").setAttribute("microformats", "true");
     }
     Operator.getSemanticData(content, semanticArrays);
@@ -1183,7 +1193,7 @@ var Operator = {
         Operator_Statusbar.enable();
         Operator_Statusbar.addPopup(popup, clonePopup);
       }
-      if (!Operator_URLbarButton.isHidden()) {
+      if (Operator.urlbar) {
         Operator_URLbarButton.addPopup(popup, clonePopup);
       }
       Operator_Toolbar.enable();
