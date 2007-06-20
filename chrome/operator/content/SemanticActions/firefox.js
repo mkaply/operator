@@ -29,7 +29,7 @@ var firefox_bookmark = {
     firefox_bookmark.bookmark(name, url, description);
   },
   bookmark: function(name, url, description) {
-    if (PlacesUtils) {
+    if (typeof(PlacesUtils) != "undefined") {
      PlacesUtils.showMinimalAddBookmarkUI(makeURI(url), name, description);
     } else {
       var dArgs = {
@@ -47,7 +47,6 @@ var firefox_bookmark = {
         ADD_BM_DIALOG_FEATURES += "dependent";
       }
   
-      alert(PlacesUtils);
       window.openDialog("chrome://browser/content/bookmarks/addBookmark2.xul", "",
                         ADD_BM_DIALOG_FEATURES, dArgs);
     }
