@@ -130,14 +130,85 @@ var wikispecies_search = {
   icon: "http://species.wikimedia.org/favicon.ico",
   scope: {
     semantic: {
-      "species" : "binomial"
+      "species" : "species"
     }
   },
   doAction: function(semanticObject, semanticObjectType) {
-    if (semanticObjectType == "species") {
-      return "http://species.wikimedia.org/wiki/Special:Search?search=" + encodeURIComponent(semanticObject.binomial) + "&go=Go";
+    var searchstring;
+    if (semanticObject.binomial) {
+      searchstring = semanticObject.binomial;
+    } else {
+      searchstring = semanticObject.toString();
     }
+    return "http://species.wikimedia.org/wiki/Special:Search?search=" + encodeURIComponent(searchstring) + "&go=Go";
   }
 };
 
 SemanticActions.add("wikispecies_search", wikispecies_search);
+
+var wikipedia_search = {
+  description: "Search Wikipedia",
+  shortDescription: "Wikipedia",
+  icon: "http://en.wikipedia.org/favicon.ico",
+  scope: {
+    semantic: {
+      "species" : "species"
+    }
+  },
+  doAction: function(semanticObject, semanticObjectType) {
+    var searchstring;
+    if (semanticObject.binomial) {
+      searchstring = semanticObject.binomial;
+    } else {
+      searchstring = semanticObject.toString();
+    }
+    return "http://wikipedia.org/wiki/Special:Search?search=" + encodeURIComponent(searchstring) + "&go=Go";
+  }
+};
+
+SemanticActions.add("wikipedia_search", wikipedia_search);
+
+var nbn_search = {
+  description: "Search NBN Species dictionary",
+  shortDescription: "NBN Species",
+  scope: {
+    semantic: {
+      "species" : "species"
+    }
+  },
+  doAction: function(semanticObject, semanticObjectType) {
+    var searchstring;
+    if (semanticObject.binomial) {
+      searchstring = semanticObject.binomial;
+    } else {
+      searchstring = semanticObject.toString();
+    }
+    return "http://nbn.nhm.ac.uk/nhm/bin/nbntaxa.dll/search?&fsearchfor=" + encodeURIComponent(searchstring);
+  }
+};
+
+SemanticActions.add("nbn_search", nbn_search);
+
+var bioimages_search = {
+  description: "Search BioImages",
+  shortDescription: "BioImages",
+  scope: {
+    semantic: {
+      "species" : "species"
+    }
+  },
+  doAction: function(semanticObject, semanticObjectType) {
+    var searchstring;
+    if (semanticObject.binomial) {
+      searchstring = semanticObject.binomial;
+    } else {
+      searchstring = semanticObject.toString();
+    }
+    return "http://www.google.co.uk/search?ie=UTF-8&oe=UTF-8&domains=www.bioimages.org.uk&sitesearch=www.bioimages.org.uk&q=" + encodeURIComponent(searchstring);
+  }
+};
+
+SemanticActions.add("bioimages_search", bioimages_search);
+
+
+
