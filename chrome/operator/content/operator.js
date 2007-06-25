@@ -122,8 +122,10 @@ var Operator = {
       try {
         Operator.actions[i].description = this.languageBundle.GetStringFromName(i + ".description");
       } catch (ex) {
-        if (Operator.actions[i].description[curLocale]) {
-          Operator.actions[i].description = Operator.actions[i].description[curLocale];
+        if (Operator.actions[i].description) {
+          if (Operator.actions[i].description[curLocale]) {
+            Operator.actions[i].description = Operator.actions[i].description[curLocale];
+          }
         }
       }
     }
@@ -406,13 +408,22 @@ var Operator = {
     /* Sort the temporary array */
     tempArray = tempArray.sort(
       function (a,b) {
-        if (a.displayName && b.displayName) {
-          if (a.displayName.toLowerCase() < b.displayName.toLowerCase()) {
+        if (!a.displayName || !b.displayName) {
+          if (!a.displayName && !b.displayName) {
+            return 0;
+          }
+          if (!a.displayName) {
             return -1;
           }
-          if (a.displayName.toLowerCase() > b.displayName.toLowerCase()) {
+          if (!b.displayName) {
             return 1;
           }
+        }
+        if (a.displayName.toLowerCase() < b.displayName.toLowerCase()) {
+          return -1;
+        }
+        if (a.displayName.toLowerCase() > b.displayName.toLowerCase()) {
+          return 1;
         }
         return 0;
       }
@@ -422,13 +433,15 @@ var Operator = {
       i=1;
       var spliced;
       while (tempArray[i]) {
-        if (tempArray[i].displayName == tempArray[i-1].displayName) {
-          if (Operator.areEqualObjects(tempArray[i], tempArray[i-1])) {
-            if (sort) {
-              tempArray.splice(i, 1);
-              spliced = true;
-            } else {
-              semanticObjects.splice(semanticObjects.indexOf(tempArray[i]),1);
+        if (tempArray[i].displayName && tempArray[i-1].displayName) {
+          if (tempArray[i].displayName == tempArray[i-1].displayName) {
+            if (Operator.areEqualObjects(tempArray[i], tempArray[i-1])) {
+              if (sort) {
+                tempArray.splice(i, 1);
+                spliced = true;
+              } else {
+                semanticObjects.splice(semanticObjects.indexOf(tempArray[i]),1);
+              }
             }
           }
         }
