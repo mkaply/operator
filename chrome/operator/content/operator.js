@@ -922,7 +922,7 @@ var Operator = {
     Operator_Toolbar.disable();
     Operator_ToolbarButton.disable();
     Operator_Statusbar.disable();
-    if (!Operator.urlbar) {
+    if (Operator.urlbar) {
       document.getElementById("operator-urlbar-icon").removeAttribute("microformats");
     }
 
