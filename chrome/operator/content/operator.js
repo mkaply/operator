@@ -606,6 +606,9 @@ var Operator = {
       } else {
         menuitem.label = Operator.actions[k].description;
       }
+      if (!menupopup && Operator.actions[k].getActionName) {
+        menuitem.label += " (" + Operator.actions[k].getActionName(semanticObject, semanticObjectType, m) + ")";
+      }
       menuitem.setAttribute("label", menuitem.label);
       if (!menupopup) {
         menuitem.store_oncommand = this.actionCallbackGenerator(semanticObject, semanticObjectType, k);
