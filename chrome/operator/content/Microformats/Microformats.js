@@ -1121,6 +1121,8 @@ var Microformats = {
   }
 };
 
+/* MICROFORMAT DEFINITIONS BEGIN HERE */
+
 function adr(node) {
   if (node) {
     Microformats.parser.newMicroformat(this, node, "adr");
