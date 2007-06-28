@@ -1065,23 +1065,19 @@ var Operator = {
             }
           }
         }
-        if ((Operator.actions[action].doActionAll)) {
-          if (!menu) {
-            menu = document.createElement("menupopup");
-          } else {
+        if (menu) {
+          if ((Operator.actions[action].doActionAll)) {
             var sep = document.createElement("menuseparator");
             menu.appendChild(sep);
+            tempMenu = document.createElement("menuitem");
+            tempMenu.label = Operator.actions[action].descriptionAll;
+            tempMenu.setAttribute("label", tempMenu.label);
+            tempMenu.store_oncommand = Operator.actionAllCallbackGenerator(semanticArrays, action);
+            tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
+            tempMenu.store_onclick = Operator.clickAllCallbackGenerator(semanticArrays, action);
+            tempMenu.addEventListener("click", tempMenu.store_onclick, true);
+            menu.appendChild(tempMenu);
           }
-          tempMenu = document.createElement("menuitem");
-          tempMenu.label = Operator.actions[action].descriptionAll;
-          tempMenu.setAttribute("label", tempMenu.label);
-          tempMenu.store_oncommand = Operator.actionAllCallbackGenerator(semanticArrays, action);
-          tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
-          tempMenu.store_onclick = Operator.clickAllCallbackGenerator(semanticArrays, action);
-          tempMenu.addEventListener("click", tempMenu.store_onclick, true);
-          menu.appendChild(tempMenu);
-        }
-        if (menu) {
           if (!popup) {
             popup = document.createElement("menupopup");
           }               
