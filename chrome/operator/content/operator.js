@@ -938,9 +938,7 @@ var Operator = {
     Operator_ToolbarButton.clearPopup();
     Operator_ToolbarButton.disable();
     Operator_URLbarButton.clearPopup();
-    if (Operator.urlbar) {
-      document.getElementById("operator-urlbar-icon").removeAttribute("microformats");
-    }
+    Operator_URLbarButton.disable();
 
     /* Get all semantic data from the web page */
     var semanticArrays = [];
@@ -952,7 +950,7 @@ var Operator = {
       }
     }
     if (haveMicroformats && Operator.urlbar) {
-      document.getElementById("operator-urlbar-icon").setAttribute("microformats", "true");
+      Operator_URLbarButton.enable();
     }
     Operator.getSemanticData(content, semanticArrays);
 

@@ -49,15 +49,11 @@ var Operator_URLbarButton = {
   },
   disable: function()
   {
-    if (!this.isHidden()) {
-      document.getElementById("operator-urlbar-icon").setAttribute("disabled", "true");
-    }
+    document.getElementById("operator-urlbar-icon").removeAttribute("microformats");
   },
   enable: function()
   {
-    if (!this.isHidden()) {
-      document.getElementById("operator-urlbar-icon").setAttribute("disabled", "false");
-    }
+    document.getElementById("operator-urlbar-icon").setAttribute("microformats", "true");
   },
   isHidden: function()
   {
