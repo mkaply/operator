@@ -257,16 +257,7 @@ var Operator_Options = {
   
   disableNewDataformat: function()
   {
-    var numDataformats = 0;
-    var i;
-    for (i=0; i< Operator.dataformats.length; i++) {
-      numDataformats++;
-    }
-
-    if (document.getElementById("dataformats").getRowCount() == numDataformats) {
-      return true;
-    }
-    return false;
+    return (document.getElementById("dataformats").getRowCount() == Operator.dataformats.length);
   },
   
   disableNewAction: function()
