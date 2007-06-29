@@ -932,12 +932,12 @@ var Operator = {
 
     /* Clear all the existing data and disable everything */
     Operator_Toolbar.clearPopups();
-    Operator_Statusbar.clearPopup();
-    Operator_ToolbarButton.clearPopup();
-    Operator_URLbarButton.clearPopup();
     Operator_Toolbar.disable();
-    Operator_ToolbarButton.disable();
+    Operator_Statusbar.clearPopup();
     Operator_Statusbar.disable();
+    Operator_ToolbarButton.clearPopup();
+    Operator_ToolbarButton.disable();
+    Operator_URLbarButton.clearPopup();
     if (Operator.urlbar) {
       document.getElementById("operator-urlbar-icon").removeAttribute("microformats");
     }
@@ -1199,14 +1199,14 @@ var Operator = {
       
       if (!Operator_ToolbarButton.isHidden()) {
         Operator_ToolbarButton.enable();
-        clonePopup = Operator_ToolbarButton.addPopup(popup);
+        clonePopup = clonePopup | Operator_ToolbarButton.addPopup(popup);
       }
       if (!Operator_Statusbar.isHidden()) {
         Operator_Statusbar.enable();
-        Operator_Statusbar.addPopup(popup, clonePopup);
+        clonePopup = clonePopup | Operator_Statusbar.addPopup(popup, clonePopup);
       }
       if (Operator.urlbar) {
-        Operator_URLbarButton.addPopup(popup, clonePopup);
+        clonePopup = clonePopup | Operator_URLbarButton.addPopup(popup, clonePopup);
       }
       Operator_Toolbar.enable();
     }
