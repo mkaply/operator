@@ -1,28 +1,50 @@
 var Operator = {
+  /* Our own dataformats array for UI purposes - includes Microformats+RDFa */
   dataformats: [],
+  /* Operator preference branch */
   prefBranch: null,
+  /* Variables for preferences */
+  /* Whether or not debug is on */
   debug: false,
-  official: true,
+  /* Current view - 0=data formats, 1=actions */
   view: 1,
+  /* Whether or not the upcoming bug related to inclusive DTEND is fixed */ 
   upcomingBugFixed: false,
+  /* Should microformats be highlighted on mouseover and when selected */
   highlightMicroformats: false,
+  /* Should data formats use descriptive names */
   useDescriptiveNames: false,
+  /* Should we remove duplicates microformats */
   removeDuplicates: true,
+  /* Should we observe all changes in the DOM */
   observeDOMAttrModified: false,
+  /* Is there an icon on the statusbar */
   statusbar: false,
+  /* Is there an icon on the URL bar */
   urlbar: false,
+  /* Should we use short descriptions for the actions */
   useShortDescriptions: false,
+  /* This is set to true by options before setting all other prefs */
+  /* This allows us to not update the Operator UI until all pref changes */
+  /* are done */
   batchPrefChanges: false,
-  customizeDone: false,
+  /* Pointer to the bundle for operator.properties */
   languageBundle: null,
+  /* Store the current highlighted element so we can unhighlight it */
   highlightedElement: null,
+  /* Store the higlighted element's old style so we can put it back */
   highlightedElementOutlineStyle: null,
+  /* If timerID is set, we know that we're being acted on by a delay. */
+  /* The delay is so that if 100 DOM changes happen, we don't do 100 checks */
+  /* for microformats. */
   timerID: null,
-  /* Operator maintains its own list of actions that combines RDFa and microformats into one */
+  /* Operator maintains its own list of actions that copies SemanticActions */
+  /* This is so we can mess with some of the data like descriptions */
+  /* It has a customer iterator so you can enumerator over Operator.actions */
   actions: {
     /* When an action is added, the name is placed in this list */
+    /* Clashes, etc. were resolved by SemanticActions */
     list: [],
-    /* need to check for clash and combine semantic scope */
     add: function add(action, actionDefinition) {
       Operator.actions[action] = actionDefinition;
       Operator.actions.list.push(action);
@@ -34,35 +56,44 @@ var Operator = {
       }
     },
   },
+  /* This is the primary init function and it is called whenever a new window is opened */
+  /* It handles loading and initializing Microformats, as well as initializing prefs */
+  /* It also adds the listeners so we can catch page load events */
   init: function init()
   {
+    /* Set a variable if we are being accessed by options so we do less work */
     var options = false;
     if (window.location.href.match("operator_options")) {
       options = true;
     }
+    /* Attempt to use the Microformats module if available (Firefox 3) */
     if (Components.utils.import) {
       try {
         Components.utils.import("resource://gre/modules/Microformats.js");
       } catch (ex) {}
     }
     var objScriptLoader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"].getService(Components.interfaces.mozIJSSubScriptLoader);
+    /* If we didn't get Microformats by import, load our own JS file */
     if (typeof(Microformats) == "undefined") {
       objScriptLoader.loadSubScript("chrome://operator/content/Microformats/Microformats.js");
     }
+    /* xFolk is not a part of Firefox 3 */
     objScriptLoader.loadSubScript("chrome://operator/content/Microformats/xFolk.js");
     /* Don't assume we have RDF */
     try {
       objScriptLoader.loadSubScript("chrome://operator/content/RDFa/rdfa.js");
     } catch (ex) {}
+    /* Load the builtin semantic actions */
     objScriptLoader.loadSubScript("chrome://operator/content/SemanticActions/SemanticActions.js");
 
     if (!options) {
-      /* Operator specific parser stuff */
+      /* Operator specific Microformats stuff */
       Microformats.hCard.icon = "chrome://operator/content/hCard.png";
       Microformats.hCalendar.icon = "chrome://operator/content/hCalendar.png";
       Microformats.geo.icon = "chrome://operator/content/geo.png";
       Microformats.tag.sort = true;
-  
+
+      /* Load the Operator UI elements */
       objScriptLoader.loadSubScript("chrome://operator/content/operator_toolbar.js");
       objScriptLoader.loadSubScript("chrome://operator/content/operator_statusbar.js");
       objScriptLoader.loadSubScript("chrome://operator/content/operator_toolbar_button.js");
@@ -70,10 +101,12 @@ var Operator = {
 //      objScriptLoader.loadSubScript("chrome://operator/content/operator_toolbar_buttons.js");
       objScriptLoader.loadSubScript("chrome://operator/content/operator_sidebar.js");
     }
+    /* Get a bundle for the operator properties file */
     var bundleService = Components.classes["@mozilla.org/intl/stringbundle;1"].
                                    getService(Components.interfaces.nsIStringBundleService);
     this.languageBundle = bundleService.createBundle("chrome://operator/locale/operator.properties");
 
+    /* Read the microformat descriptions from the language bundle */
     var i, j;
     for (i in Microformats)
     {
@@ -82,7 +115,8 @@ var Operator = {
       } catch (ex) {
       }
     }
-    
+
+    /* Load user scripts from the operator directory in the profile */
     var file = Components.classes["@mozilla.org/file/directory_service;1"].
                           getService(Components.interfaces.nsIProperties).
                           get("ProfD", Components.interfaces.nsILocalFile);
@@ -93,6 +127,7 @@ var Operator = {
       while (e.hasMoreElements()) {
         var f = e.getNext().QueryInterface(Components.interfaces.nsIFile);
         var splitpath = f.path.split(".");
+        /* Only load JS files */
         if (splitpath[splitpath.length-1] == "js") {
           var fileHandler = Components.classes["@mozilla.org/network/io-service;1"].
                                        getService(Components.interfaces.nsIIOService).
@@ -107,10 +142,14 @@ var Operator = {
       }
     }
 
+    /* Duplicate the semantic actions in our own actions array */
     for (i in SemanticActions) {
       Operator.actions.add(i, SemanticActions[i]);
     }
 
+    /* This is to allow translation of actions. Basically we get the default */
+    /* locale, and if a description exists for that locale, use it. */
+    /* We also support the old way where description is not an array */
     var curLocale = "en-US";
     try {
       curLocale = prefs.getCharPref("general.useragent.locale");
@@ -130,6 +169,7 @@ var Operator = {
       }
     }
     
+    /* We maintain our own dataformats array that combines Microformat and RDFa */
     for (i in Microformats) {
       Operator.dataformats.push(i);
     }
@@ -140,11 +180,11 @@ var Operator = {
       Operator.dataformats.push("eRDF");
     }
 
-    /* preference stuff */
+    /* Setup the pref branch */
     this.prefBranch = Components.classes["@mozilla.org/preferences-service;1"].
                                  getService(Components.interfaces.nsIPrefService).
                                  getBranch("extensions.operator.");
-    /* Just delete the really old prefs if we find them */
+    /* Check for prefs from Operator 0.6. If present, remove them */
     var prefBranchOld = Components.classes["@mozilla.org/preferences-service;1"].
                                    getService(Components.interfaces.nsIPrefService).
                                    getBranch("extensions.operator_toolbar.");
@@ -156,8 +196,8 @@ var Operator = {
     if (oldcount.value > 0) {
       prefBranchOld.deleteBranch("");
     }
-    /* Check for ***PREFERENCE*** and if we find it, just wipe wll preferences */
-    /* microformats1 */
+    /* Look for a pre 0.8 preference. If present, reset the prefs */
+    /* Pref migration just got to be too much.
     try {
       this.prefBranch.getCharPref("microformat1");
       /* If we got here, we have old stuff */
@@ -168,6 +208,7 @@ var Operator = {
       this.prefBranch.getChildList("", newcount);
     } catch (ex) {
     }
+    /* If we don't have any preferences, setup the default prefs */
     if (newcount.value == 0) {
       j = 1;
       for (i=0; i< Operator.dataformats.length; i++) {
@@ -183,6 +224,7 @@ var Operator = {
       this.prefBranch.setCharPref("action6", "technorati_search_tags");
     }
 
+    /* Initialize our default values from prefs */ 
     try {
       this.debug = this.prefBranch.getBoolPref("debug");
     } catch (ex) {}
@@ -221,9 +263,10 @@ var Operator = {
       return;
     }
 
+    /* Attach listeners for page load */ 
     window.addEventListener("load", function(e)   { Operator.startup(); }, false);
     window.addEventListener("unload", function(e) { Operator.shutdown(); }, false);
-    window.addEventListener("operator-sidebar-load", Operator_Sidebar.processSemanticData, false, true);
+//    window.addEventListener("operator-sidebar-load", Operator_Sidebar.processSemanticData, false, true);
     
   },
   startup: function startup()
@@ -1178,6 +1221,7 @@ var Operator = {
     }
 
     if (popup) {
+      /* If we have a popup, add the Options menu to the end */
       var clonePopup = false;
       tempMenu = document.createElement("menuseparator");
       popup.appendChild(tempMenu);
@@ -1188,8 +1232,9 @@ var Operator = {
       tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
       popup.appendChild(tempMenu);
 
-      /* add options to popup */
-      
+      /* Add the menu to the various buttons */
+      /* If clonePopup is set, then the menu is cloned before it is added */
+      /* This is necessary since one menu can't be used for multiple things */
       if (!Operator_ToolbarButton.isHidden()) {
         Operator_ToolbarButton.enable();
         clonePopup = clonePopup | Operator_ToolbarButton.addPopup(popup);
