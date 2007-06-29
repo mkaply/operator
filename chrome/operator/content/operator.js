@@ -575,8 +575,9 @@ var Operator = {
           semanticObject.setDefaultNS(Operator.actions[k].scope.semantic[semanticObjectType]["defaultNS"]);
         }
       }
-      if ((required instanceof Array) && (required.length > 1))  {
+      if ((required instanceof Array) && (required.length > 1)) {
         menupopup = document.createElement("menupopup");
+        menuitem = document.createElement("menu");
         for (m=0; m < required.length; m++) {
           tempMenu = document.createElement("menuitem");
           if (Operator.actions[k].getActionName) {
@@ -595,11 +596,13 @@ var Operator = {
             menupopup.appendChild(tempMenu);
           }
         }
-      }
-      if (menupopup) {
-        menuitem = document.createElement("menu");
+        menuitem.appendChild(menupopup);
       } else {
         menuitem = document.createElement("menuitem");
+        menuitem.store_oncommand = this.actionCallbackGenerator(semanticObject, semanticObjectType, k);
+        menuitem.addEventListener("command", menuitem.store_oncommand, true);
+        menuitem.store_onclick = this.clickCallbackGenerator(semanticObject, semanticObjectType, k);
+        menuitem.addEventListener("click", menuitem.store_onclick, true);
       }
       if (Operator.useShortDescriptions && Operator.actions[k].shortDescription) {
         menuitem.label = Operator.actions[k].shortDescription;
@@ -610,17 +613,9 @@ var Operator = {
         menuitem.label += " (" + Operator.actions[k].getActionName(semanticObject, semanticObjectType, m) + ")";
       }
       menuitem.setAttribute("label", menuitem.label);
-      if (!menupopup) {
-        menuitem.store_oncommand = this.actionCallbackGenerator(semanticObject, semanticObjectType, k);
-        menuitem.addEventListener("command", menuitem.store_oncommand, true);
-        menuitem.store_onclick = this.clickCallbackGenerator(semanticObject, semanticObjectType, k);
-        menuitem.addEventListener("click", menuitem.store_onclick, true);
-      }
-      if (menupopup) {
-        menuitem.appendChild(menupopup);
-      }
       submenu.appendChild(menuitem);
       addedAction = true;
+      menupopup = null;
     }
     if (this.debug) {
       if (addedAction) {
@@ -1011,7 +1006,7 @@ var Operator = {
                   menu = document.createElement("menupopup");
                 }
                 if (objectArray[k].toString()) {
-                  if ((required instanceof Array) && (required.length > 1))  {
+                  if ((required instanceof Array) && (required.length > 1)) {
                     for (m=0; m < required.length; m++) {
                       tempMenu = document.createElement("menuitem");
                       if (Operator.actions[action].getActionName) {
