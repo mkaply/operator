@@ -56,9 +56,9 @@ var Operator = {
       }
     },
   },
-  /* This is the primary init function and it is called whenever a new window is opened */
+  /* This is the primary init function and it is called whenever the XUL for a window is initially loaded */
   /* It handles loading and initializing Microformats, as well as initializing prefs */
-  /* It also adds the listeners so we can catch page load events */
+  /* It also adds the listeners so we can window load events */
   init: function init()
   {
     /* Set a variable if we are being accessed by options so we do less work */
@@ -197,7 +197,7 @@ var Operator = {
       prefBranchOld.deleteBranch("");
     }
     /* Look for a pre 0.8 preference. If present, reset the prefs */
-    /* Pref migration just got to be too much.
+    /* Pref migration just got to be too much. */
     try {
       this.prefBranch.getCharPref("microformat1");
       /* If we got here, we have old stuff */
@@ -269,45 +269,58 @@ var Operator = {
 //    window.addEventListener("operator-sidebar-load", Operator_Sidebar.processSemanticData, false, true);
     
   },
+  /* This function handles the window startup piece, initializing the UI and preferences */
   startup: function startup()
   {
+    /* Add an observer so we see changes to prefs */
     this.prefBranch.QueryInterface(Components.interfaces.nsIPrefBranch2);
     this.prefBranch.addObserver("", this, false);
 
-    /* Window specific stuff */
+    /* Display the status bar icon if it is turned on in prefs */
     if (this.statusbar) {
       Operator_Statusbar.show();
     } else {
       Operator_Statusbar.hide();
     }
+    /* Create the toolbar. We have to do this even if the toolbar is invisible, since */
+    /* A user might choose to display the toolbar at anytime and there is no notification */
     Operator_Toolbar.create();
+    /* Event listeners for showing and hiding page content */
     getBrowser().addEventListener("pageshow", function(e) { Operator.onPageShow(e); }, true);
     getBrowser().addEventListener("pagehide", function(e) { Operator.onPageHide(e); }, true);
+    /* Event listener for when you switch tabs */
     getBrowser().tabContainer.addEventListener("select", function(e) { Operator.onTabChanged(e); }, true);
+    /* Event listener so we can modify the page context menu */
     var menu = document.getElementById("contentAreaContextMenu");
     menu.addEventListener("popupshowing", Operator.contextPopupShowing, false);
   },
+  /* This function handles the window closing piece, removing listeners and observers */
   shutdown: function shutdown()
   {
+    /* Remove pref observer */
     this.prefBranch.removeObserver("", this);
+    /* Remove page show and hide observers */
     getBrowser().removeEventListener("pageshow", function(e) { Operator.onPageShow(e); }, true);
     getBrowser().removeEventListener("pagehide", function(e) { Operator.onPageHide(e); }, true);
+    /* Remove listener for switching tabs */
     getBrowser().tabContainer.removeEventListener("select", function(e) { Operator.onTabChanged(e); }, true);
+    /* Remove page context menu listener */
     var menu = document.getElementById("contentAreaContextMenu");
     menu.removeEventListener("popupshowing", Operator.contextPopupShowing, false);
   },
+  /* This function looks for preference changes and updates our internal pref */
+  /* and UI if they happen */
   observe: function observe(subject, topic, data)
   {
+    /* Bail if it isn't a pref change */
     if (topic != "nsPref:changed")
     {
       return;
     }
+    /* batchPref changes is set to true before options starts updating prefs */
+    /* Then it is set to false at the end */
     if (data == "batchPrefChanges") {
-      try {
         this.batchPrefChanges = this.prefBranch.getBoolPref("batchPrefChanges");
-      } catch(ex) {
-        this.batchPrefChanges = false;
-      }
     }
     if (data == "debug") {
       this.debug = this.prefBranch.getBoolPref("debug");
@@ -329,6 +342,7 @@ var Operator = {
     }
     if (data == "highlightMicroformats") {
       this.highlightMicroformats = this.prefBranch.getBoolPref("highlightMicroformats");
+      /* If we had a highlighted element, reset it */
       if (this.highlightedElement) {
         this.highlightedElement.style.outline = this.highlightedElementOutlineStyle;
         this.highlightedElement = null;
@@ -344,22 +358,25 @@ var Operator = {
       this.urlbar = this.prefBranch.getBoolPref("urlbar");
     }
     if (data == "statusbar") {
-      if (this.prefBranch.getBoolPref("statusbar")) {
-        this.statusbar = true;
+      this.statusbar = this.prefBranch.getBoolPref("statusbar");
+      if (this.statusbar) {
         Operator_Statusbar.show();
       } else {
         Operator_Statusbar.hide();
-        this.statusbar = false;
       }
       return;
     }
 
+    /* If batchPrefChanges is false, recreate the toolbar and reprocess */
+    /* microformats */
     if (!this.batchPrefChanges) {
       Operator_Toolbar.create();
       Operator.processSemanticData();
     }
   },
 
+  /* This is a closure used to highlight DOM nodes when a microformat is */
+  /* selected in the menu */
   highlightCallbackGenerator: function highlightCallbackGenerator(item)
   {
     return function(event) {
@@ -369,7 +386,7 @@ var Operator = {
     };
   },
 
-  
+  /* This is a closure used to execute an action */
   actionCallbackGenerator: function actionCallbackGenerator(semanticObject, semanticObjectType, semanticAction, propertyIndex)
   {
     return function(event) {
@@ -380,6 +397,7 @@ var Operator = {
       }
     };
   },
+  /* This is a closure used to execute a do all action */
   actionAllCallbackGenerator: function actionAllCallbackGenerator(semanticArrays, semanticAction, semanticObjectType, propertyIndex)
   {
     return function(event) {
@@ -391,6 +409,7 @@ var Operator = {
 
     };
   },
+  /* This is a closure specifically to handle middle click so we can do interesting stuff */
   clickCallbackGenerator: function clickCallbackGenerator(semanticObject, semanticObjectType, semanticAction)
   {
     return function(event) {
@@ -407,6 +426,8 @@ var Operator = {
       }
     };
   },
+  /* This is a closure specifically to handle middle click for do all actions */
+  /* so we can do interesting stuff */
   clickAllCallbackGenerator: function clickAllCallbackGenerator(semanticArrays, semanticAction, semanticObjectType)
   {
     return function(event) {
@@ -424,24 +445,23 @@ var Operator = {
     };
   },
 
-  sourceCallbackGenerator: function sourceCallbackGenerator(formatname, item)
-  {
-    return function(event) {
-      Operator.source(item, formatname);
-    };
-  },
-
+  /* This is a closure used when there is a microformats error. It displays */
+  /* The error/debug dialog */
   errorCallbackGenerator: function errorCallbackGenerator(semanticObject, semanticObjectType)
   {
     return function(event) {
       Operator.error(semanticObject, semanticObjectType);
     };
   },
+  /* This function sorts semantic object nodes and also removes duplicates */
   sortUnique: function (semanticObjects, sort, unique)
   {
+    /* Go ahead and set the displayName instead of querying it each time */
+    /* Major performance win */
     for (i=0; i < semanticObjects.length; i++) {
       semanticObjects[i].displayName = semanticObjects[i].toString();
     }
+    /* If we aren't sorting or removing duplicates, or we only have 1, just return */
     if ((!sort && !unique) || (semanticObjects.length <= 1)) {
       return semanticObjects;
     }
@@ -472,7 +492,9 @@ var Operator = {
       }
     );
     if (unique) {
-      /* Find the duplicates in the original array and remove them */
+      /* Find the duplicates and remove them */
+      /* The spliced variable is used to know if we should increment */
+      /* our loop counter */
       i=1;
       var spliced;
       while (tempArray[i]) {
@@ -480,9 +502,11 @@ var Operator = {
           if (tempArray[i].displayName == tempArray[i-1].displayName) {
             if (Operator.areEqualObjects(tempArray[i], tempArray[i-1])) {
               if (sort) {
+                /* If we are sorting, remove the dupes from the temp array */
                 tempArray.splice(i, 1);
                 spliced = true;
               } else {
+                /* If we aren't, find the objects in the original array and remove them */
                 semanticObjects.splice(semanticObjects.indexOf(tempArray[i]),1);
               }
             }
@@ -495,13 +519,16 @@ var Operator = {
         }
       }
     }
+    /* If we sorted, return the new array, otherwise return the original array */
     if (sort) {
       return tempArray;
     }
     return semanticObjects;
   },
+  /* Build the menu for data formats (not actions( */
   buildMenu: function buildMenu(semanticObjects, semanticObjectType, semanticAction)
   {
+    /* Sort and remove duplicates */
     if ((Microformats[semanticObjectType]) && Microformats[semanticObjectType].sort) {
       semanticObjects = Operator.sortUnique(semanticObjects, true, Operator.removeDuplicates);
     } else {
@@ -536,18 +563,10 @@ var Operator = {
           tempMenu.style.fontWeight = "bold";
           menu.error = true;
         } else {
-          /* NOT ACTIONS */
-          if (this.view === 0) {
-            var submenu = document.createElement("menupopup");
-            tempMenu.appendChild(submenu);
-            tempMenu.store_onpopupshowing = this.popupShowing(semanticObjects[j], semanticObjectType);
-            tempMenu.addEventListener("popupshowing", tempMenu.store_onpopupshowing, false);
-          } else {
-            tempMenu.store_oncommand = this.actionCallbackGenerator(semanticObjects[j], semanticObjectType, semanticAction);
-            tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
-            tempMenu.store_onclick = this.clickCallbackGenerator(semanticObjects[j], semanticObjectType, semanticAction);
-            tempMenu.addEventListener("click", tempMenu.store_onclick, true);
-          }
+          var submenu = document.createElement("menupopup");
+          tempMenu.appendChild(submenu);
+          tempMenu.store_onpopupshowing = this.popupShowing(semanticObjects[j], semanticObjectType);
+          tempMenu.addEventListener("popupshowing", tempMenu.store_onpopupshowing, false);
         }
         menu.appendChild(tempMenu);
         itemsadded++;
@@ -559,14 +578,12 @@ var Operator = {
         Microformats.parser.validate(semanticObjects[j].node, semanticObjectType, error);
 
         Operator.console_message(error.message, Operator.lineNumberFromDOMNode(semanticObjects[j].node));
-//          if (typeof Firebug != "undefined") {
-//            Firebug.Console.log(Operator.microformats[microformat].getError(items[j].node), items[j].node);
-//          }
       }
     }
     
     return menu;
   },
+  /* Function so we can delay load the action submenus for data format popups */
   popupShowing: function popupShowing(semanticObject, semanticObjectType)
   {
     return function(event) {
