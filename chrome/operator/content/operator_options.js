@@ -51,7 +51,7 @@ var Operator_Options = {
       i++;
     }
     while (haveMorePrefs);
-    this.prefBranch.clearUserPref("batchPrefChanges");
+    this.prefBranch.setBoolPref("batchPrefChanges", false);
   },
 
   checkAndSetIntPref: function(pref, value)
