@@ -8,7 +8,8 @@
         <em:creator>Michael Kaply (IBM)</em:creator>
         <em:contributor>Andy Mitchell</em:contributor>
         <em:contributor>Elias Torres (IBM)</em:contributor>
-        <em:contributor>Alex Faaborg (IBM)</em:contributor>
+        <em:contributor>Alex Faaborg</em:contributor>
+        <em:contributor>David I. Lehn</em:contributor>
         <em:homepageURL>http://www.kaply.com/weblog/</em:homepageURL>
         <em:optionsURL>chrome://operator/content/operator_options.xul</em:optionsURL>
         <em:iconURL>chrome://operator/content/operator_icon.png</em:iconURL>
