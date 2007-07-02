@@ -592,7 +592,7 @@ var Operator = {
       }
     };
   },
-  attachActions: function attachActions(parentmenu, semanticObject, semanticObjectType)
+  attachActions: function attachActions(parentmenu, semanticObject, semanticObjectType, popup)
   {
     var required;
     var menuitem;
@@ -636,12 +636,25 @@ var Operator = {
         }
       }
       if ((required instanceof Array) && (required.length > 1)) {
-        menupopup = document.createElement("menupopup");
-        menuitem = document.createElement("menu");
+        if (!popup) {
+          menupopup = document.createElement("menupopup");
+          menuitem = document.createElement("menu");
+        }
         for (m=0; m < required.length; m++) {
           tempMenu = document.createElement("menuitem");
           if (Operator.actions[k].getActionName) {
-            tempMenu.label = Operator.actions[k].getActionName(semanticObject, semanticObjectType, m);
+            tempMenu.label = "";
+            if (popup) {
+              if (Operator.useShortDescriptions && Operator.actions[k].shortDescription) {
+                tempMenu.label = Operator.actions[k].shortDescription + " (";
+              } else {
+                tempMenu.label = Operator.actions[k].description + " (";
+              }
+            }
+            tempMenu.label += Operator.actions[k].getActionName(semanticObject, semanticObjectType, m);
+            if (popup) {
+              tempMenu.label += ")";
+            }
           } else {
             tempMenu.label = semanticObject.toString();
           }
@@ -653,10 +666,16 @@ var Operator = {
             tempMenu.addEventListener("click", tempMenu.store_onclick, true);
             tempMenu.store_onDOMMenuItemActive = Operator.highlightCallbackGenerator(semanticObject.node);
             tempMenu.addEventListener("DOMMenuItemActive", tempMenu.store_onDOMMenuItemActive, true);
-            menupopup.appendChild(tempMenu);
+            if (popup) {
+              submenu.appendChild(tempMenu);
+            } else {
+              menupopup.appendChild(tempMenu);
+            }
           }
         }
-        menuitem.appendChild(menupopup);
+        if (!popup) {
+          menuitem.appendChild(menupopup);
+        }
       } else {
         menuitem = document.createElement("menuitem");
         menuitem.store_oncommand = this.actionCallbackGenerator(semanticObject, semanticObjectType, k);
@@ -664,18 +683,21 @@ var Operator = {
         menuitem.store_onclick = this.clickCallbackGenerator(semanticObject, semanticObjectType, k);
         menuitem.addEventListener("click", menuitem.store_onclick, true);
       }
-      if (Operator.useShortDescriptions && Operator.actions[k].shortDescription) {
-        menuitem.label = Operator.actions[k].shortDescription;
-      } else {
-        menuitem.label = Operator.actions[k].description;
+      if (menuitem) {
+        if (Operator.useShortDescriptions && Operator.actions[k].shortDescription) {
+          menuitem.label = Operator.actions[k].shortDescription;
+        } else {
+          menuitem.label = Operator.actions[k].description;
+        }
+        if (!menupopup && Operator.actions[k].getActionName) {
+          menuitem.label += " (" + Operator.actions[k].getActionName(semanticObject, semanticObjectType, m) + ")";
+        }
+        menuitem.setAttribute("label", menuitem.label);
+        submenu.appendChild(menuitem);
       }
-      if (!menupopup && Operator.actions[k].getActionName) {
-        menuitem.label += " (" + Operator.actions[k].getActionName(semanticObject, semanticObjectType, m) + ")";
-      }
-      menuitem.setAttribute("label", menuitem.label);
-      submenu.appendChild(menuitem);
       addedAction = true;
       menupopup = null;
+      menuitem = null;
     }
     if (this.debug) {
       if (addedAction) {
@@ -721,7 +743,7 @@ var Operator = {
       var shown_separator = false;
       for (i=0; i < mfNames.length; i++) {
         actionmenu = document.createElement("menupopup");
-        Operator.attachActions(actionmenu, new Microformats[mfNames[i]].mfObject(mfNode), mfNames[i]);
+        Operator.attachActions(actionmenu, new Microformats[mfNames[i]].mfObject(mfNode), mfNames[i], true);
         if (actionmenu.childNodes.length > 0) {
           if (!shown_separator) {
             gContextMenu.showItem("operator-separator", true);
