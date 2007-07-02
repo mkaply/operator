@@ -15,7 +15,7 @@ var Operator_Debug = {
       var item = document.getElementById('x2v').item;
       var params = "uri=" + item.ownerDocument.location.href + "&body=";
       var serializer = new XMLSerializer();
-      params += serializer.serializeToString(item);
+      params += encodeURIComponent(serializer.serializeToString(item));
       var request = new XMLHttpRequest();
       request.open('POST', url, true);
   
