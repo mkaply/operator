@@ -262,16 +262,7 @@ var Operator_Options = {
   
   disableNewAction: function()
   {
-    var numActions = 0;
-    var i;
-    for (i in Operator.actions) {
-      numActions++;
-    }
-
-    if (document.getElementById("actions").getRowCount() == numActions) {
-      return true;
-    }
-    return false;
+    return (document.getElementById("actions").getRowCount() == Operator.actions.length);
   },
   
   /* dataformat dialog */
