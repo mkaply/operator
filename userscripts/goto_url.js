@@ -39,7 +39,10 @@ var goto_url = {
     } else {
       url = semanticObject[property];
     }
-    if (url && url instanceof Array && url.length > 1) {
+    if (url && url instanceof Array) {
+      if (!propertyIndex) {
+        propertyIndex = 0;
+      }
       var name = semanticObject.toString() + " (";
       var split_url = url[propertyIndex].split(":");
       if (split_url[0] == "aim") {
