@@ -1178,7 +1178,7 @@ var adr_definition = {
     "post-office-box" : {
     },
     "street-address" : {
-      plural: true,
+      plural: true
     },
     "extended-address" : {
     },
@@ -1381,7 +1381,7 @@ var hCard_definition = {
           types: ["msg", "home", "work", "pref", "voice", "fax", "cell", "video", "pager", "bbs", "car", "isdn", "pcs"]
         },
         "value" : {
-          datatype: "tel",
+          datatype: "tel"
         }
       },
       plural: true,
@@ -1557,7 +1557,7 @@ var hCalendar_definition = {
           virtualGetter: function(mfnode) {
             return Microformats.hCalendar.properties.rrule.retrieve(mfnode, "count");
           }
-        },
+        }
       },
       retrieve: function(mfnode, property) {
         var value = Microformats.parser.defaultGetter(mfnode);
@@ -1568,8 +1568,8 @@ var hCalendar_definition = {
             return rrule[i].split('=')[1];
           }
         }
-      },
-    },
+      }
+    }
   }
 };
 
@@ -1635,7 +1635,7 @@ var geo_definition = {
             return parseFloat(latlong[0]);
           }
         }
-      },
+      }
     },
     "longitude" : {
       datatype: "float",
