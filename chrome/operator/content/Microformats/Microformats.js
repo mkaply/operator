@@ -313,11 +313,7 @@ var Microformats = {
         if (values.length > 0) {
           var value = "";
           for (var j=0;j<values.length;j++) {
-            if (values[j].innerText) {
-              value += values[j].innerText;
-            } else {
-              value += values[j].textContent;
-            }
+            value += Microformats.parser.defaultGetter(values[j], propnode);
           }
           return value;
         } else {
