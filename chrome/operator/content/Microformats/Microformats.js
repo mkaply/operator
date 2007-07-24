@@ -1,4 +1,4 @@
-EXPORTED_SYMBOLS = ["Microformats", "adr", "tag", "hCard", "hCalendar", "geo"];
+var EXPORTED_SYMBOLS = ["Microformats", "adr", "tag", "hCard", "hCalendar", "geo"];
 
 var Microformats = {
   version: 0.8,
@@ -7,8 +7,7 @@ var Microformats = {
   /* Custom iterator so that microformats can be enumerated as */
   /* for (i in Microformats */
   __iterator__: function () {
-    var i;
-    for (i=0; i < this.list.length; i++) {
+    for (let i=0; i < this.list.length; i++) {
       yield this.list[i];
     }
   },
@@ -23,19 +22,17 @@ var Microformats = {
    *         object array with the new objects added
    */
   get: function(name, rootElement, recurseFrames, microformats) {
-    var i;
+    if (!Microformats[name]) {
+      return;
+    }
+    microformats = microformats || [];
 
-    if (!microformats) {
-      microformats = [];
-    }
-    if (!rootElement) {
-      rootElement = content.document;
-    }
+    rootElement = rootElement || content.document;
 
     /* If recurseFrames is undefined or true, look through all child frames for microformats */
     if ((recurseFrames == undefined) || (recurseFrames == true)) {
       if (rootElement.defaultView && rootElement.defaultView.frames.length > 0) {
-        for (i=0; i < rootElement.defaultView.frames.length; i++) {
+        for (let i=0; i < rootElement.defaultView.frames.length; i++) {
           Microformats.get(name, rootElement.defaultView.frames[i].document, recurseFrames, microformats);
         }
       }
@@ -43,28 +40,27 @@ var Microformats = {
 
     /* Get the microformat nodes for the document */
     var microformatNodes = [];
-    if (Microformats[name]) {
-      if (Microformats[name].className) {
-        microformatNodes = Microformats.getElementsByClassName(rootElement,
-                                          Microformats[name].className);
-        /* alternateClassName is for cases where a parent microformat is inferred by the children */
-        /* If we find alternateClassName, the entire document becomes the microformat */
-        if ((microformatNodes.length == 0) && (Microformats[name].alternateClassName)) {
-          var temp = Microformats.getElementsByClassName(rootElement, Microformats[name].alternateClassName);
-          if (temp.length > 0) {
-            microformatNodes.push(rootElement); 
-          }
+    if (Microformats[name].className) {
+      microformatNodes = Microformats.getElementsByClassName(rootElement,
+                                        Microformats[name].className);
+      /* alternateClassName is for cases where a parent microformat is inferred by the children */
+      /* If we find alternateClassName, the entire document becomes the microformat */
+      if ((microformatNodes.length == 0) && Microformats[name].alternateClassName) {
+        var altClass = Microformats.getElementsByClassName(rootElement, Microformats[name].alternateClassName);
+        if (altClass.length > 0) {
+          microformatNodes.push(rootElement); 
         }
-      } else if (Microformats[name].attributeValues) {
-        microformatNodes = Microformats.getElementsByAttribute(rootElement,
-                                          Microformats[name].attributeName,
-                                          Microformats[name].attributeValues);
-        
       }
+    } else if (Microformats[name].attributeValues) {
+      microformatNodes =
+        Microformats.getElementsByAttribute(rootElement,
+                                            Microformats[name].attributeName,
+                                            Microformats[name].attributeValues);
+      
     }
     /* Create objects for the microformat nodes and put them into the microformats */
     /* array */
-    for (i = 0; i < microformatNodes.length; i++) {
+    for (let i = 0; i < microformatNodes.length; i++) {
       microformats.push(new Microformats[name].mfObject(microformatNodes[i]));
     }
     return microformats;
@@ -79,19 +75,17 @@ var Microformats = {
    * @return The new count
    */
   count: function(name, rootElement, recurseFrames, count) {
-    var i;
+    if (!Microformats[name]) {
+      return;
+    }
+    count = count || 0;
 
-    if (!count) {
-      count = 0;
-    }
-    if (!rootElement) {
-      rootElement = content.document;
-    }
+    rootElement = rootElement || content.document;
 
     /* If recurseFrames is undefined or true, look through all child frames for microformats */
-    if ((recurseFrames == undefined) || (recurseFrames == true)) {
+    if (recurseFrames || recurseFrames === undefined) {
       if (rootElement.defaultView && rootElement.defaultView.frames.length > 0) {
-        for (i=0; i < rootElement.defaultView.frames.length; i++) {
+        for (let i=0; i < rootElement.defaultView.frames.length; i++) {
           Microformats.count(name, rootElement.defaultView.frames[i].document, recurseFrames, count);
         }
       }
@@ -99,24 +93,22 @@ var Microformats = {
 
     /* Get the microformat nodes for the document */
     var microformatNodes = [];
-    if (Microformats[name]) {
-      if (Microformats[name].className) {
-        microformatNodes = Microformats.getElementsByClassName(rootElement,
-                                          Microformats[name].className);
-        /* alternateClassName is for cases where a parent microformat is inferred by the children */
-        /* If we find alternateClassName, the entire document becomes the microformat */
-        if ((microformatNodes.length == 0) && (Microformats[name].alternateClassName)) {
-          var temp = Microformats.getElementsByClassName(rootElement, Microformats[name].alternateClassName);
-          if (temp.length > 0) {
-            microformatNodes.push(rootElement); 
-          }
+    if (Microformats[name].className) {
+      microformatNodes = Microformats.getElementsByClassName(rootElement,
+                                        Microformats[name].className);
+      /* alternateClassName is for cases where a parent microformat is inferred by the children */
+      /* If we find alternateClassName, the entire document becomes the microformat */
+      if ((microformatNodes.length == 0) && Microformats[name].alternateClassName) {
+        var altClass = Microformats.getElementsByClassName(rootElement, Microformats[name].alternateClassName);
+        if (altClass.length > 0) {
+          microformatNodes.push(rootElement); 
         }
-      } else if (Microformats[name].attributeValues) {
-        microformatNodes = Microformats.getElementsByAttribute(rootElement,
-                                          Microformats[name].attributeName,
-                                          Microformats[name].attributeValues);
-        
       }
+    } else if (Microformats[name].attributeValues) {
+      microformatNodes = 
+        Microformats.getElementsByAttribute(rootElement,
+                                            Microformats[name].attributeName,
+                                            Microformats[name].attributeValues);
     }
     count += microformatNodes.length;
     return count;
@@ -129,8 +121,7 @@ var Microformats = {
    * @return true if the node is a microformat, false if it is not
    */
   isMicroformat: function(node) {
-    var i;
-    for (i in Microformats)
+    for (let i in Microformats)
     {
       if (Microformats[i].className) {
         if (node.getAttribute('class')) {
@@ -142,7 +133,7 @@ var Microformats = {
         var attribute;
         if (attribute = node.getAttribute(Microformats[i].attributeName)) {
           var attributeList = Microformats[i].attributeValues.split(" ");
-          for (var j=0; j < attributeList.length; j++) {
+          for (let j=0; j < attributeList.length; j++) {
             if (attribute.match("(^|\\s)" + attributeList[j] + "(\\s|$)")) {
               return true;
             }
@@ -153,9 +144,9 @@ var Microformats = {
     return false;
   },
   /**
-   * If the passed in node is contained in a microformat, this function returns
-   * the microformat that contains it. If the passed in node is a microformat,
-   * it still returns the parent.
+   * This function searches a given nodes ancestors looking for a microformat
+   * and if it finds it, returns it. It does NOT include self, so if the passed
+   * in node is a microformat, it will still search ancestors for a microformat.
    *
    * @param  node          DOM node to check
    * @return If the node is contained in a microformat, it returns the parent
@@ -165,8 +156,7 @@ var Microformats = {
     var xpathExpression;
     var xpathResult;
     var mfname;
-    var i, j;
-    for (i in Microformats)
+    for (let i in Microformats)
     {
       mfname = i;
       if (Microformats[mfname]) {
@@ -175,7 +165,7 @@ var Microformats = {
         } else if (Microformats[mfname].attributeValues) {
           xpathExpression = "ancestor::*[";
           var attributeList = Microformats[i].attributeValues.split(" ");
-          for (var j=0; j < attributeList.length; j++) {
+          for (let j=0; j < attributeList.length; j++) {
             if (j != 0) {
               xpathExpression += " or ";
             }
@@ -203,12 +193,10 @@ var Microformats = {
    *         names, otherwise returns nothing
    */
   getNamesFromNode: function(node) {
-    var i;
     var microformatNames = [];
     var xpathExpression;
     var xpathResult;
-    var i, j;
-    for (i in Microformats)
+    for (let i in Microformats)
     {
       if (Microformats[i]) {
         if (Microformats[i].className) {
@@ -222,15 +210,14 @@ var Microformats = {
           var attribute;
           if (attribute = node.getAttribute(Microformats[i].attributeName)) {
             var attributeList = Microformats[i].attributeValues.split(" ");
-            for (var j=0; j < attributeList.length; j++) {
+            for (let j=0; j < attributeList.length; j++) {
+              /* If we match any attribute, we've got a microformat */
               if (attribute.match("(^|\\s)" + attributeList[j] + "(\\s|$)")) {
                 microformatNames.push(i);
-                continue;
+                break;
               }
             }
           }
-        } else {
-          continue;
         }
       }
     }
@@ -248,11 +235,10 @@ var Microformats = {
       if (!indent) {
         indent = "";
       }
-      var i;
       var toreturn = "";
       var testArray = [];
       
-      for (i in item)
+      for (let i in item)
       {
         if (testArray[i]) {
           continue;
@@ -284,10 +270,13 @@ var Microformats = {
         Microformats.list.push(microformat);
       }
       Microformats[microformat] = microformatDefinition;
-      microformatDefinition.mfObject.prototype.debug = function(microformatObject) {return Microformats.debug(microformatObject)};
+      microformatDefinition.mfObject.prototype.debug =
+        function(microformatObject) {
+          return Microformats.debug(microformatObject)
+        };
     }
   },
-  /* All parser specific function are contained in this object */
+  /* All parser specific functions are contained in this object */
   parser: {
     /**
      * Uses the microformat patterns to decide what the correct text for a
@@ -312,7 +301,7 @@ var Microformats = {
         var values = Microformats.getElementsByClassName(propnode, "value");
         if (values.length > 0) {
           var value = "";
-          for (var j=0;j<values.length;j++) {
+          for (let j=0;j<values.length;j++) {
             value += Microformats.parser.defaultGetter(values[j], propnode);
           }
           return value;
@@ -413,6 +402,7 @@ var Microformats = {
     emailGetter: function(propnode, parentnode) {
       if ((propnode.nodeName.toLowerCase() == "a") || (propnode.nodeName.toLowerCase() == "area")) {
         var mailto = propnode.href;
+        /* IO Service won't fully parse mailto, so we do it manually */
         if (mailto.indexOf('?') > 0) {
           return unescape(mailto.substring("mailto:".length, mailto.indexOf('?')));
         } else {
@@ -420,6 +410,8 @@ var Microformats = {
         }
       } else {
         /* Special case - if this node is a value, use the parent node to get all the values */
+        /* If this case gets executed, per the value design pattern, the result */
+        /* will be the EXACT email address with no extra parsing required */
         if (propnode.getAttribute('class').match("(^|\\s)" + "value" + "(\\s|$)")) {
           return Microformats.parser.defaultGetter(parentnode, parentnode);
         } else {
@@ -428,7 +420,7 @@ var Microformats = {
       }
     },
     /**
-     * Used to specifically retrieve HTML in a microformat node.
+     * Used when a caller needs the HTML inside a particular DOM node.
      *
      * @param  propnode   The DOMNode to check
      * @param  parentnode The parent node of the property. If it is a subproperty,
@@ -477,7 +469,10 @@ var Microformats = {
         case "microformat":
           try {
             result = new Microformats[prop.microformat].mfObject(node);
-          } catch (ex) {}
+          } catch (ex) {
+            /* We can swallow this exception. If the creation of the */
+            /* mf object fails, then the node isn't a microformat */
+          }
           if (result) {
             if (prop.microformat_property) {
               result = result[prop.microformat_property];
@@ -501,22 +496,19 @@ var Microformats = {
         throw("Invalid microformat - " + microformat);
       }
       if (in_node.ownerDocument) {
-        if (Microformats[microformat].attributeName) {
-          if (!(in_node.getAttribute(Microformats[microformat].attributeName))) {
-            throw("Node is not a microformat (" + microformat + ")");
-          }
-        } else {
-          if (!(in_node.getAttribute('class').match("(^|\\s)" + Microformats[microformat].className + "(\\s|$)"))) {
-            throw("Node is not a microformat (" + microformat + ")");
-          }
+        if ((Microformats[microformat].attributeName &&
+            !in_node.getAttribute(Microformats[microformat].attributeName)) ||
+            (in_node.getAttribute('class') &&
+            !in_node.getAttribute('class').match("(^|\\s)" + Microformats[microformat].className + "(\\s|$)"))) {
+          throw("Node is not a microformat (" + microformat + ")");
         }
       }
       var node = in_node;
-      if ((Microformats[microformat].className) && (in_node.ownerDocument)) {
+      if ((Microformats[microformat].className) && in_node.ownerDocument) {
         node = Microformats.parser.preProcessMicroformat(in_node);
       }
   
-      for (var i in Microformats[microformat].properties) {
+      for (let i in Microformats[microformat].properties) {
         object.__defineGetter__(i, Microformats.parser.getMicroformatPropertyGenerator(node, microformat, i, object));
       }
       
@@ -538,7 +530,6 @@ var Microformats = {
       };
     },
     getMicroformatProperty: function getMicroformatProperty(in_mfnode, mfname, propname) {
-      var i, j, k;
       var result;
       var mfnode = in_mfnode;
       if (!in_mfnode.origNode && Microformats[mfname].className && in_mfnode.ownerDocument) {
@@ -555,16 +546,13 @@ var Microformats = {
      use it. This allows us to pass in an hentry and get it's entry-title
      for instance. This only works one level deep. */
       if (!tp) {
-        for (i in Microformats[mfname].properties) {
-          if (Microformats[mfname].properties[i].subproperties) {
-            if (Microformats[mfname].properties[i].subproperties[propname]) {
-              if (mfnode.getAttribute('class')) {
-                if (mfnode.getAttribute('class').match("(^|\\s)" + i + "(\\s|$)")) {
-                  tp = Microformats[mfname].properties[i].subproperties[propname];
-                  break;
-                }
-              }
-            }
+        for (let i in Microformats[mfname].properties) {
+          if (Microformats[mfname].properties[i].subproperties &&
+              Microformats[mfname].properties[i].subproperties[propname] &&
+              mfnode.getAttribute('class') &&
+              mfnode.getAttribute('class').match("(^|\\s)" + i + "(\\s|$)")) {
+            tp = Microformats[mfname].properties[i].subproperties[propname];
+            break;
           }
         }
       }
@@ -600,7 +588,7 @@ var Microformats = {
   //    }
       var curprop = 0;
       var validType, type;
-      for (j = 0; j < propnodes.length; j++) {
+      for (let j = 0; j < propnodes.length; j++) {
         foundProps = true;
         var callPropertyGetter = true;
         if (tp.subproperties) {
@@ -609,7 +597,7 @@ var Microformats = {
             var foundSubProperties = false;
             var subpropnodes = Microformats.getElementsByClassName(propnodes[j], subprop);
             var cursubprop = 0;
-            for (k = 0; k < subpropnodes.length; k++) {
+            for (let k = 0; k < subpropnodes.length; k++) {
               if (tp.subproperties[subprop].datatype) {
                 result = Microformats.parser.datatypeHelper(tp.subproperties[subprop], subpropnodes[k], propnodes[j]);
               } else {
@@ -810,7 +798,6 @@ var Microformats = {
      */
     preProcessMicroformat: function(in_mfnode) {
       var mfnode;
-      var i;
       var includes = Microformats.getElementsByClassName(in_mfnode, "include");
       if ((includes.length > 0) || ((in_mfnode.nodeName.toLowerCase() == "td") && (in_mfnode.getAttribute("headers")))) {
         mfnode = in_mfnode.cloneNode(true);
@@ -819,27 +806,23 @@ var Microformats = {
           includes = Microformats.getElementsByClassName(mfnode, "include");
           var includeId;
           var include_length = includes.length;
-          for (i = include_length -1; i >= 0; i--) {
+          for (let i = include_length -1; i >= 0; i--) {
             if (includes[i].nodeName.toLowerCase() == "a") {
               includeId = includes[i].getAttribute("href").substr(1);
             }
             if (includes[i].nodeName.toLowerCase() == "object") {
               includeId = includes[i].getAttribute("data").substr(1);
             }
-            try {
-              includes[i].parentNode.replaceChild(in_mfnode.ownerDocument.getElementById(includeId).cloneNode(true), includes[i]);
-            } catch(ex) {}
+            includes[i].parentNode.replaceChild(in_mfnode.ownerDocument.getElementById(includeId).cloneNode(true), includes[i]);
           }
         } else {
           var headers = in_mfnode.getAttribute("headers").split(" ");
-          for (i = 0; i < headers.length; i++) {
-            try {
-              var tempNode = in_mfnode.ownerDocument.createElement("span");
-              var headerNode = in_mfnode.ownerDocument.getElementById(headers[i]);
-              tempNode.innerHTML = headerNode.innerHTML;
-              tempNode.className = headerNode.className;
-              mfnode.appendChild(tempNode);
-            } catch(ex) {}
+          for (let i = 0; i < headers.length; i++) {
+            var tempNode = in_mfnode.ownerDocument.createElement("span");
+            var headerNode = in_mfnode.ownerDocument.getElementById(headers[i]);
+            tempNode.innerHTML = headerNode.innerHTML;
+            tempNode.className = headerNode.className;
+            mfnode.appendChild(tempNode);
           }
         }
       } else {
@@ -854,7 +837,7 @@ var Microformats = {
         var mfobject = new Microformats[mfname].mfObject(mfnode);
         if (Microformats[mfname].required) {
           error.message = "";
-          for (var i=0;i<Microformats[mfname].required.length;i++) {
+          for (let i=0;i<Microformats[mfname].required.length;i++) {
             if (!mfobject[Microformats[mfname].required[i]]) {
               error.message += "Required property " + Microformats[mfname].required[i] + " not specified\n";
             }
@@ -1050,7 +1033,7 @@ var Microformats = {
     if ((rootNode.ownerDocument || rootNode).getElementsByClassName) {
     /* Firefox 3 - native getElementsByClassName */
       var col = rootNode.getElementsByClassName(className);
-      for (i = 0; i < col.length; i++) {
+      for (let i = 0; i < col.length; i++) {
         returnElements[i] = col[i];
       }
     } else if ((rootNode.ownerDocument || rootNode).evaluate) {
@@ -1067,7 +1050,7 @@ var Microformats = {
     /* Slow fallback for testing */
       className = className.replace(/\-/g, "\\-");
       var elements = rootNode.getElementsByTagName("*");
-      for (var i=0;i<elements.length;i++) {
+      for (let i=0;i<elements.length;i++) {
         if (elements[i].className.match("(^|\\s)" + className + "(\\s|$)")) {
           returnElements.push(elements[i]);
         }
@@ -1096,7 +1079,7 @@ var Microformats = {
     /* Firefox 3 and below - XPath */
       /* Create an XPath expression based on the attribute list */
       var xpathExpression = ".//*[";
-      for (var i = 0; i < attributeList.length; i++) {
+      for (let i = 0; i < attributeList.length; i++) {
         if (i != 0) {
           xpathExpression += " or ";
         }
@@ -1563,7 +1546,7 @@ var hCalendar_definition = {
         var value = Microformats.parser.defaultGetter(mfnode);
         var rrule;
         rrule = value.split(';');
-        for (var i=0; i < rrule.length; i++) {
+        for (let i=0; i < rrule.length; i++) {
           if (rrule[i].match(property)) {
             return rrule[i].split('=')[1];
           }
@@ -1683,7 +1666,7 @@ var tag_definition = {
                                      getService(Components.interfaces.nsIIOService);
           var uri = ioService.newURI(mfnode.href, null, null);
           var url_array = uri.path.split("/");
-          for(var i=url_array.length-1; i > 0; i--) {
+          for(let i=url_array.length-1; i > 0; i--) {
             if (url_array[i] !== "") {
               var tag
               if (tag = Microformats.tag.validTagName(url_array[i].replace(/\+/g, ' '))) {
@@ -1732,7 +1715,7 @@ var tag_definition = {
     if (!tag) {
       if (node.href) {
         var url_array = node.getAttribute("href").split("/");
-        for(var i=url_array.length-1; i > 0; i--) {
+        for(let i=url_array.length-1; i > 0; i--) {
           if (url_array[i] !== "") {
             if (error) {
               error.message = "Invalid tag name (" + url_array[i] + ")";
