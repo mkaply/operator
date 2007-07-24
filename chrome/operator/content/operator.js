@@ -152,7 +152,9 @@ var Operator = {
     /* We also support the old way where description is not an array */
     var curLocale = "en-US";
     try {
-      curLocale = prefs.getCharPref("general.useragent.locale");
+      curLocale = Components.classes["@mozilla.org/preferences-service;1"].
+                             getService(Components.interfaces.nsIPrefService).
+                             getCharPref("general.useragent.locale");
     }
     catch (e) {}
 
@@ -539,6 +541,7 @@ var Operator = {
     var itemsadded = 0;
     var tempMenu;
     var menuitem;
+    var j;
     for (j=0; j < semanticObjects.length; j++) {
       if (semanticObjects[j].displayName || this.debug) {
         if (!menu) {
@@ -640,6 +643,7 @@ var Operator = {
           menupopup = document.createElement("menupopup");
           menuitem = document.createElement("menu");
         }
+        var tempMenu;
         for (m=0; m < required.length; m++) {
           tempMenu = document.createElement("menuitem");
           if (Operator.actions[k].getActionName) {
