@@ -118,7 +118,7 @@ var export_vcard = {
       }
       vcf += crlf;
     } else {
-      vcf += "N:;;" + crlf;
+      vcf += "N:;;;;" + crlf;
     }
     if (hcard.org) {
       vcf += "ORG;CHARSET=UTF-8:";
