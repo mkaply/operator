@@ -3,8 +3,7 @@
 if (Components.utils.import) {
   try {
     Components.utils.import("resource://gre/modules/Microformats.js");
-    EXPORTED_SYMBOLS = ["hFeed"];
-    EXPORTED_SYMBOLS = ["hEntry"];
+    var EXPORTED_SYMBOLS = ["hFeed", "hEntry"];
   } catch (ex) {}
 }
 
@@ -146,7 +145,7 @@ var hatom_firefox_bookmark = {
   doAction: function(semanticObject, semanticObjectType) {
     if (semanticObjectType == "hAtom-hEntry") {
       name = semanticObject['entry-title'];
-      url = semanticObject.bookmark.link;
+      var url = semanticObject.bookmark.link;
       SemanticActions.firefox_bookmark.bookmark(name, url);
       return true;
     }
