@@ -1,4 +1,4 @@
-EXPORTED_SYMBOLS = ["SemanticActions"];
+var EXPORTED_SYMBOLS = ["SemanticActions"];
 
 var SemanticActions = {
   version: 0.8,
@@ -49,6 +49,7 @@ var SemanticActions = {
     } else {
       /* Copy the scope */
       if (actionDefinition.scope) {
+        var i;
         for (i in actionDefinition.scope.semantic) {
           SemanticActions[action].scope.semantic[i] = actionDefinition.scope.semantic[i];
         }
