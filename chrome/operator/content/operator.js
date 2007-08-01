@@ -877,6 +877,7 @@ var Operator = {
         Operator_Toolbar.disable();
         Operator_Toolbar.clearPopups();
         Operator_Statusbar.disable();
+        Operator_ToolbarButton.disable();
         document.getElementById("operator-urlbar-icon").removeAttribute("microformats");
       }
       Operator.recursiveRemoveListeners(content);
