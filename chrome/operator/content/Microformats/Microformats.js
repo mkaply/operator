@@ -312,19 +312,22 @@ var Microformats = {
           } else {
             s = propnode.textContent;
           }
-          /* Remove any HTML tags and their contents */
-          /* This used to be replacing with a space - I don't like that */
-          s	= s.replace(/\<.*?\>/gi, '');
-          /* Remove new lines, carriage returns and tabs */
-          s	= s.replace(/[\n\r\t]/gi, ' ');
-          /* Replace any double spaces with single spaces */
-          s	= s.replace(/\s{2,}/gi, ' ');
-          /* Remove any double spaces that are left */
-          s	= s.replace(/\s{2,}/gi, '');
-          /* Remove any spaces at the beginning */
-          s	= s.replace(/^\s+/, '');
-          /* Remove any spaces at the end */
-          s	= s.replace(/\s+$/, '');
+          /* If we are processing a value node, don't remove whitespace */
+          if (propnode.getAttribute('class') && !propnode.getAttribute('class').match("(^|\\s)" + "value" + "(\\s|$)")) {
+            /* Remove any HTML tags and their contents */
+            /* This used to be replacing with a space - I don't like that */
+            s	= s.replace(/\<.*?\>/gi, '');
+            /* Remove new lines, carriage returns and tabs */
+            s	= s.replace(/[\n\r\t]/gi, ' ');
+            /* Replace any double spaces with single spaces */
+            s	= s.replace(/\s{2,}/gi, ' ');
+            /* Remove any double spaces that are left */
+            s	= s.replace(/\s{2,}/gi, '');
+            /* Remove any spaces at the beginning */
+            s	= s.replace(/^\s+/, '');
+            /* Remove any spaces at the end */
+            s	= s.replace(/\s+$/, '');
+          }
           if (s.length > 0) {
             return s;
           }
@@ -429,7 +432,7 @@ var Microformats = {
      * @return A string with the HTML including all tags.
      */
     HTMLGetter: function(propnode, parentnode) {
-      return propnode.innerHTML;
+      return Microformats.parser.defaultGetter(propnode, parentnode); 
     },
     /**
      * Internal parser API used to determine which getter to call based on the
@@ -488,6 +491,18 @@ var Microformats = {
           }
           break;
       }
+      if (result && prop.types) {
+        var validType = false;
+        for (let type in prop.types) {
+          if (result.toLowerCase() == prop.types[type]) {
+            validType = true;
+            break;
+          }
+        }
+        if (!validType) {
+          return;
+        }
+      }
       return result;
     },
     newMicroformat: function(object, in_node, microformat) {
@@ -496,18 +511,21 @@ var Microformats = {
         throw("Invalid microformat - " + microformat);
       }
       if (in_node.ownerDocument) {
-        if ((Microformats[microformat].attributeName &&
-            !in_node.getAttribute(Microformats[microformat].attributeName)) ||
-            (in_node.getAttribute('class') &&
-            !in_node.getAttribute('class').match("(^|\\s)" + Microformats[microformat].className + "(\\s|$)"))) {
-          throw("Node is not a microformat (" + microformat + ")");
+        if (Microformats[microformat].attributeName) {
+          if (!(in_node.getAttribute(Microformats[microformat].attributeName))) {
+            throw("Node is not a microformat (" + microformat + ")");
+          }
+        } else {
+          if (!(in_node.getAttribute('class').match("(^|\\s)" + Microformats[microformat].className + "(\\s|$)"))) {
+            throw("Node is not a microformat (" + microformat + ")");
+          }
         }
       }
       var node = in_node;
       if ((Microformats[microformat].className) && in_node.ownerDocument) {
         node = Microformats.parser.preProcessMicroformat(in_node);
       }
-  
+
       for (let i in Microformats[microformat].properties) {
         object.__defineGetter__(i, Microformats.parser.getMicroformatPropertyGenerator(node, microformat, i, object));
       }
@@ -529,261 +547,118 @@ var Microformats = {
         }
       };
     },
-    getMicroformatProperty: function getMicroformatProperty(in_mfnode, mfname, propname) {
+    getPropertyInternal: function getPropertyInternal(propnode, parentnode, propobj, propname, mfnode) {
       var result;
+      if (propobj.subproperties) {
+        for (let subpropname in propobj.subproperties) {
+          var subpropnodes;
+          var subpropobj = propobj.subproperties[subpropname];
+          if (subpropobj.rel == true) {
+            subpropnodes = Microformats.getElementsByAttribute(propnode, "rel", subpropname);
+          } else {
+            subpropnodes = Microformats.getElementsByClassName(propnode, subpropname);
+          }
+          var resultArray = [];
+          var subresult;
+          for (let i = 0; i < subpropnodes.length; i++) {
+            subresult = Microformats.parser.getPropertyInternal(subpropnodes[i], propnode,
+                                                                subpropobj,
+                                                                subpropname, mfnode);
+            if (subresult) {
+              resultArray.push(subresult);
+              /* If we're not a plural property, don't bother getting more */
+              if (!subpropobj.plural) {
+                break;
+              }
+            }
+          }
+          if (resultArray.length == 0) {
+            subresult = Microformats.parser.getPropertyInternal(propnode, null,
+                                                                subpropobj,
+                                                                subpropname, mfnode);
+            if (subresult) {
+              resultArray.push(subresult);
+            }
+          }
+          if (resultArray.length > 0) {
+            result = result || {};
+            if (subpropobj.plural) {
+              result[subpropname] = resultArray;
+            } else {
+              result[subpropname] = resultArray[0];
+            }
+          }
+        }
+      }
+      if (!parentnode || (!result && propobj.subproperties)) {
+        if (propobj.virtual) {
+          if (propobj.virtualGetter) {
+            result = propobj.virtualGetter(mfnode || propnode);
+          } else {
+            result = Microformats.parser.datatypeHelper(propobj, propnode);
+          }
+        } else if (propobj.implied) {
+          result = Microformats.parser.datatypeHelper(propobj, propnode);
+        }
+      } else if (!result) {
+        result = Microformats.parser.datatypeHelper(propobj, propnode, parentnode);
+      }
+      return result;
+    },
+    getMicroformatProperty: function getMicroformatProperty(in_mfnode, mfname, propname) {
       var mfnode = in_mfnode;
+      /* If the node has not been preprocessed, the requested microformat */
+      /* is a class based microformat and the passed in node is not the */
+      /* entire document, preprocess it. Preprocessing the node involves */
+      /* creating a duplicate of the node and taking care of things like */
+      /* the include and header design patterns */
       if (!in_mfnode.origNode && Microformats[mfname].className && in_mfnode.ownerDocument) {
         mfnode = Microformats.parser.preProcessMicroformat(in_mfnode);
       }
-      var foundProps = false;
-      var tp;
+      /* propobj is the corresponding property object in the microformat */
+      var propobj;
+      /* If there is a corresponding property in the microformat, use it */
       if (Microformats[mfname].properties[propname]) {
-        tp = Microformats[mfname].properties[propname];
-      }
-  /* OK this is strange so let me explain it. If we didn't find the property
-     that was passed in, look for it among the subproperties. If you find it, 
-     AND the classname of the passed in mfnode matches the parent property,
-     use it. This allows us to pass in an hentry and get it's entry-title
-     for instance. This only works one level deep. */
-      if (!tp) {
-        for (let i in Microformats[mfname].properties) {
-          if (Microformats[mfname].properties[i].subproperties &&
-              Microformats[mfname].properties[i].subproperties[propname] &&
-              mfnode.getAttribute('class') &&
-              mfnode.getAttribute('class').match("(^|\\s)" + i + "(\\s|$)")) {
-            tp = Microformats[mfname].properties[i].subproperties[propname];
-            break;
-          }
-        }
-      }
-      var propnodes;
-      if (!tp) {
-        /* propname contains a . - dereference it */
-        if (propname.indexOf(".") != -1) {
-          var props = propname.split(".");
-          tp = Microformats[mfname].properties[props[0]];
-          if (tp && tp.rel == true) {
-            propnodes = Microformats.getElementsByAttribute(mfnode, "rel", props[0]);
-          } else {
-            propnodes = Microformats.getElementsByClassName(mfnode, props[0]);
-          }
-        }
+        propobj = Microformats[mfname].properties[propname];
       } else {
-        if (tp && tp.rel == true) {
-          propnodes = Microformats.getElementsByAttribute(mfnode, "rel", propname);
-        } else {
-          propnodes = Microformats.getElementsByClassName(mfnode, propname);
-        }
-      }
-  
-      var property;
-      if (!tp) {
-  //      alert("Bad property name - " + propname);
+        /* If we didn't get a property, bail */
         return;
       }
-  //    if (tp.value instanceof Array) {
-  //      property = [];
-  //    } else {
-  //      property = {};
-  //    }
-      var curprop = 0;
-      var validType, type;
-      for (let j = 0; j < propnodes.length; j++) {
-        foundProps = true;
-        var callPropertyGetter = true;
-        if (tp.subproperties) {
-          var subprop;
-          for (subprop in tp.subproperties) {
-            var foundSubProperties = false;
-            var subpropnodes = Microformats.getElementsByClassName(propnodes[j], subprop);
-            var cursubprop = 0;
-            for (let k = 0; k < subpropnodes.length; k++) {
-              if (tp.subproperties[subprop].datatype) {
-                result = Microformats.parser.datatypeHelper(tp.subproperties[subprop], subpropnodes[k], propnodes[j]);
-              } else {
-                result = Microformats.parser.defaultGetter(subpropnodes[k], propnodes[j]);
-                if ((tp.subproperties[subprop].implied) && (result)) {
-                  var temp = result;
-                  result = {};
-                  result[tp.subproperties[subprop].implied] = temp;
-                }
-              }
-              if (tp.subproperties[subprop].types) {
-                validType = false;
-                for (type in tp.subproperties[subprop].types) {
-                  if (result.toLowerCase() == tp.subproperties[subprop].types[type]) {
-                    validType = true;
-                    break;
-                  }
-                }
-                if (!validType) {
-                  continue;
-                }
-              }
-              if (result) {
-                foundSubProperties = true;
-                callPropertyGetter = false;
-                if (tp.plural) {
-                  if (!property) {
-                    property = [];
-                  }
-                  if (!property[curprop]) {
-                    property[curprop] = [];
-                  }
-                  if (tp.subproperties[subprop].plural) {
-                    if (!property[curprop][subprop]) {
-                      property[curprop][subprop] = [];
-                    }
-                    property[curprop][subprop][cursubprop] = result;
-                  } else {
-                    property[curprop][subprop] = result;
-                  }
-                } else {
-                  if (!property) {
-                    property = {};
-                  }
-                  if (tp.subproperties[subprop].plural) {
-                    if (!property[subprop]) {
-                      property[subprop] = [];
-                    }
-                    property[subprop][cursubprop] = result;
-                  } else {
-                    property[subprop] = result;
-                  }
-                }
-              }
-              
-              if (!tp.subproperties[subprop].plural) {
-                break;
-              }
-              cursubprop++;
-            }
-            if (!foundSubProperties) {
-              if (tp.subproperties[subprop].virtual) {
-                if (tp.subproperties[subprop].virtualGetter) {
-                  result = tp.subproperties[subprop].virtualGetter(propnodes[j], propnodes[j]);
-                } else {
-                  result = Microformats.parser.datatypeHelper(tp.subproperties[subprop], propnodes[j]);
-                }
-                if (result) {
-                  callPropertyGetter = false;
-                  if (tp.plural) {
-                    if (!property) {
-                      property = [];
-                    }
-                    if (!property[curprop]) {
-                      property[curprop] = [];
-                    }
-                    if (tp.subproperties[subprop].plural) {
-                      if (!property[curprop][subprop]) {
-                        property[curprop][subprop] = [];
-                      }
-                      property[curprop][subprop][cursubprop] = result;
-                    } else {
-                      property[curprop][subprop] = result;
-                    }
-                  } else {
-                    if (!property) {
-                      property = {};
-                    }
-                    if (tp.subproperties[subprop].plural) {
-                      if (!property[subprop]) {
-                        property[subprop] = [];
-                      }
-                      property[subprop][cursubprop] = result;
-                    } else {
-                      property[subprop] = result;
-                    }
-                  }
-                }
-              }
+      /* Query the correct set of nodes (rel or class) based on the setting */
+      /* in the property */
+      var propnodes;
+      if (propobj.rel == true) {
+        propnodes = Microformats.getElementsByAttribute(mfnode, "rel", propname);
+      } else {
+        propnodes = Microformats.getElementsByClassName(mfnode, propname);
+      }
+      if (propnodes.length > 0) {
+        var resultArray = [];
+        for (let i = 0; i < propnodes.length; i++) {
+          var subresult = Microformats.parser.getPropertyInternal(propnodes[i],
+                                                                  mfnode,
+                                                                  propobj,
+                                                                  propname);
+          if (subresult) {
+            resultArray.push(subresult);
+            /* If we're not a plural property, don't bother getting more */
+            if (!propobj.plural) {
+              return resultArray[0];
             }
           }
         }
-        /* If we didn't find any sub properties for the property, check
-           to see if the property has a getter. If it does, call it. This
-           is to handle cases where the property sets up the subproperty
-           (org->organization-name) */
-        if (callPropertyGetter) {
-          if (tp.datatype) {
-            result = Microformats.parser.datatypeHelper(tp, propnodes[j]);
-          } else {
-            result = Microformats.parser.defaultGetter(propnodes[j]);
-            if ((tp.implied) && (result)) {
-              var temp = result;
-              result = {};
-              result[tp.implied] = temp;
-            }
-          }
-          if (tp.types) {
-            validType = false;
-            for (type in tp.types) {
-              if (result.toLowerCase() == tp.types[type]) {
-                validType = true;
-                break;
-              }
-            }
-            if (!validType) {
-              continue;
-            }
-          }
-          if (result) {
-            if (tp.plural) {
-              if (!property) {
-                property = [];
-              }
-              property[curprop] = result;
-            } else {
-              if (!property) {
-                property = {};
-              }
-              property = result;
-            }
-          }
-          if (!tp.plural) {
-            break;
-          }
+        if (resultArray.length > 0) {
+          return resultArray;
         }
-        curprop++;
-      }
-      /* If we didn't find the property, check to see if it is a virtual
-         property and if so, call it's getter. */
-      if (!foundProps) {
-        if (tp.virtual) {
-          if (tp.virtualGetter) {
-            result = tp.virtualGetter(mfnode, mfnode);
-          } else {
-            result = Microformats.parser.datatypeHelper(tp, mfnode);
-          }
-          if (tp.cardinality == "plural") {
-            if (result) {
-              if (!property) {
-                property = [];
-              }
-              property[0] = result;
-            } else {
-              return;
-            }
-          } else {
-            if (result) {
-              property = result;
-            } else {
-              return;
-            }
-          }
-        } else {
-          return;
+      } else {
+        /* If we didn't find any class nodes, check to see if this property */
+        /* is virtual and if so, call getPropertyInternal again */
+        if (propobj.virtual) {
+          return Microformats.parser.getPropertyInternal(mfnode, null,
+                                                         propobj, propname);
         }
       }
-      /* propname contains a . - dereference it */
-      /* this needs to be way more robust */
-      /* check if property is an array and if so only return 1st element */
-      /* handle multuiple nestings */
-      if (propname.indexOf(".") != -1) {
-        var props = propname.split(".");
-        return property[props[1]];
-      }
-      return property;
+      return;
     },
     /**
      * Internal parser API used to resolve includes and headers. Includes are
@@ -1191,7 +1066,7 @@ hCard.prototype.toString = function() {
     var fns = Microformats.getElementsByClassName(this.node, "fn");
     if (fns.length === 0) {
       if (this.fn) {
-        if (this.org[0]["organization-name"] && (this.fn != this.org[0]["organization-name"])) {
+        if (this.org && this.org[0]["organization-name"] && (this.fn != this.org[0]["organization-name"])) {
           return this.fn + " (" + this.org[0]["organization-name"] + ")";
         }
       }
@@ -1217,7 +1092,8 @@ var hCard_definition = {
     "bday" : {
       datatype: "dateTime"
     },
-    "class" : {},
+    "class" : {
+    },
     "category" : {
       plural: true,
       datatype: "microformat",
@@ -1403,14 +1279,17 @@ hCalendar.prototype.toString = function() {
       }
     }
   }
-  return this.summary;
+  if (this.dtstart) {
+    return this.summary;
+  }
+  return;
 }
 
 var hCalendar_definition = {
   mfVersion: 0.8,
   mfObject: hCalendar,
   className: "vevent",
-  required: ["summary"],
+  required: ["summary", "dtstart"],
   properties: {
     "category" : {
       plural: true,
@@ -1434,6 +1313,11 @@ var hCalendar_definition = {
       datatype: "dateTime"
     },
     "duration" : {
+    },
+    "geo" : {
+      value: "geo",
+      datatype: "microformat",
+      microformat: "geo"
     },
     "location" : {
       datatype: "microformat",
