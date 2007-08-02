@@ -476,8 +476,30 @@ var export_icalendar = {
       var T = hcalendar.dtstart.indexOf("T");
       if (T > -1) {
         ics += "-TIME";
-        date = hcalendar.dtstart.substr(0, T);
-        time = hcalendar.dtstart.substr(T);
+        /* This is some seriously ugly code that accomodates the fact that */
+        /* ICS don't support TZ offsets, only UTC (Z) */
+        var tzpos = hcalendar.dtstart.lastIndexOf("+");
+        if (tzpos == -1) {
+          tzpos = hcalendar.dtstart.lastIndexOf("-");
+        }
+        if (tzpos > T) {
+          var js_date = Microformats.dateFromISO8601(hcalendar.dtstart.substr(0, tzpos-1));
+          var tzhours = parseInt(hcalendar.dtstart.substr(tzpos+1, 2));
+          var tzminutes = parseInt(hcalendar.dtstart.substr(tzpos+3, 2));
+          if (hcalendar.dtstart.charAt(tzpos) == "-") {
+            js_date.setHours(js_date.getHours()+tzhours);
+            js_date.setMinutes(js_date.getMinutes()+tzminutes);
+          } else if (hcalendar.dtstart.charAt(tzpos) == "+") {
+            js_date.setHours(js_date.getHours()-tzhours);
+            js_date.setMinutes(js_date.getMinutes()-tzminutes);
+          }
+          var dtstart = Microformats.iso8601FromDate(js_date, true);
+          date = dtstart.substr(0, T);
+          time = dtstart.substr(T) + "Z";
+        } else {
+          date = hcalendar.dtstart.substr(0, T);
+          time = hcalendar.dtstart.substr(T);
+        }
       } else {
         date = hcalendar.dtstart;
       }
@@ -492,8 +514,30 @@ var export_icalendar = {
       var T = hcalendar.dtend.indexOf("T");
       if (T > -1) {
         ics += "-TIME";
-        date = hcalendar.dtend.substr(0, T);
-        time = hcalendar.dtend.substr(T);
+        /* This is some seriously ugly code that accomodates the fact that */
+        /* ICS don't support TZ offsets, only UTC (Z) */
+        var tzpos = hcalendar.dtstart.lastIndexOf("+");
+        if (tzpos == -1) {
+          tzpos = hcalendar.dtstart.lastIndexOf("-");
+        }
+        if (tzpos > T) {
+          var js_date = Microformats.dateFromISO8601(hcalendar.dtend.substr(0, tzpos-1));
+          var tzhours = parseInt(hcalendar.dtend.substr(tzpos+1, 2));
+          var tzminutes = parseInt(hcalendar.dtend.substr(tzpos+3, 2));
+          if (hcalendar.dtend.charAt(tzpos) == "-") {
+            js_date.setHours(js_date.getHours()+tzhours);
+            js_date.setMinutes(js_date.getMinutes()+tzminutes);
+          } else if (hcalendar.dtend.charAt(tzpos) == "+") {
+            js_date.setHours(js_date.getHours()-tzhours);
+            js_date.setMinutes(js_date.getMinutes()-tzminutes);
+          }
+          var dtend = Microformats.iso8601FromDate(js_date, true);
+          date = dtend.substr(0, T);
+          time = dtend.substr(T) + "Z";
+        } else {
+          date = hcalendar.dtend.substr(0, T);
+          time = hcalendar.dtend.substr(T);
+        }
       } else {
         date = hcalendar.dtend;
         if (!Operator.upcomingBugFixed) {
