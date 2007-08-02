@@ -18,16 +18,20 @@ var export_vcard = {
 
       var fos = Components.classes["@mozilla.org/network/file-output-stream;1"].
                            createInstance(Components.interfaces.nsIFileOutputStream);
+      var cos = Components.classes["@mozilla.org/intl/converter-output-stream;1"].
+                           createInstance(Components.interfaces.nsIConverterOutputStream);
 
       fos.init(file, -1, -1, false);
-
+      cos.init(fos, null, 0, null);
+                           
       for (var j =0; j < semanticArrays["hCard"].length; j++) {
         var vcf = this.vCard(semanticArrays["hCard"][j]);
         if (vcf) {
-          fos.write(vcf, vcf.length);
+          cos.writeString(vcf);
         }
       }
 
+      cos.close();
       fos.close();                                                                  
 
       var f = Components.classes["@mozilla.org/file/local;1"].
@@ -58,9 +62,14 @@ var export_vcard = {
   
       var fos = Components.classes["@mozilla.org/network/file-output-stream;1"].
                            createInstance(Components.interfaces.nsIFileOutputStream);
-  
+                           
+      var cos = Components.classes["@mozilla.org/intl/converter-output-stream;1"].
+                           createInstance(Components.interfaces.nsIConverterOutputStream);
+
       fos.init(file, -1, -1, false);
-      fos.write(vcf, vcf.length);                                                   
+      cos.init(fos, null, 0, null);
+      cos.writeString(vcf);
+      cos.close();
       fos.close();                                                                  
   
       var f = Components.classes["@mozilla.org/file/local;1"].
@@ -287,9 +296,14 @@ var export_icalendar = {
   
       var fos = Components.classes["@mozilla.org/network/file-output-stream;1"].
                            createInstance(Components.interfaces.nsIFileOutputStream);
-  
+      var cos = Components.classes["@mozilla.org/intl/converter-output-stream;1"].
+                           createInstance(Components.interfaces.nsIConverterOutputStream);
+
       fos.init(file, -1, -1, false);
-      fos.write(ics, ics.length);                                                   
+      cos.init(fos, null, 0, null);
+
+      cos.writeString(ics);
+      cos.close();
       fos.close();                                                                  
   
       var f = Components.classes["@mozilla.org/file/local;1"].
@@ -320,8 +334,11 @@ var export_icalendar = {
 
       var fos = Components.classes["@mozilla.org/network/file-output-stream;1"].
                            createInstance(Components.interfaces.nsIFileOutputStream);
+      var cos = Components.classes["@mozilla.org/intl/converter-output-stream;1"].
+                           createInstance(Components.interfaces.nsIConverterOutputStream);
 
       fos.init(file, -1, -1, false);
+      cos.init(fos, null, 0, null);
 
       var ics, header, footer;
       for (var j =0; j < semanticArrays["hCalendar"].length > 0; j++) {
@@ -338,11 +355,12 @@ var export_icalendar = {
         if (semanticArrays["hCalendar"][j]['dtstart']) {
           ics = this.iCalendar(semanticArrays["hCalendar"][j], header, footer);
           if (ics) {
-            fos.write(ics, ics.length);
+            cos.writeString(ics);
           }
         }
       }
 
+      cos.close();
       fos.close();                                                                  
 
       var f = Components.classes["@mozilla.org/file/local;1"].
@@ -546,18 +564,25 @@ var export_kml = {
   
       var fos = Components.classes["@mozilla.org/network/file-output-stream;1"].
                            createInstance(Components.interfaces.nsIFileOutputStream);
-  
+      var cos = Components.classes["@mozilla.org/intl/converter-output-stream;1"].
+                           createInstance(Components.interfaces.nsIConverterOutputStream);
+
       fos.init(file, -1, -1, false);
-      fos.write(kmlHeader, kmlHeader.length);
+      cos.init(fos, null, 0, null);
+  
+      cos.writeString(kmlHeader);
+
       if (semanticObject.toString()) {
         var name = '  <name>' + semanticObject.toString() + '</name>';
-        fos.write(name, name.length);
+        cos.writeString(name);
       }
       var str = kmlPoint;
       var str = str.replace(/%latitude%/g, semanticObject.latitude);
       var str = str.replace(/%longitude%/g, semanticObject.longitude);
-      fos.write(str, str.length);
-      fos.write(kmlFooter, kmlFooter.length);
+      cos.writeString(str);
+      cos.writeString(kmlFooter);
+
+      cos.close();
       fos.close();                                                                  
   
       var f = Components.classes["@mozilla.org/file/local;1"].
