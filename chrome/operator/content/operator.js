@@ -527,7 +527,7 @@ var Operator = {
     }
     return semanticObjects;
   },
-  /* Build the menu for data formats (not actions( */
+  /* Build the menu for data formats (not actions) */
   buildMenu: function buildMenu(semanticObjects, semanticObjectType, semanticAction)
   {
     /* Sort and remove duplicates */
@@ -1233,6 +1233,7 @@ var Operator = {
                   continue;
                 }
               }
+              
               var required = null;
               if ((Operator.actions[k].scope.semantic[semanticType] != semanticType)  && (semanticType != "RDFa")) {
                 for (j=0; j < objectArray.length; j++) {
@@ -1250,7 +1251,7 @@ var Operator = {
                   }
                 }
               }
-              if (required) {
+              if ((required) || (Operator.actions[k].scope.semantic[semanticType] == semanticType)) {
                 if (!addsep) {
                   var sep = document.createElement("menuseparator");
                   menu.appendChild(sep);
