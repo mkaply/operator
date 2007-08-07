@@ -259,6 +259,9 @@ var Microformats = {
           }
         }
       }
+      if (!toreturn) {
+        toreturn = item.toString();
+      }
       return toreturn;
     }
     return dumpObject(microformatObject);
@@ -287,9 +290,10 @@ var Microformats = {
      * @param  parentnode The parent node of the property. If it is a subproperty,
      *                    this is the parent property node. If it is not, this is the
      *                    microformat node.
+     & @param  datatype   HTML/text - whether to use innerHTML or innerText - defaults to text
      * @return A string with the value of the property
      */
-    defaultGetter: function(propnode, parentnode) {
+    defaultGetter: function(propnode, parentnode, datatype) {
       if (((((propnode.localName.toLowerCase() == "abbr") || (propnode.localName.toLowerCase() == "html:abbr")) && !propnode.namespaceURI) || 
          ((propnode.localName.toLowerCase() == "abbr") && (propnode.namespaceURI == "http://www.w3.org/1999/xhtml"))) && (propnode.getAttribute("title"))) {
         return propnode.getAttribute("title");
@@ -302,21 +306,22 @@ var Microformats = {
         if (values.length > 0) {
           var value = "";
           for (let j=0;j<values.length;j++) {
-            value += Microformats.parser.defaultGetter(values[j], propnode);
+            value += Microformats.parser.defaultGetter(values[j], propnode, datatype);
           }
           return value;
         } else {
           var s;
-          if (propnode.innerText) {
-            s = propnode.innerText;
+          if (datatype == "HTML") {
+            s = propnode.innerHTML;
           } else {
-            s = propnode.textContent;
+            if (propnode.innerText) {
+              s = propnode.innerText;
+            } else {
+              s = propnode.textContent;
+            }
           }
           /* If we are processing a value node, don't remove whitespace */
           if (propnode.getAttribute('class') && !propnode.getAttribute('class').match("(^|\\s)" + "value" + "(\\s|$)")) {
-            /* Remove any HTML tags and their contents */
-            /* This used to be replacing with a space - I don't like that */
-            s	= s.replace(/\<.*?\>/gi, '');
             /* Remove new lines, carriage returns and tabs */
             s	= s.replace(/[\n\r\t]/gi, ' ');
             /* Replace any double spaces with single spaces */
@@ -345,7 +350,7 @@ var Microformats = {
      * @return A string with the normalized date.
      */
     dateTimeGetter: function(propnode, parentnode) {
-      var date = Microformats.parser.defaultGetter(propnode, parentnode);
+      var date = Microformats.parser.textGetter(propnode, parentnode);
       if (date) {
         return Microformats.parser.normalizeISO8601(date);
       }
@@ -370,7 +375,7 @@ var Microformats = {
       } else if (propnode.nodeName.toLowerCase() == "area") {
         return propnode.href;
       } else {
-        return Microformats.parser.defaultGetter(propnode, parentnode);
+        return Microformats.parser.textGetter(propnode, parentnode);
       }
     },
     /**
@@ -386,9 +391,9 @@ var Microformats = {
     telGetter: function(propnode, parentnode) {
       /* Special case - if this node is a value, use the parent node to get all the values */
       if (propnode.getAttribute('class').match("(^|\\s)" + "value" + "(\\s|$)")) {
-        return Microformats.parser.defaultGetter(parentnode, parentnode);
+        return Microformats.parser.textGetter(parentnode, parentnode);
       } else {
-        return Microformats.parser.defaultGetter(propnode, parentnode);
+        return Microformats.parser.textGetter(propnode, parentnode);
       }
     },
     /**
@@ -416,11 +421,29 @@ var Microformats = {
         /* If this case gets executed, per the value design pattern, the result */
         /* will be the EXACT email address with no extra parsing required */
         if (propnode.getAttribute('class').match("(^|\\s)" + "value" + "(\\s|$)")) {
-          return Microformats.parser.defaultGetter(parentnode, parentnode);
+          return Microformats.parser.textGetter(parentnode, parentnode);
         } else {
-          return Microformats.parser.defaultGetter(propnode, parentnode);
+          return Microformats.parser.textGetter(propnode, parentnode);
         }
       }
+    },
+    /**
+     * Used when a caller needs the text inside a particular DOM node.
+     *
+     * @param  propnode   The DOMNode to check
+     * @param  parentnode The parent node of the property. If it is a subproperty,
+     *                    this is the parent property node. If it is not, this is the
+     *                    microformat node.
+     * @return A string with just the text including all tags.
+     */
+    textGetter: function(propnode, parentnode) {
+      var s = Microformats.parser.defaultGetter(propnode, parentnode, "text");
+      /* Remove any HTML comments */
+//      s	= s.replace(/\<!--.*?\-->/gi, '');
+      /* Remove any HTML tags and their contents */
+      /* This used to be replacing with a space - I don't like that */
+//      s	= s.replace(/\<.*?\>/gi, '');
+      return s;
     },
     /**
      * Used when a caller needs the HTML inside a particular DOM node.
@@ -429,10 +452,26 @@ var Microformats = {
      * @param  parentnode The parent node of the property. If it is a subproperty,
      *                    this is the parent property node. If it is not, this is the
      *                    microformat node.
-     * @return A string with the HTML including all tags.
+     * @return An object with function to access the string and the HTML
+     *         Note that because this is an object, you can't do string functions
+     *         so i faked a couple string functions that might be useful.
      */
     HTMLGetter: function(propnode, parentnode) {
-      return Microformats.parser.defaultGetter(propnode, parentnode); 
+      return {
+        toString: function () {
+          return Microformats.parser.defaultGetter(propnode, parentnode, "text");
+        },
+        toHTML: function () {
+          return Microformats.parser.defaultGetter(propnode, parentnode, "HTML"); 
+          },
+          replace: function (a, b) {
+            return this.toString().replace(a,b);
+          },
+          match: function (a) {
+            return this.toString().match(a);
+          } 
+           
+      };
     },
     /**
      * Internal parser API used to determine which getter to call based on the
@@ -464,7 +503,7 @@ var Microformats = {
           result = Microformats.parser.HTMLGetter(node, parentnode);
           break;
         case "float":
-          result = parseFloat(Microformats.parser.defaultGetter(node, parentnode));
+          result = parseFloat(Microformats.parser.textGetter(node, parentnode));
           break;
         case "custom":
           result = prop.customGetter(node, parentnode);
@@ -483,7 +522,7 @@ var Microformats = {
             break;
           }
         default:
-          result = Microformats.parser.defaultGetter(node, parentnode);
+          result = Microformats.parser.textGetter(node, parentnode);
           if ((prop.implied) && (result)) {
             var temp = result;
             result = {};
@@ -736,6 +775,7 @@ var Microformats = {
       var dateArray = string.match(/(\d\d\d\d)(?:-?(\d\d)(?:-?(\d\d)(?:[T ](\d\d)(?::?(\d\d)(?::?(\d\d)(?:\.(\d+))?)?)?(?:([-+Z])(?:(\d\d)(?::?(\d\d))?)?)?)?)?)?/);
   
       var dateString;
+      var tzOffset = 0;
       if (!dateArray) {
         return;
       }
@@ -766,7 +806,7 @@ var Microformats = {
                   if (dateArray[9]) {
                     dateString += dateArray[9];
                     if (dateArray[10]) {
-                      dateString += ":" + dateArray[10];
+                      dateString += dateArray[10];
                     }
                   }
                 }
@@ -1274,7 +1314,7 @@ hCalendar.prototype.toString = function() {
     if (summaries.length === 0) {
       if (this.summary) {
         if (this.dtstart) {
-          return this.summary + "(" + Microformats.parser.dateFromISO8601(this.dtstart).toLocaleString() + ")";
+          return this.summary + "(" + Microformats.dateFromISO8601(this.dtstart).toLocaleString() + ")";
         }
       }
     }
@@ -1427,7 +1467,7 @@ var hCalendar_definition = {
         }
       },
       retrieve: function(mfnode, property) {
-        var value = Microformats.parser.defaultGetter(mfnode);
+        var value = Microformats.parser.textGetter(mfnode);
         var rrule;
         rrule = value.split(';');
         for (let i=0; i < rrule.length; i++) {
@@ -1451,7 +1491,7 @@ geo.prototype.toString = function() {
   if (this.latitude && this.longitude) {
     var s;
     if ((this.node.localName.toLowerCase() != "abbr") && (this.node.localName.toLowerCase() == "html:abbr")) {
-      s = Microformats.parser.defaultGetter(this.node);
+      s = Microformats.parser.textGetter(this.node);
     } else {
       s = this.node.textContent;
     }
@@ -1494,7 +1534,7 @@ var geo_definition = {
       virtual: true,
       /* This will only be called in the virtual case */
       virtualGetter: function(mfnode) {
-        var value = Microformats.parser.defaultGetter(mfnode);
+        var value = Microformats.parser.textGetter(mfnode);
         var latlong;
         if (value.match(';')) {
           latlong = value.split(';');
@@ -1509,7 +1549,7 @@ var geo_definition = {
       virtual: true,
       /* This will only be called in the virtual case */
       virtualGetter: function(mfnode) {
-        var value = Microformats.parser.defaultGetter(mfnode);
+        var value = Microformats.parser.textGetter(mfnode);
         var latlong;
         if (value.match(';')) {
           latlong = value.split(';');
