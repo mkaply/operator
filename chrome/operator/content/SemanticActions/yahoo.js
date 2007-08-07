@@ -190,7 +190,7 @@ var yahoo_calendar = {
       url += "title=" + Microformats.simpleEscape(hcalendar.summary);
       if (hcalendar.description) {
         url += "&";
-        var s = hcalendar.description;
+        var s = hcalendar.description.toHTML();
         s = s.replace(/\<br\s*\>/gi, '%0D%0A');
         s = s.replace(/\<\/p>/gi, '%0D%0A%0D%0A');
         s	= s.replace(/\<.*?\>/gi, '');

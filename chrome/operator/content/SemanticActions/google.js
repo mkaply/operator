@@ -177,14 +177,7 @@ var google_calendar = {
       }
       if (hcalendar.description) {
         url += "&";
-        var s = hcalendar.description;
-        /* This should be an HTML only path */
-        s	= s.replace(/[\n\r\t]/gi, ' ');
-        s = s.replace(/\<br\s*\>\s*/gi, '\r\n');
-        s = s.replace(/\<\/p>/gi, '\r\n\r\n');
-        s	= s.replace(/\<.*?\>/gi, '');
-        s	= s.replace(/^\s+/, '');
-        s	= s.replace(/[\n\r\t\s]+$/gi, '');
+        var s = hcalendar.description.toHTML();
         url += "details=" + encodeURIComponent(s.substr(0,1024));
         if (s.length > 1024) {
           url += "...";

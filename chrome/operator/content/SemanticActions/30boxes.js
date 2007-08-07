@@ -18,8 +18,8 @@ var thirty_boxes_calendar = {
       }
       if (hcalendar.description) {
         url += " (";
-        var s = hcalendar.description;
-        /* This should be an HTML only path */
+        var s = hcalendar.description.toHTML();
+        /* 30 boxes doesn't like raw HTML. convert some */
         s	= s.replace(/[\n\r\t]/gi, ' ');
         s = s.replace(/\<br\s*\>\s*/gi, '\r\n');
         s = s.replace(/\<\/p>/gi, '\r\n\r\n');
