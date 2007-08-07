@@ -82,6 +82,7 @@ var Operator = {
     /* Don't assume we have RDF */
     try {
       objScriptLoader.loadSubScript("chrome://operator/content/RDFa/rdfa.js");
+      objScriptLoader.loadSubScript("chrome://operator/content/eRDF/eRDF.js");
     } catch (ex) {}
     /* Load the builtin semantic actions */
     objScriptLoader.loadSubScript("chrome://operator/content/SemanticActions/SemanticActions.js");
@@ -175,11 +176,8 @@ var Operator = {
     for (i in Microformats) {
       Operator.dataformats.push(i);
     }
-    if (typeof(RDFa) != "undefined") {
-      Operator.dataformats.push("RDFa");
-    }
-    if (typeof(eRDF) != "undefined") {
-      Operator.dataformats.push("eRDF");
+    if ((typeof(RDFa) != "undefined") || (typeof(eRDF) != "undefined")) {
+      Operator.dataformats.push("RDF");
     }
 
     /* Setup the pref branch */
@@ -612,7 +610,7 @@ var Operator = {
         continue;
       }
       required = null;
-      if ((Operator.actions[k].scope.semantic[semanticObjectType] != semanticObjectType)  && (semanticObjectType != "RDFa")) {
+      if ((Operator.actions[k].scope.semantic[semanticObjectType] != semanticObjectType)  && (semanticObjectType != "RDF")) {
         var reqprop = Operator.actions[k].scope.semantic[semanticObjectType];
         if (reqprop.indexOf(".") != -1) {
           var props = reqprop.split(".");
@@ -631,7 +629,7 @@ var Operator = {
           continue;
         }
       }
-      if (semanticObjectType == "RDFa") {
+      if (semanticObjectType == "RDF") {
         if ((semanticObject.$model.getProperty(semanticObject.$subject, Operator.actions[k].scope.semantic[semanticObjectType]["property"])).length == 0) {
           continue;
         } else {
@@ -969,7 +967,7 @@ var Operator = {
     
     var error = {};
     /* XXX TODO Validate needs to be more generic? Or do we only call it in the microformat case? */
-    if (semanticObjectType != "RDFa") {
+    if (semanticObjectType != "RDF") {
       Microformats.parser.validate(semanticObject.node, semanticObjectType, error);
     }
 
@@ -995,13 +993,38 @@ var Operator = {
       }
     }
     try {
-      if(RDFa.hasRDFa(window.document)) {
-        if (!semanticArrays["RDFa"]) {
-          semanticArrays["RDFa"] = [];
+      if(RDFa.hasRDF(window.document)) {
+        if (!semanticArrays["RDF"]) {
+          semanticArrays["RDF"] = [];
         }
         /* Put model in the semanticArray (RDFa) */
-        semanticArrays["RDFa"].push(RDFa.parse(window.document));
+        semanticArrays["RDF"].push(RDFa.parse(window.document));
         
+      }
+      if(eRDF.hasRDF(window.document)) {
+        if (!semanticArrays["RDF"]) {
+          semanticArrays["RDF"] = [];
+        }
+        var eRDF_model = new RDFa.Model();
+        var eRDF_parser = eRDF.parser(window.document);
+        //smush on owl:sameAs property
+        eRDF_parser.do_owlSameAs();
+        var triples = eRDF_parser.get_triples();
+        for (var i=0; i < triples.length; i++)
+        {
+             var triple = triples[i];
+             if(triple.o_type=='literal')
+             {
+                 eRDF_model.addLiteral(triple.s,triple.p,triple.o);
+             }
+             else
+             {
+                 eRDF_model.addResource(triple.s,triple.p,triple.o);
+             }
+        };
+        if (triples.length >0) {
+          semanticArrays["RDF"].push(eRDF_model);
+        }
       }
     } catch (ex) {}
   },
@@ -1058,7 +1081,7 @@ var Operator = {
           for (j in Operator.actions[action].scope.semantic) {
             if (semanticArrays[j]) {
               var objectArray;
-              if (j == "RDFa") {
+              if (j == "RDF") {
                 /* Fill in objectArray by asking model for property */
                 /* We actually need to loop through all RDFa models */
                 /* and concatenate into one object array */
@@ -1077,7 +1100,7 @@ var Operator = {
                 /* Create a menu that corresponds to the action? */
                 /* Or postpone the creation until we are sure we have the first one? */
                 required = null;
-                if ((Operator.actions[action].scope.semantic[j] != j) && (j != "RDFa")) {
+                if ((Operator.actions[action].scope.semantic[j] != j) && (j != "RDF")) {
                   var reqprop = Operator.actions[action].scope.semantic[j]
                   if (reqprop.indexOf(".") != -1) {
                     var props = reqprop.split(".");
@@ -1200,14 +1223,14 @@ var Operator = {
            process it */
         if (semanticType && semanticArrays[semanticType] && semanticArrays[semanticType].length > 0) {
           var objectArray;
-          if (semanticType == "RDFa") {
+          if (semanticType == "RDF") {
             objectArray = semanticArrays[semanticType][0].getObjects();
           } else {
             objectArray = semanticArrays[semanticType];
           }
           menu = Operator.buildMenu(objectArray, semanticType);
           if (menu) {
-            if ((Operator.debug) && (semanticType == "RDFa")) {
+            if ((Operator.debug) && (semanticType == "RDF")) {
               var sep = document.createElement("menuseparator");
               menu.insertBefore(sep, menu.firstChild);
               tempMenu = document.createElement("menuitem");
@@ -1235,7 +1258,7 @@ var Operator = {
               }
               
               var required = null;
-              if ((Operator.actions[k].scope.semantic[semanticType] != semanticType)  && (semanticType != "RDFa")) {
+              if ((Operator.actions[k].scope.semantic[semanticType] != semanticType)  && (semanticType != "RDF")) {
                 for (j=0; j < objectArray.length; j++) {
                   var reqprop = Operator.actions[k].scope.semantic[semanticType];
                   if (reqprop.indexOf(".") != -1) {
