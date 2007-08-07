@@ -39,7 +39,7 @@ var RDFa = {
     var bnodes = {nodes:[], names:[], counter:[]};
     var model = new RDFa.Model();
 
-    if(!RDFa.hasRDFa(rootElement)) {
+    if(!RDFa.hasRDF(rootElement)) {
       return null;
     }
 
@@ -141,7 +141,7 @@ var RDFa = {
     }
     return model;
   },
-  hasRDFa: function(rootElement)
+  hasRDF: function(rootElement)
   {
     return (RDFa.evaluateXPath("count(//" + RDFa.xpathExpression + ")", rootElement).numberValue > 0);
   },
