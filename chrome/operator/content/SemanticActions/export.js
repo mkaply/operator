@@ -229,10 +229,12 @@ var export_vcard = {
     }
     if (hcard.tel) {
       for (i=0;i<hcard.tel.length;i++) {
-        vcf += "TEL";
+        vcf += "TEL;TYPE=";
         if (hcard.tel[i].type) {
-          vcf += ";TYPE=";
           vcf += hcard.tel[i].type.join(",");
+        } else {
+          /* Default to voice if there is no type */
+          vcf += "VOICE";
         }
         vcf += ":";
         vcf += hcard.tel[i].value;
