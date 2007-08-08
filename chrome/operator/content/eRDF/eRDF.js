@@ -58,14 +58,16 @@ eRDF.hasRDF = function(document)
 	}	
 }
 
-eRDF.parser = function(document){	
-	if(!document) document = window.document;
+eRDF.parser = function(document){
+	
+	if(!document) this.document = window.document;
+	else this.document = document;
 	
 	this.get_base = function(){
-		var bases= document.getElementsByTagName('base');
+		var bases= this.document.getElementsByTagName('base');
 		if(bases.length){
 			var base = bases[0].getAttribute('href');
-		}else{ var base = location.href}
+		}else{ var base = this.document.location.href}
 			
 			return base+"#";
 	};
@@ -86,12 +88,12 @@ eRDF.parser = function(document){
 	};
 
 	this._get_triple = function(el, resource, att){
-	
 	if(att=='class') var att_val =el.className;
 	else var att_val = el.getAttribute(att);
 		
 			if (att_val && att_val.match(/-|\./))
 			{
+				
 				var att_names = att_val.split(' ');
 				var att_len = att_names.length
 				for (var i=0; i < att_len; i++)
@@ -111,9 +113,11 @@ eRDF.parser = function(document){
 								if(el_id) var s = this.get_base()+el.getAttribute('id');
 								else if(el_href) var s = el.href;
 								if (el_id || el_href) this.triples.push({"s":s,"p": this.rdf_type,"p_label":'rdf-type', "o": rdftype,"o_label":att_name,"o_type":"uri" });
+								break;
 							}
 						}
-						else if(this.get_predicate(att_name))
+						
+						if(this.get_predicate(att_name))
 						{
 							var o = this.get_object(el, att)	;
 							var p = this.get_predicate(att_name) ;
