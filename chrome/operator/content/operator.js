@@ -636,26 +636,25 @@ var Operator = {
           semanticObject.setDefaultNS(Operator.actions[k].scope.semantic[semanticObjectType]["defaultNS"]);
         }
       }
+      var description;
+      if (Operator.useShortDescriptions && Operator.actions[k].shortDescription) {
+        description = Operator.actions[k].shortDescription;
+      } else {
+        description = Operator.actions[k].description;
+      }
+      if (!description) {
+        description = k;
+      }
       if ((required instanceof Array) && (required.length > 1)) {
-        if (!popup) {
-          menupopup = document.createElement("menupopup");
-          menuitem = document.createElement("menu");
-        }
         var tempMenu;
         for (m=0; m < required.length; m++) {
           tempMenu = document.createElement("menuitem");
           if (Operator.actions[k].getActionName) {
-            tempMenu.label = "";
-            if (popup) {
-              if (Operator.useShortDescriptions && Operator.actions[k].shortDescription) {
-                tempMenu.label = Operator.actions[k].shortDescription + " (";
-              } else {
-                tempMenu.label = Operator.actions[k].description + " (";
+            tempMenu.label = Operator.actions[k].getActionName(semanticObject, semanticObjectType, m);
+            if (tempMenu.label) {
+              if (popup) {
+                tempMenu.label = description + " (" + tempMenu.label + ")";
               }
-            }
-            tempMenu.label += Operator.actions[k].getActionName(semanticObject, semanticObjectType, m);
-            if (popup) {
-              tempMenu.label += ")";
             }
           } else {
             tempMenu.label = semanticObject.toString();
@@ -671,30 +670,40 @@ var Operator = {
             if (popup) {
               submenu.appendChild(tempMenu);
             } else {
+              if (!menupopup) {
+                menupopup = document.createElement("menupopup");
+              }
               menupopup.appendChild(tempMenu);
             }
           }
         }
-        if (!popup) {
+        if ((!popup) && (menupopup)) {
+          menuitem = document.createElement("menu");
+          menuitem.label = description;
+          menuitem.setAttribute("label", menuitem.label);
           menuitem.appendChild(menupopup);
         }
       } else {
-        menuitem = document.createElement("menuitem");
-        menuitem.store_oncommand = this.actionCallbackGenerator(semanticObject, semanticObjectType, k);
-        menuitem.addEventListener("command", menuitem.store_oncommand, true);
-        menuitem.store_onclick = this.clickCallbackGenerator(semanticObject, semanticObjectType, k);
-        menuitem.addEventListener("click", menuitem.store_onclick, true);
+        var label;
+        if (Operator.actions[k].getActionName) {
+          label = Operator.actions[k].getActionName(semanticObject, semanticObjectType, m);
+          if (label) {
+            label = description + " (" + label + ")"; 
+          }
+        } else {
+          label = description;
+        }
+        if (label) {
+          menuitem = document.createElement("menuitem");
+          menuitem.store_oncommand = this.actionCallbackGenerator(semanticObject, semanticObjectType, k);
+          menuitem.addEventListener("command", menuitem.store_oncommand, true);
+          menuitem.store_onclick = this.clickCallbackGenerator(semanticObject, semanticObjectType, k);
+          menuitem.addEventListener("click", menuitem.store_onclick, true);
+          menuitem.label = label;
+          menuitem.setAttribute("label", menuitem.label);
+        }
       }
       if (menuitem) {
-        if (Operator.useShortDescriptions && Operator.actions[k].shortDescription) {
-          menuitem.label = Operator.actions[k].shortDescription;
-        } else {
-          menuitem.label = Operator.actions[k].description;
-        }
-        if (!menupopup && Operator.actions[k].getActionName) {
-          menuitem.label += " (" + Operator.actions[k].getActionName(semanticObject, semanticObjectType, m) + ")";
-        }
-        menuitem.setAttribute("label", menuitem.label);
         submenu.appendChild(menuitem);
       }
       addedAction = true;
@@ -1135,23 +1144,28 @@ var Operator = {
                         tempMenu.store_onDOMMenuItemActive = Operator.highlightCallbackGenerator(objectArray[k].node);
                         tempMenu.addEventListener("DOMMenuItemActive", tempMenu.store_onDOMMenuItemActive, true);
                         menu.appendChild(tempMenu);
+                        addedAction = true;
                       }
                     }
                     tempMenu = null;
                   } else {
-                    tempMenu = document.createElement("menuitem");
+                    var label;
                     if (Operator.actions[action].getActionName) {
-                        tempMenu.label = Operator.actions[action].getActionName(objectArray[k], j);
+                      label = Operator.actions[action].getActionName(objectArray[k], j);
                     } else {
-                      tempMenu.label = objectArray[k].toString();
+                      label = objectArray[k].toString();
                     }
-                    tempMenu.setAttribute("label", tempMenu.label);
-                    tempMenu.store_oncommand = Operator.actionCallbackGenerator(objectArray[k], j, action);
-                    tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
-                    tempMenu.store_onclick = Operator.clickCallbackGenerator(objectArray[k], j, action);
-                    tempMenu.addEventListener("click", tempMenu.store_onclick, true);
+                    if (label) {
+                      tempMenu = document.createElement("menuitem");
+                      tempMenu.label = label;
+                      tempMenu.setAttribute("label", tempMenu.label);
+                      tempMenu.store_oncommand = Operator.actionCallbackGenerator(objectArray[k], j, action);
+                      tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
+                      tempMenu.store_onclick = Operator.clickCallbackGenerator(objectArray[k], j, action);
+                      tempMenu.addEventListener("click", tempMenu.store_onclick, true);
+                      addedAction = true;
+                    }
                   }
-                  addedAction = true;
                 } else if (Operator.debug) {
                   tempMenu = document.createElement("menuitem");
                   /* L10N */
