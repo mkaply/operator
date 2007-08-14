@@ -44,6 +44,7 @@
         <checkbox id="debug" label="&debug.label;"/>
         <checkbox id="statusbar" label="&statusbar.label;"/>
         <checkbox id="urlbar" label="&urlbar.label;"/>
+        <checkbox id="autohide" label="&autohide.label;"/>
         <checkbox id="highlightMicroformats" label="&highlightMicroformats.label;"/>
         <checkbox id="removeDuplicates" label="&removeDuplicates.label;"/>
         <checkbox id="observeDOMAttrModified" label="&observeDOMAttrModified.label;"/>
