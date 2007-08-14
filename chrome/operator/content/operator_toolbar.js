@@ -204,19 +204,17 @@ var Operator_Toolbar = {
       }
     }
   },
-  isHidden: function()
-  {
-    if (document.getElementById("operator-toolbar")) {
-      return false;
-    }
-    return true;
-  },
   isVisible: function()
   {
-    if (document.getElementById("operator-toolbar")) {
-      return true;
-    }
-    return false;
+    return !document.getElementById("operator-toolbar").collapsed;
+  },
+  hide: function()
+  {
+    document.getElementById("operator-toolbar").collapsed = true;
+  },
+  show: function()
+  {
+    document.getElementById("operator-toolbar").collapsed = false;
   }
 };
 
