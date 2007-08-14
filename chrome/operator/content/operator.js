@@ -22,6 +22,8 @@ var Operator = {
   statusbar: false,
   /* Is there an icon on the URL bar */
   urlbar: false,
+  /* Should we autohide the toolbar */
+  autohide: false,
   /* Should we use short descriptions for the actions */
   useShortDescriptions: false,
   /* This is set to true by options before setting all other prefs */
@@ -256,6 +258,9 @@ var Operator = {
       this.urlbar = this.prefBranch.getBoolPref("urlbar");
     } catch (ex) {}
     try {
+      this.autohide = this.prefBranch.getBoolPref("autohide");
+    } catch (ex) {}
+    try {
       this.useShortDescriptions = this.prefBranch.getBoolPref("useShortDescriptions");
     } catch (ex) {}
 
@@ -266,7 +271,7 @@ var Operator = {
     /* Attach listeners for page load */ 
     window.addEventListener("load", function(e)   { Operator.startup(); }, false);
     window.addEventListener("unload", function(e) { Operator.shutdown(); }, false);
-//    window.addEventListener("operator-sidebar-load", Operator_Sidebar.processSemanticData, false, true);
+    window.addEventListener("operator-sidebar-load", function(e) { Operator_Sidebar.populate(); }, false);
     
   },
   /* This function handles the window startup piece, initializing the UI and preferences */
@@ -286,8 +291,9 @@ var Operator = {
     /* A user might choose to display the toolbar at anytime and there is no notification */
     Operator_Toolbar.create();
     /* Event listeners for showing and hiding page content */
-    getBrowser().addEventListener("pageshow", function(e) { Operator.onPageShow(e); }, true);
-    getBrowser().addEventListener("pagehide", function(e) { Operator.onPageHide(e); }, true);
+    window.document.getElementById("content").addEventListener("pageshow", function(e) { Operator.onPageShow(e); }, true);
+    window.document.getElementById("content").addEventListener("pagehide", function(e) { Operator.onPageHide(e); }, true);
+    window.document.getElementById("content").addEventListener("DOMContentLoaded", function(e) { Operator.onPageShow(e); }, true);
     /* Event listener for when you switch tabs */
     getBrowser().tabContainer.addEventListener("select", function(e) { Operator.onTabChanged(e); }, true);
     /* Event listener so we can modify the page context menu */
@@ -302,6 +308,7 @@ var Operator = {
     /* Remove page show and hide observers */
     getBrowser().removeEventListener("pageshow", function(e) { Operator.onPageShow(e); }, true);
     getBrowser().removeEventListener("pagehide", function(e) { Operator.onPageHide(e); }, true);
+    getBrowser().removeEventListener("DOMContentLoaded", function(e) { Operator.onPageShow(e); }, true);
     /* Remove listener for switching tabs */
     getBrowser().tabContainer.removeEventListener("select", function(e) { Operator.onTabChanged(e); }, true);
     /* Remove page context menu listener */
@@ -356,6 +363,9 @@ var Operator = {
     }
     if (data == "urlbar") {
       this.urlbar = this.prefBranch.getBoolPref("urlbar");
+    }
+    if (data == "autohide") {
+      this.autohide = this.prefBranch.getBoolPref("autohide");
     }
     if (data == "statusbar") {
       this.statusbar = this.prefBranch.getBoolPref("statusbar");
@@ -821,6 +831,10 @@ var Operator = {
       window.clearTimeout(Operator.timerID);
     }
     Operator.timerID = window.setTimeout(Operator.processSemanticData, 100);
+    try {
+      FirebugContext.window.console.log("processSemanticDataDelayed");
+    } catch (ex) {
+    }
   },
   recursiveAddListeners: function recursiveAddListeners(window)
   {
@@ -845,53 +859,31 @@ var Operator = {
  	  window.document.body.appendChild(icon);
 */
   },
-  recursiveRemoveListeners: function recursiveRemoveListeners(window)
-  {
-    if (window && window.frames.length > 0) {
-      for (var i=0; i < window.frames.length; i++) {
-        Operator.recursiveRemoveListeners(window.frames[i]);
-      }
-    }
-    if (window) {
-      window.document.removeEventListener("mouseover", Operator.mouseOver, false);
-      window.document.removeEventListener("DOMNodeInserted", Operator.processSemanticDataDelayed, false);
-      window.document.removeEventListener("DOMNodeRemoved", Operator.processSemanticDataDelayed, false);
-      if (Operator.observeDOMAttrModified) {
-        window.document.removeEventListener("DOMAttrModified", Operator.processSemanticDataDelayed, false);
-      }
-    }
-  },
-  onPageShow: function onPageShow(event) 
-  {
-    {
-      /* This is required so that things work properly when pages are opened */
-      /* in background tabs (OR NOT - it broke nested page load notifications) */
-//      if (content && (event.originalTarget == content.document)) {
-        Operator.processSemanticDataDelayed();
-        Operator.recursiveAddListeners(content);
-//      }
-    }
-  },
-  
+  pageShowTimerID: null,
+  pageShowDOMContentLoaded: null,
   onPageHide: function onPageHide(event) 
   {
-    {
-      /* This is required so that things work properly when pages are opened */
-      /* in background tabs */
-      if (content && (event.originalTarget == content.document)) {
-        /* These are required in case we go to a page that doesn't invoke our */
-        /* onPageShow, like a non HTML document or an error page */
-        Operator_Toolbar.disable();
-        Operator_Toolbar.clearPopups();
-        Operator_Statusbar.disable();
-        Operator_ToolbarButton.disable();
-        document.getElementById("operator-urlbar-icon").removeAttribute("microformats");
-      }
-      Operator.recursiveRemoveListeners(content);
-    }
+    /* Reset our stored event target on page hide */
+    Operator.pageShowDOMContentLoaded = null;
   },
-
-
+  onPageShow: function onPageShowDelayed(event) 
+  {
+    /* If this came because of a DOMContentLoaded, note that */
+    if (event.type == "DOMContentLoaded") {
+      Operator.pageShowDOMContentLoaded = event.target;
+    }
+    if (event.type == "pageshow") {
+      if (Operator.pageShowDOMContentLoaded == event.target) {
+        /* we already processed it */
+        return;
+      }
+    }
+    if (Operator.pageShowTimerID) {
+      window.clearTimeout(Operator.pageShowTimerID);
+    }
+    Operator.processSemanticDataDelayed();
+    Operator.recursiveAddListeners(content);
+  },
   onTabChanged: function onTabChanged(event) 
   {
     Operator.processSemanticData();
@@ -1041,18 +1033,23 @@ var Operator = {
      looking for semantic data and creates the menus and buttons */
   processSemanticData: function processSemanticData()
   {
+//    FirebugContext.window.console.log("processSemanticData"); 
     /* Reset the timer we're using to batch processing */
     Operator.timerID = null;
 
     /* Clear all the existing data and disable everything */
     Operator_Toolbar.clearPopups();
     Operator_Toolbar.disable();
+    if (Operator.autohide) {
+      Operator_Toolbar.hide();
+    }
     Operator_Statusbar.clearPopup();
     Operator_Statusbar.disable();
     Operator_ToolbarButton.clearPopup();
     Operator_ToolbarButton.disable();
     Operator_URLbarButton.clearPopup();
     Operator_URLbarButton.disable();
+    Operator_Sidebar.clear();
 
     /* Get all semantic data from the web page */
     var semanticArrays = [];
@@ -1347,19 +1344,23 @@ var Operator = {
       /* Add the menu to the various buttons */
       /* If clonePopup is set, then the menu is cloned before it is added */
       /* This is necessary since one menu can't be used for multiple things */
-      if (!Operator_ToolbarButton.isHidden()) {
+      if (Operator_ToolbarButton.isVisible()) {
         Operator_ToolbarButton.enable();
         clonePopup = clonePopup | Operator_ToolbarButton.addPopup(popup);
-      }
-      if (!Operator_Statusbar.isHidden()) {
-        Operator_Statusbar.enable();
-        clonePopup = clonePopup | Operator_Statusbar.addPopup(popup, clonePopup);
       }
       if (Operator.urlbar) {
         clonePopup = clonePopup | Operator_URLbarButton.addPopup(popup, clonePopup);
       }
+      if (Operator_Statusbar.isVisible()) {
+        Operator_Statusbar.enable();
+        clonePopup = clonePopup | Operator_Statusbar.addPopup(popup, clonePopup);
+      }
+      if (Operator.autohide) {
+        Operator_Toolbar.show();
+      }
       Operator_Toolbar.enable();
     }
+    Operator_Sidebar.populate(semanticArrays);
   },
   simpleEscape: function simpleEscape(s)
   {
