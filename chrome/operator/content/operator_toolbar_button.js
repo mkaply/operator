@@ -3,7 +3,7 @@
 var Operator_ToolbarButton = {
   addPopup: function(menu, clone)
   {
-    if (!this.isHidden()) {
+    if (this.isVisible()) {
       if (menu) {
         /* Position popup? */
 /*            popup.setAttribute("position", "before_start"); */
@@ -40,7 +40,7 @@ var Operator_ToolbarButton = {
   },
   clearPopup: function()
   {
-    if (!this.isHidden()) {
+    if (this.isVisible()) {
       var toolbar = document.getElementById("operator-toolbar-button");
       while (toolbar.firstChild) {
         toolbar.removeChild(toolbar.firstChild);
@@ -49,21 +49,21 @@ var Operator_ToolbarButton = {
   },
   disable: function()
   {
-    if (!this.isHidden()) {
+    if (this.isVisible()) {
       document.getElementById("operator-toolbar-button").setAttribute("disabled", "true");
     }
   },
   enable: function()
   {
-    if (!this.isHidden()) {
+    if (this.isVisible()) {
       document.getElementById("operator-toolbar-button").setAttribute("disabled", "false");
     }
   },
-  isHidden: function()
+  isVisible: function()
   {
     if (document.getElementById("operator-toolbar-button")) {
-      return false;
+      return true;
     }
-    return true;
+    return false;
   }
 };
