@@ -14,5 +14,6 @@
 <!ENTITY  debug.label                      "Debug mode">
 <!ENTITY  statusbar.label                  "Display icon in status bar">
 <!ENTITY  urlbar.label                     "Display icon on location bar">
+<!ENTITY  autohide.label                   "Auto-hide the toolbar">
 <!ENTITY  userscripts.label                "User Scripts">
 <!ENTITY  observeDOMAttrModified.label     "Observe all page changes (will impact performance)">
