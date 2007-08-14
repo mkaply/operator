@@ -6,6 +6,30 @@
         onload="var event = window.content.document.createEvent('Event');event.initEvent('operator-sidebar-load', true, true);window.content.document.dispatchEvent(event);"
         onunload=""
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-
+  <script>
+  <![CDATA[
+    function popup(event) {
+      while (event.target.firstChild) {
+        event.target.removeChild(event.target.firstChild);
+      }
+      var tree = document.getElementById('operator-sidebar-tree');
+      if (tree.view.getItemAtIndex(tree.currentIndex).store_onpopupshowing) {
+        tree.view.getItemAtIndex(tree.currentIndex).store_onpopupshowing(event);
+      } else {
+        return false;
+      }
+    }
+  
+  ]]>
+  </script>
+  <popupset>
+    <popup id="clipmenu" onpopupshowing="return popup(event);">
+    </popup>
+  </popupset>
+<tree hidecolumnpicker="true" flex="1" id="operator-sidebar-tree" context="clipmenu">
+  <treecols>
+      <treecol hideheader="true" id="title" primary="true" flex="11"/>
+  </treecols>
+</tree>
 </window>
 
