@@ -3,7 +3,7 @@
 var Operator_URLbarButton = {
   addPopup: function(menu, clone)
   {
-    if (!this.isHidden()) {
+    if (this.isVisible()) {
       if (menu) {
         /* Position popup? */
 /*            popup.setAttribute("position", "before_start"); */
@@ -40,7 +40,7 @@ var Operator_URLbarButton = {
   },
   clearPopup: function()
   {
-    if (!this.isHidden()) {
+    if (this.isVisible()) {
       var toolbar = document.getElementById("operator-urlbar-icon");
       while (toolbar.firstChild) {
         toolbar.removeChild(toolbar.firstChild);
@@ -55,11 +55,11 @@ var Operator_URLbarButton = {
   {
     document.getElementById("operator-urlbar-icon").setAttribute("microformats", "true");
   },
-  isHidden: function()
+  isVisible: function()
   {
     if (document.getElementById("operator-urlbar-icon")) {
-      return false;
+      return true;
     }
-    return true;
+    return false;
   }
 };

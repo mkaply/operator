@@ -1,7 +1,7 @@
 var Operator_Statusbar = {
   addPopup: function(menu, clone)
   {
-    if (!this.isHidden()) {
+    if (this.isVisible()) {
       if (menu) {
         /* Position popup? */
 /*            popup.setAttribute("position", "before_start"); */
@@ -38,7 +38,7 @@ var Operator_Statusbar = {
   },
   clearPopup: function()
   {
-    if (!this.isHidden()) {
+    if (this.isVisible()) {
       var statusbar = document.getElementById("operator-statusbarpanel");
       while (statusbar.firstChild) {
         statusbar.removeChild(statusbar.firstChild);
@@ -48,13 +48,13 @@ var Operator_Statusbar = {
   },
   disable: function()
   {
-    if (!this.isHidden()) {
+    if (this.isVisible()) {
       document.getElementById("operator-statusbarpanel").setAttribute("disabled", "true");
     }
   },
   enable: function()
   {
-    if (!this.isHidden()) {
+    if (this.isVisible()) {
       document.getElementById("operator-statusbarpanel").setAttribute("disabled", "false");
     }
   },
@@ -67,9 +67,9 @@ var Operator_Statusbar = {
     document.getElementById("operator-statusbarpanel").hidden = false;
     this.clearPopup();
   },
-  isHidden: function()
+  isVisible: function()
   {
-    return document.getElementById("operator-statusbarpanel").hidden;
+    return !document.getElementById("operator-statusbarpanel").hidden;
   }
 };
 
