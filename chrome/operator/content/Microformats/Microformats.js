@@ -301,6 +301,10 @@ var Microformats = {
         return propnode.getAttribute("alt");
       } else if ((propnode.nodeName.toLowerCase() == "area") && (propnode.getAttribute("alt"))) {
         return propnode.getAttribute("alt");
+      } else if ((propnode.nodeName.toLowerCase() == "textarea") ||
+                 (propnode.nodeName.toLowerCase() == "select") ||
+                 (propnode.nodeName.toLowerCase() == "input")) {
+        return propnode.value;
       } else {
         var values = Microformats.getElementsByClassName(propnode, "value");
         if (values.length > 0) {
@@ -579,11 +583,9 @@ var Microformats = {
     {
       return function() {
         var result = Microformats.parser.getMicroformatProperty(node, name, property);
-        delete microformat[property];
-        if (result) {
-          microformat[property] = result; 
-          return result;
-        }
+//        delete microformat[property];
+//        microformat[property] = result; 
+        return result;
       };
     },
     getPropertyInternal: function getPropertyInternal(propnode, parentnode, propobj, propname, mfnode) {
