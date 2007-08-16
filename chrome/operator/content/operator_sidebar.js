@@ -51,15 +51,22 @@ var Operator_Sidebar = {
         }
         var sub_treechildren = doc.createElement("treechildren");
         var addRow = false;
-        for (let j=0; j< semanticArrays[Operator.dataformats[i]].length; j++) {
-          var label = semanticArrays[Operator.dataformats[i]][j].toString();
+        var semanticObjects;
+        if ((Microformats[Operator.dataformats[i]]) && Microformats[Operator.dataformats[i]].sort) {
+          semanticObjects = Operator.sortUnique(semanticArrays[Operator.dataformats[i]], true, Operator.removeDuplicates);
+        } else {
+          semanticObjects = Operator.sortUnique(semanticArrays[Operator.dataformats[i]], false, Operator.removeDuplicates);
+        }
+
+        for (let j=0; j< semanticObjects.length; j++) {
+          var label = semanticObjects[j].toString();
           if (label) {
             addRow = true;
             var sub_treeitem = doc.createElement("treeitem");
-            sub_treeitem.store_onpopupshowing = Operator.popupShowing(semanticArrays[Operator.dataformats[i]][j], Operator.dataformats[i]);
+            sub_treeitem.store_onpopupshowing = Operator.popupShowing(semanticObjects[j], Operator.dataformats[i]);
             var sub_treerow = doc.createElement("treerow");
             var sub_treecell = doc.createElement("treecell");
-            sub_treecell.setAttribute("label", semanticArrays[Operator.dataformats[i]][j].toString());
+            sub_treecell.setAttribute("label", semanticObjects[j].toString());
             sub_treerow.appendChild(sub_treecell);
             sub_treeitem.appendChild(sub_treerow);
             sub_treechildren.appendChild(sub_treeitem);
