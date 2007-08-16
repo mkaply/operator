@@ -2,7 +2,7 @@
 eRDF parser
 
 author: Keith Alexander (http://semwebdev.keithalexander.co.uk/blog/)
-last-modified: 7th August 2007
+last-modified: 8th August 2007
 license: GPL
 usage:
 	if(eRDF.hasRDF(document))
@@ -38,12 +38,12 @@ eRDF.hasRDF = function(document)
 		
 	*/
 	
-	var profile = document.getElementsByTagName('head')[0].getAttribute('profile');
+	profile = document.getElementsByTagName('head')[0].getAttribute('profile');
 	//decide whether to parse as eRDF or not	
 	if(!profile || profile.match('http://purl.org/NET/erdf/profile(/)*( |$)') || profile.match('http://dublincore.org/documents/dcq-html(/)*( |$)')  )
 	{
 		if(!document) document = window.document;
-		var links = document.getElementsByTagName('link');
+		links = document.getElementsByTagName('link');
 		for (var i=0; i < links.length; i++) {
 			if(links[i].rel.substring(0,7) == 'schema.')
 			{
@@ -72,7 +72,7 @@ eRDF.parser = function(document){
 			return base+"#";
 	};
 	this._get_triples = function(el){
-		var resource = this.get_base()+this._last_el_with_id(el);
+		var resource = this._get_subject_of_el(el);
 		var pred_atts = ['class','rev','rel'];
 		if (el.tagName.toLowerCase() == 'meta')  pred_atts = ['name'];
 
@@ -115,6 +115,10 @@ eRDF.parser = function(document){
 								if (el_id || el_href) this.triples.push({"s":s,"p": this.rdf_type,"p_label":'rdf-type', "o": rdftype,"o_label":att_name,"o_type":"uri" });
 								break;
 							}
+							else
+							{
+								resource = this._get_subject_of_el(el.parentNode);
+							}
 						}
 						
 						if(this.get_predicate(att_name))
@@ -125,9 +129,10 @@ eRDF.parser = function(document){
 							// rdfs:label images
 							if(el.getAttribute('src') && el.getAttribute('title')) this.triples.push({"s":el.src, "p": this.rdfs_label,"p_label":'rdfs-label', "o": el.getAttribute('title'),"o_type":"literal" });
 							// rdfs:label anchors
-							if(el.getAttribute('href') && (att=='rel'||att=='rev') && this.get_object(el, 'label') ) this.triples.push({"s":el.href,"p": this.rdfs_label,"p_label":'rdfs-label', "o": this.get_object(el, 'label').value, "o_type":"literal" });
-							//the triple, reversed for 'rev'
+							if(el.getAttribute('href') && (att=='rel'||att=='rev') && this.get_object(el, 'label').value) this.triples.push({"s":el.href,"p": this.rdfs_label,"p_label":'rdfs-label', "o": this.get_object(el, 'label').value, "o_type":"literal" });
+							// class rel and rev
 							if(att!='rev') this.triples.push({"s":resource,"p": p,"p_label":att_name, "o": o.value,"o_type":o.type });
+							//the triple, reversed for 'rev'
 							else this.triples.push({"s":o.value,"p": p,"p_label":att_name, "o": resource, "o_type":"uri" });
 						}
 					}
@@ -136,10 +141,14 @@ eRDF.parser = function(document){
 	}
 	
 
-	this._last_el_with_id = function(el){
+	this._get_subject_of_el = function(el){
 
-			if(el.getAttribute('id')) return el.id;
-			else if(el.parentNode.nodeType==1) return this._last_el_with_id(el.parentNode);
+			if(el.getAttribute('id')) return this.get_base()+el.id;
+			else if(el.parentNode.nodeType==1)
+			{
+				if(el.parentNode.getAttribute('href')) return el.parentNode.href;
+				else return this._get_subject_of_el(el.parentNode);
+			} 			
 			else return '';
 
 	};
@@ -187,21 +196,13 @@ eRDF.parser = function(document){
 
 	this.check_type = function(class_att, classType)
 	{
-		if(class_att.match('-'))
+		if(class_att.match(/-?([a-z]+)[\.|-](.+)/))
 		{
-			var found = false;
-			for(var prefix in this.schemas)
-			{
-				var regex = (classType=='rdftype')? '-'+prefix+'-' : prefix+'-';
-				if(class_att.match(regex))
-				{
-
-					var regex_term = prefix+'-(.+)';
-					
-					found =  this.schemas[prefix]+class_att.match(regex_term)[1];
-				}
-			};
-			return found;
+			var bits = class_att.match(/-?([a-z]+)[\.|-](.+)/);
+			var prefix = bits[1];
+			var term = bits[2];
+			if(this.schemas[prefix] && ( classType!='rdftype' || class_att[0]=='-')  ) return this.schemas[prefix]+term;
+			else return false;
 		}
 		else return false;
 	}
