@@ -91,7 +91,7 @@ var Microformats = {
       }
     }
 
-    /* Get the microfor`mat nodes for the document */
+    /* Get the microformat nodes for the document */
     var microformatNodes = [];
     if (Microformats[name].className) {
       microformatNodes = Microformats.getElementsByClassName(rootElement,
@@ -325,7 +325,7 @@ var Microformats = {
             }
           }
           /* If we are processing a value node, don't remove whitespace */
-          if ((propnode.getAttribute('class') && !propnode.getAttribute('class').match("(^|\\s)" + "value" + "(\\s|$)")) || (propnode.getAttribute('rel'))) {
+          if (!(propnode.getAttribute('class') && propnode.getAttribute('class').match("(^|\\s)" + "value" + "(\\s|$)"))) {
             /* Remove new lines, carriage returns and tabs */
             s	= s.replace(/[\n\r\t]/gi, ' ');
             /* Replace any double spaces with single spaces */
