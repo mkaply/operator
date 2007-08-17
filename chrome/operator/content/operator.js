@@ -1302,9 +1302,14 @@ var Operator = {
             }
             tempMenu = document.createElement("menu");
 
-            if ((Operator.useDescriptiveNames) && Microformats[semanticType] && Microformats[semanticType].description) {
-              tempMenu.label = Microformats[semanticType].description;
-             } else {
+            if (Operator.useDescriptiveNames) {
+              if (Microformats[semanticType] && Microformats[semanticType].description) {
+                tempMenu.label = Microformats[semanticType].description;
+              } else if (semanticType == "RDF") {
+                tempMenu.label = Operator.languageBundle.GetStringFromName("rdf.description");
+              }
+            }
+            if (!tempMenu.label) {
               tempMenu.label = semanticType;
             }
             tempMenu.setAttribute("label", tempMenu.label);

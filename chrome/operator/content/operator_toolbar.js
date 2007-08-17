@@ -63,11 +63,17 @@ var Operator_Toolbar = {
         if (semanticType) {
           button = document.createElement("toolbarbutton");
           button.setAttribute("disabled", "true");
-          if ((Operator.useDescriptiveNames) && (Microformats[semanticType]) && (Microformats[semanticType].description)) {
-            button.label = Microformats[semanticType].description;
-          } else {
-            button.label =  semanticType;
+          if (Operator.useDescriptiveNames) {
+            if (Microformats[semanticType] && Microformats[semanticType].description) {
+              button.label = Microformats[semanticType].description;
+            } else if (semanticType == "RDF") {
+              button.label = Operator.languageBundle.GetStringFromName("rdf.description");
+            }
           }
+          if (!button.label) {
+            button.label = semanticType;
+          }
+
           button.setAttribute("label", button.label);
           button.setAttribute("origlabel", button.label);
 
