@@ -335,14 +335,7 @@ var yahoo_contacts = {
         var workphone;
         var mobilephone;
         var preferred;
-        /* If business, default to work */
-        if (hcard.org && (hcard.fn == hcard.org)) {
-          workphone = hcard.tel[0].value;
-        } else {
-          homephone = hcard.tel[0].value;
-        }
-        preferred = hcard.tel[0].value;
-        
+        var fax;
         for (j=0;j<hcard.tel.length;j++) {
           if (hcard.tel[j].type) {
             for (k=0;k<hcard.tel[j].type.length;k++) {
@@ -358,9 +351,21 @@ var yahoo_contacts = {
               if (hcard.tel[j].type[k].toLowerCase() == "pref") {
                 preferred = hcard.tel[j].value; 
               }
+              if (hcard.tel[j].type[k].toLowerCase() == "fax") {
+                fax = hcard.tel[j].value; 
+              }
             }
           }
         }
+        if (!homephone && !workphone) {
+          /* If business, default to work */
+          if (hcard.org && (hcard.fn == hcard.org)) {
+            workphone = hcard.tel[0].value;
+          } else {
+            homephone = hcard.tel[0].value;
+          }
+        }
+        
         /* op for other */
         if (homephone) {
           url += "hp=" + homephone + "&";
@@ -371,12 +376,21 @@ var yahoo_contacts = {
         if (mobilephone) {
           url += "mb=" + mobilephone + "&";
         }
+        if (fax) {
+          url += "f=" + fax + "&";
+        }
+        if (!preferred) {
+          /* Yahoo sucks and if there is no preferred defaults to home */
+          /* even if there is no home. let's be smarter. The first phone */
+          /* in the list will be preferred */
+          preferred = hcard.tel[0].value;
+        }
         /* 0=home, 1=work, 2=mobile */
         if (preferred == workphone) {
           url += "pp=1&";
         } else if (preferred == mobilephone) {
           url += "pp=2&";
-        } else {
+        } else  if (preferred == homephone) {
           url += "pp=0&";
         }
       }
