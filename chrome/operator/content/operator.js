@@ -696,7 +696,7 @@ var Operator = {
       } else {
         var label;
         if (Operator.actions[k].getActionName) {
-          label = Operator.actions[k].getActionName(semanticObject, semanticObjectType, m);
+          label = Operator.actions[k].getActionName(semanticObject, semanticObjectType);
           if (label) {
             label = description + " (" + label + ")"; 
           }
@@ -831,10 +831,6 @@ var Operator = {
       window.clearTimeout(Operator.timerID);
     }
     Operator.timerID = window.setTimeout(Operator.processSemanticData, 100);
-    try {
-      FirebugContext.window.console.log("processSemanticDataDelayed");
-    } catch (ex) {
-    }
   },
   recursiveAddListeners: function recursiveAddListeners(window)
   {
@@ -1033,7 +1029,6 @@ var Operator = {
      looking for semantic data and creates the menus and buttons */
   processSemanticData: function processSemanticData()
   {
-//    FirebugContext.window.console.log("processSemanticData"); 
     /* Reset the timer we're using to batch processing */
     Operator.timerID = null;
 
