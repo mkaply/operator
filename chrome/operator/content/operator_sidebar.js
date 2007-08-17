@@ -37,27 +37,32 @@ var Operator_Sidebar = {
 
     var main_treechildren = doc.createElement("treechildren");
     main_treechildren.setAttribute("id", "operator-sidebar-treechildren");
-    for (let i=0; i< Operator.dataformats.length; i++) {
-      if (semanticArrays[Operator.dataformats[i]] && semanticArrays[Operator.dataformats[i]].length > 0) {
+    for (let i in semanticArrays) {
+      if (semanticArrays[i] && semanticArrays[i].length > 0) {
         var main_treeitem = doc.createElement("treeitem");
         main_treeitem.setAttribute("container", "true");
         main_treeitem.setAttribute("open", "true");
         var main_treerow = doc.createElement("treerow");
         var main_treecell = doc.createElement("treecell");
-        if (Microformats[Operator.dataformats[i]].description) {
-          main_treecell.setAttribute("label", Microformats[Operator.dataformats[i]].description);
+        var semanticObjects;
+        if (Microformats[i]) {
+          if (Microformats[i].description) {
+            main_treecell.setAttribute("label", Microformats[i].description);
+          } else {
+            main_treecell.setAttribute("label", i);
+          }
+          if (Microformats[i].sort) {
+            semanticObjects = Operator.sortUnique(semanticArrays[i], true, Operator.removeDuplicates);
+          } else {
+            semanticObjects = Operator.sortUnique(semanticArrays[i], false, Operator.removeDuplicates);
+          }
         } else {
-          main_treecell.setAttribute("label", Operator.dataformats[i]);
+          semanticObjects = semanticArrays[i][0].getObjects();
+          main_treecell.setAttribute("label", i);
         }
         var sub_treechildren = doc.createElement("treechildren");
         var addRow = false;
-        var semanticObjects;
-        if ((Microformats[Operator.dataformats[i]]) && Microformats[Operator.dataformats[i]].sort) {
-          semanticObjects = Operator.sortUnique(semanticArrays[Operator.dataformats[i]], true, Operator.removeDuplicates);
-        } else {
-          semanticObjects = Operator.sortUnique(semanticArrays[Operator.dataformats[i]], false, Operator.removeDuplicates);
-        }
-
+  
         for (let j=0; j< semanticObjects.length; j++) {
           var label = semanticObjects[j].toString();
           if (label) {
