@@ -325,7 +325,7 @@ var Microformats = {
             }
           }
           /* If we are processing a value node, don't remove whitespace */
-          if (propnode.getAttribute('class') && !propnode.getAttribute('class').match("(^|\\s)" + "value" + "(\\s|$)")) {
+          if ((propnode.getAttribute('class') && !propnode.getAttribute('class').match("(^|\\s)" + "value" + "(\\s|$)")) || (propnode.getAttribute('rel'))) {
             /* Remove new lines, carriage returns and tabs */
             s	= s.replace(/[\n\r\t]/gi, ' ');
             /* Replace any double spaces with single spaces */
