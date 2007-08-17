@@ -91,7 +91,7 @@ var Microformats = {
       }
     }
 
-    /* Get the microformat nodes for the document */
+    /* Get the microfor`mat nodes for the document */
     var microformatNodes = [];
     if (Microformats[name].className) {
       microformatNodes = Microformats.getElementsByClassName(rootElement,
@@ -1316,7 +1316,7 @@ hCalendar.prototype.toString = function() {
     if (summaries.length === 0) {
       if (this.summary) {
         if (this.dtstart) {
-          return this.summary + "(" + Microformats.dateFromISO8601(this.dtstart).toLocaleString() + ")";
+          return this.summary + " (" + Microformats.dateFromISO8601(this.dtstart).toLocaleString() + ")";
         }
       }
     }
