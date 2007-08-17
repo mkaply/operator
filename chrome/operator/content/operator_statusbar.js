@@ -27,6 +27,13 @@ var Operator_Statusbar = {
               newmenus[i].addEventListener("popupshowing", menus[i].store_onpopupshowing, true);
             }
           }
+          var menupops = menu.getElementsByTagName("menupopup");
+          var newmenupops = newmenu.getElementsByTagName("menupopup");
+          for(var i=0; i < menupops.length; i++) {
+            if (menupops[i].store_onpopupshowing) {
+              newmenupops[i].addEventListener("popupshowing", menupops[i].store_onpopupshowing, true);
+            }
+          }
           document.getElementById("operator-statusbarpanel").appendChild(newmenu);
         } else {
           document.getElementById("operator-statusbarpanel").appendChild(menu);
