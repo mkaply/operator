@@ -613,6 +613,9 @@ var Operator = {
     var required;
     var menupopup;
     for (k in Operator.actions) {
+      if (!Operator.actions[k].doAction ) {
+        continue;
+      }
       if (!Operator.actions[k].scope) {
         continue;
       }
@@ -1078,7 +1081,7 @@ var Operator = {
           break;
         }
 
-        if (Operator.actions[action].scope) {
+        if (Operator.actions[action].doAction && Operator.actions[action].scope) {
           for (j in Operator.actions[action].scope.semantic) {
             if (semanticArrays[j]) {
               var objectArray;
@@ -1177,19 +1180,28 @@ var Operator = {
             }
           }
         }
-        if (menu) {
-          if ((Operator.actions[action].doActionAll && addedAction)) {
+        if (Operator.actions[action].doActionAll) {
+          if (addedAction && menu) {
             var sep = document.createElement("menuseparator");
             menu.appendChild(sep);
-            tempMenu = document.createElement("menuitem");
-            tempMenu.label = Operator.actions[action].descriptionAll;
-            tempMenu.setAttribute("label", tempMenu.label);
-            tempMenu.store_oncommand = Operator.actionAllCallbackGenerator(semanticArrays, action);
-            tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
-            tempMenu.store_onclick = Operator.clickAllCallbackGenerator(semanticArrays, action);
-            tempMenu.addEventListener("click", tempMenu.store_onclick, true);
-            menu.appendChild(tempMenu);
           }
+          tempMenu = document.createElement("menuitem");
+          tempMenu.label = Operator.actions[action].descriptionAll;
+          tempMenu.setAttribute("label", tempMenu.label);
+          tempMenu.store_oncommand = Operator.actionAllCallbackGenerator(semanticArrays, action);
+          tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
+          tempMenu.store_onclick = Operator.clickAllCallbackGenerator(semanticArrays, action);
+          tempMenu.addEventListener("click", tempMenu.store_onclick, true);
+          if (menu) {
+            menu.appendChild(tempMenu);
+          } else {
+            if (!popup) {
+              popup = document.createElement("menupopup");
+            }
+            popup.appendChild(tempMenu);
+          }
+        }
+        if (menu) {
           if (!popup) {
             popup = document.createElement("menupopup");
           }               
