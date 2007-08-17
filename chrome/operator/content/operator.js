@@ -7,13 +7,13 @@ var Operator = {
   /* Whether or not debug is on */
   debug: false,
   /* Current view - 0=data formats, 1=actions */
-  view: 1,
+  view: 0,
   /* Whether or not the upcoming bug related to inclusive DTEND is fixed */ 
   upcomingBugFixed: false,
   /* Should microformats be highlighted on mouseover and when selected */
   highlightMicroformats: false,
   /* Should data formats use descriptive names */
-  useDescriptiveNames: false,
+  useDescriptiveNames: true,
   /* Should we remove duplicates microformats */
   removeDuplicates: true,
   /* Should we observe all changes in the DOM */
