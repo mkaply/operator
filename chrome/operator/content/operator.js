@@ -661,7 +661,7 @@ var Operator = {
       if ((required instanceof Array) && (required.length > 1)) {
         var tempMenu;
         for (m=0; m < required.length; m++) {
-          tempMenu = document.createElement("menuitem");
+          tempMenu = parentmenu.ownerDocument.createElement("menuitem");
           if (Operator.actions[k].getActionName) {
             tempMenu.label = Operator.actions[k].getActionName(semanticObject, semanticObjectType, m);
             if (tempMenu.label) {
@@ -684,14 +684,14 @@ var Operator = {
               submenu.appendChild(tempMenu);
             } else {
               if (!menupopup) {
-                menupopup = document.createElement("menupopup");
+                menupopup = parentmenu.ownerDocument.createElement("menupopup");
               }
               menupopup.appendChild(tempMenu);
             }
           }
         }
         if ((!popup) && (menupopup)) {
-          menuitem = document.createElement("menu");
+          menuitem = parentmenu.ownerDocument.createElement("menu");
           menuitem.label = description;
           menuitem.setAttribute("label", menuitem.label);
           menuitem.appendChild(menupopup);
@@ -707,7 +707,7 @@ var Operator = {
           label = description;
         }
         if (label) {
-          menuitem = document.createElement("menuitem");
+          menuitem = parentmenu.ownerDocument.createElement("menuitem");
           menuitem.store_oncommand = this.actionCallbackGenerator(semanticObject, semanticObjectType, k);
           menuitem.addEventListener("command", menuitem.store_oncommand, true);
           menuitem.store_onclick = this.clickCallbackGenerator(semanticObject, semanticObjectType, k);
@@ -725,10 +725,10 @@ var Operator = {
     }
     if (this.debug) {
       if (addedAction) {
-        menuitem = document.createElement("menuseparator");
+        menuitem = parentmenu.ownerDocument.createElement("menuseparator");
         submenu.appendChild(menuitem);
       }
-      menuitem = document.createElement("menuitem");
+      menuitem = parentmenu.ownerDocument.createElement("menuitem");
       menuitem.label = Operator.languageBundle.GetStringFromName("debug.label");
       menuitem.setAttribute("label", menuitem.label);
       menuitem.store_oncommand = this.errorCallbackGenerator(semanticObject, semanticObjectType);
@@ -736,7 +736,7 @@ var Operator = {
       submenu.appendChild(menuitem);
     }
     if ((!addedAction) && (!this.debug)) {
-      menuitem = document.createElement("menuitem");
+      menuitem = parentmenu.ownerDocument.createElement("menuitem");
       menuitem.label = Operator.languageBundle.GetStringFromName("noActions.label");
       menuitem.setAttribute("label", menuitem.label);
       menuitem.setAttribute("disabled", true);
