@@ -29,11 +29,16 @@ var Operator_Toolbar = {
         button.setAttribute("disabled", "true");
         if (Operator.useShortDescriptions && Operator.actions[action].shortDescription) {
           button.label = Operator.actions[action].shortDescription;
-          button.setAttribute("origlabel", Operator.actions[action].shortDescription);
-        } else {
+        } else if (Operator.actions[action].description) {
           button.label = Operator.actions[action].description;
-          button.setAttribute("origlabel", Operator.actions[action].description);
+        } else {
+          if (!Operator.actions[action].doAction && Operator.actions[action].doActionAll && Operator.actions[action].descriptionAll) {
+            button.label = Operator.actions[action].descriptionAll;
+          } else {
+            button.label = action;
+          }
         }
+        button.setAttribute("origlabel", button.label);
         button.setAttribute("label", button.label);
         button.setAttribute("type", "menu");
         button.addEventListener("mouseover", Operator_Toolbar.mouseOver, false);
@@ -148,11 +153,12 @@ var Operator_Toolbar = {
     if (newmenu.childNodes.length > 0) {
       if (useActions) {
         button.label = button.getAttribute("origlabel");
+        button.numitems = 1;
       } else {
         button.label = button.getAttribute("origlabel") + " (" + numitems + ")";
+        button.numitems = numitems;
       }
       button.setAttribute("label", button.label);
-      button.numitems = numitems;
     }
   },
   disable: function()

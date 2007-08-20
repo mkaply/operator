@@ -1051,17 +1051,23 @@ var Operator = {
 
     /* Get all semantic data from the web page */
     var semanticArrays = [];
-    var haveMicroformats;
+    var haveSemanticData;
     for (i in Microformats) {
       semanticArrays[i] = Microformats.get(i, content.document);
-      if (semanticArrays[i].length > 0) {
-        haveMicroformats = true;
-      }
-    }
-    if (haveMicroformats && Operator.urlbar) {
-      Operator_URLbarButton.enable();
     }
     Operator.getSemanticData(content, semanticArrays);
+    for (let i in semanticArrays) {
+      if (semanticArrays[i].length > 0) {
+        haveSemanticData = true;
+      }
+    }
+    if (!haveSemanticData) {
+      return;
+    }
+    if (Operator.urlbar) {
+      Operator_URLbarButton.enable();
+    }
+
 
     var i, j, k, m;
     var popup, menu, tempMenu, action;
@@ -1083,7 +1089,7 @@ var Operator = {
 
         if (Operator.actions[action].doAction && Operator.actions[action].scope) {
           for (j in Operator.actions[action].scope.semantic) {
-            if (semanticArrays[j]) {
+            if (semanticArrays[j] && semanticArrays[j].length > 0) {
               var objectArray;
               if (j == "RDF") {
                 /* Fill in objectArray by asking model for property */
@@ -1181,24 +1187,33 @@ var Operator = {
           }
         }
         if (Operator.actions[action].doActionAll) {
-          if (addedAction && menu) {
-            var sep = document.createElement("menuseparator");
-            menu.appendChild(sep);
-          }
-          tempMenu = document.createElement("menuitem");
-          tempMenu.label = Operator.actions[action].descriptionAll;
-          tempMenu.setAttribute("label", tempMenu.label);
-          tempMenu.store_oncommand = Operator.actionAllCallbackGenerator(semanticArrays, action);
-          tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
-          tempMenu.store_onclick = Operator.clickAllCallbackGenerator(semanticArrays, action);
-          tempMenu.addEventListener("click", tempMenu.store_onclick, true);
-          if (menu) {
-            menu.appendChild(tempMenu);
-          } else {
-            if (!popup) {
-              popup = document.createElement("menupopup");
+          var showActionAll = false;
+          for (j in Operator.actions[action].scope.semantic) {
+            if (semanticArrays[j] && semanticArrays[j].length > 0) {
+              showActionAll = true;
             }
-            popup.appendChild(tempMenu);
+          }
+          if (showActionAll) {
+            if (addedAction && menu) {
+              var sep = document.createElement("menuseparator");
+              menu.appendChild(sep);
+            }
+            tempMenu = document.createElement("menuitem");
+            tempMenu.label = Operator.actions[action].descriptionAll;
+            tempMenu.setAttribute("label", tempMenu.label);
+            tempMenu.store_oncommand = Operator.actionAllCallbackGenerator(semanticArrays, action);
+            tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
+            tempMenu.store_onclick = Operator.clickAllCallbackGenerator(semanticArrays, action);
+            tempMenu.addEventListener("click", tempMenu.store_onclick, true);
+            if (menu) {
+              menu.appendChild(tempMenu);
+            } else {
+              if (!popup) {
+                popup = document.createElement("menupopup");
+              }
+              popup.appendChild(tempMenu);
+              Operator_Toolbar.addButtonMenu(popup, null, action);
+            }
           }
         }
         if (menu) {
