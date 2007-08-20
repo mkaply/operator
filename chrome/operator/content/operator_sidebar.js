@@ -33,6 +33,9 @@ var Operator_Sidebar = {
 
     var doc = document.getElementById("sidebar").contentDocument;
     var tree = doc.getElementById("operator-sidebar-tree")
+    if (!tree) {
+      return;
+    }
     var addedContent = false;
 
     var main_treechildren = doc.createElement("treechildren");
