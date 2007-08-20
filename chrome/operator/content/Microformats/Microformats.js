@@ -245,7 +245,7 @@ var Microformats = {
         }
         if (typeof item[i] == "object") {
           if ((i != "node") && (i != "resolvedNode")) {
-            if (item[i].semanticType) {
+            if (item[i] && item[i].semanticType) {
               toreturn += indent + item[i].semanticType + " [" + i + "] { \n";
             } else {
               toreturn += indent + "object " + i + " { \n";
@@ -259,7 +259,7 @@ var Microformats = {
           }
         }
       }
-      if (!toreturn) {
+      if (!toreturn && item) {
         toreturn = item.toString();
       }
       return toreturn;
@@ -1596,7 +1596,11 @@ var tag_definition = {
             if (url_array[i] !== "") {
               var tag
               if (tag = Microformats.tag.validTagName(url_array[i].replace(/\+/g, ' '))) {
-                return decodeURIComponent(tag);
+                try {
+                  return decodeURIComponent(tag);
+                } catch (ex) {
+                  return unescape(tag);
+                }
               }
             }
           }
