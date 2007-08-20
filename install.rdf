@@ -3,7 +3,7 @@
     <Description about="urn:mozilla:install-manifest">
         <em:id>{95C9A302-8557-4052-91B7-2BB6BA33C885}</em:id>
         <em:name>Operator</em:name>
-        <em:version>0.8b</em:version>
+        <em:version>0.8</em:version>
         <em:description></em:description>
         <em:creator>Michael Kaply (IBM)</em:creator>
         <em:contributor>Andy Mitchell</em:contributor>
@@ -18,7 +18,7 @@
             <Description>
                 <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
                 <em:minVersion>2.0</em:minVersion>
-                <em:maxVersion>3.0a7</em:maxVersion>
+                <em:maxVersion>3.0a8</em:maxVersion>
             </Description>
         </em:targetApplication>
         <!-- Flock -->
