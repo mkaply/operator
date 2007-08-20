@@ -71,7 +71,7 @@ var Operator_Sidebar = {
           if (label) {
             addRow = true;
             var sub_treeitem = doc.createElement("treeitem");
-            sub_treeitem.store_onpopupshowing = Operator.popupShowing(semanticObjects[j], Operator.dataformats[i]);
+            sub_treeitem.store_onpopupshowing = Operator.popupShowing(semanticObjects[j], i);
             var sub_treerow = doc.createElement("treerow");
             var sub_treecell = doc.createElement("treecell");
             sub_treecell.setAttribute("label", semanticObjects[j].toString());
