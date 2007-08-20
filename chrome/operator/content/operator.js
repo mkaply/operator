@@ -1062,6 +1062,7 @@ var Operator = {
       }
     }
     if (!haveSemanticData) {
+      Operator_Sidebar.populate();
       return;
     }
     if (Operator.urlbar) {
