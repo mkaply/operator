@@ -9,21 +9,25 @@ var firefox_bookmark = {
     semantic: {
       "hCard" : "hCard",
       "hCalendar" : "hCalendar",
-      "xFolk" : "taggedlink"
+      "xFolk" : "taggedlink.link"
     }
   },
   doAction: function(semanticObject, semanticObjectType) {
     var url, name, description;
-    if (semanticObjectType == "xFolk") {
-      if (semanticObject.taggedlink) {
-        url = semanticObject.taggedlink.link;
-        name = semanticObject.taggedlink.title;
-      }
-      description = semanticObject.description;
-    } else {
+    /* If type = value in semantic scope, bookmark the content of the microformat */ 
+    if (firefox_bookmark.scope.semantic[semanticObjectType] == semanticObjectType) {
       var serializer = new XMLSerializer();
       var xmlString = serializer.serializeToString(semanticObject.resolvedNode);
       url = "data:text/html;charset=utf8," + xmlString;
+      name = semanticObject.toString();
+    } else {
+      var property = firefox_bookmark.scope.semantic[semanticObjectType];
+      if (property.indexOf(".") != -1) {
+        var props = property.split(".");
+        url = semanticObject[props[0]][props[1]];
+      } else {
+        url = semanticObject[property];
+      }
       name = semanticObject.toString();
     }
     firefox_bookmark.bookmark(name, url, description);
