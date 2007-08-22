@@ -826,6 +826,7 @@ var Operator = {
 //      mfNode.style.cursor = "url(http://microformats.org/favicon.ico), pointer";
       Operator.highlightDOMNode(mfNode);
     } else {
+      Operator.highlightDOMNode();
     }
   },
   processSemanticDataDelayed: function processSemanticDataDelayed(event)
