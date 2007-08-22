@@ -63,7 +63,7 @@ var google_search = {
   },
   doAction: function(semanticObject, semanticObjectType) {
     var searchstring;
-    var property = this.scope.semantic[semanticObjectType];
+    var property = google_search.scope.semantic[semanticObjectType];
     if (property.indexOf(".") != -1) {
       var props = property.split(".");
       searchstring = semanticObject[props[0]][props[1]];

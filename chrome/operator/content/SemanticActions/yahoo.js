@@ -63,7 +63,7 @@ var yahoo_search = {
   },
   doAction: function(semanticObject, semanticObjectType) {
     var searchstring;
-    var property = this.scope.semantic[semanticObjectType];
+    var property = yahoo_search.scope.semantic[semanticObjectType];
     if (property.indexOf(".") != -1) {
       var props = property.split(".");
       searchstring = semanticObject[props[0]][props[1]];
@@ -236,6 +236,8 @@ var yahoo_calendar = {
     return url;
   }
 };
+
+/* yid = Yahoo! ID */
 
 var yahoo_contacts = {
   version: 0.8,
