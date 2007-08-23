@@ -401,7 +401,7 @@ var Operator = {
   {
     return function(event) {
       var url;
-      url = SemanticActions[semanticAction].doAction(semanticObject, semanticObjectType, propertyIndex)
+      url = SemanticActions[semanticAction].doAction(semanticObject, semanticObjectType, propertyIndex, event)
       if ((url) && (url != true)) {
         openUILink(url, event);
       }
@@ -412,7 +412,7 @@ var Operator = {
   {
     return function(event) {
       var url;
-      url = SemanticActions[semanticAction].doActionAll(semanticArrays, semanticObjectType, propertyIndex)
+      url = SemanticActions[semanticAction].doActionAll(semanticArrays, semanticObjectType)
       if ((url) && (url != true)) {
         openUILink(url, event);
       }
@@ -420,14 +420,14 @@ var Operator = {
     };
   },
   /* This is a closure specifically to handle middle click so we can do interesting stuff */
-  clickCallbackGenerator: function clickCallbackGenerator(semanticObject, semanticObjectType, semanticAction)
+  clickCallbackGenerator: function clickCallbackGenerator(semanticObject, semanticObjectType, semanticAction, propertyIndex)
   {
     return function(event) {
       /* This is for middle click only */
       if (event.button == 1) {
         if (event.target.getAttribute("disabled") != "true") {
           var url;
-          url = SemanticActions[semanticAction].doAction(semanticObject, semanticObjectType)
+          url = SemanticActions[semanticAction].doAction(semanticObject, semanticObjectType, propertyIndex, event)
           if ((url) && (url != true)) {
             openUILink(url, event);
           }
