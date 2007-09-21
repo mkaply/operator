@@ -5,7 +5,7 @@ var Microformats = {
   /* When a microformat is added, the name is placed in this list */
   list: [],
   /* Custom iterator so that microformats can be enumerated as */
-  /* for (i in Microformats */
+  /* for (i in Microformats) */
   __iterator__: function () {
     for (let i=0; i < this.list.length; i++) {
       yield this.list[i];
@@ -17,15 +17,15 @@ var Microformats = {
    * @param  name          The name of the microformat (required)
    * @param  rootElement   The DOM element at which to start searching (required)
    * @param  recurseFrames Whether or not to search child frames for microformats (optional - defaults to true)
-   * @param  microformats  An array of microformat objects to which is added the results (optional)
+   * @param  targetArray  An array of microformat objects to which is added the results (optional)
    * @return A new array of microformat objects or the passed in microformat 
    *         object array with the new objects added
    */
-  get: function(name, rootElement, recurseFrames, microformats) {
+  get: function(name, rootElement, recurseFrames, targetArray) {
     if (!Microformats[name]) {
       return;
     }
-    microformats = microformats || [];
+    targetArray = targetArray || [];
 
     rootElement = rootElement || content.document;
 
@@ -33,7 +33,7 @@ var Microformats = {
     if ((recurseFrames == undefined) || (recurseFrames == true)) {
       if (rootElement.defaultView && rootElement.defaultView.frames.length > 0) {
         for (let i=0; i < rootElement.defaultView.frames.length; i++) {
-          Microformats.get(name, rootElement.defaultView.frames[i].document, recurseFrames, microformats);
+          Microformats.get(name, rootElement.defaultView.frames[i].document, recurseFrames, targetArray);
         }
       }
     }
@@ -61,9 +61,9 @@ var Microformats = {
     /* Create objects for the microformat nodes and put them into the microformats */
     /* array */
     for (let i = 0; i < microformatNodes.length; i++) {
-      microformats.push(new Microformats[name].mfObject(microformatNodes[i]));
+      targetArray.push(new Microformats[name].mfObject(microformatNodes[i]));
     }
-    return microformats;
+    return targetArray;
   },
   /**
    * Counts microformats objects of the given type from a document
@@ -71,14 +71,13 @@ var Microformats = {
    * @param  name          The name of the microformat (required)
    * @param  rootElement   The DOM element at which to start searching (required)
    * @param  recurseFrames Whether or not to search child frames for microformats (optional - defaults to true)
-   * @param  count         The current count
    * @return The new count
    */
-  count: function(name, rootElement, recurseFrames, count) {
+  count: function(name, rootElement, recurseFrames) {
     if (!Microformats[name]) {
       return;
     }
-    count = count || 0;
+    var count = 0;
 
     rootElement = rootElement || content.document;
 
@@ -86,7 +85,7 @@ var Microformats = {
     if (recurseFrames || recurseFrames === undefined) {
       if (rootElement.defaultView && rootElement.defaultView.frames.length > 0) {
         for (let i=0; i < rootElement.defaultView.frames.length; i++) {
-          Microformats.count(name, rootElement.defaultView.frames[i].document, recurseFrames, count);
+          count += Microformats.count(name, rootElement.defaultView.frames[i].document, recurseFrames);
         }
       }
     }
@@ -124,10 +123,8 @@ var Microformats = {
     for (let i in Microformats)
     {
       if (Microformats[i].className) {
-        if (node.getAttribute('class')) {
-          if (node.getAttribute('class').match("(^|\\s)" + Microformats[i].className + "(\\s|$)")) {
+        if (Microformats.matchClass(node, Microformats[i].className)) {
             return true;
-          }
         }
       } else {
         var attribute;
@@ -150,7 +147,7 @@ var Microformats = {
    *
    * @param  node          DOM node to check
    * @return If the node is contained in a microformat, it returns the parent
-   *         DOM node, otherwise returns nothing
+   *         DOM node, otherwise returns null
    */
   getParent: function(node) {
     var xpathExpression;
@@ -182,7 +179,7 @@ var Microformats = {
         }
       }
     }
-    return;
+    return null;
   },
   /**
    * If the passed in node is a microformat, this function returns a space 
@@ -200,11 +197,9 @@ var Microformats = {
     {
       if (Microformats[i]) {
         if (Microformats[i].className) {
-          if (node.getAttribute('class')) {
-            if (node.getAttribute('class').match("(^|\\s)" + Microformats[i].className + "(\\s|$)")) {
-              microformatNames.push(i);
-              continue;
-            }
+          if (Microformats.matchClass(node, Microformats[i].className)) {
+            microformatNames.push(i);
+            continue;
           }
         } else if (Microformats[i].attributeValues) {
           var attribute;
@@ -325,7 +320,7 @@ var Microformats = {
             }
           }
           /* If we are processing a value node, don't remove whitespace */
-          if (!(propnode.getAttribute('class') && propnode.getAttribute('class').match("(^|\\s)" + "value" + "(\\s|$)"))) {
+          if (!Microformats.matchClass(propnode, "value")) {
             /* Remove new lines, carriage returns and tabs */
             s	= s.replace(/[\n\r\t]/gi, ' ');
             /* Replace any double spaces with single spaces */
@@ -370,22 +365,19 @@ var Microformats = {
      * @return A string with the fully qualified URI.
      */
     uriGetter: function(propnode, parentnode) {
-      if (propnode.nodeName.toLowerCase() == "a") {
-        return propnode.href;
-      } else if (propnode.nodeName.toLowerCase() == "img") {
-        return propnode.src;
-      } else if (propnode.nodeName.toLowerCase() == "object") {
-        return propnode.data;
-      } else if (propnode.nodeName.toLowerCase() == "area") {
-        return propnode.href;
-      } else {
-        return Microformats.parser.textGetter(propnode, parentnode);
+      var pairs = {"a":"href", "img":"src", "object":"data", "area":"href"};
+      var name = propnode.nodeName.toLowerCase();
+      if (pairs.hasOwnProperty(name)) {
+        return propnode[pairs[name]];
       }
+      return Microformats.parser.textGetter(propnode, parentnode);
     },
     /**
      * Used to specifically retrieve a telephone number in a microformat node.
-     * Basically this is to handle weird value excerpting
-     *
+     * Basically this is to handle the face that telephone numbers use value
+     * as the name as one of their subproperties, but value is also used for
+     * value excerpting (http://microformats.org/wiki/hcard#Value_excerpting)
+     
      * @param  propnode   The DOMNode to check
      * @param  parentnode The parent node of the property. If it is a subproperty,
      *                    this is the parent property node. If it is not, this is the
@@ -394,7 +386,7 @@ var Microformats = {
      */
     telGetter: function(propnode, parentnode) {
       /* Special case - if this node is a value, use the parent node to get all the values */
-      if (propnode.getAttribute('class').match("(^|\\s)" + "value" + "(\\s|$)")) {
+      if (Microformats.matchClass(propnode, "value")) {
         return Microformats.parser.textGetter(parentnode, parentnode);
       } else {
         return Microformats.parser.textGetter(propnode, parentnode);
@@ -424,7 +416,7 @@ var Microformats = {
         /* Special case - if this node is a value, use the parent node to get all the values */
         /* If this case gets executed, per the value design pattern, the result */
         /* will be the EXACT email address with no extra parsing required */
-        if (propnode.getAttribute('class').match("(^|\\s)" + "value" + "(\\s|$)")) {
+        if (Microformats.matchClass(propnode, "value")) {
           return Microformats.parser.textGetter(parentnode, parentnode);
         } else {
           return Microformats.parser.textGetter(propnode, parentnode);
@@ -433,6 +425,8 @@ var Microformats = {
     },
     /**
      * Used when a caller needs the text inside a particular DOM node.
+     * It calls defaultGetter to handle all the subtleties of getting
+     * text from a microformat.
      *
      * @param  propnode   The DOMNode to check
      * @param  parentnode The parent node of the property. If it is a subproperty,
@@ -441,13 +435,7 @@ var Microformats = {
      * @return A string with just the text including all tags.
      */
     textGetter: function(propnode, parentnode) {
-      var s = Microformats.parser.defaultGetter(propnode, parentnode, "text");
-      /* Remove any HTML comments */
-//      s	= s.replace(/\<!--.*?\-->/gi, '');
-      /* Remove any HTML tags and their contents */
-      /* This used to be replacing with a space - I don't like that */
-//      s	= s.replace(/\<.*?\>/gi, '');
-      return s;
+      return Microformats.parser.defaultGetter(propnode, parentnode, "text");
     },
     /**
      * Used when a caller needs the HTML inside a particular DOM node.
@@ -467,14 +455,21 @@ var Microformats = {
         },
         toHTML: function () {
           return Microformats.parser.defaultGetter(propnode, parentnode, "HTML"); 
-          },
-          replace: function (a, b) {
+        },
+        replace: function (a, b) {
+          if (this.toString()) {
             return this.toString().replace(a,b);
-          },
-          match: function (a) {
+          } else {
+            return this;
+          }
+        },
+        match: function (a) {
+          if (this.toString()) {
             return this.toString().match(a);
-          } 
-           
+          } else {
+            return this;
+          }
+        }
       };
     },
     /**
@@ -559,7 +554,7 @@ var Microformats = {
             throw("Node is not a microformat (" + microformat + ")");
           }
         } else {
-          if (!(in_node.getAttribute('class').match("(^|\\s)" + Microformats[microformat].className + "(\\s|$)"))) {
+          if (!Microformats.matchClass(in_node, Microformats[microformat].className)) {
             throw("Node is not a microformat (" + microformat + ")");
           }
         }
@@ -575,7 +570,7 @@ var Microformats = {
       
       /* The node in the object should be the original node */
       object.node = in_node;
-      /* we also store the nodes that has been "resolved" */
+      /* we also store the node that has been "resolved" */
       object.resolvedNode = node; 
       object.semanticType = microformat;
     },
@@ -712,7 +707,7 @@ var Microformats = {
      *         the original node. You can check to see if the node was cloned
      *         by looking for .origNode in the new node.
      */
-    preProcessMicroformat: function(in_mfnode) {
+    preProcessMicroformat: function preProcessMicroformat(in_mfnode) {
       var mfnode;
       var includes = Microformats.getElementsByClassName(in_mfnode, "include");
       if ((includes.length > 0) || ((in_mfnode.nodeName.toLowerCase() == "td") && (in_mfnode.getAttribute("headers")))) {
@@ -746,7 +741,7 @@ var Microformats = {
       }
       return mfnode;
     },
-    validate: function(mfnode, mfname, error) {
+    validate: function validate(mfnode, mfname, error) {
       if (Microformats[mfname].validate) {
         return Microformats[mfname].validate(mfnode, error);
       } else {
@@ -772,7 +767,7 @@ var Microformats = {
     },
     /* This function normalizes an ISO8601 date by adding punctuation and */
     /* ensuring that hours and seconds have values */
-    normalizeISO8601: function(string)
+    normalizeISO8601: function normalizeISO8601(string)
     {
       var dateArray = string.match(/(\d\d\d\d)(?:-?(\d\d)(?:-?(\d\d)(?:[T ](\d\d)(?::?(\d\d)(?::?(\d\d)(?:\.(\d+))?)?)?(?:([-+Z])(?:(\d\d)(?::?(\d\d))?)?)?)?)?)?/);
   
@@ -918,7 +913,7 @@ var Microformats = {
     }
     return string;
   },
-  simpleEscape: function(s)
+  simpleEscape: function simpleEscape(s)
   {
     s = s.replace(/\&/g, '%26');
     s = s.replace(/\#/g, '%23');
@@ -943,7 +938,7 @@ var Microformats = {
    * @return microformatNodes An array of DOM Nodes, each representing a
                               microformat in the document.
    */
-  getElementsByClassName: function(rootNode, className)
+  getElementsByClassName: function getElementsByClassName(rootNode, className)
   {
     var returnElements = [];
 
@@ -986,7 +981,7 @@ var Microformats = {
    * @return microformatNodes An array of DOM Nodes, each representing a
                               microformat in the document.
    */
-  getElementsByAttribute: function(rootNode, attributeName, attributeValues)
+  getElementsByAttribute: function getElementsByAttribute(rootNode, attributeName, attributeValues)
   {
     var attributeList = attributeValues.split(" ");
 
@@ -1014,6 +1009,10 @@ var Microformats = {
     /* Need Slow fallback for testing */
     }
     return returnElements;
+  },
+  matchClass: function matchClass(node, className) {
+    var classValue = node.getAttribute("class");
+    return (classValue && classValue.match("(^|\\s)" + className + "(\\s|$)"));
   }
 };
 
