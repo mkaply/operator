@@ -22,7 +22,7 @@ var google_maps = {
       if (adr) {
         url = "http://maps.google.com/maps?q=";
         if (adr["street-address"]) {
-          url += adr["street-address"].join(", ");
+          url += Microformats.simpleEscape(adr["street-address"].join(", "));
           url += ", ";
         }
         if (adr.region) {
