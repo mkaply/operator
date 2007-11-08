@@ -31,7 +31,7 @@
 
 </toolbox>
  <statusbar id="status-bar">
-   <statusbarpanel class="statusbarpanel-menu-iconic" disable="true"
+   <statusbarpanel class="statusbarpanel-menu-iconic" disabled="true"
      id="operator-statusbarpanel"
    />
  </statusbar>

@@ -34,19 +34,9 @@ var Operator_Statusbar = {
               newmenupops[i].addEventListener("popupshowing", menupops[i].store_onpopupshowing, true);
             }
           }
-          document.getElementById("status-bar").appendChild(newmenu);
-          newmenu.id="operator-statusbarpanel-contextmenu";
-          newmenu.setAttribute("id", "operator-statusbarpanel-contextmenu");
-          document.getElementById("operator-statusbarpanel").context="operator-statusbarpanel-contextmenu";
-          document.getElementById("operator-statusbarpanel").setAttribute("context", "operator-statusbarpanel-contextmenu");
-          newmenu.setAttribute("position", "before_end");
+          document.getElementById("operator-statusbarpanel").appendChild(newmenu);
         } else {
-          document.getElementById("status-bar").appendChild(menu);
-          menu.id="operator-statusbarpanel-contextmenu";
-          menu.setAttribute("id", "operator-statusbarpanel-contextmenu");
-          document.getElementById("operator-statusbarpanel").context="operator-statusbarpanel-contextmenu";
-          document.getElementById("operator-statusbarpanel").setAttribute("context", "operator-statusbarpanel-contextmenu");
-          menu.setAttribute("position", "before_end");
+          document.getElementById("operator-statusbarpanel").appendChild(menu);
         }
         return true;
       }
@@ -66,13 +56,13 @@ var Operator_Statusbar = {
   disable: function()
   {
     if (this.isVisible()) {
-      document.getElementById("operator-statusbarpanel").setAttribute("disable", "true");
+      document.getElementById("operator-statusbarpanel").setAttribute("disabled", "true");
     }
   },
   enable: function()
   {
     if (this.isVisible()) {
-      document.getElementById("operator-statusbarpanel").setAttribute("disable", "false");
+      document.getElementById("operator-statusbarpanel").setAttribute("disabled", "false");
     }
   },
   hide: function()
