@@ -51,7 +51,7 @@ toolbar[iconsize="small"] #operator-toolbar-button[disabled="true"] {
    list-style-image: url("chrome://operator/content/operator_small.png");
 }
 
-#operator-statusbarpanel[disabled="true"] {
+#operator-statusbarpanel[disable="true"] {
    list-style-image: url("chrome://operator/content/operator_small_disabled.png");
 }
 

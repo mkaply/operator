@@ -47,6 +47,7 @@
         <checkbox id="autohide" label="&autohide.label;"/>
         <checkbox id="highlightMicroformats" label="&highlightMicroformats.label;"/>
         <checkbox id="removeDuplicates" label="&removeDuplicates.label;"/>
+        <checkbox id="showHidden" label="&showHidden.label;"/>
         <checkbox id="observeDOMAttrModified" label="&observeDOMAttrModified.label;"/>
         </vbox>
       </tabpanel>
@@ -62,7 +63,7 @@
       <tabpanel>
       <vbox id="clientBox" flex="1">
         <label id="extensionName" crop="right">Operator</label>
-        <label id="extensionVersion" crop="right">0.8</label>
+        <label id="extensionVersion" crop="right">0.9a</label>
         <description id="extensionDescription">The Semantic Web in Action</description>
     
         <label id="extensionCreatorLabel" class="sectionTitle">&creator.label;</label>

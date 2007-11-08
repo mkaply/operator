@@ -15,6 +15,7 @@ var Operator_Options = {
     this.checkAndSetBoolPref("autohide", document.getElementById("autohide").checked);
     this.checkAndSetBoolPref("highlightMicroformats", document.getElementById("highlightMicroformats").checked);
     this.checkAndSetBoolPref("removeDuplicates", document.getElementById("removeDuplicates").checked);
+    this.checkAndSetBoolPref("showHidden", document.getElementById("showHidden").checked);
     this.checkAndSetBoolPref("observeDOMAttrModified", document.getElementById("observeDOMAttrModified").checked);
     var dataformats = document.getElementById("dataformats");
     for (i=0; i < dataformats.getRowCount(); i++) {
@@ -156,9 +157,17 @@ var Operator_Options = {
     try {
       removeDuplicates = this.prefBranch.getBoolPref("removeDuplicates");
     } catch (ex) {
-      removeDuplicates = Operator.removeDuplicates
+      removeDuplicates = Operator.removeDuplicates;
     }
-      document.getElementById("removeDuplicates").checked = removeDuplicates;
+    document.getElementById("removeDuplicates").checked = removeDuplicates;
+      
+    var showHidden;
+    try {
+      showHidden = this.prefBranch.getBoolPref("showHidden");
+    } catch (ex) {
+      showHidden = Operator.showHidden;
+    }
+    document.getElementById("showHidden").checked = showHidden;
 
     var observeDOMAttrModified;
     try {

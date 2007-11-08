@@ -16,6 +16,8 @@ var Operator = {
   useDescriptiveNames: true,
   /* Should we remove duplicates microformats */
   removeDuplicates: true,
+  /* Should we show hidden microformats */
+  showHidden: false,
   /* Should we observe all changes in the DOM */
   observeDOMAttrModified: false,
   /* Is there an icon on the statusbar */
@@ -243,6 +245,9 @@ var Operator = {
       this.removeDuplicates = this.prefBranch.getBoolPref("removeDuplicates");
     } catch (ex) {}
     try {
+      this.showHidden = this.prefBranch.getBoolPref("showHidden");
+    } catch (ex) {}
+    try {
       this.observeDOMAttrModified = this.prefBranch.getBoolPref("observeDOMAttrModified");
     } catch (ex) {}
     try {
@@ -340,6 +345,9 @@ var Operator = {
     }
     if (data == "removeDuplicates") {
       this.removeDuplicates = this.prefBranch.getBoolPref("removeDuplicates");
+    }
+    if (data == "showHidden") {
+      this.showHidden = this.prefBranch.getBoolPref("showHidden");
     }
     if (data == "observeDOMAttrModified") {
       this.observeDOMAttrModified = this.prefBranch.getBoolPref("observeDOMAttrModified");
@@ -1054,7 +1062,8 @@ var Operator = {
     var semanticArrays = [];
     var haveSemanticData;
     for (i in Microformats) {
-      semanticArrays[i] = Microformats.get(i, content.document);
+      semanticArrays[i] = Microformats.get(i, content.document,
+                                           {showHidden: Operator.showHidden});
     }
     Operator.getSemanticData(content, semanticArrays);
     for (let i in semanticArrays) {

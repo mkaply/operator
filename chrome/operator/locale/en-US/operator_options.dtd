@@ -11,6 +11,7 @@
 <!ENTITY  useShortDescriptions.label       "Use short descriptions">
 <!ENTITY  highlightMicroformats.label      "Highlight Microformats (test feature)">
 <!ENTITY  removeDuplicates.label           "Remove duplicates (might impact performance)">
+<!ENTITY  showHidden.label                 "Show hidden microformats">
 <!ENTITY  debug.label                      "Debug mode">
 <!ENTITY  statusbar.label                  "Display icon in status bar">
 <!ENTITY  urlbar.label                     "Display icon on location bar">
