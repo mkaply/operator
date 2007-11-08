@@ -7,15 +7,18 @@ var google_maps = {
   scope: {
     semantic: {
       "geo" : "geo",
-      "adr" : "adr"
+      "hCard" : "adr"
     }
   },
-  doAction: function(semanticObject, semanticObjectType) {
+  doAction: function(semanticObject, semanticObjectType, propertyIndex) {
     var url;
     if ((semanticObjectType == "hCard") || (semanticObjectType == "adr")) {
       var adr;
       if (semanticObjectType == "hCard") {
-        adr = semanticObject.adr[0];
+        if (!propertyIndex) {
+          propertyIndex = 0;
+        }
+        adr = semanticObject.adr[propertyIndex];
       } else {
         adr = semanticObject;
       }
@@ -50,7 +53,22 @@ var google_maps = {
       }
     }
     return url;
+  },
+  getActionName: function(semanticObject, semanticObjectType, propertyIndex) {
+    if (semanticObjectType == "hCard") {
+      if (propertyIndex == undefined) {
+        return;
+      }
+      var adr = semanticObject.adr[propertyIndex];
+      if (!adr) {
+        return;
+      }
+      return adr.toString();
+    } else {
+      return semanticObject.toString();
+    }
   }
+
 };
 
 var google_search = {

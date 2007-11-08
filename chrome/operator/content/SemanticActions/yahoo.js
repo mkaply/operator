@@ -6,14 +6,17 @@ var yahoo_maps = {
   icon: "http://www.yahoo.com/favicon.ico",
   scope: {
     semantic: {
-      "adr" : "adr",
+      "hCard" : "adr",
       "geo" : "geo"
     }
   },
-  doAction: function(semanticObject, semanticObjectType) {
+  doAction: function(semanticObject, semanticObjectType, propertyIndex) {
     var url;
-    if (semanticObjectType == "adr") {
-      var adr = semanticObject;
+    if (semanticObjectType == "hCard") {
+      if (propertyIndex == undefined) {
+        propertyIndex = 0;
+      }
+      var adr = semanticObject.adr[propertyIndex];
       if (adr) {
         url = "http://maps.yahoo.com/maps_result?";
         if (adr["street-address"]) {
@@ -49,6 +52,20 @@ var yahoo_maps = {
       }
     }
     return url;
+  },
+  getActionName: function(semanticObject, semanticObjectType, propertyIndex) {
+    if (semanticObjectType == "hCard") {
+      if (propertyIndex == undefined) {
+        return;
+      }
+      var adr = semanticObject.adr[propertyIndex];
+      if (!adr) {
+        return;
+      }
+      return adr.toString();
+    } else {
+      return semanticObject().toString();
+    }
   }
 };
 
