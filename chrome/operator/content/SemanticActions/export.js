@@ -247,7 +247,10 @@ var export_vcard = {
     if (hcard.note) {
       vcf += "NOTE;CHARSET=UTF-8:";
       for (i=0; i< hcard.note.length;i++) {
-        var s = hcard.note[i];
+        var s = hcard.note[i].toString();
+        if (!s) {
+          continue;
+        }
         s = s.replace(/\<.*?\>/gi, ' ');
         s = s.replace(/[\n\r\t]/gi, ' ');
         s = s.replace(/\s{2,}/gi, ' ');
@@ -349,7 +352,7 @@ var export_icalendar = {
         } else {
           header = false;
         }
-        if (j == (semanticArrays["hCalendar"].length > 0 -1)) {
+        if (j == (semanticArrays["hCalendar"].length - 1)) {
           footer = true;
         } else {
           footer = false;
@@ -619,7 +622,7 @@ var export_kml = {
       cos.writeString(kmlHeader);
 
       if (semanticObject.toString()) {
-        var name = '  <name>' + semanticObject.toString() + '</name>';
+        var name = '  <name>' + semanticObject.toString() + '</name>\n';
         cos.writeString(name);
       }
       var str = kmlPoint;
