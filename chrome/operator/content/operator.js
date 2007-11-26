@@ -1040,7 +1040,7 @@ var Operator = {
      looking for semantic data and creates the menus and buttons */
   processSemanticData: function processSemanticData()
   {
-    Operator.console_message("processSemanticData called");
+//    Operator.console_message("processSemanticData called");
     /* Reset the timer we're using to batch processing */
     Operator.timerID = null;
 
