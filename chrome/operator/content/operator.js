@@ -839,58 +839,41 @@ var Operator = {
   },
   processSemanticDataDelayed: function processSemanticDataDelayed(event)
   {
-    if (Operator.timerID) {
-      window.clearTimeout(Operator.timerID);
-    }
-    Operator.timerID = window.setTimeout(Operator.processSemanticData, 100);
-  },
-  recursiveAddListeners: function recursiveAddListeners(window)
-  {
-    if (window && window.frames.length > 0) {
-      for (var i=0; i < window.frames.length; i++) {
-        Operator.recursiveAddListeners(window.frames[i]);
-      }
-    }
-    if (window) {
-      window.document.addEventListener("mouseover", Operator.mouseOver, false);
-      window.document.addEventListener("DOMNodeInserted", Operator.processSemanticDataDelayed, false);
-      window.document.addEventListener("DOMNodeRemoved", Operator.processSemanticDataDelayed, false);
-      if (Operator.observeDOMAttrModified) {
-        window.document.addEventListener("DOMAttrModified", Operator.processSemanticDataDelayed, false);
-      }
-    }
-/*
-    var icon = window.document.createElement("img");
-    icon.setAttribute("id","operator-mouseover-icon");
-    icon.setAttribute("style","position:absolute;left:0px;top:0px;width:16px;height:16px;");
-    icon.setAttribute("src","chrome://operator/content/operator_small.png");
- 	  window.document.body.appendChild(icon);
-*/
-  },
-  pageShowTimerID: null,
-  pageShowDOMContentLoaded: null,
-  onPageHide: function onPageHide(event) 
-  {
-    /* Reset our stored event target on page hide */
-    Operator.pageShowDOMContentLoaded = null;
-  },
-  onPageShow: function onPageShowDelayed(event) 
-  {
-    /* If this came because of a DOMContentLoaded, note that */
-    if (event.type == "DOMContentLoaded") {
-      Operator.pageShowDOMContentLoaded = event.target;
-    }
-    if (event.type == "pageshow") {
-      if (Operator.pageShowDOMContentLoaded == event.target) {
-        /* we already processed it */
+    if (event) {
+      var target = event.target.ownerDocument ? event.target.ownerDocument : event.target;
+      if (content.document != target) {
         return;
       }
     }
-    if (Operator.pageShowTimerID) {
-      window.clearTimeout(Operator.pageShowTimerID);
+    /* Should we check to make sure the node involved is microformat related ? */
+    if (Operator.timerID) {
+      window.clearTimeout(Operator.timerID);
     }
-    Operator.processSemanticDataDelayed();
-    Operator.recursiveAddListeners(content);
+    Operator.timerID = window.setTimeout(Operator.processSemanticData, 0);
+  },
+  onPageHide: function onPageHide(event) 
+  {
+    /* Should we do something some day? */
+  },
+  onPageShow: function onPageShow(event) 
+  {
+    /* If this came because of a DOMContentLoaded, just disable stuff */
+    if (event.type == "DOMContentLoaded") {
+      Operator.disable();
+      return;
+    }
+    if (event.type == "pageshow") {
+      var target = event.target.ownerDocument ? event.target.ownerDocument : event.target;
+      /* Add listeners in the page show case. We don't need them in the */
+      /* DOMContentLoaded case */
+      target.addEventListener("mouseover", Operator.mouseOver, false);
+      target.addEventListener("DOMNodeInserted", Operator.processSemanticDataDelayed, false);
+      target.addEventListener("DOMNodeRemoved", Operator.processSemanticDataDelayed, false);
+      if (Operator.observeDOMAttrModified) {
+        target.addEventListener("DOMAttrModified", Operator.processSemanticDataDelayed, false);
+      }
+      Operator.processSemanticDataDelayed();
+    }
   },
   onTabChanged: function onTabChanged(event) 
   {
@@ -1037,13 +1020,8 @@ var Operator = {
       }
     } catch (ex) {}
   },
-  /* This is the heavy lifter for Operator. It goes through the document
-     looking for semantic data and creates the menus and buttons */
-  processSemanticData: function processSemanticData()
+  disable: function disableOperator()
   {
-    /* Reset the timer we're using to batch processing */
-    Operator.timerID = null;
-
     /* Clear all the existing data and disable everything */
     Operator_Toolbar.clearPopups();
     Operator_Toolbar.disable();
@@ -1057,6 +1035,16 @@ var Operator = {
     Operator_URLbarButton.clearPopup();
     Operator_URLbarButton.disable();
     Operator_Sidebar.clear();
+  },
+  /* This is the heavy lifter for Operator. It goes through the document
+     looking for semantic data and creates the menus and buttons */
+  processSemanticData: function processSemanticData()
+  {
+    Operator.console_message("processSemanticData called");
+    /* Reset the timer we're using to batch processing */
+    Operator.timerID = null;
+
+    Operator.disable();
 
     /* Get all semantic data from the web page */
     var semanticArrays = [];
