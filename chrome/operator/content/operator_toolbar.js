@@ -42,6 +42,8 @@ var Operator_Toolbar = {
         button.setAttribute("label", button.label);
         button.setAttribute("type", "menu");
         button.addEventListener("mouseover", Operator_Toolbar.mouseOver, false);
+        button.addEventListener("popupshowing", function() {Operator.updateMenus = false;}, false);
+        button.addEventListener("popuphiding", function() {Operator.updateMenus = true;}, false);
 
         if (Operator.actions[action].icon) {
           button.style.listStyleImage = "url('" + Operator.actions[action].icon + "')";
@@ -84,6 +86,9 @@ var Operator_Toolbar = {
 
           button.setAttribute("type", "menu");
           button.addEventListener("mouseover", Operator_Toolbar.mouseOver, false);
+          button.addEventListener("popupshowing", function() {Operator.updateMenus = false;}, false);
+          button.addEventListener("popuphiding", function() {Operator.updateMenus = true;}, false);
+
 
           if ((Microformats[semanticType]) && (Microformats[semanticType].icon)) {
             button.style.listStyleImage = "url('" + Microformats[semanticType].icon + "')";

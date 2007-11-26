@@ -36,8 +36,12 @@ var Operator_URLbarButton = {
               newmenupops[i].addEventListener("popupshowing", menupops[i].store_onpopupshowing, true);
             }
           }
+          newmenu.addEventListener("popupshowing", function() {Operator.updateMenus = false;}, false);
+          newmenu.addEventListener("popuphiding", function() {Operator.updateMenus = true;}, false);
           document.getElementById("operator-urlbar-icon").appendChild(newmenu);
         } else {
+          menu.addEventListener("popupshowing", function() {Operator.updateMenus = false;}, false);
+          menu.addEventListener("popuphiding", function() {Operator.updateMenus = true;}, false);
           document.getElementById("operator-urlbar-icon").appendChild(menu);
         }
         return true;

@@ -8,6 +8,8 @@ var Operator = {
   debug: false,
   /* Current view - 0=data formats, 1=actions */
   view: 0,
+  /* Set to false if we shouldn't do stuff */
+  updateMenus: true,
   /* Whether or not the upcoming bug related to inclusive DTEND is fixed */ 
   upcomingBugFixed: false,
   /* Should microformats be highlighted on mouseover and when selected */
@@ -1040,6 +1042,10 @@ var Operator = {
      looking for semantic data and creates the menus and buttons */
   processSemanticData: function processSemanticData()
   {
+    if (!Operator.updateMenus) {
+      Operator.processSemanticDataDelayed();
+      return;
+    }
 //    Operator.console_message("processSemanticData called");
     /* Reset the timer we're using to batch processing */
     Operator.timerID = null;
