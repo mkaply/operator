@@ -68,7 +68,7 @@ var Microformats = {
     /* array */
     for (let i = 0; i < microformatNodes.length; i++) {
       if (!options || !options.hasOwnProperty("showHidden") || !options.showHidden) {
-        var box = content.document.getBoxObjectFor(microformatNodes[i]);
+        var box = (microformatNodes[i].ownerDocument || microformatNodes[i]).getBoxObjectFor(microformatNodes[i]);
         if ((box.height == 0) || (box.width == 0)) {
           continue;
         }
