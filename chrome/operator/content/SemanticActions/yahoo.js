@@ -64,7 +64,7 @@ var yahoo_maps = {
       }
       return adr.toString();
     } else {
-      return semanticObject().toString();
+      return semanticObject.toString();
     }
   }
 };
