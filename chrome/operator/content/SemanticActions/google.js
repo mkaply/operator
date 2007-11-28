@@ -57,14 +57,17 @@ var google_maps = {
   getActionName: function(semanticObject, semanticObjectType, propertyIndex) {
     if (semanticObjectType == "hCard") {
       if (propertyIndex == undefined) {
-        return;
+        return "";
       }
       var adr = semanticObject.adr[propertyIndex];
       if (!adr) {
         return;
       }
       return adr.toString();
-    } else {
+    } else if (semanticObjectType == "geo") {
+      if (propertyIndex == undefined) {
+        return "";
+      }
       return semanticObject.toString();
     }
   }
