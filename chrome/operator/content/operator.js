@@ -1142,6 +1142,13 @@ var Operator = {
                       tempMenu = document.createElement("menuitem");
                       if (Operator.actions[action].getActionName) {
                         tempMenu.label = Operator.actions[action].getActionName(objectArray[k], j, m);
+                        if (tempMenu.label != undefined) {
+                          if (tempMenu.label.length == 0) {
+                            tempMenu.label = objectArray[k].toString();
+                          } else {
+                            tempMenu.label = objectArray[k].toString() + " (" + tempMenu.label + ")";
+                          }
+                        }
                       } else {
                         tempMenu.label = objectArray[k].toString();
                       }
