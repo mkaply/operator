@@ -34,12 +34,12 @@ var Operator_Statusbar = {
               newmenupops[i].addEventListener("popupshowing", menupops[i].store_onpopupshowing, true);
             }
           }
-          newmenu.addEventListener("popupshowing", function() {Operator.updateMenus = false;}, false);
-          newmenu.addEventListener("popuphiding", function() {Operator.updateMenus = true;}, false);
+          newmenu.addEventListener("popupshowing", function(event) {if (event.target == newmenu) Operator.updateMenus = false;}, false);
+          newmenu.addEventListener("popuphiding", function(event) {if (event.target == newmenu) Operator.updateMenus = true;}, false);
           document.getElementById("operator-statusbarpanel").appendChild(newmenu);
         } else {
-          menu.addEventListener("popupshowing", function() {Operator.updateMenus = false;}, false);
-          menu.addEventListener("popuphiding", function() {Operator.updateMenus = true;}, false);
+          menu.addEventListener("popupshowing", function(event) {if (event.target == menu) Operator.updateMenus = false;}, false);
+          menu.addEventListener("popuphiding", function(event) {if (event.target == menu) Operator.updateMenus = true;}, false);
           document.getElementById("operator-statusbarpanel").appendChild(menu);
         }
         return true;

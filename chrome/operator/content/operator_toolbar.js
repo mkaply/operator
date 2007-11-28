@@ -42,8 +42,6 @@ var Operator_Toolbar = {
         button.setAttribute("label", button.label);
         button.setAttribute("type", "menu");
         button.addEventListener("mouseover", Operator_Toolbar.mouseOver, false);
-        button.addEventListener("popupshowing", function() {Operator.updateMenus = false;}, false);
-        button.addEventListener("popuphiding", function() {Operator.updateMenus = true;}, false);
 
         if (Operator.actions[action].icon) {
           button.style.listStyleImage = "url('" + Operator.actions[action].icon + "')";
@@ -86,9 +84,6 @@ var Operator_Toolbar = {
 
           button.setAttribute("type", "menu");
           button.addEventListener("mouseover", Operator_Toolbar.mouseOver, false);
-          button.addEventListener("popupshowing", function() {Operator.updateMenus = false;}, false);
-          button.addEventListener("popuphiding", function() {Operator.updateMenus = true;}, false);
-
 
           if ((Microformats[semanticType]) && (Microformats[semanticType].icon)) {
             button.style.listStyleImage = "url('" + Microformats[semanticType].icon + "')";
@@ -115,6 +110,8 @@ var Operator_Toolbar = {
     var useActions = (Operator.view == 1);
     var button;
     var newmenu = menu.cloneNode(true);
+    newmenu.addEventListener("popupshowing", function(event) {if (event.target == newmenu) Operator.updateMenus = false;}, false);
+    newmenu.addEventListener("popuphiding", function(event) {if (event.target == newmenu) Operator.updateMenus = true;}, false);
     var menuitems = menu.getElementsByTagName("menuitem");
     var newmenuitems = newmenu.getElementsByTagName("menuitem");
     var numitems = 0;
