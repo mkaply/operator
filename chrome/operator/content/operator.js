@@ -476,78 +476,59 @@ var Operator = {
   /* This function sorts semantic object nodes and also removes duplicates */
   sortUnique: function (semanticObjects, sort, unique)
   {
-    /* Go ahead and set the displayName instead of querying it each time */
-    /* Major performance win */
-    for (i=0; i < semanticObjects.length; i++) {
-      semanticObjects[i].displayName = semanticObjects[i].toString();
-    }
-    /* If we aren't sorting or removing duplicates, or we only have 1, just return */
-    if ((!sort && !unique) || (semanticObjects.length <= 1)) {
+    if (semanticObjects.length == 1) {
       return semanticObjects;
     }
-    var i, j;
-    /* Create duplicate of the semanticObject array */
-    var tempArray = semanticObjects.slice();
-    /* Sort the temporary array */
-    tempArray = tempArray.sort(
-      function (a,b) {
-        if (!a.displayName || !b.displayName) {
-          if (!a.displayName && !b.displayName) {
-            return 0;
-          }
-          if (!a.displayName) {
-            return -1;
-          }
-          if (!b.displayName) {
-            return 1;
-          }
-        }
-        if (a.displayName.toLowerCase() < b.displayName.toLowerCase()) {
-          return -1;
-        }
-        if (a.displayName.toLowerCase() > b.displayName.toLowerCase()) {
-          return 1;
-        }
-        return 0;
-      }
-    );
     if (unique) {
-      /* Find the duplicates and remove them */
-      /* The spliced variable is used to know if we should increment */
-      /* our loop counter */
-      i=1;
-      var spliced;
-      while (tempArray[i]) {
-        if (tempArray[i].displayName && tempArray[i-1].displayName) {
-          if (tempArray[i].displayName == tempArray[i-1].displayName) {
-            if (Operator.areEqualObjects(tempArray[i], tempArray[i-1])) {
-              if (sort) {
-                /* If we are sorting, remove the dupes from the temp array */
-                tempArray.splice(i, 1);
-                spliced = true;
-              } else {
-                /* If we aren't, find the objects in the original array and remove them */
-                semanticObjects.splice(semanticObjects.indexOf(tempArray[i]),1);
+      for (var i=0; i < semanticObjects.length; i++) {
+        for (var j=i+1; j < semanticObjects.length; j++) {
+          /* If we aren't already a duplicate, check to see if */
+          /* j is the same as i */
+          if (!semanticObjects[j].duplicate) {
+            if (semanticObjects[j].displayName && (semanticObjects[j].displayName == semanticObjects[i].displayName)) {
+              if (Operator.areEqualObjects(semanticObjects[j], semanticObjects[i])) {
+                semanticObjects[j].duplicate = true;
               }
             }
           }
         }
-        if (!spliced) {
-          i++;
-        } else {
-          spliced = false;
-        }
       }
     }
-    /* If we sorted, return the new array, otherwise return the original array */
     if (sort) {
-      return tempArray;
+      return semanticObjects.sort(
+        function (a,b) {
+          if (!a.displayName || !b.displayName) {
+            if (!a.displayName && !b.displayName) {
+              return 0;
+            }
+            if (!a.displayName) {
+              return -1;
+            }
+            if (!b.displayName) {
+              return 1;
+            }
+          }
+          if (a.displayName.toLowerCase() < b.displayName.toLowerCase()) {
+            return -1;
+          }
+          if (a.displayName.toLowerCase() > b.displayName.toLowerCase()) {
+            return 1;
+          }
+          return 0;
+        }
+      );
     }
     return semanticObjects;
   },
   /* Build the menu for data formats (not actions) */
   buildMenu: function buildMenu(semanticObjects, semanticObjectType, semanticAction)
   {
+    /* Go ahead and set the displayName instead of querying it each time */
+    /* Major performance win */
+    for (var i=0; i < semanticObjects.length; i++) {
+      semanticObjects[i].displayName = semanticObjects[i].toString();
+    }
+    
     /* Sort and remove duplicates */
     if ((Microformats[semanticObjectType]) && Microformats[semanticObjectType].sort) {
       semanticObjects = Operator.sortUnique(semanticObjects, true, Operator.removeDuplicates);
@@ -561,6 +542,9 @@ var Operator = {
     var menuitem;
     var j;
     for (j=0; j < semanticObjects.length; j++) {
+      if (semanticObjects[j].duplicate) {
+        continue;
+      }
       if (semanticObjects[j].displayName || this.debug) {
         if (!menu) {
           menu = document.createElement("menupopup");
@@ -601,6 +585,10 @@ var Operator = {
         Operator.console_message(error.message, Operator.lineNumberFromDOMNode(semanticObjects[j].node));
       }
     }
+    for (var i=0; i < semanticObjects.length; i++) {
+      delete(semanticObjects[i].displayName);
+    }
+
     
     return menu;
   },
@@ -888,27 +876,12 @@ var Operator = {
   /* This function compares the strings in two objects to see if they are equal */
   areEqualObjects: function areEqualObjects(object1, object2)
   {
-    if (!object1 || !object2) {
-      return false;
-    }
-    if (object1.__count__ != object1.__count__) {
-      return false;
-    }
-    for (var i in object1) {
-      if (object1[i] instanceof String) {
-        if (object1[i] == object2[i]) {
-          continue;
-        }
-      } else if (object1[i] instanceof Array) {
-        if (Operator.areEqualObjects(object1[i], object2[i])) {
-          continue;
-        }
-      } else {
-        continue;
+    if (object1.debug & object2.debug) {
+      if (object1.debug(object1) == object2.debug(object2)) {
+        return true;
       }
-      return false;
     }
-    return true;
+    return false;
   },
   debug_alert: function debug_alert(text)
   {
