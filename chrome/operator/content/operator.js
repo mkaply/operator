@@ -710,8 +710,12 @@ var Operator = {
         var label;
         if (Operator.actions[k].getActionName) {
           label = Operator.actions[k].getActionName(semanticObject, semanticObjectType);
-          if (label) {
-            label = description + " (" + label + ")"; 
+          if (label != undefined) {
+            if (label.length > 1) {
+              label = description + " (" + label + ")";
+            } else {
+              label = description;
+            }
           }
         } else {
           label = description;
@@ -877,7 +881,7 @@ var Operator = {
       Operator.processSemanticDataDelayed();
     }
   },
-  onTabChanged: function onTabChanged(event) 
+  onTabChanged: function onTabChanged(event)
   {
     Operator.processSemanticData();
   },
@@ -1158,6 +1162,11 @@ var Operator = {
                     var label;
                     if (Operator.actions[action].getActionName) {
                       label = Operator.actions[action].getActionName(objectArray[k], j);
+                      if (label != undefined) {
+                        if (label.length == 0) {
+                          label = objectArray[k].toString();
+                        }
+                      }
                     } else {
                       label = objectArray[k].toString();
                     }
