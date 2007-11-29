@@ -736,26 +736,18 @@ var Microformats = {
       }
       return mfnode;
     },
-    validate: function validate(mfnode, mfname, error) {
+    validate: function validate(mfnode, mfname) {
+      var error = "";
       if (Microformats[mfname].validate) {
-        return Microformats[mfname].validate(mfnode, error);
-      } else {
-        var mfobject = new Microformats[mfname].mfObject(mfnode);
-        if (Microformats[mfname].required) {
-          error.message = "";
-          for (let i=0;i<Microformats[mfname].required.length;i++) {
-            if (!mfobject[Microformats[mfname].required[i]]) {
-              error.message += "Required property " + Microformats[mfname].required[i] + " not specified\n";
-            }
+        return Microformats[mfname].validate(mfnode);
+      } else if (Microformats[mfname].required) {
+        for (let i=0;i<Microformats[mfname].required.length;i++) {
+          if (!Microformats.parser.getMicroformatProperty(mfnode, mfname, Microformats[mfname].required[i])) {
+            error += "Required property " + Microformats[mfname].required[i] + " not specified\n";
           }
-          if (error.message.length > 0) {
-            return false;
-          }
-        } else {
-          if (!mfobject.toString()) {
-            error.message = "Unable to create microformat";
-            return false;
-          }
+        }
+        if (error.length > 0) {
+          throw(error);
         }
         return true;
       }
@@ -1084,6 +1076,22 @@ var adr_definition = {
     },
     "country-name" : {
     }
+  },
+  validate: function(node) {
+    var xpathExpression = "count(descendant::*[" +
+                                              "contains(concat(' ', @class, ' '), ' post-office-box ')" +
+                                              " or contains(concat(' ', @class, ' '), ' street-address ')" +
+                                              " or contains(concat(' ', @class, ' '), ' extended-address ')" +
+                                              " or contains(concat(' ', @class, ' '), ' locality ')" +
+                                              " or contains(concat(' ', @class, ' '), ' region ')" +
+                                              " or contains(concat(' ', @class, ' '), ' postal-code ')" +
+                                              " or contains(concat(' ', @class, ' '), ' country-name')" +
+                                              "])";
+    var xpathResult = (node.ownerDocument || node).evaluate(xpathExpression, node, null,  Components.interfaces.nsIDOMXPathResult.ANY_TYPE, null).numberValue;
+    if (xpathResult == 0) {
+      throw("Unable to create microformat");
+    }
+    return true;
   }
 };
 
@@ -1632,24 +1640,18 @@ var tag_definition = {
     }
     return returnTag;
   },
-  validate: function(node, error) {
+  validate: function(node) {
     var tag = Microformats.parser.getMicroformatProperty(node, "tag", "tag");
     if (!tag) {
       if (node.href) {
         var url_array = node.getAttribute("href").split("/");
         for(let i=url_array.length-1; i > 0; i--) {
           if (url_array[i] !== "") {
-            if (error) {
-              error.message = "Invalid tag name (" + url_array[i] + ")";
-            }
-            return false;
+            throw("Invalid tag name (" + url_array[i] + ")");;
           }
         }
       } else {
-        if (error) {
-          error.message = "No href specified on tag";
-        }
-        return false;
+        throw("No href specified on tag");
       }
     }
     return true;
