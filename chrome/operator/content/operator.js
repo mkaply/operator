@@ -84,7 +84,9 @@ var Operator = {
       objScriptLoader.loadSubScript("chrome://operator/content/Microformats/Microformats.js");
     }
     /* xFolk is not a part of Firefox 3 */
-    objScriptLoader.loadSubScript("chrome://operator/content/Microformats/xFolk.js");
+    if (!Microformats.xFolk) {
+      objScriptLoader.loadSubScript("chrome://operator/content/Microformats/xFolk.js");
+    }
     /* Don't assume we have RDF */
     try {
       objScriptLoader.loadSubScript("chrome://operator/content/RDFa/rdfa.js");
