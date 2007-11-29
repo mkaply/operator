@@ -577,12 +577,16 @@ var Operator = {
         itemsadded++;
         delete(semanticObjects[j].displayName);
       } else {
-        var error = {};
-        
         /* XXX TODO Validate needs to be more generic? Or do we only call it in the microformat case? */
-        Microformats.parser.validate(semanticObjects[j].node, semanticObjectType, error);
-
-        Operator.console_message(error.message, Operator.lineNumberFromDOMNode(semanticObjects[j].node));
+        var olderror = {};
+        try {
+          Microformats.parser.validate(semanticObjects[j].node, semanticObjectType, olderror);
+          if (olderror.message) {
+            Operator.console_message(olderror.message, Operator.lineNumberFromDOMNode(semanticObjects[j].node));
+          }
+        } catch (ex) {
+          Operator.console_message(ex, Operator.lineNumberFromDOMNode(semanticObjects[j].node));
+        }
       }
     }
     for (var i=0; i < semanticObjects.length; i++) {
@@ -604,6 +608,7 @@ var Operator = {
   attachActions: function attachActions(parentmenu, semanticObject, semanticObjectType, popup)
   {
     var required;
+    var plural;
     var menuitem;
     var submenu = parentmenu;
     var k, m;
@@ -621,15 +626,18 @@ var Operator = {
         continue;
       }
       required = null;
+      plural = false;
       if ((Operator.actions[k].scope.semantic[semanticObjectType] != semanticObjectType)  && (semanticObjectType != "RDF")) {
         var reqprop = Operator.actions[k].scope.semantic[semanticObjectType];
         if (reqprop.indexOf(".") != -1) {
           var props = reqprop.split(".");
           if (semanticObject[props[0]]) {
             required = semanticObject[props[0]][props[1]];
+            plural = Microformats[semanticObjectType].properties[props[0]][props[1]].plural;
           }
         } else {
           required = semanticObject[reqprop];
+          plural = Microformats[semanticObjectType].properties[reqprop].plural;
         }
         if (!required) {
           continue;
@@ -656,7 +664,7 @@ var Operator = {
       if (!description) {
         description = k;
       }
-      if ((required instanceof Array) && (required.length > 1)) {
+      if (plural && (required.length > 1)) {
         var tempMenu;
         for (m=0; m < required.length; m++) {
           tempMenu = parentmenu.ownerDocument.createElement("menuitem");
@@ -853,7 +861,10 @@ var Operator = {
   {
     /* If this came because of a DOMContentLoaded, just disable stuff */
     if (event.type == "DOMContentLoaded") {
-      Operator.disable();
+      var target = event.target.ownerDocument ? event.target.ownerDocument : event.target;
+      if (content.document == target) {
+        Operator.disable();
+      }
       return;
     }
     if (event.type == "pageshow") {
@@ -936,10 +947,18 @@ var Operator = {
       X2V = semanticObject.node;
     }
     
-    var error = {};
+    var error;
+    var olderror = {};
     /* XXX TODO Validate needs to be more generic? Or do we only call it in the microformat case? */
     if (semanticObjectType != "RDF") {
-      Microformats.parser.validate(semanticObject.node, semanticObjectType, error);
+      try {
+        Microformats.parser.validate(semanticObject.node, semanticObjectType, olderror);
+        if (olderror.message) {
+          error = olderror.message;
+        }
+      } catch (ex) {
+        error = ex;
+      }
     }
 
     /* XXX TODO cross semantic validation */
@@ -950,7 +969,7 @@ var Operator = {
 
     window.openDialog("chrome://operator/content/operator_debug.xul","debug","chrome,centerscreen",
                       semanticObjectType,
-                      error.message,
+                      error,
                       dump,
                       xmlString,
                       vcfical,
@@ -1087,6 +1106,7 @@ var Operator = {
                 }
               }
               var required;
+              var plural = false;
               for (k=0; k < objectArray.length; k++) {
                 /* Here we know we have objects that will work with this action */
                 /* Create a menu that corresponds to the action? */
@@ -1097,10 +1117,11 @@ var Operator = {
                   if (reqprop.indexOf(".") != -1) {
                     var props = reqprop.split(".");
                     if (objectArray[k][props[0]]) {
-                      required = objectArray[k][props[0]][props[1]];
+                      plural = Microformats[j].properties[props[0]][props[1]].plural;
                     }
                   } else {
                     required = objectArray[k][reqprop];
+                    plural = Microformats[j].properties[reqprop].plural;
                   }
                   if (!required) {
                     continue;
@@ -1110,7 +1131,7 @@ var Operator = {
                   menu = document.createElement("menupopup");
                 }
                 if (objectArray[k].toString()) {
-                  if ((required instanceof Array) && (required.length > 1)) {
+                  if (plural && (required.length > 1)) {
                     for (m=0; m < required.length; m++) {
                       tempMenu = document.createElement("menuitem");
                       if (Operator.actions[action].getActionName) {
