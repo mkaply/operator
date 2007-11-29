@@ -63,7 +63,7 @@
       <tabpanel>
       <vbox id="clientBox" flex="1">
         <label id="extensionName" crop="right">Operator</label>
-        <label id="extensionVersion" crop="right">0.9a</label>
+        <label id="extensionVersion" crop="right">0.9b</label>
         <description id="extensionDescription">The Semantic Web in Action</description>
     
         <label id="extensionCreatorLabel" class="sectionTitle">&creator.label;</label>
@@ -77,6 +77,7 @@
         <label class="contributor">Alex Faaborg</label>
         <label class="contributor">David I. Lehn</label>
         <label class="contributor">Keith Alexander</label>
+        <label class="contributor">Daniel O'Connor</label>
         </vbox>
       </vbox>
       </tabpanel>
