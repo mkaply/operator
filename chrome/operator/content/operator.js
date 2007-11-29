@@ -633,7 +633,13 @@ var Operator = {
           var props = reqprop.split(".");
           if (semanticObject[props[0]]) {
             required = semanticObject[props[0]][props[1]];
-            plural = Microformats[semanticObjectType].properties[props[0]][props[1]].plural;
+            try {
+              plural = Microformats[semanticObjectType].properties[props[0]][props[1]].plural;
+            } catch (ex) {
+              /* It's possible with nesting of microformat types to have no */
+              /* in the actual microformats */
+              plural = false;
+            }
           }
         } else {
           required = semanticObject[reqprop];
@@ -769,33 +775,34 @@ var Operator = {
       mfNode = Microformats.getParent(node);
     }
     var curmenu = 0;
+    /* Loop through node and all parent nodes to get all microformat */
+    /* for ancestore chain */
     while (mfNode) {
       var mfNameString = Microformats.getNamesFromNode(mfNode);
       var mfNames = mfNameString.split(" ");
       var i;
       var actionmenu;
       var shown_separator = false;
+      /* Loop through names for this given mfnode and handle each mf */
       for (i=0; i < mfNames.length; i++) {
-        actionmenu = document.createElement("menupopup");
-        Operator.attachActions(actionmenu, new Microformats[mfNames[i]].mfObject(mfNode), mfNames[i], true);
-        if (actionmenu.childNodes.length > 0) {
-          if (!shown_separator) {
-            gContextMenu.showItem("operator-separator", true);
-          }
-          gContextMenu.showItem("operator-menu-" + curmenu, true);
-          var menuitem = document.getElementById("operator-menu-" + curmenu);
-          curmenu++;
-          if (Microformats[mfNames[i]].description) {
-            menuitem.label = "Operator " + Microformats[mfNames[i]].description;
-          } else {
-            menuitem.label = "Operator " + mfNames[i];
-          }
-          menuitem.setAttribute("label", menuitem.label);
-          for(var j=menuitem.childNodes.length - 1; j>=0; j--) {
-            menuitem.removeChild(menuitem.childNodes.item(j));
-          }
-          menuitem.appendChild(actionmenu);
+        if (!shown_separator) {
+          gContextMenu.showItem("operator-separator", true);
         }
+        gContextMenu.showItem("operator-menu-" + curmenu, true);
+        var menupopup = document.getElementById("operator-menupopup-" + curmenu);
+        for(var j=menupopup.childNodes.length - 1; j>=0; j--) {
+          menupopup.removeChild(menupopup.childNodes.item(j));
+        }
+        var menuitem = document.getElementById("operator-menu-" + curmenu);
+        actionmenu = document.createElement("menupopup");
+        curmenu++;
+        if (Microformats[mfNames[i]].description) {
+          menuitem.label = "Operator " + Microformats[mfNames[i]].description;
+        } else {
+          menuitem.label = "Operator " + mfNames[i];
+        }
+        menuitem.setAttribute("label", menuitem.label);
+        Operator.attachActions(menupopup, new Microformats[mfNames[i]].mfObject(mfNode), mfNames[i], true);
       }
       mfNode = Microformats.getParent(mfNode);
     }
@@ -1117,7 +1124,13 @@ var Operator = {
                   if (reqprop.indexOf(".") != -1) {
                     var props = reqprop.split(".");
                     if (objectArray[k][props[0]]) {
-                      plural = Microformats[j].properties[props[0]][props[1]].plural;
+                      try {
+                        plural = Microformats[j].properties[props[0]][props[1]].plural;
+                      } catch (ex) {
+                        /* It's possible with nesting of microformat types to have no */
+                        /* in the actual microformats */
+                        plural = false;
+                      }
                     }
                   } else {
                     required = objectArray[k][reqprop];
