@@ -586,69 +586,112 @@ var export_icalendar = {
 };
 
 var export_kml = {
-  description: "Export KML",
-  scope: {
-    semantic: {
-      "geo" : "geo"
-    }
-  },
-  doAction: function(semanticObject, semanticObjectType) {
-    var url;
-    var kmlHeader = '<?xml version="1.0" encoding="UTF-8"?>\n' +
-                    '<kml xmlns="http://earth.google.com/kml/2.1">\n' +
-                    '  <Placemark>\n';
-    var kmlFooter = '  </Placemark>\n' +
-                    '</kml>';
-    var kmlPoint = '  <Point>\n' +
-                   '     <coordinates>%longitude%,%latitude%,0</coordinates>\n' +
-                   '  </Point>\n';
- 
-    
-    if (semanticObjectType == "geo") {
+    description: "Export KML",
+    descriptionAll: "Export All KML",
+    scope: {
+        semantic: {
+            "geo" : "geo"
+        }
+    },
+    doActionAll: function(semanticArrays, semanticObjectType) {
+        if (semanticObjectType == 'geo') {
+            return export_kml.kml_export_action(semanticArrays['geo']);
+        }
+    },
+    doAction: function(semanticObject, semanticObjectType) {
+        if (semanticObjectType == 'geo') {
+            return export_kml.kml_export_action(new Array(semanticObject));
+        }
+    },
+    xmlns_kml: 'http://earth.google.com/kml/2.2',
+    kml_create_placemark: function kml_create_placemark(name, description, lat, lon, alt) {
+      var placemark = document.createElementNS(export_kml.xmlns_kml, 'Placemark');
+  
+      var nameNode = document.createElementNS(export_kml.xmlns_kml, 'name');
+      nameNode.appendChild(document.createTextNode(name));
+  
+      var descriptionNode = document.createElementNS(export_kml.xmlns_kml, 'description');
+      descriptionNode.appendChild(document.createTextNode(description));
+  
+      var pointNode = export_kml.kml_create_point(lat, lon, alt);
+  
+      placemark.appendChild(nameNode);
+      placemark.appendChild(descriptionNode);
+      placemark.appendChild(pointNode);
+  
+      return placemark;
+    },
+    kml_create_point: function kml_create_point(lat, lon, alt) {
+      var point = document.createElementNS(export_kml.xmlns_kml, 'Point');
+      var coordinates = document.createElementNS(export_kml.xmlns_kml, 'coordinates');
+      coordinates.appendChild(document.createTextNode(lon + ',' + lat));
+  
+      point.appendChild(coordinates);
+  
+      return point;
+    },
+    kml_open_file: function kml_open_file(filename) {
       var file = Components.classes["@mozilla.org/file/directory_service;1"].
                             getService(Components.interfaces.nsIProperties).
                             get("TmpD", Components.interfaces.nsIFile);
+      file.append(filename);
   
-      file.append("geo.kml");
-  
+      return file;
+    },
+    kml_write_document: function kml_write_document(doc, filename) {
+      var file = export_kml.kml_open_file(filename);
       var fos = Components.classes["@mozilla.org/network/file-output-stream;1"].
-                           createInstance(Components.interfaces.nsIFileOutputStream);
-      var cos = Components.classes["@mozilla.org/intl/converter-output-stream;1"].
-                           createInstance(Components.interfaces.nsIConverterOutputStream);
+                             createInstance(Components.interfaces.nsIFileOutputStream);
 
       fos.init(file, -1, -1, false);
-      cos.init(fos, null, 0, null);
-  
-      cos.writeString(kmlHeader);
 
-      if (semanticObject.toString()) {
-        var name = '  <name>' + semanticObject.toString() + '</name>\n';
-        cos.writeString(name);
-      }
-      var str = kmlPoint;
-      var str = str.replace(/%latitude%/g, semanticObject.latitude);
-      var str = str.replace(/%longitude%/g, semanticObject.longitude);
-      cos.writeString(str);
-      cos.writeString(kmlFooter);
+      var xml;
+      var s = new XMLSerializer();
 
-      cos.close();
-      fos.close();                                                                  
-  
-      var f = Components.classes["@mozilla.org/file/local;1"].
-                         createInstance(Components.interfaces.nsILocalFile);
+      var stream = {
+          close : function() {},
+          flush : function() {},
+          write : function(string, count) {
+                        fos.write(string, string.length);
+                  }
+      };
+
+      s.serializeToStream(doc, stream, "UTF-8");
+
+      fos.close();
+
+      return file;
+    },
+    kml_execute_url: function kml_execute_url(file) {
+      var f = Components.classes["@mozilla.org/file/local;1"]
+                        .createInstance(Components.interfaces.nsILocalFile);
+
       f.initWithPath(file.path);
       if (Components.classes["@mozilla.org/xre/app-info;1"]
                     .getService(Components.interfaces.nsIXULRuntime)
                     .OS == "Darwin") {
-        f.launch();
-        return true;
+          f.launch();
+          return true;
       }
-      url = Components.classes["@mozilla.org/network/io-service;1"].
-                       getService(Components.interfaces.nsIIOService).
-                       newFileURI(f).
-                       spec;
+
+      return Components.classes["@mozilla.org/network/io-service;1"]
+                       .getService(Components.interfaces.nsIIOService)
+                       .newFileURI(f)
+                       .spec;
+    },
+    kml_export_action: function kml_export_action(items) {
+    var doc = document.implementation.createDocument(export_kml.xmlns_kml,'kml',null);;
+
+    var folder = document.createElementNS(export_kml.xmlns_kml, 'Folder');
+
+    for (var i = 0; i < items.length; i++) {
+        var placemark = export_kml.kml_create_placemark(items[i].toString(), '', items[i].latitude, items[i].longitude, 0);
+        folder.appendChild(placemark);
     }
-    return url;
+
+    doc.documentElement.appendChild(folder);
+
+    return export_kml.kml_execute_url(export_kml.kml_write_document(doc, 'geo.kml'));
   }
 };
 
