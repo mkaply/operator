@@ -1,6 +1,6 @@
 if (Components.utils.import) {
   try {
-    Components.utils.import("resource://gre/modules/Microformats.js");
+    Components.utils.import("rel:Microformats.js");
     EXPORTED_SYMBOLS = ["GRDDL"];
   } catch (ex) {}
 }
