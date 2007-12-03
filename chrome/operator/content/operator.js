@@ -77,8 +77,10 @@ var Operator = {
     /* Attempt to use the Microformats module if available (Firefox 3) */
     if (Components.utils.import) {
       try {
-        Components.utils.import("resource://gre/modules/Microformats.js");
-      } catch (ex) {}
+        Components.utils.import("resource:///modules/Microformats.js");
+      } catch (ex) {
+        /* Unable to load system Microformats - use builtin */
+      }
     }
     var objScriptLoader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"].getService(Components.interfaces.mozIJSSubScriptLoader);
     /* If we didn't get Microformats by import, load our own JS file */
