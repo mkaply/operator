@@ -1,15 +1,12 @@
 if (Components.utils.import) {
   try {
-    Components.utils.import("resource://gre/modules/Microformats.js");
-    EXPORTED_SYMBOLS = ["hResume"];
+    Components.utils.import("rel:Microformats.js");
+    var EXPORTED_SYMBOLS = ["hResume"];
   } catch (ex) {}
 }
 
 function hResume(node) {
   if (node) {
-    if (Components && Components.utils.import) {
-      Components.utils.import("resource://gre/modules/Microformats.js");
-    }
     Microformats.parser.newMicroformat(this, node, "hResume");
   }
 }
@@ -17,7 +14,6 @@ hResume.prototype.toString = function() {
   if (this.contact) {
     return this.contact.fn;
   }
-  return null;
 }
 
 var hResume_definition = {
@@ -66,7 +62,7 @@ var hResume_definition = {
         }
         return experience;
       },
-      plural: true
+      plural: true,
     },
     "summary" : {
     },
@@ -96,7 +92,6 @@ var hResume_definition = {
             return new hCard(vcards[noAffiliation]);
           }
         }
-        return null;
       }
     }
   }
@@ -107,7 +102,7 @@ Microformats.add("hResume", hResume_definition);
 var hresume_firefox_bookmark = {
   scope: {
     semantic: {
-      "hResume" : "hResume"
+      "hResume" : "hResume",
     }
   }
 };
