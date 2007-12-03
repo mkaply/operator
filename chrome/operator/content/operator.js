@@ -20,6 +20,8 @@ var Operator = {
   removeDuplicates: true,
   /* Should we show hidden microformats */
   showHidden: false,
+  /* Should we show allow invalid tags */
+  allowInvalidTags: false,
   /* Should we observe all changes in the DOM */
   observeDOMAttrModified: false,
   /* Is there an icon on the statusbar */
@@ -124,6 +126,70 @@ var Operator = {
       } catch (ex) {
       }
     }
+    
+    /* Setup the pref branch */
+    this.prefBranch = Components.classes["@mozilla.org/preferences-service;1"].
+                                 getService(Components.interfaces.nsIPrefService).
+                                 getBranch("extensions.operator.");
+    /* Check for prefs from Operator 0.6. If present, remove them */
+    var prefBranchOld = Components.classes["@mozilla.org/preferences-service;1"].
+                                   getService(Components.interfaces.nsIPrefService).
+                                   getBranch("extensions.operator_toolbar.");
+    var oldcount = { value: 0 };
+    try {
+      var prefArray = prefBranchOld.getChildList("", oldcount);
+    } catch (ex) {
+    }
+    if (oldcount.value > 0) {
+      prefBranchOld.deleteBranch("");
+    }
+    /* Look for a pre 0.8 preference. If present, reset the prefs */
+    /* Pref migration just got to be too much. */
+    try {
+      this.prefBranch.getCharPref("microformat1");
+      /* If we got here, we have old stuff */
+      this.prefBranch.deleteBranch("");
+    } catch (ex) {}
+    var newcount = { value: 0 };
+    try {
+      this.prefBranch.getChildList("", newcount);
+    } catch (ex) {
+    }
+    /* If we don't have any preferences, setup the default prefs */
+    /* We do this before user scripts so defaults just contain our stuff */
+    if (newcount.value == 0) {
+      j = 1;
+      for (i in Microformats) {
+        if (i != "adr") {
+          this.prefBranch.setCharPref("dataformat" + (j), i);
+          j++;
+        }
+      }
+      if ((typeof(RDFa) != "undefined") || (typeof(eRDF) != "undefined")) {
+        this.prefBranch.setCharPref("dataformat" + (j), "RDF");
+      }
+
+      this.prefBranch.setCharPref("action1", "export_vcard");
+      this.prefBranch.setCharPref("action2", "google_calendar");
+      this.prefBranch.setCharPref("action3", "google_maps");
+      this.prefBranch.setCharPref("action4", "flickr_search_tags");
+      this.prefBranch.setCharPref("action5", "delicious_search_tags");
+      this.prefBranch.setCharPref("action6", "technorati_search_tags");
+    }
+    
+    var i=1;
+    do {
+      try {
+        var dataformat = this.prefBranch.getCharPref("dataformat" + i);
+      } catch (ex) {
+        break;
+      }
+      if (dataformat) {
+        Operator.dataformats[dataformat] = true;
+      }
+      i++;
+    } while (1);
+
 
     /* Load user scripts from the operator directory in the profile */
     var file = Components.classes["@mozilla.org/file/directory_service;1"].
@@ -180,57 +246,6 @@ var Operator = {
       }
     }
     
-    /* We maintain our own dataformats array that combines Microformat and RDFa */
-    for (i in Microformats) {
-      Operator.dataformats.push(i);
-    }
-    if ((typeof(RDFa) != "undefined") || (typeof(eRDF) != "undefined")) {
-      Operator.dataformats.push("RDF");
-    }
-
-    /* Setup the pref branch */
-    this.prefBranch = Components.classes["@mozilla.org/preferences-service;1"].
-                                 getService(Components.interfaces.nsIPrefService).
-                                 getBranch("extensions.operator.");
-    /* Check for prefs from Operator 0.6. If present, remove them */
-    var prefBranchOld = Components.classes["@mozilla.org/preferences-service;1"].
-                                   getService(Components.interfaces.nsIPrefService).
-                                   getBranch("extensions.operator_toolbar.");
-    var oldcount = { value: 0 };
-    try {
-      var prefArray = prefBranchOld.getChildList("", oldcount);
-    } catch (ex) {
-    }
-    if (oldcount.value > 0) {
-      prefBranchOld.deleteBranch("");
-    }
-    /* Look for a pre 0.8 preference. If present, reset the prefs */
-    /* Pref migration just got to be too much. */
-    try {
-      this.prefBranch.getCharPref("microformat1");
-      /* If we got here, we have old stuff */
-      this.prefBranch.deleteBranch("");
-    } catch (ex) {}
-    var newcount = { value: 0 };
-    try {
-      this.prefBranch.getChildList("", newcount);
-    } catch (ex) {
-    }
-    /* If we don't have any preferences, setup the default prefs */
-    if (newcount.value == 0) {
-      j = 1;
-      for (i=0; i< Operator.dataformats.length; i++) {
-        this.prefBranch.setCharPref("dataformat" + (j), Operator.dataformats[i]);
-        j++;
-      }
-      
-      this.prefBranch.setCharPref("action1", "export_vcard");
-      this.prefBranch.setCharPref("action2", "google_calendar");
-      this.prefBranch.setCharPref("action3", "google_maps");
-      this.prefBranch.setCharPref("action4", "flickr_search_tags");
-      this.prefBranch.setCharPref("action5", "delicious_search_tags");
-      this.prefBranch.setCharPref("action6", "technorati_search_tags");
-    }
 
     /* Initialize our default values from prefs */ 
     try {
@@ -250,6 +265,9 @@ var Operator = {
     } catch (ex) {}
     try {
       this.showHidden = this.prefBranch.getBoolPref("showHidden");
+    } catch (ex) {}
+    try {
+      this.allowInvalidTags = this.prefBranch.getBoolPref("allowInvalidTags");
     } catch (ex) {}
     try {
       this.observeDOMAttrModified = this.prefBranch.getBoolPref("observeDOMAttrModified");
@@ -353,6 +371,9 @@ var Operator = {
     if (data == "showHidden") {
       this.showHidden = this.prefBranch.getBoolPref("showHidden");
     }
+    if (data == "allowInvalidTags") {
+      this.allowInvalidTags = this.prefBranch.getBoolPref("allowInvalidTags");
+    }
     if (data == "observeDOMAttrModified") {
       this.observeDOMAttrModified = this.prefBranch.getBoolPref("observeDOMAttrModified");
     }
@@ -387,6 +408,21 @@ var Operator = {
         Operator_Statusbar.hide();
       }
       return;
+    }
+    if (data.match("dataformat")) {
+      Operator.dataformats = {};
+      var i=1;
+      do {
+        try {
+          var dataformat = this.prefBranch.getCharPref("dataformat" + i);
+        } catch (ex) {
+          break;
+        }
+        if (dataformat) {
+          Operator.dataformats[dataformat] = true;
+        }
+        i++;
+      } while (1);
     }
 
     /* If batchPrefChanges is false, recreate the toolbar and reprocess */
@@ -528,7 +564,13 @@ var Operator = {
     /* Go ahead and set the displayName instead of querying it each time */
     /* Major performance win */
     for (var i=0; i < semanticObjects.length; i++) {
-      semanticObjects[i].displayName = semanticObjects[i].toString();
+      if (Operator.allowInvalidTags && (semanticObjectType == "tag")) {
+        semanticObjects[i].displayName = semanticObjects[i].text;
+        delete(semanticObjects[i].tag);
+        semanticObjects[i].tag = semanticObjects[i].text;
+      } else {
+        semanticObjects[i].displayName = semanticObjects[i].toString();
+      }
     }
     
     /* Sort and remove duplicates */
@@ -787,6 +829,9 @@ var Operator = {
       var shown_separator = false;
       /* Loop through names for this given mfnode and handle each mf */
       for (i=0; i < mfNames.length; i++) {
+        if (!Operator.dataformats[mfNames[i]]) {
+          continue;
+        }
         if (!shown_separator) {
           gContextMenu.showItem("operator-separator", true);
         }
@@ -1060,9 +1105,11 @@ var Operator = {
     /* Get all semantic data from the web page */
     var semanticArrays = [];
     var haveSemanticData;
-    for (i in Microformats) {
-      semanticArrays[i] = Microformats.get(i, content.document,
-                                           {showHidden: Operator.showHidden});
+    for (i in Operator.dataformats) {
+      if (Microformats[i]) {
+        semanticArrays[i] = Microformats.get(i, content.document,
+                                             {showHidden: Operator.showHidden});
+      }
     }
     Operator.getSemanticData(content, semanticArrays);
     for (let i in semanticArrays) {
