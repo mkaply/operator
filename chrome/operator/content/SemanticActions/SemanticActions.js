@@ -24,11 +24,13 @@ var SemanticActions = {
       try {
         ojl.loadSubScript(baseurl + "export.js");
         ojl.loadSubScript(baseurl + "30boxes.js");
+        ojl.loadSubScript(baseurl + "amazon.js");
         ojl.loadSubScript(baseurl + "delicious.js");
         ojl.loadSubScript(baseurl + "firefox.js");
         ojl.loadSubScript(baseurl + "flickr.js");
         ojl.loadSubScript(baseurl + "google.js");
         ojl.loadSubScript(baseurl + "magnolia.js");
+        ojl.loadSubScript(baseurl + "mapquest.js");
         ojl.loadSubScript(baseurl + "technorati.js");
         ojl.loadSubScript(baseurl + "upcoming.js");
         ojl.loadSubScript(baseurl + "yahoo.js");
