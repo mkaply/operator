@@ -1,6 +1,7 @@
 /*extern Components, sizeToContent, Operator, ufJSActions */
 
 var Operator_Options = {
+  dataformats: [],
   prefBranch: null,
   saveOptions: function() 
   {
@@ -84,6 +85,14 @@ var Operator_Options = {
 
   onPageLoad: function() 
   {
+    for (i in Microformats) {
+      Operator_Options.dataformats.push(i);
+    }
+    if ((typeof(RDFa) != "undefined") || (typeof(eRDF) != "undefined")) {
+      Operator_Options.dataformats.push("RDF");
+    }
+
+
     this.prefBranch = Components.classes["@mozilla.org/preferences-service;1"].
                                  getService(Components.interfaces.nsIPrefService).
                                  getBranch("extensions.operator.");
@@ -160,7 +169,7 @@ var Operator_Options = {
       removeDuplicates = Operator.removeDuplicates;
     }
     document.getElementById("removeDuplicates").checked = removeDuplicates;
-      
+
     var showHidden;
     try {
       showHidden = this.prefBranch.getBoolPref("showHidden");
@@ -275,7 +284,7 @@ var Operator_Options = {
   
   disableNewDataformat: function()
   {
-    return (document.getElementById("dataformats").getRowCount() == Operator.dataformats.length);
+    return (document.getElementById("dataformats").getRowCount() == Operator_Options.dataformats.length);
   },
   
   disableNewAction: function()
@@ -300,20 +309,30 @@ var Operator_Options = {
     var dataformatmenu = document.getElementById("dataformats");
     var i, j;
     var add;
-    for (i=0; i< Operator.dataformats.length; i++) {
+    
+    for (i in Microformats) {
+      Operator_Options.dataformats.push(i);
+    }
+    if ((typeof(RDFa) != "undefined") || (typeof(eRDF) != "undefined")) {
+      Operator_Options.dataformats.push("RDF");
+    }
+
+    
+    
+    for (i=0; i< Operator_Options.dataformats.length; i++) {
       add = true;
       /* if it is not already in the list */
       for (j=0; j < dataformats.getRowCount(); j++) {
         var item = dataformats.getItemAtIndex(j);
-        if (item.label == Operator.dataformats[i]) {
+        if (item.label == Operator_Options.dataformats[i]) {
           add = false;
           break;
         }
       }
-      if ((add) || ((Operator.dataformats[i] == dataformat) && (edit))) {
-        var menulistitem = dataformatmenu.appendItem(Operator.dataformats[i]);
+      if ((add) || ((Operator_Options.dataformats[i] == dataformat) && (edit))) {
+        var menulistitem = dataformatmenu.appendItem(Operator_Options.dataformats[i]);
         menulistitem.minWidth=dataformatmenu.width;
-        if (Operator.dataformats[i] == dataformat) {
+        if (Operator_Options.dataformats[i] == dataformat) {
           selectedItem = menulistitem;
         }
       }
