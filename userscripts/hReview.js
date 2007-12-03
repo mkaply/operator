@@ -1,19 +1,15 @@
-if (Components.utils.imort) {
+if (Components.utils.import) {
   try {
-    Components.utils.import("resource://gre/modules/Microformats.js");
+    Components.utils.import("rel:Microformats.js");
     var EXPORTED_SYMBOLS = ["hReview"];
   } catch (ex) {}
 }
 
 function hReview(node) {
   if (node) {
-    if (Components && Components.utils.import) {
-      Components.utils.import("resource://gre/modules/Microformats.js");
-    }
     Microformats.parser.newMicroformat(this, node, "hReview");
   }
 }
-
 hReview.prototype.toString = function() {
   var fn;
   if (this.item) {
@@ -32,7 +28,6 @@ hReview.prototype.toString = function() {
       return fn;
     }
   }
-  return null;
 }
 
 var hReview_definition = {
@@ -87,7 +82,7 @@ var hReview_definition = {
         for (var i in item) {
           return item;
         }
-        return null;
+        return;
       }
     },
     "rating" : {
@@ -152,8 +147,9 @@ var hReview_definition = {
         error.message = errormsg;
       }
       return false;
+    } else {
+      return true;
     }
-    return true;
   }
 };
 
