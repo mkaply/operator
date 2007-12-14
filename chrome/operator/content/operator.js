@@ -907,22 +907,14 @@ var Operator = {
     if (Operator.timerID) {
       window.clearTimeout(Operator.timerID);
     }
-    Operator.timerID = window.setTimeout(Operator.processSemanticData, 0);
+    Operator.timerID = window.setTimeout(Operator.processSemanticData, 100);
   },
   onPageHide: function onPageHide(event) 
   {
-    /* Should we do something some day? */
+    Operator.disable();
   },
   onPageShow: function onPageShow(event) 
   {
-    /* If this came because of a DOMContentLoaded, just disable stuff */
-    if (event.type == "DOMContentLoaded") {
-      var target = event.target.ownerDocument ? event.target.ownerDocument : event.target;
-      if (content.document == target) {
-        Operator.disable();
-      }
-      return;
-    }
     if (event.type == "pageshow") {
       var target = event.target.ownerDocument ? event.target.ownerDocument : event.target;
       /* Add listeners in the page show case. We don't need them in the */
@@ -933,7 +925,10 @@ var Operator = {
       if (Operator.observeDOMAttrModified) {
         target.addEventListener("DOMAttrModified", Operator.processSemanticDataDelayed, false);
       }
-      Operator.processSemanticDataDelayed();
+      /* Cannot do this check because it breaks frame navigation! */
+//      if (content.document == target) {
+        Operator.processSemanticDataDelayed();
+//      }
     }
   },
   onTabChanged: function onTabChanged(event)
