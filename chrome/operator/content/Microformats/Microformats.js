@@ -1,4 +1,3 @@
-var EXPORTED_SYMBOLS = ["Microformats", "adr", "tag", "hCard", "hCalendar", "geo"];
 
 var Microformats = {
   version: 0.8,
@@ -67,6 +66,7 @@ var Microformats = {
     /* Create objects for the microformat nodes and put them into the microformats */
     /* array */
     for (let i = 0; i < microformatNodes.length; i++) {
+      /* If showHidden undefined or false, don't add microformats to the list that aren't visible */
       if (!options || !options.hasOwnProperty("showHidden") || !options.showHidden) {
         var box = (microformatNodes[i].ownerDocument || microformatNodes[i]).getBoxObjectFor(microformatNodes[i]);
         if ((box.height == 0) || (box.width == 0)) {
@@ -376,7 +376,28 @@ var Microformats = {
      * @return A string with the telephone number
      */
     telGetter: function(propnode, parentnode) {
-      /* Special case - if this node is a value, use the parent node to get all the values */
+      var pairs = {"a":"href", "object":"data", "area":"href"};
+      var name = propnode.nodeName.toLowerCase();
+      if (pairs.hasOwnProperty(name)) {
+        var protocol;
+        if (propnode[pairs[name]].indexOf("tel:") == 0) {
+          protocol = "tel:";
+        }
+        if (propnode[pairs[name]].indexOf("fax:") == 0) {
+          protocol = "fax:";
+        }
+        if (propnode[pairs[name]].indexOf("modem:") == 0) {
+          protocol = "modem:";
+        }
+        if (protocol) {
+          if (propnode[pairs[name]].indexOf('?') > 0) {
+            return unescape(propnode[pairs[name]].substring(protocol.length, propnode[pairs[name]].indexOf('?')));
+          } else {
+            return unescape(propnode[pairs[name]].substring(protocol.length));
+          }
+        }
+      }
+     /* Special case - if this node is a value, use the parent node to get all the values */
       if (Microformats.matchClass(propnode, "value")) {
         return Microformats.parser.textGetter(parentnode, parentnode);
       } else {
@@ -476,7 +497,11 @@ var Microformats = {
      */
     datatypeHelper: function(prop, node, parentnode) {
       var result;
-      switch (prop.datatype) {
+      var datatype = prop.datatype;
+      if (prop.implied) {
+        datatype = prop.subproperties[prop.implied].datatype;
+      }
+      switch (datatype) {
         case "dateTime":
           result = Microformats.parser.dateTimeGetter(node, parentnode);
           break;
@@ -513,12 +538,14 @@ var Microformats = {
           }
         default:
           result = Microformats.parser.textGetter(node, parentnode);
-          if ((prop.implied) && (result)) {
-            var temp = result;
-            result = {};
-            result[prop.implied] = temp;
-          }
           break;
+      }
+      /* This handles the case where one property implies another property */
+      /* For instance, org by itself is actually org.organization-name */
+      if ((prop.implied) && (result)) {
+        var temp = result;
+        result = {};
+        result[prop.implied] = temp;
       }
       if (result && prop.values) {
         var validType = false;
@@ -1491,11 +1518,33 @@ function geo(node) {
 }
 geo.prototype.toString = function() {
   if (this.latitude && this.longitude) {
+    /* We can't use textGetter if the geo is an abbr or html:abbr because then we will */
+    /* get the title text instead of the text content. For display purposes, we */
+    /* want the text content. **/
     var s;
-    if ((this.node.localName.toLowerCase() != "abbr") && (this.node.localName.toLowerCase() == "html:abbr")) {
+    if ((this.node.localName.toLowerCase() != "abbr") && (this.node.localName.toLowerCase() != "html:abbr")) {
       s = Microformats.parser.textGetter(this.node);
     } else {
-      s = this.node.textContent;
+      /* This code is copied from defaultGetter, since we can't use it due to */
+      /* the abbr problem */
+      if (this.node.innerText) {
+        s = this.node.innerText;
+      } else {
+        s = this.node.textContent;
+      }
+      /* Remove new lines, carriage returns and tabs */
+      s	= s.replace(/[\n\r\t]/gi, ' ');
+      /* Replace any double spaces with single spaces */
+      s	= s.replace(/\s{2,}/gi, ' ');
+      /* Remove any double spaces that are left */
+      s	= s.replace(/\s{2,}/gi, '');
+      /* Remove any spaces at the beginning */
+      s	= s.replace(/^\s+/, '');
+      /* Remove any spaces at the end */
+      s	= s.replace(/\s+$/, '');
+    }
+    if (s) {
+      return s;
     }
 
     /* FIXME - THIS IS FIREFOX SPECIFIC */
