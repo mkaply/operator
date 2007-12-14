@@ -911,7 +911,10 @@ var Operator = {
   },
   onPageHide: function onPageHide(event) 
   {
-    Operator.disable();
+    var target = event.target.ownerDocument ? event.target.ownerDocument : event.target;
+    if (content.document == target) {
+      Operator.disable();
+    }
   },
   onPageShow: function onPageShow(event) 
   {
@@ -938,7 +941,7 @@ var Operator = {
   /* This function compares the strings in two objects to see if they are equal */
   areEqualObjects: function areEqualObjects(object1, object2)
   {
-    if (object1.debug & object2.debug) {
+    if (object1.debug && object2.debug) {
       if (object1.debug(object1) == object2.debug(object2)) {
         return true;
       }
