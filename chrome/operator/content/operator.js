@@ -673,7 +673,8 @@ var Operator = {
       }
       required = null;
       plural = false;
-      if ((Operator.actions[k].scope.semantic[semanticObjectType] != semanticObjectType)  && (semanticObjectType != "RDF")) {
+      if ((Operator.actions[k].scope.semantic[semanticObjectType] != semanticObjectType) &&
+        Microformats[semanticObjectType] && !Operator.actions[k].scope.semantic[semanticObjectType].custom) { 
         var reqprop = Operator.actions[k].scope.semantic[semanticObjectType];
         if (reqprop.indexOf(".") != -1) {
           var props = reqprop.split(".");
@@ -688,8 +689,8 @@ var Operator = {
             }
           }
         } else {
-          required = semanticObject[reqprop];
-          plural = Microformats[semanticObjectType].properties[reqprop].plural;
+            required = semanticObject[reqprop];
+            plural = Microformats[semanticObjectType].properties[reqprop].plural;
         }
         if (!required) {
           continue;
@@ -912,7 +913,7 @@ var Operator = {
   onPageHide: function onPageHide(event) 
   {
     var target = event.target.ownerDocument ? event.target.ownerDocument : event.target;
-    if (content.document == target) {
+    if (content && content.document == target) {
       Operator.disable();
     }
   },
