@@ -3,4 +3,15 @@ style   chrome://browser/content/browser.xul    chrome://operator/content/operat
 style   chrome://global/content/customizeToolbar.xul    chrome://operator/content/operator.css
 content	operator jar:chrome/operator.jar!/content/
 locale  operator en-US jar:chrome/operator.jar!/locale/en-US/
+locale  operator cs-CZ jar:chrome/operator.jar!/locale/cs-CZ/
+locale  operator de-DE jar:chrome/operator.jar!/locale/de-DE/
+locale  operator fr-FR jar:chrome/operator.jar!/locale/fr-FR/
+locale  operator hr-HR jar:chrome/operator.jar!/locale/hr-HR/
+locale  operator it-IT jar:chrome/operator.jar!/locale/it-IT/
+locale  operator ja-JP jar:chrome/operator.jar!/locale/ja-JP/
+locale  operator nl-NL jar:chrome/operator.jar!/locale/nl-NL/
+locale  operator pt-BR jar:chrome/operator.jar!/locale/pt-BR/
+locale  operator ru-RU jar:chrome/operator.jar!/locale/ru-RU/
+locale  operator zh-CN jar:chrome/operator.jar!/locale/zh-CN/
+locale  operator zh-TW jar:chrome/operator.jar!/locale/zh-TW/
 
