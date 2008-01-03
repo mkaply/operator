@@ -13,6 +13,10 @@ function species(node) {
 species.prototype.toString = function() {
   if (this.vernacular) {
     return this.vernacular;
+  } else if (this.trinomial) {
+    return this.trinomial;
+  } else if (this.trinominal) {
+    return this.trinominal;
   } else if (this.binomial) {
     return this.binomial;
   } else if (this.binominal) {
@@ -96,6 +100,10 @@ var species_definition = {
     },
     "binominal" : {
     },
+    "trinomial" : {
+    },
+    "trinominal" : {
+    },
     "genus" : {
     },
     "variety" : {
@@ -137,10 +145,12 @@ var wikispecies_search = {
     var searchstring;
     if (semanticObject.binomial) {
       searchstring = semanticObject.binomial;
+    } else if (semanticObject.binominal) {
+      searchstring = semanticObject.binominal;
     } else {
       searchstring = semanticObject.toString();
     }
-    return "http://species.wikimedia.org/wiki/Special:Search?search=" + encodeURIComponent(searchstring) + "&go=Go";
+    return "http://species.wikimedia.org/wiki/Special:Search?search=" + Microformats.simpleEscape(searchstring) + "&go=Go";
   }
 };
 
@@ -159,10 +169,12 @@ var wikipedia_search = {
     var searchstring;
     if (semanticObject.binomial) {
       searchstring = semanticObject.binomial;
+    } else if (semanticObject.binominal) {
+      searchstring = semanticObject.binominal;
     } else {
       searchstring = semanticObject.toString();
     }
-    return "http://wikipedia.org/wiki/Special:Search?search=" + encodeURIComponent(searchstring) + "&go=Go";
+    return "http://wikipedia.org/wiki/Special:Search?search=" + Microformats.simpleEscape(searchstring) + "&go=Go";
   }
 };
 
