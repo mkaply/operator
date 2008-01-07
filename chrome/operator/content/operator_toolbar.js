@@ -6,6 +6,9 @@ var Operator_Toolbar = {
     var button, action;
     var i;
     var toolbar = document.getElementById("operator-toolbar");
+    if (!toolbar) {
+      return;
+    }
     var toolbarbuttons = toolbar.getElementsByTagName("toolbarbutton");
     for(i=toolbarbuttons.length - 1; i>=0; i--) {
       if (toolbarbuttons[i].id != "operator-options") {
