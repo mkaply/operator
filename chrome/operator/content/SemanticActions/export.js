@@ -53,6 +53,7 @@ var export_vcard = {
   doAction: function(semanticObject, semanticObjectType) {
     var url;
     if (semanticObjectType == "hCard") {
+      this.checkForMimeType();
       var vcf = this.vCard(semanticObject);
       var file = Components.classes["@mozilla.org/file/directory_service;1"].
                             getService(Components.interfaces.nsIProperties).
@@ -278,6 +279,45 @@ var export_vcard = {
     }
     vcf += "END:VCARD" + crlf;
     return vcf;
+  },
+  /* This function checks to see if VCF is handled and if it isn't it sets it */
+  checkForMimeType: function() {
+    try {
+      var mimeSvc = Components.classes["@mozilla.org/mime;1"].getService(Components.interfaces.nsIMIMEService);
+      mimeSvc.getFromTypeAndExtension(null, "vcf");
+      return true;
+    } catch (ex) {
+     var gRDF = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+     const mimeTypes = "UMimTyp";
+     var fileLocator = Components.classes["@mozilla.org/file/directory_service;1"].getService(Components.interfaces.nsIProperties);
+     var file = fileLocator.get(mimeTypes, Components.interfaces.nsIFile);
+     var ioService = Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService);
+     var fileHandler = ioService.getProtocolHandler("file").QueryInterface(Components.interfaces.nsIFileProtocolHandler);
+     var datasource = gRDF.GetDataSourceBlocking(fileHandler.getURLSpecFromFile(file));
+     
+     var source = gRDF.GetResource("urn:mimetypes");
+     var property = gRDF.GetResource("http://home.netscape.com/NC-rdf#MIME-types");
+     var target = gRDF.GetResource("urn:mimetypes:root");
+     datasource.Assert(source, property, target, true);
+ 
+     // Make sure the target is a container.
+     var containerUtils = Components.classes["@mozilla.org/rdf/container-utils;1"]
+                             .getService(Components.interfaces.nsIRDFContainerUtils);
+     if (!containerUtils.IsContainer(datasource, target))
+       containerUtils.MakeSeq(datasource, target);
+ 
+     // Get the type list as an RDF container.
+     var container =
+           Components.classes["@mozilla.org/rdf/container;1"].createInstance(Components.interfaces.nsIRDFContainer);
+     container.Init(datasource, target);
+     var element = gRDF.GetUnicodeResource("urn:mimetype:text/x-vcard");
+     if (container.IndexOf(element) == -1)
+       container.AppendElement(element);
+     var source = gRDF.GetResource("urn:mimetypes");
+     var property =  gRDF.GetResource("http://home.netscape.com/NC-rdf#MIME-types");
+     datasource.Assert(gRDF.GetUnicodeResource("urn:mimetype:text/x-vcard"), gRDF.GetUnicodeResource("http://home.netscape.com/NC-rdf#value"), gRDF.GetLiteral("text/x-vcard"), true);
+     datasource.Assert(gRDF.GetUnicodeResource("urn:mimetype:text/x-vcard"), gRDF.GetUnicodeResource("http://home.netscape.com/NC-rdf#fileExtensions"), gRDF.GetLiteral("vcf"), true);
+    }
   }
 };
 
@@ -292,6 +332,7 @@ var export_icalendar = {
   doAction: function(semanticObject, semanticObjectType) {
     var url;
     if (semanticObjectType == "hCalendar") {
+      this.checkForMimeType();
       var ics = this.iCalendar(semanticObject, true, true);
       var file = Components.classes["@mozilla.org/file/directory_service;1"].
                             getService(Components.interfaces.nsIProperties).
@@ -431,25 +472,27 @@ var export_icalendar = {
         if (hcalendar.location.fn) {
           ics += hcalendar.location.fn;
         }
-        if (hcalendar.location.adr[0]["street-address"]) {
-          ics += ", ";
-          ics += hcalendar.location.adr[0]["street-address"][0];
-        }
-        if (hcalendar.location.adr[0].locality) {
-          ics += ", ";
-          ics += hcalendar.location.adr[0].locality;
-        }
-        if (hcalendar.location.adr[0].region) {
-          ics += ", ";
-          ics += hcalendar.location.adr[0].region;
-        }
-        if (hcalendar.location.adr[0]["postal-code"]) {
-          ics += " ";
-          ics += hcalendar.location.adr[0]["postal-code"];
-        }
-        if (hcalendar.location.adr[0]["country-name"]) {
-          ics += ",";
-          ics += hcalendar.location.adr[0]["country-name"];
+        if (hcalendar.location.adr) {
+          if (hcalendar.location.adr[0]["street-address"]) {
+            ics += ", ";
+            ics += hcalendar.location.adr[0]["street-address"][0];
+          }
+          if (hcalendar.location.adr[0].locality) {
+            ics += ", ";
+            ics += hcalendar.location.adr[0].locality;
+          }
+          if (hcalendar.location.adr[0].region) {
+            ics += ", ";
+            ics += hcalendar.location.adr[0].region;
+          }
+          if (hcalendar.location.adr[0]["postal-code"]) {
+            ics += " ";
+            ics += hcalendar.location.adr[0]["postal-code"];
+          }
+          if (hcalendar.location.adr[0]["country-name"]) {
+            ics += ",";
+            ics += hcalendar.location.adr[0]["country-name"];
+          }
         }
       } else {
         ics += hcalendar.location;
@@ -582,6 +625,45 @@ var export_icalendar = {
     }
 
     return ics;
+  },
+  /* This function checks to see if VCF is handled and if it isn't it sets it */
+  checkForMimeType: function() {
+    try {
+      var mimeSvc = Components.classes["@mozilla.org/mime;1"].getService(Components.interfaces.nsIMIMEService);
+      mimeSvc.getFromTypeAndExtension(null, "ics");
+      return true;
+    } catch (ex) {
+     var gRDF = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+     const mimeTypes = "UMimTyp";
+     var fileLocator = Components.classes["@mozilla.org/file/directory_service;1"].getService(Components.interfaces.nsIProperties);
+     var file = fileLocator.get(mimeTypes, Components.interfaces.nsIFile);
+     var ioService = Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService);
+     var fileHandler = ioService.getProtocolHandler("file").QueryInterface(Components.interfaces.nsIFileProtocolHandler);
+     var datasource = gRDF.GetDataSourceBlocking(fileHandler.getURLSpecFromFile(file));
+     
+     var source = gRDF.GetResource("urn:mimetypes");
+     var property = gRDF.GetResource("http://home.netscape.com/NC-rdf#MIME-types");
+     var target = gRDF.GetResource("urn:mimetypes:root");
+     datasource.Assert(source, property, target, true);
+ 
+     // Make sure the target is a container.
+     var containerUtils = Components.classes["@mozilla.org/rdf/container-utils;1"]
+                             .getService(Components.interfaces.nsIRDFContainerUtils);
+     if (!containerUtils.IsContainer(datasource, target))
+       containerUtils.MakeSeq(datasource, target);
+ 
+     // Get the type list as an RDF container.
+     var container =
+           Components.classes["@mozilla.org/rdf/container;1"].createInstance(Components.interfaces.nsIRDFContainer);
+     container.Init(datasource, target);
+     var element = gRDF.GetUnicodeResource("urn:mimetype:text/calendar");
+     if (container.IndexOf(element) == -1)
+       container.AppendElement(element);
+     var source = gRDF.GetResource("urn:mimetypes");
+     var property =  gRDF.GetResource("http://home.netscape.com/NC-rdf#MIME-types");
+     datasource.Assert(gRDF.GetUnicodeResource("urn:mimetype:text/calendar"), gRDF.GetUnicodeResource("http://home.netscape.com/NC-rdf#value"), gRDF.GetLiteral("text/calendar"), true);
+     datasource.Assert(gRDF.GetUnicodeResource("urn:mimetype:text/calendar"), gRDF.GetUnicodeResource("http://home.netscape.com/NC-rdf#fileExtensions"), gRDF.GetLiteral("ics"), true);
+    }
   }
 };
 
