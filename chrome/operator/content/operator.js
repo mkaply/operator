@@ -322,7 +322,6 @@ var Operator = {
     /* Event listeners for showing and hiding page content */
     window.document.getElementById("content").addEventListener("pageshow", function(e) { Operator.onPageShow(e); }, true);
     window.document.getElementById("content").addEventListener("pagehide", function(e) { Operator.onPageHide(e); }, true);
-    window.document.getElementById("content").addEventListener("DOMContentLoaded", function(e) { Operator.onPageShow(e); }, true);
     /* Event listener for when you switch tabs */
     getBrowser().tabContainer.addEventListener("select", function(e) { Operator.onTabChanged(e); }, true);
     /* Event listener so we can modify the page context menu */
@@ -337,7 +336,6 @@ var Operator = {
     /* Remove page show and hide observers */
     getBrowser().removeEventListener("pageshow", function(e) { Operator.onPageShow(e); }, true);
     getBrowser().removeEventListener("pagehide", function(e) { Operator.onPageHide(e); }, true);
-    getBrowser().removeEventListener("DOMContentLoaded", function(e) { Operator.onPageShow(e); }, true);
     /* Remove listener for switching tabs */
     getBrowser().tabContainer.removeEventListener("select", function(e) { Operator.onTabChanged(e); }, true);
     /* Remove page context menu listener */
