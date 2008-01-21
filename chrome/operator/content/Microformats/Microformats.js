@@ -74,7 +74,11 @@ var Microformats = {
         }
       }
       try {
-         targetArray.push(new Microformats[name].mfObject(microformatNodes[i]));
+        if (options && options.debug) {
+          targetArray.push(new Microformats[name].mfObject(microformatNodes[i], true));
+        } else {
+          targetArray.push(new Microformats[name].mfObject(microformatNodes[i]));
+        }
       } catch (ex) {
         /* Creation of individual object probably failed because it is invalid. */
         /* This isn't a problem, because the page might have invalid microformats */
@@ -561,7 +565,7 @@ var Microformats = {
       }
       return result;
     },
-    newMicroformat: function(object, in_node, microformat) {
+    newMicroformat: function(object, in_node, microformat, validate) {
       /* check to see if we are even valid */
       if (!Microformats[microformat]) {
         throw("Invalid microformat - " + microformat);
@@ -591,6 +595,9 @@ var Microformats = {
       /* we also store the node that has been "resolved" */
       object.resolvedNode = node; 
       object.semanticType = microformat;
+      if (validate) {
+        Microformats.parser.validate(object, microformat);
+      }
     },
     getMicroformatPropertyGenerator: function getMicroformatPropertyGenerator(node, name, property, microformat)
     {
@@ -1127,9 +1134,9 @@ var adr_definition = {
 
 Microformats.add("adr", adr_definition);
 
-function hCard(node) {
+function hCard(node, validate) {
   if (node) {
-    Microformats.parser.newMicroformat(this, node, "hCard");
+    Microformats.parser.newMicroformat(this, node, "hCard", validate);
   }
 }
 hCard.prototype.toString = function() {
@@ -1333,9 +1340,9 @@ var hCard_definition = {
 
 Microformats.add("hCard", hCard_definition);
 
-function hCalendar(node) {
+function hCalendar(node, validate) {
   if (node) {
-    Microformats.parser.newMicroformat(this, node, "hCalendar");
+    Microformats.parser.newMicroformat(this, node, "hCalendar", validate);
   }
 }
 hCalendar.prototype.toString = function() {
@@ -1514,9 +1521,9 @@ var hCalendar_definition = {
 
 Microformats.add("hCalendar", hCalendar_definition);
 
-function geo(node) {
+function geo(node, validate) {
   if (node) {
-    Microformats.parser.newMicroformat(this, node, "geo");
+    Microformats.parser.newMicroformat(this, node, "geo", validate);
   }
 }
 geo.prototype.toString = function() {
@@ -1618,15 +1625,12 @@ var geo_definition = {
 
 Microformats.add("geo", geo_definition);
 
-function tag(node) {
+function tag(node, validate) {
   if (node) {
-    Microformats.parser.newMicroformat(this, node, "tag");
+    Microformats.parser.newMicroformat(this, node, "tag", validate);
   }
 }
 tag.prototype.toString = function() {
-//  if (!this.tag) {
-//    return this.text;
-//  }
   return this.tag;
 }
 
