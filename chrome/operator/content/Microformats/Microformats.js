@@ -75,9 +75,11 @@ var Microformats = {
       }
       try {
         if (options && options.debug) {
-          targetArray.push(new Microformats[name].mfObject(microformatNodes[i], true));
+          /* Don't validate in the debug case so that we don't get errors thrown */
+          /* in the debug case, we want all microformats, even if they are invalid */
+          targetArray.push(new Microformats[name].mfObject(microformatNodes[i], false));
         } else {
-          targetArray.push(new Microformats[name].mfObject(microformatNodes[i]));
+          targetArray.push(new Microformats[name].mfObject(microformatNodes[i], true));
         }
       } catch (ex) {
         /* Creation of individual object probably failed because it is invalid. */
