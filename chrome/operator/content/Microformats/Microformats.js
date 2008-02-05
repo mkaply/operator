@@ -1039,9 +1039,9 @@ var Microformats = {
 
 /* MICROFORMAT DEFINITIONS BEGIN HERE */
 
-function adr(node) {
+function adr(node, validate) {
   if (node) {
-    Microformats.parser.newMicroformat(this, node, "adr");
+    Microformats.parser.newMicroformat(this, node, "adr", validate);
   }
 }
 
@@ -1050,21 +1050,19 @@ adr.prototype.toString = function() {
   var start_parens = false;
   if (this["street-address"]) {
     address_text += this["street-address"][0];
-    address_text += " ";
   } else if (this["extended-address"]) {
     address_text += this["extended-address"];
-    address_text += " ";
   }
   if (this["locality"]) {
     if (this["street-address"] || this["extended-address"]) {
-      address_text += "(";
+      address_text += " (";
       start_parens = true;
     }
     address_text += this["locality"];
   }
   if (this["region"]) {
     if ((this["street-address"] || this["extended-address"]) && (!start_parens)) {
-      address_text += "(";
+      address_text += " (";
       start_parens = true;
     } else if (this["locality"]) {
       address_text += ", ";
@@ -1073,7 +1071,7 @@ adr.prototype.toString = function() {
   }
   if (this["country-name"]) {
     if ((this["street-address"] || this["extended-address"]) && (!start_parens)) {
-      address_text += "(";
+      address_text += " (";
       start_parens = true;
       address_text += this["country-name"];
     } else if ((!this["locality"]) && (!this["region"])) {
