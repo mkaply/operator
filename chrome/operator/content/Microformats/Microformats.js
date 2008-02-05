@@ -598,7 +598,7 @@ var Microformats = {
       object.resolvedNode = node; 
       object.semanticType = microformat;
       if (validate) {
-        Microformats.parser.validate(object, microformat);
+        Microformats.parser.validate(node, microformat);
       }
     },
     getMicroformatPropertyGenerator: function getMicroformatPropertyGenerator(node, name, property, microformat)
@@ -1526,38 +1526,20 @@ function geo(node, validate) {
     Microformats.parser.newMicroformat(this, node, "geo", validate);
   }
 }
+
 geo.prototype.toString = function() {
   if (this.latitude && this.longitude) {
-    /* We can't use textGetter if the geo is an abbr or html:abbr because then we will */
-    /* get the title text instead of the text content. For display purposes, we */
-    /* want the text content. **/
     var s;
     if ((this.node.localName.toLowerCase() != "abbr") && (this.node.localName.toLowerCase() != "html:abbr")) {
       s = Microformats.parser.textGetter(this.node);
     } else {
-      /* This code is copied from defaultGetter, since we can't use it due to */
-      /* the abbr problem */
-      if (this.node.innerText) {
-        s = this.node.innerText;
-      } else {
-        s = this.node.textContent;
-      }
-      /* Remove new lines, carriage returns and tabs */
-      s	= s.replace(/[\n\r\t]/gi, ' ');
-      /* Replace any double spaces with single spaces */
-      s	= s.replace(/\s{2,}/gi, ' ');
-      /* Remove any double spaces that are left */
-      s	= s.replace(/\s{2,}/gi, '');
-      /* Remove any spaces at the beginning */
-      s	= s.replace(/^\s+/, '');
-      /* Remove any spaces at the end */
-      s	= s.replace(/\s+$/, '');
+      s = this.node.textContent;
     }
+
     if (s) {
       return s;
     }
 
-    /* FIXME - THIS IS FIREFOX SPECIFIC */
     /* check if geo is contained in a vcard */
     var xpathExpression = "ancestor::*[contains(concat(' ', @class, ' '), ' vcard ')]";
     var xpathResult = this.node.ownerDocument.evaluate(xpathExpression, this.node, null,  Components.interfaces.nsIDOMXPathResult.FIRST_ORDERED_NODE_TYPE, null);
