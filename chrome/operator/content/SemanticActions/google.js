@@ -53,25 +53,7 @@ var google_maps = {
       }
     }
     return url;
-  },
-  getActionName: function(semanticObject, semanticObjectType, propertyIndex) {
-    if (semanticObjectType == "hCard") {
-      if (propertyIndex == undefined) {
-        return "";
-      }
-      var adr = semanticObject.adr[propertyIndex];
-      if (!adr) {
-        return;
-      }
-      return adr.toString();
-    } else if (semanticObjectType == "geo") {
-      if (propertyIndex == undefined) {
-        return "";
-      }
-      return semanticObject.toString();
-    }
   }
-
 };
 
 var google_search = {
