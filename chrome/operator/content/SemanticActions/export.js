@@ -151,7 +151,7 @@ var export_vcard = {
       vcf += "ROLE;CHARSET=UTF-8:" + hcard.role[0] + crlf;
     }
     if (hcard["sort-string"]) {
-      vcf += "SORT-STRING;CHARSET=UTF-8:" + hcard["sort-string"][0] + crlf;
+      vcf += "SORT-STRING;CHARSET=UTF-8:" + hcard["sort-string"] + crlf;
     }
     if (hcard["class"]) {
       vcf += "CLASS;CHARSET=UTF-8:" + hcard["class"] + crlf;
