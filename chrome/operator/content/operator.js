@@ -727,7 +727,7 @@ var Operator = {
               }
             }
           } else {
-            tempMenu.label = semanticObject.toString();
+            tempMenu.label = required[m].toString();
           }
           if (tempMenu.label) {
             tempMenu.setAttribute("label", tempMenu.label);
