@@ -721,9 +721,11 @@ var Operator = {
           tempMenu = parentmenu.ownerDocument.createElement("menuitem");
           if (Operator.actions[k].getActionName) {
             tempMenu.label = Operator.actions[k].getActionName(semanticObject, semanticObjectType, m);
-            if (tempMenu.label) {
-              if (popup) {
-                tempMenu.label = description + " (" + tempMenu.label + ")";
+            if (tempMenu.label != undefined) {
+              if (tempMenu.label.length > 1) {
+                tempMenu.label = tempMenu.label;
+              } else {
+                tempMenu.label = required[m].toString();
               }
             }
           } else {
