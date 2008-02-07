@@ -771,13 +771,25 @@ var Operator = {
             tempMenu.label = Operator.actions[k].getActionName(semanticObject, semanticObjectType, m);
             if (tempMenu.label != undefined) {
               if (tempMenu.label.length > 1) {
-                tempMenu.label = tempMenu.label;
+                if (popup) {
+                  tempMenu.label = description + " (" + tempMenu.label + ")";
+                } else {
+                  tempMenu.label = tempMenu.label;
+                }
               } else {
-                tempMenu.label = required[m].toString();
+                if (popup) {
+                  tempMenu.label = description + " (" + required[m].toString() + ")";
+                } else {
+                  tempMenu.label = required[m].toString();
+                }
               }
             }
           } else {
-            tempMenu.label = required[m].toString();
+            if (popup) {
+              tempMenu.label = description + " (" + required[m].toString() + ")";
+            } else {
+              tempMenu.label = required[m].toString();
+            }
           }
           if (tempMenu.label) {
             tempMenu.setAttribute("label", tempMenu.label);
@@ -811,7 +823,7 @@ var Operator = {
             if (label.length > 1) {
               label = description + " (" + label + ")";
             } else {
-              label = description;
+              label = description; 
             }
           }
         } else {
