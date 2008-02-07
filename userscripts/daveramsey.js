@@ -38,15 +38,6 @@ var fpu_find = {
         return true;
       }
     }
-  },
-  getActionName: function(semanticObject, semanticObjectType, propertyIndex) {
-    if (!propertyIndex) {
-      propertyIndex = 0;
-    }
-    if (semanticObject.adr && semanticObject.adr[propertyIndex] && semanticObject.adr[propertyIndex]["postal-code"]) {
-      return semanticObject.adr[propertyIndex]["postal-code"];
-    }
-    return;
   }
 };
 
