@@ -149,32 +149,30 @@ var Microformats = {
   getParent: function(node) {
     var xpathExpression;
     var xpathResult;
-    var mfname;
-    for (let i in Microformats)
-    {
-      mfname = i;
-      if (Microformats[mfname]) {
-        if (Microformats[mfname].className) {
-          xpathExpression = "ancestor::*[contains(concat(' ', @class, ' '), ' " + Microformats[mfname].className + " ')]";
-        } else if (Microformats[mfname].attributeValues) {
-          xpathExpression = "ancestor::*[";
-          var attributeList = Microformats[i].attributeValues.split(" ");
-          for (let j=0; j < attributeList.length; j++) {
-            if (j != 0) {
-              xpathExpression += " or ";
-            }
-            xpathExpression += "contains(concat(' ', @" + Microformats[mfname].attributeName + ", ' '), ' " + attributeList[j] + " ')";
+
+    xpathExpression = "ancestor::*[";
+    for (let i=0; i < Microformats.list.length; i++) {
+      var mfname = Microformats.list[i];
+      if (i != 0) {
+        xpathExpression += " or ";
+      }
+      if (Microformats[mfname].className) {
+        xpathExpression += "contains(concat(' ', @class, ' '), ' " + Microformats[mfname].className + " ')";
+      } else {
+        var attributeList = Microformats[mfname].attributeValues.split(" ");
+        for (let j=0; j < attributeList.length; j++) {
+          if (j != 0) {
+            xpathExpression += " or ";
           }
-          xpathExpression += "]"; 
-        } else {
-          continue;
-        }
-        xpathResult = (node.ownerDocument || node).evaluate(xpathExpression, node, null,  Components.interfaces.nsIDOMXPathResult.FIRST_ORDERED_NODE_TYPE, null);
-        if (xpathResult.singleNodeValue) {
-          xpathResult.singleNodeValue.microformat = mfname;
-          return xpathResult.singleNodeValue;
+          xpathExpression += "contains(concat(' ', @" + Microformats[mfname].attributeName + ", ' '), ' " + attributeList[j] + " ')";
         }
       }
+    }
+    xpathExpression += "][1]";
+    xpathResult = (node.ownerDocument || node).evaluate(xpathExpression, node, null,  Components.interfaces.nsIDOMXPathResult.FIRST_ORDERED_NODE_TYPE, null);
+    if (xpathResult.singleNodeValue) {
+      xpathResult.singleNodeValue.microformat = mfname;
+      return xpathResult.singleNodeValue;
     }
     return null;
   },
@@ -695,6 +693,15 @@ var Microformats = {
       } else {
         propnodes = Microformats.getElementsByClassName(mfnode, propname);
       }
+      for (let i=0; i < propnodes.length; i++) {
+        var parentnode = Microformats.getParent(propnodes[i]);
+        /* If the propnode is not a child of the microformat, */
+        /* Remove it */
+        if (parentnode != mfnode) {
+          propnodes.splice(i,1);
+          i--;
+        }
+      }
       if (propnodes.length > 0) {
         var resultArray = [];
         for (let i = 0; i < propnodes.length; i++) {
@@ -1168,7 +1175,9 @@ var hCard_definition = {
       microformat: "adr"
     },
     "agent" : {
-      plural: true
+      plural: true,
+      datatype: "microformat",
+      microformat: "hCard"
     },
     "bday" : {
       datatype: "dateTime"
