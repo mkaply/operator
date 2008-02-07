@@ -40,7 +40,10 @@ var pizzahut_find = {
     }
   },
   getActionName: function(semanticObject, semanticObjectType, propertyIndex) {
-    if (semanticObject.adr[propertyIndex]["postal-code"]) {
+    if (!propertyIndex) {
+      propertyIndex = 0;
+    }
+    if (semanticObject.adr && semanticObject.adr[propertyIndex] && semanticObject.adr[propertyIndex]["postal-code"]) {
       return semanticObject.adr[propertyIndex]["postal-code"];
     }
     return;
