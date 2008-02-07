@@ -1159,7 +1159,7 @@ var Operator = {
         semanticArrays[i] = Microformats.get(i, content.document,
                                              {showHidden: Operator.showHidden,
                                              debug: Operator.debug});
-      }
+      } 
     }
     Operator.getSemanticData(content, semanticArrays);
     for (let i in semanticArrays) {
