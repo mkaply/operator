@@ -1,4 +1,4 @@
-var pizzahut_find = {
+var fpu_find = {
   description: "Find an FPU Class",
   scope: {
     semantic: {
