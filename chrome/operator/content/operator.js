@@ -192,15 +192,63 @@ var Operator = {
       i++;
     } while (1);
 
+    var usdir = Components.classes["@mozilla.org/file/directory_service;1"].
+                            getService(Components.interfaces.nsIProperties).
+                            get("ProfD", Components.interfaces.nsILocalFile);
+    usdir.append("operator");
 
-    /* Load user scripts from the operator directory in the profile */
-    var file = Components.classes["@mozilla.org/file/directory_service;1"].
-                          getService(Components.interfaces.nsIProperties).
-                          get("ProfD", Components.interfaces.nsILocalFile);
-    file.append("operator");
-    
-    if (file.exists() && file.isDirectory()) {
-      var e = file.directoryEntries;
+    if (!usdir.exists()) {
+      usdir.create(Components.interfaces.nsIFile.DIRECTORY_TYPE, 0755);
+    }
+    if (usdir.isDirectory()) {
+      /* If we have user scripts, copy them over */
+      var extman = Components.classes["@mozilla.org/extensions/manager;1"]
+                                      .getService(Components.interfaces.nsIExtensionManager);
+      var appdir = extman.getInstallLocation("{95C9A302-8557-4052-91B7-2BB6BA33C885}")
+                         .getItemLocation("{95C9A302-8557-4052-91B7-2BB6BA33C885}");
+      appdir.append("userscripts");
+      
+      if (appdir.exists() && appdir.isDirectory()) {
+        var e = appdir.directoryEntries;
+        while (e.hasMoreElements()) {
+          var f = e.getNext().QueryInterface(Components.interfaces.nsIFile);
+          var splitpath = f.path.split(".");
+          /* Only load JS files */
+          if (splitpath[splitpath.length-1] == "js") {
+            var oldfile = usdir.clone();
+            oldfile.append(f.leafName);
+            if (!oldfile.exists()) {
+              f.copyTo(usdir, null);
+            } else {
+              /* If the files don't have the same size and date, ask about */
+              /* overwriting */
+              if ((f.fileSize != oldfile.fileSize) || (f.lastModifiedTime != oldfile.lastModifiedTime)) {
+                if (f.lastModifiedTime > oldfile.lastModifiedTime) {
+                  var promptService = Components.classes["@mozilla.org/embedcomp/prompt-service;1"].
+                                                 getService(Components.interfaces.nsIPromptService);
+                  var button = promptService.confirmEx(window, "",
+                                                       this.languageBundle.formatStringFromName("overwriteUserScript.confirm", [f.leafName], 1),
+                                                       promptService.BUTTON_TITLE_YES * promptService.BUTTON_POS_0 +
+                                                       promptService.BUTTON_TITLE_NO * promptService.BUTTON_POS_1,
+                                                       null, null, null, null, {});
+  
+                  if (button == 0) {
+                    oldfile.remove(false);
+                    f.copyTo(usdir, null);
+                  }
+                }
+              }
+            }
+          }
+        }
+        /* Remove the user scripts directory completely so they aren't asked again */
+        try {
+          appdir.remove(true);
+        } catch (ex) {
+        }
+      }
+      /* Load user scripts from the operator directory in the profile */
+      var e = usdir.directoryEntries;
       while (e.hasMoreElements()) {
         var f = e.getNext().QueryInterface(Components.interfaces.nsIFile);
         var splitpath = f.path.split(".");
@@ -1109,7 +1157,8 @@ var Operator = {
     for (i in Operator.dataformats) {
       if (Microformats[i]) {
         semanticArrays[i] = Microformats.get(i, content.document,
-                                             {showHidden: Operator.showHidden});
+                                             {showHidden: Operator.showHidden,
+                                             debug: Operator.debug});
       }
     }
     Operator.getSemanticData(content, semanticArrays);
