@@ -982,6 +982,10 @@ var Operator = {
     if ((event.target.nodeName.toLowerCase() == "style") || (event.target.nodeName.toLowerCase() == "script")) {
       return;
     }
+    var target = event.target.ownerDocument ? event.target.ownerDocument : event.target;
+    if (content.document != target) {
+      return;
+    }
     Operator.processSemanticDataDelayed();
   },
   onPageShow: function onPageShow(event) 
