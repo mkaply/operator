@@ -34,35 +34,9 @@ var hResume_definition = {
       microformat: "hCalendar"
     },
     "experience" : {
-/* These must be handled explicity by the experience getter because of
-   the possibility of vcard
-      subproperties: {
-        "vcard" : {
-          datatype: "microformat",
-          microformat: "hCard"
-        },
-      },
       datatype: "microformat",
-      microformat: "hCalendar"
-*/
-      datatype: "custom",
-      customGetter: function(propnode) {
-        var experience = new hCard(propnode);
-        var vcardnode;
-        if (propnode.className.match("(^|\\s)" + "vcard" + "(\\s|$)")) {
-          vcardnode = propnode;
-        } else {
-          var vcards = Microformats.getElementsByClassName(propnode, "vcard");
-          if (vcards.length > 0) {
-            vcardnode = vcards[0];
-          }
-        }
-        if (vcardnode && experience) {
-          experience.vcard = new hCard(vcardnode);
-        }
-        return experience;
-      },
-      plural: true,
+      microformat: "hCalendar",
+      plural: true
     },
     "summary" : {
     },
