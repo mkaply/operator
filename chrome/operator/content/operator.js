@@ -1149,9 +1149,6 @@ var Operator = {
     /* Clear all the existing data and disable everything */
     Operator_Toolbar.clearPopups();
     Operator_Toolbar.disable();
-    if (Operator.autohide) {
-      Operator_Toolbar.hide();
-    }
     Operator_Statusbar.clearPopup();
     Operator_Statusbar.disable();
     Operator_ToolbarButton.clearPopup();
@@ -1192,6 +1189,9 @@ var Operator = {
     }
     if (!haveSemanticData) {
       Operator_Sidebar.populate();
+      if (Operator.autohide) {
+        Operator_Toolbar.hide();
+      }
       return;
     }
     if (Operator.urlbar) {
