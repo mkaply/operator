@@ -465,33 +465,21 @@ var Microformats = {
      * @param  parentnode The parent node of the property. If it is a subproperty,
      *                    this is the parent property node. If it is not, this is the
      *                    microformat node.
-     * @return An object with function to access the string and the HTML
-     *         Note that because this is an object, you can't do string functions
-     *         so i faked a couple string functions that might be useful.
+     * @return An emulated string object that also has a new function called toHTML
      */
     HTMLGetter: function(propnode, parentnode) {
-      return {
-        toString: function () {
-          return Microformats.parser.defaultGetter(propnode, parentnode, "text");
-        },
-        toHTML: function () {
-          return Microformats.parser.defaultGetter(propnode, parentnode, "HTML"); 
-        },
-        replace: function (a, b) {
-          if (this.toString()) {
-            return this.toString().replace(a,b);
-          } else {
-            return this;
-          }
-        },
-        match: function (a) {
-          if (this.toString()) {
-            return this.toString().match(a);
-          } else {
-            return this;
-          }
-        }
-      };
+      /* This is so we can have a string that behaves like a string */
+      /* but also has a new function that can return the HTML that corresponds */
+      /* to the string. */
+      function mfHTML(value) {
+        this.valueOf = function() {return value.valueOf();}
+        this.toString = function() {return value.toString();}
+      }
+      mfHTML.prototype = new String;
+      mfHTML.prototype.toHTML = function() {
+        return Microformats.parser.defaultGetter(propnode, parentnode, "HTML");
+      }
+      return new mfHTML(Microformats.parser.defaultGetter(propnode, parentnode, "text"));
     },
     /**
      * Internal parser API used to determine which getter to call based on the
