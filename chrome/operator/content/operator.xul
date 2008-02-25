@@ -49,24 +49,24 @@
       / -->
 	</toolbarpalette>
 <popup id="contentAreaContextMenu">
-  <menuseparator id="operator-separator"/>
-  <menu id="operator-menu-0">
+  <menuseparator id="operator-separator" hidden="true"/>
+  <menu id="operator-menu-0" hidden="true">
     <menupopup id="operator-menupopup-0">
     </menupopup>
   </menu>
-  <menu id="operator-menu-1">
+  <menu id="operator-menu-1" hidden="true">
     <menupopup id="operator-menupopup-1">
     </menupopup>
   </menu>
-  <menu id="operator-menu-2">
+  <menu id="operator-menu-2" hidden="true">
     <menupopup id="operator-menupopup-2">
     </menupopup>
   </menu>
-  <menu id="operator-menu-3">
+  <menu id="operator-menu-3" hidden="true">
     <menupopup id="operator-menupopup-3">
     </menupopup>
   </menu>
-  <menu id="operator-menu-4">
+  <menu id="operator-menu-4" hidden="true">
     <menupopup id="operator-menupopup-4">
     </menupopup>
   </menu>
