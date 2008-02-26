@@ -8,6 +8,9 @@ var fpu_find = {
   doAction: function(semanticObject, semanticObjectType, propertyIndex, event) {
     var url;
     if (semanticObjectType == "hCard") {
+      if (!propertyIndex) {
+        propertyIndex = 0;
+      }
       var body = "intZipCode=" + semanticObject.adr[propertyIndex]["postal-code"] + "&intMaxRad=30";
 
       var ios = Components.classes["@mozilla.org/network/io-service;1"]

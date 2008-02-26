@@ -6,11 +6,15 @@ var dominos = {
       "hCard" : "adr"
     }
   },
-  doAction: function(semanticObject, semanticObjectType) {
+  doAction: function(semanticObject, semanticObjectType, propertyIndex) {
     var url;
     if (semanticObjectType == "hCard") {
-      var adr = semanticObject.adr;
-      url = "http://www.dominos.com/apps/storelocator-EN.jsp?";
+      if (propertyIndex) {
+        var adr = semanticObject.adr[propertyIndex];
+      } else {
+        var adr = semanticObject.adr[0];
+      }
+      url = "http://www.dominos.com/home/findstore/storelocator.jsp?";
       if (adr["street-address"]) {
         url += "street=";
         url += adr["street-address"].join(", ");
