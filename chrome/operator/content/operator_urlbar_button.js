@@ -60,11 +60,15 @@ var Operator_URLbarButton = {
   },
   disable: function()
   {
-    document.getElementById("operator-urlbar-icon").removeAttribute("microformats");
+    if (document.getElementById("operator-urlbar-icon")) {
+      document.getElementById("operator-urlbar-icon").removeAttribute("microformats");
+    }
   },
   enable: function()
   {
-    document.getElementById("operator-urlbar-icon").setAttribute("microformats", "true");
+    if (document.getElementById("operator-urlbar-icon")) {
+      document.getElementById("operator-urlbar-icon").setAttribute("microformats", "true");
+    }
   },
   isVisible: function()
   {

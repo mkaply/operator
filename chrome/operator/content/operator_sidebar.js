@@ -102,7 +102,11 @@ var Operator_Sidebar = {
   },
   isVisible: function()
   {
-    return !document.getElementById("sidebar-box").hidden;
+    if (document.getElementById("sidebar-box")) {
+      return !document.getElementById("sidebar-box").hidden;
+    } else {
+      return false;
+    }
   }
 
 };
