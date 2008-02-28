@@ -249,6 +249,12 @@ var Operator_Options = {
         }
       }
     }
+    var appInfo = Components.classes["@mozilla.org/xre/app-info;1"]  
+                            .getService(Components.interfaces.nsIXULAppInfo);
+    if (appInfo.ID == "songbird@songbirdnest.com") {
+      document.getElementById("urlbar").disabled = true;
+      document.getElementById("autohide").disabled = true;
+    }
   },
   
   doDataformatEnabling: function()
