@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+
+<?xml-stylesheet href="chrome://operator/content/operator.css" type="text/css"?>
+
+<!DOCTYPE operator SYSTEM "chrome://operator/locale/operator.dtd">
+
+<overlay id="operator" 
+         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+  <script type="application/x-javascript;version=1.7" src="chrome://operator/content/operator.js"/>
+ <statusbar id="status-bar">
+   <statusbarpanel class="statusbarpanel-menu-iconic" disabled="true" mousethrough="never"
+     id="operator-statusbarpanel"
+   />
+ </statusbar>
+</overlay>
