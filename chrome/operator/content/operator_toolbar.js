@@ -110,6 +110,10 @@ var Operator_Toolbar = {
 
   addButtonMenu: function(menu, semanticObjectType, semanticAction)
   {
+    var toolbar = document.getElementById("operator-toolbar");
+    if (!toolbar) {
+      return;
+    }
     var useActions = (Operator.view == 1);
     var button;
     var newmenu = menu.cloneNode(true);
@@ -169,43 +173,48 @@ var Operator_Toolbar = {
   disable: function()
   {
     var toolbar = document.getElementById("operator-toolbar");
-    var toolbarbuttons = toolbar.getElementsByTagName("toolbarbutton");
-    for(var i=0; i < toolbarbuttons.length; i++) {
-      if (toolbarbuttons[i].id != "operator-options") {
-        toolbarbuttons[i].numitems = 0;
-        toolbarbuttons[i].setAttribute("disabled", "true");
-        var node = document.getAnonymousElementByAttribute(toolbarbuttons[i], "class", "toolbarbutton-icon");
-        node.style.opacity = 0.3;
+    if (toolbar) {
+      var toolbarbuttons = toolbar.getElementsByTagName("toolbarbutton");
+      for(var i=0; i < toolbarbuttons.length; i++) {
+        if (toolbarbuttons[i].id != "operator-options") {
+          toolbarbuttons[i].numitems = 0;
+          toolbarbuttons[i].setAttribute("disabled", "true");
+          var node = document.getAnonymousElementByAttribute(toolbarbuttons[i], "class", "toolbarbutton-icon");
+          node.style.opacity = 0.3;
+        }
       }
     }
   },
   clearPopups: function()
   {
     var toolbar = document.getElementById("operator-toolbar");
-    var toolbarbuttons = toolbar.getElementsByTagName("toolbarbutton");
-    for(var i=0; i < toolbarbuttons.length; i++) {
-      if (toolbarbuttons[i].id != "operator-options") {
-        toolbarbuttons[i].label = toolbarbuttons[i].getAttribute("origlabel");
-        toolbarbuttons[i].setAttribute("label", toolbarbuttons[i].label);
-        toolbarbuttons[i].style.fontWeight = "normal";
+    if (toolbar) {
+      var toolbarbuttons = toolbar.getElementsByTagName("toolbarbutton");
+      for(var i=0; i < toolbarbuttons.length; i++) {
+        if (toolbarbuttons[i].id != "operator-options") {
+          toolbarbuttons[i].label = toolbarbuttons[i].getAttribute("origlabel");
+          toolbarbuttons[i].setAttribute("label", toolbarbuttons[i].label);
+          toolbarbuttons[i].style.fontWeight = "normal";
+        }
       }
     }
   },
   enable: function()
   {
     var toolbar = document.getElementById("operator-toolbar");
-    var toolbarbuttons = toolbar.getElementsByTagName("toolbarbutton");
-    var classes;
-    for(var i=0; i < toolbarbuttons.length; i++) {
-      if (toolbarbuttons[i].id != "operator-options") {
-        if (toolbarbuttons[i].numitems > 0) {
-          toolbarbuttons[i].setAttribute("disabled", "false");
-          var node = document.getAnonymousElementByAttribute(toolbarbuttons[i], "class", "toolbarbutton-icon");
-          node.style.opacity = 0.99;
+    if (toolbar) {
+      var toolbarbuttons = toolbar.getElementsByTagName("toolbarbutton");
+      var classes;
+      for(var i=0; i < toolbarbuttons.length; i++) {
+        if (toolbarbuttons[i].id != "operator-options") {
+          if (toolbarbuttons[i].numitems > 0) {
+            toolbarbuttons[i].setAttribute("disabled", "false");
+            var node = document.getAnonymousElementByAttribute(toolbarbuttons[i], "class", "toolbarbutton-icon");
+            node.style.opacity = 0.99;
+          }
         }
       }
     }
-
   },
   mouseOver: function(event)
   {
