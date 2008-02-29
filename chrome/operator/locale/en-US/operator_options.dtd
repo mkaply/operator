@@ -1,20 +1,20 @@
-<!ENTITY  operatorOptions.label            "Operator Options">
-<!ENTITY  general.label                    "General">
-<!ENTITY  dataformats.label                "Data formats">
-<!ENTITY  dataformat.label                 "Data format">
-<!ENTITY  actions.label                    "Actions">
-<!ENTITY  action.label                     "Action">
-<!ENTITY  handler.label                    "Handler">
-<!ENTITY  defaultHandler.label             "Default Handler">
-<!ENTITY  displayStyle.label               "Display style">
-<!ENTITY  useDescriptiveNames.label        "Use descriptive names">
-<!ENTITY  useShortDescriptions.label       "Use short descriptions">
-<!ENTITY  highlightMicroformats.label      "Highlight Microformats (test feature)">
-<!ENTITY  removeDuplicates.label           "Remove duplicates (might impact performance)">
-<!ENTITY  showHidden.label                 "Show hidden microformats">
-<!ENTITY  debug.label                      "Debug mode">
-<!ENTITY  statusbar.label                  "Display icon in status bar">
-<!ENTITY  urlbar.label                     "Display icon on location bar">
-<!ENTITY  autohide.label                   "Auto-hide the toolbar">
-<!ENTITY  userscripts.label                "User Scripts">
-<!ENTITY  observeDOMAttrModified.label     "Observe all page changes (will impact performance)">
+<!ENTITY operatorOptions.label "Operator Options">
+<!ENTITY general.label "General">
+<!ENTITY dataformats.label "Data formats">
+<!ENTITY dataformat.label "Data format">
+<!ENTITY actions.label "Actions">
+<!ENTITY action.label "Action">
+<!ENTITY handler.label "Handler">
+<!ENTITY defaultHandler.label "Default Handler">
+<!ENTITY displayStyle.label "Display style">
+<!ENTITY useDescriptiveNames.label "Use descriptive names">
+<!ENTITY useShortDescriptions.label "Use short descriptions">
+<!ENTITY highlightMicroformats.label "Highlight Microformats (test feature)">
+<!ENTITY removeDuplicates.label "Remove duplicates (might impact performance)">
+<!ENTITY showHidden.label "Show hidden microformats">
+<!ENTITY debug.label "Debug mode">
+<!ENTITY statusbar.label "Display icon in status bar">
+<!ENTITY urlbar.label "Display icon on location bar">
+<!ENTITY autohide.label "Auto-hide the toolbar">
+<!ENTITY userscripts.label "User Scripts">
+<!ENTITY observeDOMAttrModified.label "Observe all page changes (will impact performance)">

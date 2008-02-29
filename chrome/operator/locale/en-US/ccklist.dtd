@@ -1,11 +1,10 @@
-<!ENTITY newButton.label               "New">
-<!ENTITY newButton.accesskey           "W">
-<!ENTITY deleteButton.label            "Delete">
-<!ENTITY deleteButton.accesskey        "D">
-<!ENTITY editButton.label              "Edit">
-<!ENTITY editButton.accesskey          "E">
-<!ENTITY moveUpButton.label            "Move Up">
-<!ENTITY moveUpButton.accesskey        "U">
-<!ENTITY moveDownButton.label          "Move Down">
-<!ENTITY moveDownButton.accesskey      "O">
-
+<!ENTITY newButton.label "New">
+<!ENTITY newButton.accesskey "W">
+<!ENTITY deleteButton.label "Delete">
+<!ENTITY deleteButton.accesskey "D">
+<!ENTITY editButton.label "Edit">
+<!ENTITY editButton.accesskey "E">
+<!ENTITY moveUpButton.label "Move Up">
+<!ENTITY moveUpButton.accesskey "U">
+<!ENTITY moveDownButton.label "Move Down">
+<!ENTITY moveDownButton.accesskey "O">

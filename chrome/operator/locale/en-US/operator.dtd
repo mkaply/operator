@@ -1,7 +1,6 @@
-<!ENTITY  operatorToolbar.name      "Operator Toolbar">
-<!ENTITY  operator.name             "Operator">
-<!ENTITY  operatorOptions.label     "Options">
-<!ENTITY  operatorToolbar.accesskey "O">
-<!ENTITY  operatorSidebar.name      "Operator Sidebar">
-<!ENTITY  operatorSidebar.accesskey "O">
-
+<!ENTITY operatorToolbar.name "Operator Toolbar">
+<!ENTITY operator.name "Operator">
+<!ENTITY operatorOptions.label "Options">
+<!ENTITY operatorToolbar.accesskey "O">
+<!ENTITY operatorSidebar.name "Operator Sidebar">
+<!ENTITY operatorSidebar.accesskey "O">
