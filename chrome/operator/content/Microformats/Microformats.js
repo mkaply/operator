@@ -1,4 +1,3 @@
-
 var Microformats = {
   version: 0.8,
   /* When a microformat is added, the name is placed in this list */
@@ -68,13 +67,17 @@ var Microformats = {
     for (let i = 0; i < microformatNodes.length; i++) {
       /* If showHidden undefined or false, don't add microformats to the list that aren't visible */
       if (!options || !options.hasOwnProperty("showHidden") || !options.showHidden) {
-        if ((microformatNodes[i].ownerDocument || microformatNodes[i]).getBoundingClientRect) {
-          var box = (microformatNodes[i].ownerDocument || microformatNodes[i]).getBoundingClientRect();
-        } else {
-          var box = (microformatNodes[i].ownerDocument || microformatNodes[i]).getBoxObjectFor(microformatNodes[i]);
-        }
-        if ((box.height == 0) || (box.width == 0)) {
-          continue;
+        /* If there is no ownerDocument, this is the root node and these APIs */
+        /* won't work. */
+        if (microformatNodes[i].ownerDocument) {
+          if (microformatNodes[i].getBoundingClientRect) {
+            var box = microformatNodes[i].getBoundingClientRect();
+          } else {
+            var box = microformatNodes[i].ownerDocument.getBoxObjectFor(microformatNodes[i]);
+          }
+          if ((box.height == 0) || (box.width == 0)) {
+            continue;
+          }
         }
       }
       try {
