@@ -566,13 +566,20 @@ var Operator = {
       return semanticObjects;
     }
     if (unique) {
+      var serializer = new XMLSerializer();
       for (var i=0; i < semanticObjects.length; i++) {
         for (var j=i+1; j < semanticObjects.length; j++) {
           /* If we aren't already a duplicate, check to see if */
           /* j is the same as i */
           if (!semanticObjects[j].duplicate) {
             if (semanticObjects[j].displayName && (semanticObjects[j].displayName == semanticObjects[i].displayName)) {
-              if (Operator.areEqualObjects(semanticObjects[j], semanticObjects[i])) {
+              if (Microformats[semanticObjects[i].semanticType].className) {
+                if (semanticObjects[i].innerHTML == semanticObjects[j].innerHTML) {
+                  semanticObjects[j].duplicate = true;
+                }
+              } else if (serializer.serializeToString(semanticObjects[i].node) == serializer.serializeToString(semanticObjects[j].node)) {
+                semanticObjects[j].duplicate = true;
+              } else if (Operator.areEqualObjects(semanticObjects[j], semanticObjects[i])) {
                 semanticObjects[j].duplicate = true;
               }
             }
@@ -1013,12 +1020,27 @@ var Operator = {
   /* This function compares the strings in two objects to see if they are equal */
   areEqualObjects: function areEqualObjects(object1, object2)
   {
-    if (object1.debug && object2.debug) {
-      if (object1.debug(object1) == object2.debug(object2)) {
-        return true;
-      }
+    if (!object1 || !object2) {
+      return false;
     }
-    return false;
+    if (object1.__count__ != object1.__count__) {
+      return false;
+    }
+    for (var i in object1) {
+      if (object1[i] instanceof String) {
+        if (object1[i] == object2[i]) {
+          continue;
+        }
+      } else if (object1[i] instanceof Array) {
+        if (Operator.areEqualObjects(object1[i], object2[i])) {
+          continue;
+        }
+      } else {
+        continue;
+      }
+      return false;
+    }
+    return true;
   },
   debug_alert: function debug_alert(text)
   {
