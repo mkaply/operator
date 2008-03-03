@@ -17,4 +17,6 @@
 <!ENTITY urlbar.label "Display icon on location bar">
 <!ENTITY autohide.label "Auto-hide the toolbar">
 <!ENTITY userscripts.label "User Scripts">
+<!ENTITY about.label "About">
 <!ENTITY observeDOMAttrModified.label "Observe all page changes (will impact performance)">
+<!ENTITY extension.description "The Semantic Web in Action">
