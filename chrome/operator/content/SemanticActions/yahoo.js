@@ -315,10 +315,10 @@ var yahoo_contacts = {
           }
     
           if (hcard.adr[j]["street-address"]) {
-            url += prefix + "a1=" + escape(hcard.adr[j]["street-address"][0]) + "&";
+            url += prefix + "a1=" + encodeURIComponent(hcard.adr[j]["street-address"][0]) + "&";
           }
           if (hcard.adr[j]["extended-address"]) {
-            url += prefix + "a2=" + escape(hcard.adr[j]["extended-address"]) + "&";
+            url += prefix + "a2=" + encodeURIComponent(hcard.adr[j]["extended-address"]) + "&";
           }
           if (hcard.adr[j].locality) {
             url += prefix + "c=" + hcard.adr[j].locality + "&";
