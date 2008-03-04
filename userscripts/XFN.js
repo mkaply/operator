@@ -10,8 +10,22 @@ function XFN(node) {
     Microformats.parser.newMicroformat(this, node, "XFN");
   }
 }
+
 XFN.prototype.toString = function() {
-  var displayName = this.text + " (";
+  var displayName = this.text;
+  if (!displayName) {
+    /* This is basically for twitter */
+    /* If the node has no text, check to see if we have one (and only one) */
+    /* image as a child. If so, use the alt text */
+    var imgs = this.node.getElementsByTagName("img");
+    if (imgs.length == 1) {
+      displayName = imgs[0].alt;
+    }
+  }
+  if (!displayName) {
+    return;
+  }
+  displayName += " (";
   var first = true;
   var i;
   for (i in this) {
