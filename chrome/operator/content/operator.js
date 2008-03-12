@@ -574,7 +574,7 @@ var Operator = {
           if (!semanticObjects[j].duplicate) {
             if (semanticObjects[j].displayName && (semanticObjects[j].displayName == semanticObjects[i].displayName)) {
               if (Microformats[semanticObjects[i].semanticType].className) {
-                if (semanticObjects[i].innerHTML == semanticObjects[j].innerHTML) {
+                if (semanticObjects[i].node.innerHTML == semanticObjects[j].node.innerHTML) {
                   semanticObjects[j].duplicate = true;
                 }
               } else if (serializer.serializeToString(semanticObjects[i].node) == serializer.serializeToString(semanticObjects[j].node)) {
