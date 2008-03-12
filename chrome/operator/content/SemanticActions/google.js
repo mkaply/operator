@@ -94,41 +94,78 @@ var google_calendar = {
     if (semanticObjectType == "hCalendar") {
       var hcalendar = semanticObject;
       url = "http://www.google.com/calendar/event?action=TEMPLATE";
+      var date, time;
       if (hcalendar.dtstart) {
         url += "&";
         url += "dates="
-        var dtstart = hcalendar.dtstart;
         /* If the date has a Z or nothing, use it as is (remove punctation) */
-        /* If it has an offset, convert to local time */
-        var T = dtstart.indexOf("T");
+        /* If it has an offset, convert to Z */
+        var T = hcalendar.dtstart.indexOf("T");
         if (T > -1) {
-          var offset = dtstart.lastIndexOf("-");
-          /* If there is an offset and there is no Z, localize */
-          if ((offset > T) || !dtstart.match("Z")) {
-            var dtStartDate = Microformats.dateFromISO8601(dtstart);
-            dtstart = Microformats.iso8601FromDate(dtStartDate);
+          var tzpos = hcalendar.dtstart.lastIndexOf("+");
+          if (tzpos == -1) {
+            tzpos = hcalendar.dtstart.lastIndexOf("-");
           }
+          if (tzpos > T) {
+            var js_date = Microformats.dateFromISO8601(hcalendar.dtstart.substr(0, tzpos-1));
+            var tzhours = parseInt(hcalendar.dtstart.substr(tzpos+1, 2));
+            var tzminutes = parseInt(hcalendar.dtstart.substr(tzpos+3, 2));
+            if (hcalendar.dtstart.charAt(tzpos) == "-") {
+              js_date.setHours(js_date.getHours()+tzhours);
+              js_date.setMinutes(js_date.getMinutes()+tzminutes);
+            } else if (hcalendar.dtstart.charAt(tzpos) == "+") {
+              js_date.setHours(js_date.getHours()-tzhours);
+              js_date.setMinutes(js_date.getMinutes()-tzminutes);
+            }
+            var dtstart = Microformats.iso8601FromDate(js_date, true);
+            date = dtstart.substr(0, T);
+            time = dtstart.substr(T) + "Z";
+          } else {
+            date = hcalendar.dtstart.substr(0, T);
+            time = hcalendar.dtstart.substr(T);
+          }
+          dtstart = date + time;
+        } else {
+          dtstart = hcalendar.dtstart;
         }
         /* This will need to change if Google ever supports TZ offsets */
         dtstart = dtstart.replace(/-/g,"").replace(/:/g,"");
         url += dtstart;
         url += "/";
         if (hcalendar.dtend) {
-          var dtend = hcalendar.dtend;
-          var T = dtend.indexOf("T");
+          var T = hcalendar.dtend.indexOf("T");
           if (T > -1) {
-            var offset = dtend.lastIndexOf("-");
-            /* If there is an offset and there is no Z, localize */
-            if ((offset > T) || !dtend.match("Z")) {
-              var dtEndDate = Microformats.dateFromISO8601(dtend);
-              dtend = Microformats.iso8601FromDate(dtEndDate);
+            var tzpos = hcalendar.dtend.lastIndexOf("+");
+            if (tzpos == -1) {
+              tzpos = hcalendar.dtend.lastIndexOf("-");
             }
+            if (tzpos > T) {
+              var js_date = Microformats.dateFromISO8601(hcalendar.dtend.substr(0, tzpos-1));
+              var tzhours = parseInt(hcalendar.dtend.substr(tzpos+1, 2));
+              var tzminutes = parseInt(hcalendar.dtend.substr(tzpos+3, 2));
+              if (hcalendar.dtend.charAt(tzpos) == "-") {
+                js_date.setHours(js_date.getHours()+tzhours);
+                js_date.setMinutes(js_date.getMinutes()+tzminutes);
+              } else if (hcalendar.dtend.charAt(tzpos) == "+") {
+                js_date.setHours(js_date.getHours()-tzhours);
+                js_date.setMinutes(js_date.getMinutes()-tzminutes);
+              }
+              var dtend = Microformats.iso8601FromDate(js_date, true);
+              date = dtend.substr(0, T);
+              time = dtend.substr(T) + "Z";
+            } else {
+              date = hcalendar.dtend.substr(0, T);
+              time = hcalendar.dtend.substr(T);
+            }
+            dtend = date + time;
           } else {
             if (!Operator.upcomingBugFixed) {
               if (content.document.location.href.indexOf("http://upcoming.yahoo.com") == 0) {
-                dtend = dtend.replace(/-/g, "");
+                dtend = hcalendar.dtend.replace(/-/g, "");
                 dtend = (parseInt(dtend)+1).toString();
               }
+            } else {
+              dtend = hcalendar.dtend;
             }
             /* if dtstart had a time, dtend must have a time - google bug? */
             if (dtstart.indexOf("T") > -1) {
