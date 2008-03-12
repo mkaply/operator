@@ -72,6 +72,8 @@ var Microformats = {
         if (microformatNodes[i].ownerDocument) {
           if (microformatNodes[i].getBoundingClientRect) {
             var box = microformatNodes[i].getBoundingClientRect();
+            box.width = box.right - box.left;
+            box.height = box.bottom - box.top;
           } else {
             var box = microformatNodes[i].ownerDocument.getBoxObjectFor(microformatNodes[i]);
           }
