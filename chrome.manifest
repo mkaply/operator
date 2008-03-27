@@ -5,7 +5,6 @@ style   chrome://browser/content/browser.xul    chrome://operator/content/operat
 style   chrome://global/content/customizeToolbar.xul    chrome://operator/content/operator.css
 content	operator chrome/operator/content/
 locale  operator en-US chrome/operator/locale/en-US/
-locale  operator en-US chrome/operator/locale/en-US/
 locale  operator cs-CZ chrome/operator/locale/cs-CZ/
 locale  operator de-DE chrome/operator/locale/de-DE/
 locale  operator fr-FR chrome/operator/locale/fr-FR/
