@@ -49,10 +49,10 @@ var google_maps = {
       }
     } else if (semanticObjectType == "geo") {
       if (semanticObject.latitude && semanticObject.longitude) {
-        return "http://maps.google.com/maps?ll=" + semanticObject.latitude + "," + semanticObject.longitude + "&q=" + semanticObject.latitude + "," + semanticObject.longitude;
+        url = "http://maps.google.com/maps?ll=" + semanticObject.latitude + "," + semanticObject.longitude + "&q=" + semanticObject.latitude + "," + semanticObject.longitude;
       }
     }
-    return url;
+    return url + " (" + semanticObject.toString() + ")";
   }
 };
 
