@@ -277,9 +277,10 @@ var Operator = {
     /* We also support the old way where description is not an array */
     var curLocale = "en-US";
     try {
-      curLocale = Components.classes["@mozilla.org/preferences-service;1"].
-                             getService(Components.interfaces.nsIPrefService).
-                             getCharPref("general.useragent.locale");
+      curLocale = Components.classes["@mozilla.org/preferences-service;1"]
+                            .getService(Components.interfaces.nsIPrefService)
+                            .getBranch(null)
+                            .getCharPref("general.useragent.locale");
     }
     catch (e) {}
 
