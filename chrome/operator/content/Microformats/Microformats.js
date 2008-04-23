@@ -1574,15 +1574,14 @@ function geo(node, validate) {
     Microformats.parser.newMicroformat(this, node, "geo", validate);
   }
 }
-
 geo.prototype.toString = function() {
   if (this.latitude != undefined) {
-    if ((this.latitude > 360) || (this.latitude < -360)) {
+    if (!isFinite(this.latitude) || (this.latitude > 360) || (this.latitude < -360)) {
       return;
     }
   }
   if (this.longitude != undefined) {
-    if ((this.longitude > 360) || (this.longitude < -360)) {
+    if (!isFinite(this.longitude) || (this.longitude > 360) || (this.longitude < -360)) {
       return;
     }
   }
@@ -1668,14 +1667,14 @@ var geo_definition = {
     var latitude = Microformats.parser.getMicroformatProperty(node, "geo", "latitude");
     var longitude = Microformats.parser.getMicroformatProperty(node, "geo", "longitude");
     if (latitude != undefined) {
-      if ((latitude > 360) || (latitude < -360)) {
+      if (!isFinite(latitude) || (latitude > 360) || (latitude < -360)) {
         throw("Invalid latitude");
       }
     } else {
       throw("No latitude specified");
     }
     if (longitude != undefined) {
-      if ((longitude > 360) || (longitude < -360)) {
+      if (!isFinite(longitude) || (longitude > 360) || (longitude < -360)) {
         throw("Invalid longitude");
       }
     } else {
