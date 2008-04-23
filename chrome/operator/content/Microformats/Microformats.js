@@ -1,5 +1,4 @@
 var Microformats = {
-  version: 0.8,
   /* When a microformat is added, the name is placed in this list */
   list: [],
   /* Custom iterator so that microformats can be enumerated as */
@@ -67,8 +66,6 @@ var Microformats = {
     for (let i = 0; i < microformatNodes.length; i++) {
       /* If showHidden undefined or false, don't add microformats to the list that aren't visible */
       if (!options || !options.hasOwnProperty("showHidden") || !options.showHidden) {
-        /* If there is no ownerDocument, this is the root node and these APIs */
-        /* won't work. */
         if (microformatNodes[i].ownerDocument) {
           if (microformatNodes[i].getBoundingClientRect) {
             var box = microformatNodes[i].getBoundingClientRect();
@@ -549,7 +546,7 @@ var Microformats = {
       }
       /* This handles the case where one property implies another property */
       /* For instance, org by itself is actually org.organization-name */
-      if ((prop.implied) && (result != undefined)) {
+      if (prop.implied && (result != undefined)) {
         var temp = result;
         result = {};
         result[prop.implied] = temp;
