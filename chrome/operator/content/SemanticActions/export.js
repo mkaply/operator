@@ -601,6 +601,14 @@ var export_icalendar = {
       }
       ics += crlf;
     }
+    if (hcalendar.rrule) {
+      ics += "RRULE:";
+      for (let i in hcalendar.rrule) {
+        ics += i.toUpperCase() + "=" + hcalendar.rrule[i].toUpperCase() + ";";
+      }
+      ics += crlf;
+    }
+    
     /* OUTLOOK REQUIRES DTSTAMP */
     ics += "DTSTAMP:";
     if (hcalendar.dtstamp) {
