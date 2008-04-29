@@ -12,11 +12,16 @@ var yahoo_maps = {
   },
   doAction: function(semanticObject, semanticObjectType, propertyIndex) {
     var url;
-    if (semanticObjectType == "hCard") {
-      if (propertyIndex == undefined) {
-        propertyIndex = 0;
+    if ((semanticObjectType == "hCard") || (semanticObjectType == "adr")) {
+      var adr;
+      if (semanticObjectType == "hCard") {
+        if (!propertyIndex) {
+          propertyIndex = 0;
+        }
+        adr = semanticObject.adr[propertyIndex];
+      } else {
+        adr = semanticObject;
       }
-      var adr = semanticObject.adr[propertyIndex];
       if (adr) {
         url = "http://maps.yahoo.com/maps_result?";
         if (adr["street-address"]) {
