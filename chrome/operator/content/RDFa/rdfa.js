@@ -1,7 +1,7 @@
 /*extern Operator, Components, content */
 
 var RDFa = {
-  version: 0.8,
+  version: 0.9,
   /* All action specific function are contained in this object */
   actions: {
     /* When an action is added, the name is placed in this list */
@@ -28,7 +28,7 @@ var RDFa = {
   {
     return (RDFa.evaluateXPath("count(//" + RDFa.xpathExpression + ")", rootElement).numberValue > 0);
   },
-  xpathExpression: "*[@about or @property or @instanceof or @datatype]",
+  xpathExpression: "*[@about or @property or @typeof or @instanceof or @datatype]",
   XHTML_VOCAB : 'http://www.w3.org/1999/xhtml/vocab#',
   DEFAULT_NS:  { 
     dc:'http://purl.org/dc/elements/1.1/',
@@ -40,14 +40,14 @@ var RDFa = {
     xsd :'http://www.w3.org/2001/XMLSchema#'
   },
   ns : {
-    rdf : function(name) { return RDFa.DEFAULT_NS.rdf + name; },
-    rdfs : function(name) { return RDFa.DEFAULT_NS.rdfs + name; },
-    dc : function(name) { return RDFa.DEFAULT_NS.dc + name; },
-    foaf : function(name) { return RDFa.DEFAULT_NS.foaf + name; },
-    xsd : function(name) { return RDFa.DEFAULT_NS.xsd + name; }
+    rdf : function(name) { return RDFa.DEFAULT_NS.rdf + (name||''); },
+    rdfs : function(name) { return RDFa.DEFAULT_NS.rdfs + (name||''); },
+    dc : function(name) { return RDFa.DEFAULT_NS.dc + (name||''); },
+    foaf : function(name) { return RDFa.DEFAULT_NS.foaf + (name||''); },
+    xsd : function(name) { return RDFa.DEFAULT_NS.xsd + (name||''); }
   },
   attributes : [ "about", "content", "datatype", 
-    "href", "instanceof", "property", 
+    "href", "typeof", "property", "instanceof",
     "rel", "resource", "rev", "src"
   ],
   xhtmlrel : [ "alternate","appendix","bookmark","cite",
@@ -110,7 +110,7 @@ var RDFa = {
       if(["body","head"].indexOf(e.nodeName) > -1) {
         context.newSubject = RDFa.expandSingleURI('', env);
         context.retval = true;
-      } else if(attributes["instanceof"] != null) {
+      } else if(attributes["typeof"] != null || attributes["instanceof"]) {
         context.newSubject = RDFa.generateBNodeName(e, env.bnodes); 
       } else if(context.pObject != null) {
         context.newSubject = context.pObject;
@@ -136,8 +136,8 @@ var RDFa = {
     if(context.newSubject != null) {
 
       // create type triples
-      if(attributes["instanceof"] != null) {
-        var types = RDFa.expandURI(attributes["instanceof"], env);   
+      if(attributes["typeof"] != null || attributes["instanceof"] != null) {
+        var types = RDFa.expandURI(attributes["typeof"] || attributes["instanceof"], env);   
         for each(type in types) {
           env.model.addResource(context.newSubject, RDFa.ns.rdf("type"), type);
           context.retval = true;
@@ -201,16 +201,12 @@ var RDFa = {
         if(attributes.content != null) {
           content = attributes.content; 
         } else if(e.childNodes.length == textNodes.length ||
-          (e.childNodes.length > 0 && datatype == '')) {
-          content = "";
-          textNodes.forEach(function (n) {
-            content += n.textContent;
-          });
+          	(e.childNodes.length > 0 && datatype == '') ||
+		  	datatype == RDFa.ns.xsd('string') ||
+			(datatype && datatype.length > 0 && datatype != RDFa.ns.rdf("XMLLiteral"))) {
+          content = e.textContent;
         } else if(e.childNodes.length == 0) {
           content = "";
-        } else if(datatype == RDFa.ns.xsd('string')) {
-          content = [e.childNodes[i].textContent 
-            for each(i in RDFa.range(0,e.childNodes.length))].join("");
         }
 
         if(content !== undefined) {
@@ -227,8 +223,8 @@ var RDFa = {
             context.retval = true;
           }
         } else if(nonTextNodes.length > 0 &&
-          (attributes.datatype == null || 
-            attributes.datatype == RDFa.ns.rdf("XMLLiteral"))) {
+          (datatype == null || 
+            datatype == RDFa.ns.rdf("XMLLiteral"))) {
           env.model.addTypedLiteral(context.newSubject || context.pSubject, prop, e.innerHTML, RDFa.ns.rdf("XMLLiteral")); 
           context.retval = true;
           context.recurse = false;
@@ -296,14 +292,17 @@ var RDFa = {
       // strip []
       if(uri[0] == "[" && uri[uri.length-1] == "]") {
         uri = uri.substr(1,uri.length-2);
-        if(uri.length === 0) {
+        if(uri.length == 0) {
           // generate bnode
           uri = RDFa.generateBNodeName(context.e, env.bnodes);
         }
       }     
 
       // if bnode, we're done, no more expanding
-      if(uri.indexOf("_:") === 0) {
+      if(uri.indexOf("_:") == 0) {
+		if(uri == "_:") { // crazy case
+			uri = '_:__operatorbnode__';
+		}
         expanded.push([null, uri]);
         continue;
       }
@@ -348,15 +347,61 @@ var RDFa = {
     return expanded;
     
   },
-  resolveURL: function(relURL, baseURL) {
-    try {
-      var base = Components.classes["@mozilla.org/network/standard-url;1"].createInstance();
-      base = base.QueryInterface(Components.interfaces.nsIURL);
-      base.spec = baseURL;
-      return base.resolve(relURL);
-    } catch(e) {
-      return relURL;
+  resolveURL: function(given, base) {
+    var baseHash = base.indexOf('#');
+    if (baseHash > 0) base = base.slice(0, baseHash);
+    if (given.length==0) return base; // before chopping its filename off
+    if (given.indexOf('#')==0) return base + given;
+    var colon = given.indexOf(':');
+    if (colon >= 0) return given;    // Absolute URI form overrides base URI
+    var baseColon = base.indexOf(':');
+    if (base == "") return given;
+    if (baseColon < 0) {
+        //alert("Invalid base: "+ base + ' in join with ' +given);
+        return given;
     }
+    var baseScheme = base.slice(0,baseColon+1);  // eg http:
+    if (given.indexOf("//") == 0)     // Starts with //
+      return baseScheme + given;
+    if (base.indexOf('//', baseColon)==baseColon+1) {  // Any hostpart?
+      var baseSingle = base.indexOf("/", baseColon+3)
+      if (baseSingle < 0) {
+        if (base.length-baseColon-3 > 0) {
+          return base + "/" + given;
+        } else {
+          return baseScheme + given;
+        }
+      }
+    } else {
+      var baseSingle = base.indexOf("/", baseColon+1);
+        if (baseSingle < 0) {
+          if (base.length-baseColon-1 > 0) {
+            return base + "/" + given;
+          } else {
+            return baseScheme + given;
+          }
+        }
+    }
+
+    if (given.indexOf('/') == 0) {    // starts with / but not //
+      return base.slice(0, baseSingle) + given;
+    }
+    
+    var path = base.slice(baseSingle);
+    var lastSlash = path.lastIndexOf("/");
+    if (lastSlash <0) {
+      return baseScheme + given;
+    }
+    if ((lastSlash >=0) && (lastSlash < (path.length-1))) {
+      path = path.slice(0, lastSlash+1); // Chop trailing filename from base
+    }
+    
+    path = path + given;
+    while (path.match(/[^\/]*\/\.\.\//)) { // must apply to result of prev
+      path = path.replace( /[^\/]*\/\.\.\//, '') // ECMAscript spec 7.8.5
+    }
+    path = path.replace( /\.\//g, ''); // spec vague on escaping
+    return base.slice(0, baseSingle) + path;
   },
   getDocumentBase: function(e)
   {
@@ -509,12 +554,13 @@ RDFa.Literal = function(_value, _type, _lang, _model) {
     return model.literals[value];
   };
   this.prettyPrint = function() {
+	var str = (this.toString() || "").toString().replace(/"/g,"\\\"");
     if(this.$type != null) {
-      return "\"" + this.toString() + "\"" + "^^" + new RDFa.Resource(type, model).prettyPrint();
+      return "\"" + str + "\"" + "^^" + new RDFa.Resource(type, model).prettyPrint();
     } else if (this.$lang != null) {
-      return "\"" + this.toString() + "\"" + "@" + lang;
+      return "\"" + str + "\"" + "@" + lang;
     } else {
-      return "\"" + this.toString() + "\"";
+      return "\"" + str + "\"";
     }
   };
   this.equals = function(obj) {
@@ -736,48 +782,12 @@ RDFa.Model = function() {
     }
     return ntriples;
   };
-  this.dump = function() {
-    var turtle = "";
-    for(var prefix in namespaces) {
-      if(prefix != '_default_') {
-        turtle += "@prefix " + prefix + ": " + "<" + namespaces[prefix] + "> .\n"
-      }
-    }
-
-    if(namespaces['_default_'] !== undefined) {
-      turtle += "@prefix : " + "<" + namespaces['_default_'] + "> .\n"
-    }
-
-    if (turtle.length > 0) turtle += "\n";
-
-    var inverted_ns = {};
-    for(var prefix in namespaces) {
-        inverted_ns[namespaces[prefix]] = prefix;
-    }
-
-    var context = { seen : [] , subjects : [], suppress : false };
-
-    for(var s in subjects) { 
-      context.subjects.push(s);
-    } 
-
-    while(context.subjects.length > 0) {
-      turtle += this.dumpSubject(context.subjects[0], 1, context);
-    }
-
-    return turtle;
-  };
-  this.debug = this.dump;
-
+  this.debug = this.dumpTriples;
   this.dumpSubject = function (s, depth, context, anon) {
-    if(depth === undefined) {
-        depth = 0;
-    }
+    var depth = depth || 0;
+    var context = context || { seen : [], subjects : [] };
     if(typeof uris_map[s] != 'undefined') {
       s = uris_map[s];
-    }
-    if(context === undefined) {
-      context = { seen : [], subjects : [] };
     }
     if(context.seen[s] !== undefined) {
       throw new RDFa.Exceptions.CycleDetected("A cycle has been detected in the graph");
@@ -793,7 +803,7 @@ RDFa.Model = function() {
     var turtle = !anon ? "<" + uris_arr[s] + ">\n" : "";
     var props = this.enumProperties(uris_arr[s]);
     for(var p = 0; p < props.length; p++) {
-      var prop_name = this.prettyURI(props[p].$url);
+      var prop_name = props[p].prettyPrint();
       var values = this.getProperty(uris_arr[s],props[p].$url);
       for(var v = 0; v < values.length; v++) {
           turtle += RDFa.Utilities.string_repeat(" ", depth * 2);
@@ -810,16 +820,10 @@ RDFa.Model = function() {
                 }
               }
             } else {
-              turtle += prop_name + " " + this.prettyURI(values[v].$url);
+              turtle += prop_name + " " + values[v].prettyPrint();
             }
           } else {
-              var append = "";
-              if(values[v].$type !== undefined && values[v].$type != null) {
-                 append += "^^" + this.prettyURI(values[v].$type);
-              } else if(values[v].$lang !== undefined && values[v].$lang != null) {
-                 append += "@" + values[v].$lang;
-              } 
-              turtle += prop_name + " \"" + values[v].toString() + "\"" + append;
+              turtle += prop_name + " " + values[v].prettyPrint();
           }
           if((p == props.length -1) && (v == values.length -1)) {
             if(!anon) {
@@ -836,37 +840,6 @@ RDFa.Model = function() {
       }
     }
     return turtle;
-  };
-  this.prettyURI = function(uri) {
-
-      var prefix_found = undefined;
-      var prefix_ns = undefined;
-      for(var prefix in namespaces) {
-          if(uri.indexOf(namespaces[prefix]) == 0) {
-              prefix_found = prefix;
-              prefix_ns = namespaces[prefix];
-              break;
-          }
-      }
-
-      if(prefix_found === undefined) {
-        /*
-        for(var prefix in RDFa.DEFAULT_NS) {
-            if(uri.indexOf(RDFa.DEFAULT_NS[prefix]) == 0) {
-                prefix_found = prefix;
-                prefix_ns = RDFa.DEFAULT_NS[prefix];
-                break;
-            }
-        }
-        */
-      }
-
-      var prefixed = "<" + uri + ">";
-      if(prefix_found !== undefined) {
-          prefixed = (prefix_found != '_default_') ? prefix_found : "";
-          prefixed += ":" + uri.substring(prefix_ns.length);
-      }
-      return prefixed;
   };
 };
 
@@ -976,18 +949,6 @@ RDFa.SemanticObject = function (_model, _subject) {
 };
 
 RDFa.Utilities = {
-  log : function() {
-    if (console) console.log.apply(null, arguments);
-  },
-  debug : function() {
-    if (console) console.debug.apply(null, arguments);
-  },
-  warn : function() {
-    if (console) console.warn.apply(null, arguments);
-  },
-  info : function() {
-    if (console) console.info.apply(null, arguments);
-  },
   string_repeat : function(str, n) {
    var s = "";
    while (--n >= 0) s += str;
@@ -1045,347 +1006,7 @@ RDFa.Exceptions = {
   } 
 };
 
-RDFa.TestSuite = {
-  ns : {
-    foaf : function(name) { return "http://xmlns.com/foaf/0.1/" + name; },
-    rdf : function(name) { return "http://www.w3.org/1999/02/22-rdf-syntax-ns#" + name; },
-    dc : function(name) { return "http://purl.org/dc/elements/1.1/" + name; }
-  }, 
-  run : function() {
-    for(var i = 0; i < RDFa.TestSuite.tests.length; i++) {
-        if(typeof(RDFa.TestSuite.tests[i]) == 'function') {
-          RDFa.TestSuite.tests[i].apply(RDFa.TestSuite);
-        }
-    }
-    alert("Success!");
-  },
-  assert : function(expr, msg) {
-    if(expr !== undefined && !expr) {
-        throw new Error(msg || "test failed");
-    }
-  },
-  assertTrue : function(expected, result) {
-    if(expected != result) {
-        throw new Error("Expected: " + expected + ", and found: " + result);
-    }
-  },
-  tests : [
-    function() {
-        var ns = RDFa.TestSuite.ns;
-        var model = new RDFa.Model();
-        var s1 = "http://example.org/card.xhtml#i";
-        var s2 = "http://www.w3.org/People/djweitzner/foaf#DJW";
-        var s3 = "http://www.w3.org/People/Berners-Lee/card#i";
-        var s4 = "http://www.w3.org/People/EM/contact#me";
-        var b1 = "_:div0";
-        var b2 = "_:span0";
 
-        model.addResource(s1, ns.rdf("type"), ns.foaf("Person"));
-        model.addLiteral(s1, ns.foaf("givenname"), "Ben");
-        model.addLiteral(s1, ns.foaf("family_name"), "Adida");
-        model.addLiteral(s1, ns.foaf("nick"), "Ben");
 
-        model.addResource(s1, ns.foaf("knows"), s2);
-        model.addResource(s1, ns.foaf("knows"), s3);
-        model.addResource(s1, ns.foaf("knows"), s4);
-
-        model.addResource(s1, ns.foaf("office"), b1);
-        model.addResource(b1, ns.foaf("address"), b2);
-
-        model.addLiteral(b2, ns.foaf("street"), "32 Vassar Street");
-        model.addLiteral(b2, ns.foaf("street2"), "MIT CSAIL Room 32G-694");
-        model.addLiteral(b2, ns.foaf("city"), "Cambridge");
-        model.addLiteral(b2, ns.foaf("postalCode"), "02139");
-        model.addLiteral(b2, ns.foaf("country"), "USA");
-
-        this.assert(model.subjects.length == 1, "model should have 1 subject.");
-        
-        var x = model.subjects[0];
-        this.assertTrue(x, s1); 
-
-        this.assert(model.hasSubject(b1));
-        this.assert(model.hasSubject(b2));
-        this.assert(!model.hasSubject(s2));
-        this.assert(!model.hasSubject(s3));
-        this.assert(!model.hasSubject(s4));
-
-        var props = model.enumProperties(x);
-        this.assertTrue(6, props.length); 
-
-        var props = model.getProperty(x,ns.foaf("knows"));
-        this.assertTrue(3, props.length); 
-
-        var y = new RDFa.SemanticObject(model, x);
-        y.setDefaultNS("http://xmlns.com/foaf/0.1/");
-
-        this.assertTrue("32 Vassar Street", y.office.address.street.toString());
-        this.assertTrue("MIT CSAIL Room 32G-694", y.office.address.street2.toString());
-        this.assertTrue("Cambridge", y.office.address.city.toString());
-        this.assertTrue("USA", y.office.address.country.toString());
-        this.assertTrue("02139", y.office.address.postalCode.toString());
-        
-        this.assertTrue(3, y.knows.$all.length);
-        this.assertTrue(s2, y.knows.$all[0].toString());
-        this.assertTrue(s3, y.knows.$all[1].toString());
-        this.assertTrue(s4, y.knows.$all[2].toString());
-    },
-    function() {
-        var ns = RDFa.TestSuite.ns;
-        var model = new RDFa.Model();
-        var s1 = "http://example.org/card.xhtml#i";
-        var s2 = "http://www.w3.org/People/djweitzner/foaf#DJW";
-        var s3 = "http://www.w3.org/People/Berners-Lee/card#i";
-        var s4 = "http://www.w3.org/People/EM/contact#me";
-        var b1 = "_:div0";
-        var b2 = "_:span0";
-        var b3 = "_:div1";
-
-        model.addResource(s1, ns.rdf("type"), ns.foaf("Person"));
-        model.addLiteral(s1, ns.foaf("givenname"), "Ben");
-        model.addLiteral(s1, ns.foaf("family_name"), "Adida");
-        model.addLiteral(s1, ns.foaf("nick"), "Ben");
-
-        model.addResource(s1, ns.foaf("knows"), s2);
-        model.addResource(s1, ns.foaf("knows"), s3);
-        model.addResource(s1, ns.foaf("knows"), s4);
-
-        model.addResource(s1, ns.foaf("office"), b1);
-        model.addResource(b1, ns.foaf("address"), b2);
-
-        model.addLiteral(b2, ns.foaf("street"), "32 Vassar Street");
-        model.addLiteral(b2, ns.foaf("country"), "USA");
-
-        model.addResource(s1, ns.foaf("met"), s2);
-        model.addResource(s1, ns.foaf("met"), s3);
-        model.addResource(s1, ns.foaf("met"), s4);
-        
-        model.setNamespace("foaf", ns.foaf(""));
-        
-        model.dump();
-    },
-    function() {
-        var ns = RDFa.TestSuite.ns;
-        var model = new RDFa.Model();
-        var s1 = "http://example.org/card.xhtml#i";
-        var s2 = "http://www.w3.org/People/djweitzner/foaf#DJW";
-        var s3 = "http://www.w3.org/People/Berners-Lee/card#i";
-        var s4 = "http://www.w3.org/People/EM/contact#me";
-        var b1 = "_:div0";
-        var b2 = "_:span0";
-        var b3 = "_:div1";
-
-        model.addResource(s1, ns.rdf("type"), ns.foaf("Person"));
-        model.addLiteral(s1, ns.foaf("givenname"), "Ben");
-        model.addLiteral(s1, ns.foaf("family_name"), "Adida");
-        model.addLiteral(s1, ns.foaf("nick"), "Ben");
-
-        model.addResource(s1, ns.foaf("knows"), s2);
-        model.addResource(s1, ns.foaf("knows"), s3);
-        model.addResource(s1, ns.foaf("knows"), s4);
-
-        model.addResource(s1, ns.foaf("office2"), b1);
-        model.addResource(s1, ns.foaf("office"), b1);
-        model.addResource(b1, ns.foaf("address"), b2);
-
-        model.addLiteral(b2, ns.foaf("street"), "32 Vassar Street");
-        model.addLiteral(b2, ns.foaf("country"), "USA");
-
-        model.addResource(s1, ns.foaf("met"), s2);
-        model.addResource(s1, ns.foaf("met"), s3);
-        model.addResource(s1, ns.foaf("met"), s4);
-        
-        model.setNamespace("foaf", ns.foaf(""));
-        
-        model.dump();
-    },
-    function() {
-        var ns = RDFa.TestSuite.ns;
-        var model = new RDFa.Model();
-        var s1 = "http://example.org/card.xhtml#i";
-
-        model.addLiteral(s1, ns.foaf("givenname"), "Ben");
-        model.addLiteral(s1, ns.foaf("nick"), "Elias");
-
-        var x = model.subjects[0];
-        var props1 = model.getProperty(x, ns.foaf("givenname"));
-        var props2 = model.getProperty(x, ns.foaf("nick"));
-        var props3 = model.getProperty(x, ns.foaf("givenname"));
-        
-        this.assert(props1[0].equals(props3[0]));
-        this.assert(!props1[0].equals(props2[0]));
-    },
-    function() {
-        var ns = RDFa.TestSuite.ns;
-        var model = new RDFa.Model();
-        var s1 = "http://example.org/card.xhtml#i";
-        var s2 = "http://www.w3.org/People/djweitzner/foaf#DJW";
-        var s3 = "http://www.w3.org/People/Berners-Lee/card#i";
-        var s4 = "http://www.w3.org/People/EM/contact#me";
-        var b1 = "_:div0";
-        var b2 = "_:span0";
-        var b3 = "_:div1";
-
-        model.addResource(s1, ns.rdf("type"), ns.foaf("Person"));
-        model.addResource(s1, ns.foaf("office2"), b1);
-        model.addResource(s1, ns.foaf("office"), b1);
-        model.addResource(b1, ns.foaf("address"), b2);
-        model.addResource(b2, ns.foaf("address"), b1);
-        
-        model.setNamespace("foaf", ns.foaf(""));
-        
-        model.dump();
-    },
-    function() {
-        var ns = RDFa.TestSuite.ns;
-        var model = new RDFa.Model();
-        var s1 = "http://example.org/card.xhtml#i";
-        var s2 = "http://www.w3.org/People/djweitzner/foaf#DJW";
-        var s3 = "http://www.w3.org/People/Berners-Lee/card#i";
-        var s4 = "http://www.w3.org/People/EM/contact#me";
-        var b1 = "_:div0";
-        var b2 = "_:span0";
-        var b3 = "_:div1";
-
-        model.addResource(s1, ns.rdf("type"), ns.foaf("Person"));
-        model.addResource(s1, ns.foaf("office2"), b1);
-        model.addResource(s1, ns.foaf("office"), b1);
-        model.addResource(b1, ns.foaf("address"), b2);
-        model.addResource(b2, ns.foaf("address"), b1);
-        
-        model.setNamespace("_default_", ns.foaf(""));
-        
-        model.dump();
-    },
-    function() {
-        var ns = RDFa.TestSuite.ns;
-        var model = new RDFa.Model();
-        var s1 = "http://example.org/card.xhtml#i";
-        var s2 = "http://www.w3.org/People/djweitzner/foaf#DJW";
-        var s3 = "http://www.w3.org/People/Berners-Lee/card#i";
-        var s4 = "http://www.w3.org/People/EM/contact#me";
-        var b1 = "_:div0";
-        var b2 = "_:span0";
-
-        model.addResource(s1, ns.rdf("type"), ns.foaf("Person"));
-        model.addLiteral(s1, ns.foaf("givenname"), "Ben");
-        model.addLiteral(s1, ns.foaf("family_name"), "Adida");
-        model.addLiteral(s1, ns.foaf("nick"), "Ben");
-        model.addLiteral(s1, "http://example.org/ns/foo", "Ben");
-
-        model.addResource(s1, ns.foaf("knows"), s2);
-        model.addResource(s1, ns.foaf("knows"), s3);
-        model.addResource(s1, ns.foaf("knows"), s4);
-
-        model.addResource(s1, ns.foaf("office"), b1);
-        model.addResource(b1, ns.foaf("address"), b2);
-
-        model.addLiteral(b2, ns.foaf("street"), "32 Vassar Street");
-        model.addLiteral(b2, ns.foaf("street2"), "MIT CSAIL Room 32G-694");
-        model.addLiteral(b2, ns.foaf("city"), "Cambridge");
-        model.addLiteral(b2, ns.foaf("postalCode"), "02139");
-        model.addLiteral(b2, ns.foaf("country"), "USA");
-
-        model.setNamespace("_default_", ns.foaf(""));
-        
-        var x = model.subjects[0];
-        var y = new RDFa.SemanticObject(model, x);
-        y.dump();
-    },
-    function() {
-        var ns = RDFa.TestSuite.ns;
-        var model = new RDFa.Model();
-        var s1 = "http://example.org/card.xhtml#i";
-        var b1 = "_:div0";
-        var b2 = "_:span0";
-
-        model.addLiteral(s1, ns.foaf("knows"), "Lee");
-        model.addResource(s1, ns.foaf("knows"), b1);
-
-        model.addResource(b1, ns.foaf("knows"), "Elias");
-
-        var x = model.subjects[0];
-        var y = new RDFa.SemanticObject(model, x);
-        y.setDefaultNS("http://xmlns.com/foaf/0.1/");
-
-        this.assertTrue(2, y.knows.$all.length);
-        this.assertTrue("Lee", y.knows.$all[0].toString());
-        this.assertTrue(b1, y.knows.$all[1].toString());
-        this.assertTrue("Elias", y.knows.$all[1].knows.toString());
-    },
-    function() {
-        var ns = RDFa.TestSuite.ns;
-        var model = new RDFa.Model();
-        var s1 = "http://example.org/card.xhtml#i";
-        var s2 = "http://example.org/card.xhtml#you";
-        var s3 = "http://example.org/card.xhtml#her";
-
-        model.addLiteral(s1, ns.foaf("knows"), "Lee");
-        model.addResource(s2, ns.foaf("knows"), "Whatever");
-
-        var objects = model.getObjectsWithProperty(ns.foaf("knows"));
-
-        this.assertTrue(2, objects.length);
-    },
-    function() {
-        var ns = RDFa.TestSuite.ns;
-        var model = new RDFa.Model();
-        var s1 = "http://example.org/card.xhtml#i";
-        var s2 = "http://example.org/card.xhtml#you";
-        var s3 = "http://example.org/card.xhtml#her";
-
-        model.addLiteral(s1, ns.foaf("knows"), "Lee");
-        model.addResource(s2, ns.foaf("knows"), "Whatever");
-
-        var objects = model.getObjectsWithProperty(ns.foaf("knows"), ns.foaf(""));
-
-        this.assertTrue(2, objects.length);
-        for(var i = 0; i < objects.length; i++) {
-            this.assert(objects[i].knows, "missing foaf:knows property, default NS did not work");
-        }
-
-    },
-    function() {
-        var ns = RDFa.TestSuite.ns;
-        var model = new RDFa.Model();
-        var s1 = "http://example.org/card.xhtml#i";
-        var b1 = "_:div0";
-
-        model.addResource(s1, ns.foaf("knows"), b1);
-        model.addResource(s1, ns.foaf("knows"), b1);
-        model.addResource(s1, ns.foaf("knows"), b1);
-    
-        this.assertTrue(1, model.triples.length);
-    },
-    function() {
-        var ns = RDFa.TestSuite.ns;
-
-        if(document && document.location.href.indexOf("rdfa-test.html") == -1) return;
-        
-        var model = RDFa.parse(document);
-
-        RDFa.Utilities.log(model.dump());
-    },
-    function() {
-        var ns = RDFa.TestSuite.ns;
-        var model = new RDFa.Model();
-        var s1 = "http://example.org/card.xhtml#i";
-        var b1 = "_:div0";
-        var b2 = "_:span0";
-
-        model.addResource(s1, ns.foaf("knows"), b1);
-        model.addResource(b1, ns.foaf("knows"), s1);
-
-        /*
-        // for now recursion doesn't work. :(
-
-        var x = model.subjects[0];
-        var y = new RDFa.SemanticObject(model, x);
-        y.setDefaultNS("http://xmlns.com/foaf/0.1/");
-
-        this.assertTrue(1, y.knows.$all.length);
-        */
-    }
-  ]
-};
 
 
