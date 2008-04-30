@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openServiceDescription xmlns="http://www.microsoft.com/schemas/openservicedescription/1.0">
+  <display>
+		<name>Bookmark with Ma.gnolia</name>
+		<icon>http://ma.gnolia.com/favicon.ico</icon>
+  </display>
+  
+  <homepageUrl>http://youtube.com</homepageUrl>
+  <activity category="Bookmark">
+    <activityAction context="xFolk">
+      <execute method="get" action="http://ma.gnolia.com/bookmarklet/add?url={taggedlink.link}">
+        <parameter name="title" value="{taggedlink.title}"/>
+        <parameter name="description" value="{description}"/>
+        <parameter name="tags" value="{tag}"/>
+      </execute>
+    </activityAction>
+  </activity>
+	
+</openServiceDescription>

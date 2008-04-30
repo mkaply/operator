@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openServiceDescription xmlns="http://www.microsoft.com/schemas/openservicedescription/1.0">
+  <display>
+    <name>Find events on Upcoming</name>
+    <icon>http://upcoming.yahoo.com/favicon.ico</icon>
+  </display>
+  <homepageUrl>http://upcoming.yahoo.com</homepageUrl>
+  <activity category="Tags">
+    <activityAction context="tag">
+      <execute method="get" action="http://upcoming.yahoo.com/tag/{tag}"/>
+    </activityAction>
+  </activity>
+</openServiceDescription>

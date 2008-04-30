@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openServiceDescription xmlns="http://www.microsoft.com/schemas/openservicedescription/1.0">
+  <display>
+    <name>Find answers on Yedda</name>
+    <icon>http://yedda.com/favicon.ico</icon>
+  </display>
+  <homepageUrl>http://yedda.com</homepageUrl>
+  <activity category="Tags">
+    <activityAction context="tag">
+      <execute method="get" action="http://yedda.com/questions/tags/{tag}?source=operator"/>
+    </activityAction>
+  </activity>
+</openServiceDescription>

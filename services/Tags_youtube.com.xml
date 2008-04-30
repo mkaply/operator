@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openServiceDescription xmlns="http://www.microsoft.com/schemas/openservicedescription/1.0">
+  <display>
+    <name>Find videos on YouTube</name>
+    <icon>http://www.youtube.com/favicon.ico</icon>
+  </display>
+  <homepageUrl>http://youtube.com</homepageUrl>
+  <activity category="Tags">
+    <activityAction context="tag">
+      <execute method="get" action="http://youtube.com/results?search_query={tag}"/>
+    </activityAction>
+  </activity>
+</openServiceDescription>

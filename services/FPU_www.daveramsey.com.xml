@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openServiceDescription xmlns="http://www.microsoft.com/schemas/openservicedescription/1.0">
+  <display>
+    <name>Find an FPU Class</name>
+    <icon>http://www.daveramsey.com/favicon.ico</icon>
+  </display>
+  <homepageUrl>http://www.daveramsey.com</homepageUrl>
+  <activity category="FPU">
+    <activityAction context="hCard.adr">
+      <execute method="post" action="http://www.daveramsey.com/fpu/classfinder/index.cfm?fuseaction=actfindclass">
+        <parameter name="intZipCode" value="{postal-code}"/>
+        <parameter name="intMaxRad" value="30"/>
+      </execute>
+    </activityAction>
+  </activity>
+</openServiceDescription>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openServiceDescription xmlns="http://www.microsoft.com/schemas/openservicedescription/1.0">
+  <display>
+		<name>Find with Yahoo! Maps</name>
+		<icon>http://maps.yahoo.com/favicon.ico</icon>
+  </display>
+  
+	<homepageUrl>http://maps.yahoo.com</homepageUrl>
+	<activity category="Map">
+		<activityAction context="hCard.adr">
+      <execute method="get" action="http://maps.yahoo.com/maps_result">
+        <parameter name="addr" value="{street-address}"/>
+        <parameter name="csz" value="{locality}, {region} {postal-code}"/>
+        <parameter name="country" value="{country-name}"/>
+      </execute>
+    </activityAction>
+		<activityAction context="geo">
+      <execute method="get" action="http://maps.yahoo.com/?ard=1&amp;mvt=m">
+        <parameter name="lat" value="{latitude}"/>
+        <parameter name="lon" value="{longitude}"/>
+      </execute>
+    </activityAction>
+	</activity>
+	
+</openServiceDescription>

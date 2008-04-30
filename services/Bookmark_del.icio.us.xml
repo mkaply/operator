@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openServiceDescription xmlns="http://www.microsoft.com/schemas/openservicedescription/1.0">
+  <display>
+		<name>Bookmark with del.icio.us</name>
+		<icon>http://del.icio.us/favicon.ico</icon>
+  </display>
+  
+	<homepageUrl>http://del.icio.us</homepageUrl>
+	<activity category="Bookmark">
+		<activityAction context="xFolk">
+      <execute method="get" action="http://del.icio.us/post?v=4;url={taggedlink.link};title={taggedlink.title};notes={description}"/>
+    </activityAction>
+	</activity>
+	
+</openServiceDescription>

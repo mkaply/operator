@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openServiceDescription xmlns="http://www.microsoft.com/schemas/openservicedescription/1.0">
+  <display>
+    <name>Find bookmarks on Ma.gnolia</name>
+    <icon>http://ma.gnolia.com/favicon.ico</icon>
+  </display>
+  <homepageUrl>http://ma.gnolia.com</homepageUrl>
+  <activity category="Tags">
+    <activityAction context="tag">
+      <execute method="get" action="http://ma.gnolia.com/tags/{tag}"/>
+    </activityAction>
+  </activity>
+</openServiceDescription>

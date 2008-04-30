@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openServiceDescription xmlns="http://www.microsoft.com/schemas/openservicedescription/1.0">
+  <display>
+		<name>Find with MapQuest</name>
+		<icon>http://www.mapquest.com/favicon.ico</icon>
+  </display>
+  
+	<homepageUrl>http://www.mapquest.com</homepageUrl>
+	<activity category="Map">
+		<activityAction context="hCard.adr">
+      <execute method="get" action="http://www.mapquest.com/maps/map.adp?searchtype=address">
+        <parameter name="address" value="{street-address}"/>
+        <parameter name="city" value="{locality}"/>
+        <parameter name="state" value="{region}"/>
+        <parameter name="zipcode" value="{postal-code}"/>
+        <parameter name="country" value="{country-name}"/>
+      </execute>
+    </activityAction>
+		<activityAction context="geo">
+      <execute method="get" action="http://www.mapquest.com/maps/map.adp?latlongtype=decimal">
+        <parameter name="latitude" value="{latitude}"/>
+        <parameter name="longitude" value="{longitude}"/>
+      </execute>
+    </activityAction>
+	</activity>
+	
+</openServiceDescription>
