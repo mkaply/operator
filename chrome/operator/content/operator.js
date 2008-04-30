@@ -62,8 +62,188 @@ var Operator = {
       for (i=0; i < this.list.length; i++) {
         yield this.list[i];
       }
-    },
+    }
   },
+  actionObjectsFromDocument: function actionObjectsFromDocument(doc) {
+    var namespaceURI = "http://www.microsoft.com/schemas/openservicedescription/1.0";
+
+
+    var ioService = Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService);
+    var homepageUrl = doc.getElementsByTagNameNS(namespaceURI, "homepageUrl")[0];
+    var host = ioService.newURI(homepageUrl.textContent.replace(/^\s*|\s*$/g,''), null, null).host;
+    
+    var display = doc.getElementsByTagNameNS(namespaceURI, "display")[0];
+    var description = display.getElementsByTagNameNS(namespaceURI, "name")[0].textContent.replace(/^\s*|\s*$/g,'');
+    var icon;
+    try {
+      icon = display.getElementsByTagNameNS(namespaceURI, "icon")[0].textContent.replace(/^\s*|\s*$/g,'');
+    } catch (ex) {
+      /* Icon is optional */
+    }
+    var activity = doc.getElementsByTagNameNS(namespaceURI, "activity")[0];
+    var category = activity.getAttribute("category").replace(/^\s*|\s*$/g,'');
+
+    var activityActions = activity.getElementsByTagNameNS(namespaceURI, "activityAction");
+    for (let i=0; i<activityActions.length; i++) {
+      var actionObject = {};
+      actionObject.description = description;
+      if (icon) {
+        actionObject.icon = icon;
+      }
+      var Context = activityActions[i].getAttribute("context").replace(/^\s*|\s*$/g,'');
+      var ContextArray = Context.split(".");
+      if (Microformats[ContextArray[0]]) {
+        if (!actionObject.scope) {
+          actionObject.scope = {};
+        }
+        if (!actionObject.scope.semantic) {
+          actionObject.scope.semantic = {};
+        }
+        /* No subproperties */
+        if (ContextArray.length == 1) {
+          actionObject.scope.semantic[Context] = Context;
+        } else {
+          // XXX TODO - support a.b.c (we only support a.b)
+          actionObject.scope.semantic[ContextArray[0]] = ContextArray[1];
+        }
+      }
+      var execute = activityActions[i].getElementsByTagNameNS(namespaceURI, "execute")[0];
+      var Execute = {};
+      if (execute.hasAttribute("accept-charset")) {
+        Execute["Accept-charset"] = execute.getAttribute("accept-charset").replace(/^\s*|\s*$/g,'');
+      }
+      if (execute.hasAttribute("enctype")) {
+        Execute.Enctype = execute.getAttribute("enctype").replace(/^\s*|\s*$/g,'');
+      }
+      if (execute.hasAttribute("method")) {
+        Execute.Method = execute.getAttribute("method").replace(/^\s*|\s*$/g,'');
+      } else {
+        Execute.Method = "GET";
+      }
+      if (execute.hasAttribute("action")) {
+        Execute.Action = execute.getAttribute("action").replace(/^\s*|\s*$/g,'');
+        var parameters = execute.getElementsByTagNameNS(namespaceURI, "parameter");
+        var Parameters = [];
+        if (parameters.length > 0) {
+          for (let j=0; j<parameters.length; j++) {
+            var Parameter = {};
+            Parameter.Name = parameters[j].getAttribute("name").replace(/^\s*|\s*$/g,'');
+            Parameter.Value = parameters[j].getAttribute("value").replace(/^\s*|\s*$/g,'');
+            if (parameters[j].hasAttribute("type")) {
+              Parameter.Type = parameters[j].getAttribute("type").replace(/^\s*|\s*$/g,'');
+            }
+            Parameters.push(Parameter);
+          }
+        }
+
+
+        function doActionCallbackGenerator(Execute, Parameters) {
+          return function(semanticObject, semanticObjectType, propertyIndex, event) {
+            for (property in Microformats[semanticObjectType].properties) {
+              if (semanticObject[property]) {
+                if (Microformats[semanticObjectType].properties[property].plural) {
+                  Execute.Action = Execute.Action.replace('{' + property + '}', encodeURIComponent(semanticObject[property].join(',')));
+                  for (let j=0; j < Parameters.length; j++) {
+                    Parameters[j].Value = Parameters[j].Value.replace('{' + property + '}', encodeURIComponent(semanticObject[property].join(',')));
+                  }
+                } else {
+                  Execute.Action = Execute.Action.replace('{' + property + '}', encodeURIComponent(semanticObject[property]));
+                  for (let j=0; j < Parameters.length; j++) {
+                    Parameters[j].Value = Parameters[j].Value.replace('{' + property + '}', encodeURIComponent(semanticObject[property]));
+                  }
+                }
+                if (Microformats[semanticObjectType].properties[property].subproperties) {
+                  for (subproperty in Microformats[semanticObjectType].properties[property].subproperties) {
+                    if (semanticObject[property][subproperty]) {
+                      if (Microformats[semanticObjectType].properties[property].subproperties[subproperty].plural) {
+                        Action = Action.replace('{' + property + '.' + subproperty + '}', encodeURIComponent(semanticObject[property][subproperty].join(',')));
+                        for (let j=0; j < Parameters.length; j++) {
+                          Parameters[j].Value = Parameters[j].Value.replace('{' + property + '.' + subproperty + '}', encodeURIComponent(semanticObject[property][subproperty].join(',')));
+                        }
+                      } else {
+                        Execute.Action = Execute.Action.replace('{' + property + '.' + subproperty + '}', encodeURIComponent(semanticObject[property][subproperty]));
+                        for (let j=0; j < Parameters.length; j++) {
+                          Parameters[j].Value = Parameters[j].Value.replace('{' + property + '.' + subproperty + '}', encodeURIComponent(semanticObject[property][subproperty]));
+                        }
+                      }
+                    } else {
+                      Execute.Action = Execute.Action.replace('{' + property + '.' + subproperty + '}', "");
+                      for (let j=0; j < Parameters.length; j++) {
+                        Parameters[j].Value = Parameters[j].Value.replace('{' + property + '.' + subproperty + '}', "");
+                      }
+                    }
+                  } /* for (subproperty in Microformats[semanticObjectType].properties[property].subproperties) */
+                }
+              } else {
+                Execute.Action = Execute.Action.replace('{' + property + '}', "");
+                for (let j=0; j < Parameters.length; j++) {
+                  Parameters[j].Value = Parameters[j].Value.replace('{' + property + '}', "");
+                }
+              }
+            } /* for (property in Microformats[semanticObjectType].properties) */
+            
+            var query = "";
+            for (let j=0; j < Parameters.length; j++) {
+              if (Parameters[j].Value.length > 0) {
+              /* If we are not the first parameter, add an ampersand */
+                if (query.length != 0) {
+                  query += "&";
+                }
+                query += Parameters[j].Name;
+                query += "=";
+                query += Parameters[j].Value;
+              }
+            }
+
+            var url = Execute.Action;
+                
+            if (Execute.Method.toLowerCase() == "post") {
+              var ios = Components.classes["@mozilla.org/network/io-service;1"]
+                                  .getService(Components.interfaces.nsIIOService);
+
+              var stringStream =  Components.classes["@mozilla.org/io/string-input-stream;1"]
+                                            .createInstance(Components.interfaces.nsIStringInputStream);
+              if ("data" in stringStream) // Gecko 1.9 or newer
+                stringStream.data = query;
+              else // 1.8 or older
+                stringStream.setData(query, query.length);
+
+              var postData = Components.classes["@mozilla.org/network/mime-input-stream;1"]
+                                       .createInstance(Components.interfaces.nsIMIMEInputStream);
+              if (Execute.Enctype) {
+                postData.addHeader("Content-Type", Execute.Enctype);
+              } else {
+                postData.addHeader("Content-Type", "application/x-www-form-urlencoded");
+              }
+              if (Execute["Accept-charset"]) {
+                postData.addHeader("Accept-Charset", Execute["Accept-charset"]);
+              } else {
+                postData.addHeader("Accept-Charset", "utf-8");
+              }
+              postData.addContentLength = true;
+              postData.setData(stringStream);
+              openUILink(url, event, undefined, undefined, undefined, postData, undefined);
+            } else {
+              if (query.length > 0) {
+                if (!action.Action.match(/\?/)) {
+                  url += "?";
+                } else {
+                  url += "&";
+                }
+                url += query;
+              }
+              return url;
+            }
+          }
+        };
+        actionObject.doAction = doActionCallbackGenerator(Execute, Parameters);
+      } else {
+        /* other method like script */
+      }
+      SemanticActions.add(category + "_" + i + "_" + host, actionObject);
+    }
+  },
+  
   /* This is the primary init function and it is called whenever the XUL for a window is initially loaded */
   /* It handles loading and initializing Microformats, as well as initializing prefs */
   /* It also adds the listeners so we can window load events */
@@ -249,10 +429,10 @@ var Operator = {
       }
       /* Load user scripts from the operator directory in the profile */
       var e = usdir.directoryEntries;
+      var domParser = new DOMParser();
       while (e.hasMoreElements()) {
         var f = e.getNext().QueryInterface(Components.interfaces.nsIFile);
         var splitpath = f.path.split(".");
-        /* Only load JS files */
         if (splitpath[splitpath.length-1] == "js") {
           var fileHandler = Components.classes["@mozilla.org/network/io-service;1"].
                                        getService(Components.interfaces.nsIIOService).
@@ -263,10 +443,24 @@ var Operator = {
           } catch (ex) {
             alert("Unable to load " + f.leafName + "\n\n" + "(" + ex.message + ")");
           }
+        } else if (splitpath[splitpath.length-1] == "xml") {
+          var sourcefile = Components.classes["@mozilla.org/file/local;1"]
+                                     .createInstance(Components.interfaces.nsILocalFile);
+          sourcefile.initWithPath(f.path);
+
+          var fileInStream = Components.classes["@mozilla.org/network/file-input-stream;1"]
+                                       .createInstance(Components.interfaces.nsIFileInputStream);
+          fileInStream.init(sourcefile, 0x01, 0644, false);
+          var doc = domParser.parseFromStream(fileInStream, "UTF-8",
+                                              sourcefile.fileSize,
+                                             "text/xml");
+          fileInStream.close();
+
+          Operator.actionObjectsFromDocument(doc);
         }
       }
     }
-
+    
     /* Duplicate the semantic actions in our own actions array */
     for (i in SemanticActions) {
       Operator.actions.add(i, SemanticActions[i]);
@@ -801,9 +995,17 @@ var Operator = {
           }
           if (tempMenu.label) {
             tempMenu.setAttribute("label", tempMenu.label);
-            tempMenu.store_oncommand = Operator.actionCallbackGenerator(semanticObject, semanticObjectType, k, m);
+            if (required[m].semanticType) {
+              tempMenu.store_oncommand = Operator.actionCallbackGenerator(required[m], required[m].semanticType, k);
+            } else {
+              tempMenu.store_oncommand = Operator.actionCallbackGenerator(semanticObject, semanticObjectType, k, m);
+            }
             tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
-            tempMenu.store_onclick = Operator.clickCallbackGenerator(semanticObject, semanticObjectType, k, m);
+            if (required[m].semanticType) {
+              tempMenu.store_onclick = Operator.clickCallbackGenerator(required[m], required[m].semanticType, k);
+            } else {
+              tempMenu.store_onclick = Operator.clickCallbackGenerator(semanticObject, semanticObjectType, k, m);
+            }
             tempMenu.addEventListener("click", tempMenu.store_onclick, true);
             tempMenu.store_onDOMMenuItemActive = Operator.highlightCallbackGenerator(semanticObject.node);
             tempMenu.addEventListener("DOMMenuItemActive", tempMenu.store_onDOMMenuItemActive, true);
@@ -1078,7 +1280,7 @@ var Operator = {
     var serializer = new XMLSerializer();
     var xmlString;
     if (semanticObject.node) {
-      xmlString = serializer.serializeToString(semanticObject.node.origNode || semanticObject.node);
+      xmlString = serializer.serializeToString(semanticObject.node);
     }
     var vcfical = null;
     var X2V = null;
