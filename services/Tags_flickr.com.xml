@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openServiceDescription xmlns="http://www.microsoft.com/schemas/openservicedescription/1.0">
+  <display>
+    <name>Find photos on flickr</name>
+    <icon>http://flickr.com/favicon.ico</icon>
+  </display>
+  <homepageUrl>http://flickr.com</homepageUrl>
+  <activity category="Tags">
+    <activityAction context="tag">
+      <execute method="get" action="http://flickr.com/photos/tags/{tag}"/>
+    </activityAction>
+  </activity>
+</openServiceDescription>

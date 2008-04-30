@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openServiceDescription xmlns="http://www.microsoft.com/schemas/openservicedescription/1.0">
+  <display>
+    <name>Find products on amazon.com</name>
+    <icon>http://www.amazon.com/favicon.ico</icon>
+  </display>
+  <homepageUrl>http://www.amazon.com</homepageUrl>
+  <activity category="Tags">
+    <activityAction context="tag">
+      <execute method="get" action="http://www.amazon.com/tag/{tag}"/>
+    </activityAction>
+  </activity>
+</openServiceDescription>

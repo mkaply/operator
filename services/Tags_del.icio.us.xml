@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openServiceDescription xmlns="http://www.microsoft.com/schemas/openservicedescription/1.0">
+  <display>
+    <name>Find bookmarks on del.icio.us</name>
+    <icon>http://del.icio.us/favicon.ico</icon>
+  </display>
+  <homepageUrl>http://del.icio.us</homepageUrl>
+  <activity category="Tags">
+    <activityAction context="tag">
+      <execute method="get" action="http://del.icio.us/tag/{tag}"/>
+    </activityAction>
+  </activity>
+</openServiceDescription>
