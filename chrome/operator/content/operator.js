@@ -65,6 +65,7 @@ var Operator = {
     }
   },
   actionObjectsFromDocument: function actionObjectsFromDocument(doc) {
+    var actionObjects = [];
     var namespaceURI = "http://www.microsoft.com/schemas/openservicedescription/1.0";
 
 
@@ -86,6 +87,8 @@ var Operator = {
     var activityActions = activity.getElementsByTagNameNS(namespaceURI, "activityAction");
     for (let i=0; i<activityActions.length; i++) {
       var actionObject = {};
+      actionObject.host = host;
+      actionObject.category = category;
       actionObject.description = description;
       if (icon) {
         actionObject.icon = icon;
@@ -232,7 +235,7 @@ var Operator = {
                 }
                 url += query;
               }
-              return url;
+              openUILink(url, event);
             }
           }
         };
@@ -240,8 +243,9 @@ var Operator = {
       } else {
         /* other method like script */
       }
-      SemanticActions.add(category + "_" + i + "_" + host, actionObject);
+      actionObjects.push(actionObject);
     }
+    return actionObjects;
   },
   
   /* This is the primary init function and it is called whenever the XUL for a window is initially loaded */
@@ -456,7 +460,11 @@ var Operator = {
                                              "text/xml");
           fileInStream.close();
 
-          Operator.actionObjectsFromDocument(doc);
+          var actionObjects = Operator.actionObjectsFromDocument(doc);
+          for (let i = 0; i < actionObjects.length; i++) {
+            SemanticActions.add(actionObjects[i].category + "_" + i + "_" + actionObjects[i].host, actionObjects[i]);
+          }
+
         }
       }
     }
@@ -768,10 +776,8 @@ var Operator = {
           /* j is the same as i */
           if (!semanticObjects[j].duplicate) {
             if (semanticObjects[j].displayName && (semanticObjects[j].displayName == semanticObjects[i].displayName)) {
-              if (Microformats[semanticObjects[i].semanticType].className) {
-                if (semanticObjects[i].node.innerHTML == semanticObjects[j].node.innerHTML) {
+              if ((Microformats[semanticObjects[i].semanticType].className) && (semanticObjects[i].node.innerHTML == semanticObjects[j].node.innerHTML)) {
                   semanticObjects[j].duplicate = true;
-                }
               } else if (serializer.serializeToString(semanticObjects[i].node) == serializer.serializeToString(semanticObjects[j].node)) {
                 semanticObjects[j].duplicate = true;
               } else if (Operator.areEqualObjects(semanticObjects[j], semanticObjects[i])) {
@@ -1423,6 +1429,59 @@ var Operator = {
       Operator_URLbarButton.enable();
     }
 
+/* check for rel-service link tags */
+   var dochead = content.document.getElementsByTagName("head")[0];
+   var links = dochead.getElementsByTagName("link");
+   for (let i=0; i < links.length; i++) {
+     if ((links[i].getAttribute("rel") == "service") &&
+         (links[i].getAttribute("type") == "application/openservicedescription+xml")) {
+      var file = Components.classes["@mozilla.org/file/directory_service;1"].
+                            getService(Components.interfaces.nsIProperties).
+                            get("TmpD", Components.interfaces.nsIFile);
+          
+      var ios = Components.classes["@mozilla.org/network/io-service;1"]
+                          .getService(Components.interfaces.nsIIOService);
+      var uri = ios.newURI(links[i].getAttribute("href"), null, null);
+      /* Need URL to get leafName */
+      uri.QueryInterface(Components.interfaces.nsIURL);
+      file.append(uri.fileName);
+      try {
+        file.remove(false);                         
+      } catch (ex) {
+      }
+      var channel = ios.newChannelFromURI(uri);
+      var downloader =
+        Components.classes["@mozilla.org/network/downloader;1"]
+                  .createInstance(Components.interfaces.nsIDownloader);
+      var listener = {
+        onDownloadComplete: function(downloader, request, ctxt, status, result) {
+          /* Need result as an nsiFile */
+          result.QueryInterface(Components.interfaces.nsIFile);
+          var fileInStream = Components.classes["@mozilla.org/network/file-input-stream;1"]
+                                       .createInstance(Components.interfaces.nsIFileInputStream);
+          fileInStream.init(result, 0x01, 0644, false);
+          var domParser = new DOMParser();
+          var doc = domParser.parseFromStream(fileInStream, "UTF-8",
+                                              result.fileSize,
+                                             "text/xml");
+          fileInStream.close();
+
+          var actionObjects = Operator.actionObjectsFromDocument(doc);
+          for (let i = 0; i < actionObjects.length; i++) {
+            /* set URL semantic scope */
+            /* need to get host */
+            if (!Operator.actions[actionObjects[i].category + "_" + i + "_" + actionObjects[i].host]) {
+              actionObjects[i].scope.url = content.document.location.href;
+              SemanticActions.add(actionObjects[i].category + "_" + i + "_" + actionObjects[i].host, actionObjects[i]);
+              Operator.actions.add(actionObjects[i].category + "_" + i + "_" + actionObjects[i].host, actionObjects[i], true);
+            }
+          }
+        }
+      }
+      downloader.init(listener,file);
+      channel.asyncOpen(downloader, null);
+    }
+   }
 
     var i, j, k, m;
     var popup, menu, tempMenu, action;
