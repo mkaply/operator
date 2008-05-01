@@ -5,7 +5,7 @@
 		<icon>http://ma.gnolia.com/favicon.ico</icon>
   </display>
   
-  <homepageUrl>http://youtube.com</homepageUrl>
+  <homepageUrl>http://ma.gnolia.com</homepageUrl>
   <activity category="Bookmark">
     <activityAction context="xFolk">
       <execute method="get" action="http://ma.gnolia.com/bookmarklet/add?url={taggedlink.link}">
