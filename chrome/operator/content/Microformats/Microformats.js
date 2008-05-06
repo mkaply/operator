@@ -191,7 +191,7 @@ var Microformats = {
       }
     }
     xpathExpression += "][1]";
-    xpathResult = (node.ownerDocument || node).evaluate(xpathExpression, node, null,  Components.interfaces.nsIDOMXPathResult.FIRST_ORDERED_NODE_TYPE, null);
+    xpathResult = (node.ownerDocument || node).evaluate(xpathExpression, node, null,  XPathResult.FIRST_ORDERED_NODE_TYPE, null);
     if (xpathResult.singleNodeValue) {
       xpathResult.singleNodeValue.microformat = mfname;
       return xpathResult.singleNodeValue;
@@ -731,7 +731,7 @@ var Microformats = {
           }
         }
         xpathExpression += "][1]";
-        var xpathResult = (node.ownerDocument || node).evaluate(xpathExpression, node, null,  Components.interfaces.nsIDOMXPathResult.FIRST_ORDERED_NODE_TYPE, null);
+        var xpathResult = (node.ownerDocument || node).evaluate(xpathExpression, node, null,  XPathResult.FIRST_ORDERED_NODE_TYPE, null);
         if (xpathResult.singleNodeValue) {
           xpathResult.singleNodeValue.microformat = mfname;
           parentnode = xpathResult.singleNodeValue;
@@ -1180,7 +1180,7 @@ var adr_definition = {
                                               " or contains(concat(' ', @class, ' '), ' postal-code ')" +
                                               " or contains(concat(' ', @class, ' '), ' country-name')" +
                                               "])";
-    var xpathResult = (node.ownerDocument || node).evaluate(xpathExpression, node, null,  Components.interfaces.nsIDOMXPathResult.ANY_TYPE, null).numberValue;
+    var xpathResult = (node.ownerDocument || node).evaluate(xpathExpression, node, null,  XPathResult.ANY_TYPE, null).numberValue;
     if (xpathResult == 0) {
       throw("Unable to create microformat");
     }
@@ -1606,7 +1606,7 @@ geo.prototype.toString = function() {
 
     /* check if geo is contained in a vcard */
     var xpathExpression = "ancestor::*[contains(concat(' ', @class, ' '), ' vcard ')]";
-    var xpathResult = this.node.ownerDocument.evaluate(xpathExpression, this.node, null,  Components.interfaces.nsIDOMXPathResult.FIRST_ORDERED_NODE_TYPE, null);
+    var xpathResult = this.node.ownerDocument.evaluate(xpathExpression, this.node, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
     if (xpathResult.singleNodeValue) {
       var hcard = new hCard(xpathResult.singleNodeValue);
       if (hcard.fn) {
@@ -1615,7 +1615,7 @@ geo.prototype.toString = function() {
     }
     /* check if geo is contained in a vevent */
     xpathExpression = "ancestor::*[contains(concat(' ', @class, ' '), ' vevent ')]";
-    xpathResult = this.node.ownerDocument.evaluate(xpathExpression, this.node, null,  Components.interfaces.nsIDOMXPathResult.FIRST_ORDERED_NODE_TYPE, xpathResult);
+    xpathResult = this.node.ownerDocument.evaluate(xpathExpression, this.node, null, XPathResult.FIRST_ORDERED_NODE_TYPE, xpathResult);
     if (xpathResult.singleNodeValue) {
       var hcal = new hCalendar(xpathResult.singleNodeValue);
       if (hcal.summary) {
@@ -1711,10 +1711,14 @@ var tag_definition = {
       virtual: true,
       virtualGetter: function(mfnode) {
         if (mfnode.href) {
-          var ioService = Components.classes["@mozilla.org/network/io-service;1"].
-                                     getService(Components.interfaces.nsIIOService);
-          var uri = ioService.newURI(mfnode.href, null, null);
-          var url_array = uri.path.split("/");
+          try {
+            var ioService = Components.classes["@mozilla.org/network/io-service;1"].
+                                       getService(Components.interfaces.nsIIOService);
+            var uri = ioService.newURI(mfnode.href, null, null);
+            var url_array = uri.path.split("/");
+          } catch (ex) {
+            var url_array = mfnode.href.split("/");
+          }
           for(let i=url_array.length-1; i > 0; i--) {
             if (url_array[i] !== "") {
               var tag
