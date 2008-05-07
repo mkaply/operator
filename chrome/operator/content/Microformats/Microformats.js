@@ -1717,7 +1717,7 @@ var tag_definition = {
             var uri = ioService.newURI(mfnode.href, null, null);
             var url_array = uri.path.split("/");
           } catch (ex) {
-            var url_array = mfnode.ref.split("/");
+            var url_array = mfnode.href.split("/");
           }
           for(let i=url_array.length-1; i > 0; i--) {
             if (url_array[i] !== "") {
