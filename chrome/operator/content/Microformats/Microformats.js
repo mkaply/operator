@@ -1277,11 +1277,13 @@ var hCard_definition = {
           plural: true
         },
         "given-name" : {
+          plural: true
         },
         "additional-name" : {
           plural: true
         },
         "family-name" : {
+          plural: true
         },
         "honorific-suffix" : {
           plural: true
