@@ -185,7 +185,7 @@ var google_calendar = {
           url += "&";
           url += "location=";
           if (hcalendar.location.fn) {
-            url += hcalendar.location.fn;
+            url += encodeURIComponent(hcalendar.location.fn);
           }
           if (hcalendar.location.adr[j]["street-address"]) {
             if (hcalendar.location.fn) {
@@ -195,11 +195,11 @@ var google_calendar = {
           }
           if (hcalendar.location.adr[j].locality) {
             url += ", ";
-            url += hcalendar.location.adr[j].locality;
+            url += encodeURIComponent(hcalendar.location.adr[j].locality);
           }
           if (hcalendar.location.adr[j].region) {
             url += ", ";
-            url += hcalendar.location.adr[j].region;
+            url += encodeURIComponent(hcalendar.location.adr[j].region);
           }
           if (hcalendar.location.adr[j]["postal-code"]) {
             url += " ";
@@ -207,11 +207,11 @@ var google_calendar = {
           }
           if (hcalendar.location.adr[j]["country-name"]) {
             url += ",";
-            url += hcalendar.location.adr[j]["country-name"];
+            url += encodeURIComponent(hcalendar.location.adr[j]["country-name"]);
           }
         } else {
           url += "&";
-          url += "location=" + hcalendar.location;
+          url += "location=" + encodeURIComponent(calendar.location);
         }
       }
       if (hcalendar.description) {
