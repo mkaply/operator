@@ -142,63 +142,68 @@ var Operator = {
 
         function doActionCallbackGenerator(Execute, Parameters) {
           return function(semanticObject, semanticObjectType, propertyIndex, event) {
+            var action = Execute.Action;
+            var parameters = [];
+            for (let j=0; j < Parameters.length; j++) {
+              parameters[j] = Parameters[j].Value;
+            }
             for (property in Microformats[semanticObjectType].properties) {
               if (semanticObject[property]) {
                 if (Microformats[semanticObjectType].properties[property].plural) {
-                  Execute.Action = Execute.Action.replace('{' + property + '}', encodeURIComponent(semanticObject[property].join(',')));
+                  action = action.replace('{' + property + '}', encodeURIComponent(semanticObject[property].join(',')));
                   for (let j=0; j < Parameters.length; j++) {
-                    Parameters[j].Value = Parameters[j].Value.replace('{' + property + '}', encodeURIComponent(semanticObject[property].join(',')));
+                    parameters[j] = parameters[j].replace('{' + property + '}', encodeURIComponent(semanticObject[property].join(',')));
                   }
                 } else {
-                  Execute.Action = Execute.Action.replace('{' + property + '}', encodeURIComponent(semanticObject[property]));
+                  action = action.replace('{' + property + '}', encodeURIComponent(semanticObject[property]));
                   for (let j=0; j < Parameters.length; j++) {
-                    Parameters[j].Value = Parameters[j].Value.replace('{' + property + '}', encodeURIComponent(semanticObject[property]));
+                    parameters[j] = parameters[j].replace('{' + property + '}', encodeURIComponent(semanticObject[property]));
                   }
                 }
                 if (Microformats[semanticObjectType].properties[property].subproperties) {
                   for (subproperty in Microformats[semanticObjectType].properties[property].subproperties) {
                     if (semanticObject[property][subproperty]) {
                       if (Microformats[semanticObjectType].properties[property].subproperties[subproperty].plural) {
-                        Action = Action.replace('{' + property + '.' + subproperty + '}', encodeURIComponent(semanticObject[property][subproperty].join(',')));
+                        action = action.replace('{' + property + '.' + subproperty + '}', encodeURIComponent(semanticObject[property][subproperty].join(',')));
                         for (let j=0; j < Parameters.length; j++) {
-                          Parameters[j].Value = Parameters[j].Value.replace('{' + property + '.' + subproperty + '}', encodeURIComponent(semanticObject[property][subproperty].join(',')));
+                          parameters[j] = parameters[j].replace('{' + property + '.' + subproperty + '}', encodeURIComponent(semanticObject[property][subproperty].join(',')));
                         }
                       } else {
-                        Execute.Action = Execute.Action.replace('{' + property + '.' + subproperty + '}', encodeURIComponent(semanticObject[property][subproperty]));
+                        action = action.replace('{' + property + '.' + subproperty + '}', encodeURIComponent(semanticObject[property][subproperty]));
                         for (let j=0; j < Parameters.length; j++) {
-                          Parameters[j].Value = Parameters[j].Value.replace('{' + property + '.' + subproperty + '}', encodeURIComponent(semanticObject[property][subproperty]));
+                          parameters[j] = parameters[j].replace('{' + property + '.' + subproperty + '}', encodeURIComponent(semanticObject[property][subproperty]));
                         }
                       }
                     } else {
-                      Execute.Action = Execute.Action.replace('{' + property + '.' + subproperty + '}', "");
+                      action = action.replace('{' + property + '.' + subproperty + '}', "");
                       for (let j=0; j < Parameters.length; j++) {
-                        Parameters[j].Value = Parameters[j].Value.replace('{' + property + '.' + subproperty + '}', "");
+                        parameters[j] = parameters[j].replace('{' + property + '.' + subproperty + '}', "");
                       }
                     }
                   } /* for (subproperty in Microformats[semanticObjectType].properties[property].subproperties) */
                 }
               } else {
-                Execute.Action = Execute.Action.replace('{' + property + '}', "");
+                action = action.replace('{' + property + '}', "");
                 for (let j=0; j < Parameters.length; j++) {
-                  Parameters[j].Value = Parameters[j].Value.replace('{' + property + '}', "");
+                  parameters[j] = parameters[j].replace('{' + property + '}', "");
                 }
               }
             } /* for (property in Microformats[semanticObjectType].properties) */
             
             var query = "";
             for (let j=0; j < Parameters.length; j++) {
-              if (Parameters[j].Value.length > 0) {
+              if (parameters[j].length > 0) {
               /* If we are not the first parameter, add an ampersand */
                 if (query.length != 0) {
                   query += "&";
                 }
                 query += Parameters[j].Name;
                 query += "=";
-                query += Parameters[j].Value;
+                query += parameters[j];
               }
             }
 
-            var url = Execute.Action;
+            var url = action;
                 
             if (Execute.Method.toLowerCase() == "post") {
               var ios = Components.classes["@mozilla.org/network/io-service;1"]
@@ -228,7 +233,7 @@ var Operator = {
               openUILink(url, event, undefined, undefined, undefined, postData, undefined);
             } else {
               if (query.length > 0) {
-                if (!action.Action.match(/\?/)) {
+                if (!action.match(/\?/)) {
                   url += "?";
                 } else {
                   url += "&";
