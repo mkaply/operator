@@ -612,7 +612,7 @@ var Microformats = {
       object.node = in_node;
       /* we also store the node that has been "resolved" */
       object.resolvedNode = node; 
-      object.semanticType = microformat;
+//      object.semanticType = microformat;
       if (validate) {
         Microformats.parser.validate(node, microformat);
       }
