@@ -1715,14 +1715,8 @@ var tag_definition = {
       virtual: true,
       virtualGetter: function(mfnode) {
         if (mfnode.href) {
-          try {
-            var ioService = Components.classes["@mozilla.org/network/io-service;1"].
-                                       getService(Components.interfaces.nsIIOService);
-            var uri = ioService.newURI(mfnode.href, null, null);
-            var url_array = uri.path.split("/");
-          } catch (ex) {
-            var url_array = mfnode.href.split("/");
-          }
+          var href = mfnode.href.split("?")[0].split("#")[0];
+          var url_array = href.split("/");
           for(let i=url_array.length-1; i > 0; i--) {
             if (url_array[i] !== "") {
               var tag
