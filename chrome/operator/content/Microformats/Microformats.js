@@ -471,6 +471,15 @@ var Microformats = {
         if (Microformats.matchClass(propnode, "value")) {
           return Microformats.parser.textGetter(parentnode, parentnode);
         } else {
+          /* Virtual case */
+          if (!parentnode && (Microformats.getElementsByClassName(propnode, "type").length > 0)) {
+            var tempNode = propnode.cloneNode(true);
+            var typeNodes = Microformats.getElementsByClassName(tempNode, "type");
+            for (let i=0; i < typeNodes.length; i++) {
+              typeNodes[i].parentNode.removeChild(typeNodes[i]);
+            }
+            return Microformats.parser.textGetter(tempNode);
+          }
           return Microformats.parser.textGetter(propnode, parentnode);
         }
       }
