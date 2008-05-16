@@ -93,11 +93,18 @@ var Operator = {
       if (icon) {
         actionObject.icon = icon;
       }
+      try {
+        var Domain = activityActions[i].getAttribute("domain").replace(/^\s*|\s*$/g,'');
+      } catch (ex) {
+      }
       var Context = activityActions[i].getAttribute("context").replace(/^\s*|\s*$/g,'');
       var ContextArray = Context.split(".");
-      if (Microformats[ContextArray[0]]) {
+      if (Microformats[ContextArray[0]] || Domain) {
         if (!actionObject.scope) {
           actionObject.scope = {};
+        }
+        if (Domain) {
+          actionObject.scope.url = "http://" + Domain;
         }
         if (!actionObject.scope.semantic) {
           actionObject.scope.semantic = {};
@@ -1052,9 +1059,17 @@ var Operator = {
         }
         if (label) {
           menuitem = parentmenu.ownerDocument.createElement("menuitem");
-          menuitem.store_oncommand = this.actionCallbackGenerator(semanticObject, semanticObjectType, k);
+          if (required && required[0].semanticType) {
+            menuitem.store_oncommand = Operator.actionCallbackGenerator(required[0], required[0].semanticType, k);
+          } else {
+            menuitem.store_oncommand = Operator.actionCallbackGenerator(semanticObject, semanticObjectType, k);
+          }
           menuitem.addEventListener("command", menuitem.store_oncommand, true);
-          menuitem.store_onclick = this.clickCallbackGenerator(semanticObject, semanticObjectType, k);
+          if (required && required[0].semanticType) {
+            menuitem.store_onclick = Operator.clickCallbackGenerator(required[0], required[0].semanticType, k);
+          } else {
+            menuitem.store_onclick = Operator.clickCallbackGenerator(semanticObject, semanticObjectType, k);
+          }
           menuitem.addEventListener("click", menuitem.store_onclick, true);
           menuitem.label = label;
           menuitem.setAttribute("label", menuitem.label);
@@ -1446,7 +1461,8 @@ var Operator = {
           
       var ios = Components.classes["@mozilla.org/network/io-service;1"]
                           .getService(Components.interfaces.nsIIOService);
-      var uri = ios.newURI(links[i].getAttribute("href"), null, null);
+                          
+      var uri = ios.newURI(links[i].getAttribute("href"), null, ios.newURI(content.document.location.href, null, null));
       /* Need URL to get leafName */
       uri.QueryInterface(Components.interfaces.nsIURL);
       file.append(uri.fileName);
@@ -1475,9 +1491,9 @@ var Operator = {
           for (let i = 0; i < actionObjects.length; i++) {
             /* set URL semantic scope */
             /* need to get host */
+            actionObjects[i].scope.url = content.document.location.href;
+            SemanticActions.add(actionObjects[i].category + "_" + i + "_" + actionObjects[i].host, actionObjects[i]);
             if (!Operator.actions[actionObjects[i].category + "_" + i + "_" + actionObjects[i].host]) {
-              actionObjects[i].scope.url = content.document.location.href;
-              SemanticActions.add(actionObjects[i].category + "_" + i + "_" + actionObjects[i].host, actionObjects[i]);
               Operator.actions.add(actionObjects[i].category + "_" + i + "_" + actionObjects[i].host, actionObjects[i], true);
             }
           }
