@@ -532,8 +532,8 @@ var export_icalendar = {
         }
         if (tzpos > T) {
           var js_date = Microformats.dateFromISO8601(hcalendar.dtstart.substr(0, tzpos-1));
-          var tzhours = parseInt(hcalendar.dtstart.substr(tzpos+1, 2));
-          var tzminutes = parseInt(hcalendar.dtstart.substr(tzpos+3, 2));
+          var tzhours = parseInt(hcalendar.dtstart.substr(tzpos+1, 2), 10);
+          var tzminutes = parseInt(hcalendar.dtstart.substr(tzpos+3, 2), 10);
           if (hcalendar.dtstart.charAt(tzpos) == "-") {
             js_date.setHours(js_date.getHours()+tzhours);
             js_date.setMinutes(js_date.getMinutes()+tzminutes);
@@ -570,8 +570,8 @@ var export_icalendar = {
         }
         if (tzpos > T) {
           var js_date = Microformats.dateFromISO8601(hcalendar.dtend.substr(0, tzpos-1));
-          var tzhours = parseInt(hcalendar.dtend.substr(tzpos+1, 2));
-          var tzminutes = parseInt(hcalendar.dtend.substr(tzpos+3, 2));
+          var tzhours = parseInt(hcalendar.dtend.substr(tzpos+1, 2), 10);
+          var tzminutes = parseInt(hcalendar.dtend.substr(tzpos+3, 2), 10);
           if (hcalendar.dtend.charAt(tzpos) == "-") {
             js_date.setHours(js_date.getHours()+tzhours);
             js_date.setMinutes(js_date.getMinutes()+tzminutes);
@@ -591,7 +591,7 @@ var export_icalendar = {
         if (!Operator.upcomingBugFixed) {
           if (content.document.location.href.indexOf("http://upcoming.yahoo.com") == 0) {
             date = date.replace(/-/g, "");
-            date = (parseInt(date)+1).toString();
+            date = (parseInt(date, 10)+1).toString();
           }
         }
       }
