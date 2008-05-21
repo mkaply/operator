@@ -33,8 +33,8 @@ var firefox_bookmark = {
     firefox_bookmark.bookmark(name, url, description);
   },
   bookmark: function(name, url, description) {
-    if (typeof(PlacesUtils) != "undefined") {
-     PlacesUtils.showMinimalAddBookmarkUI(makeURI(url), name, description);
+    if (typeof(PlacesUIUtils) != "undefined") {
+     PlacesUIUtils.showMinimalAddBookmarkUI(makeURI(url), name, description);
     } else {
       var dArgs = {
         name: name,
