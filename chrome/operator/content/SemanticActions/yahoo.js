@@ -264,23 +264,16 @@ var yahoo_contacts = {
       var hcard = semanticObject;
       url = "http://address.yahoo.com/?";
       if (hcard.n && (hcard.n["family-name"]) && (hcard.n["given-name"])) {
-        url += "ln=" + hcard.n["family-name"] + "&";
-        url += "fn=" + hcard.n["given-name"] + "&";
+        url += "ln=" + encodeURIComponent(hcard.n["family-name"].join(" ")) + "&";
+        url += "fn=" + encodeURIComponent(hcard.n["given-name"].join(" ")) + "&";
         if (hcard.n["additional-name"]) {
-          url += "mn=";
-          for (j=0;j<hcard.n["additional-name"].length;j++) {
-            url += hcard.n["additional-name"][j];
-            if (i != hcard.n["additional-name"].length -1) {
-              url += " ";
-            }
-            url += "&";
-          }
+          url += "mn=" + encodeURIComponent(hcard.n["additional-name"].join(" ")) + "&";
         }
       } else {
-        url += "fn=" + hcard.fn + "&";
+        url += "fn=" + encodeURIComponent(hcard.fn) + "&";
       }
       if (hcard.org) {
-        url += "co=" + hcard.org[0]["organization-name"] + "&";
+        url += "co=" + encodeURIComponent(hcard.org[0]["organization-name"]) + "&";
       }
       /* only using the first email */
       if (hcard.email) {
@@ -326,16 +319,16 @@ var yahoo_contacts = {
             url += prefix + "a2=" + encodeURIComponent(hcard.adr[j]["extended-address"]) + "&";
           }
           if (hcard.adr[j].locality) {
-            url += prefix + "c=" + hcard.adr[j].locality + "&";
+            url += prefix + "c=" + encodeURIComponent(hcard.adr[j].locality) + "&";
           }
           if (hcard.adr[j].region) {
-            url += prefix + "s=" + hcard.adr[j].region + "&";
+            url += prefix + "s=" + encodeURIComponent(hcard.adr[j].region) + "&";
           }
           if (hcard.adr[j]["postal-code"]) {
             url += prefix + "z=" + hcard.adr[j]["postal-code"] + "&";
           }
           if (hcard.adr[j]["country-name"]) {
-            url += prefix + "co=" + hcard.adr[j]["country-name"] + "&";
+            url += prefix + "co=" + encodeURIComponent(hcard.adr[j]["country-name"]) + "&";
           }
         }
       }
