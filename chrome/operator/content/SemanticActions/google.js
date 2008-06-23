@@ -211,7 +211,7 @@ var google_calendar = {
           }
         } else {
           url += "&";
-          url += "location=" + encodeURIComponent(calendar.location);
+          url += "location=" + encodeURIComponent(hcalendar.location);
         }
       }
       if (hcalendar.description) {
