@@ -378,10 +378,33 @@ var Microformats = {
      * @return A string with the normalized date.
      */
     dateTimeGetter: function(propnode, parentnode) {
-      var date = Microformats.parser.textGetter(propnode, parentnode);
-      if (date) {
-        return Microformats.parser.normalizeISO8601(date);
+      var values = Microformats.getElementsByClassName(propnode, "value");
+      /* Verify that values are children of the propnode */
+      for (let i = values.length-1; i >= 0; i--) {
+        if (values[i].parentNode != propnode) {
+          values.splice(i,1);
+        }
       }
+      if (values.length > 0) {
+        var time = "";
+        var date = "";
+        var value = "";
+        for (let j=0;j<values.length;j++) {
+          value = Microformats.parser.defaultGetter(values[j], propnode);
+          if (value.match(":")) {
+            time = value;
+          } else {
+            date = value;
+          }
+        }
+        return Microformats.parser.normalizeISO8601(date + (time?"T":"") + time);
+      } else {
+        var date = Microformats.parser.textGetter(propnode, parentnode);
+        if (date) {
+          return Microformats.parser.normalizeISO8601(date);
+        }
+      }
+      return undefined;
     },
     /**
      * Used to specifically retrieve a URI in a microformat node. This includes
