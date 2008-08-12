@@ -1256,7 +1256,7 @@ var Operator = {
       return false;
     }
     for (var i in object1) {
-      if (object1[i] instanceof String) {
+      if (typeof(object1[i]) =="string") {
         if (object1[i] == object2[i]) {
           continue;
         }
