@@ -108,11 +108,11 @@ var export_vcard = {
         hcard.n["honorific-suffix"])) {
       vcf += "N;CHARSET=UTF-8:";
       if (hcard.n["family-name"]) {
-        vcf += hcard.n["family-name"];
+        vcf += hcard.n["family-name"].join(",");
       }
       vcf += ";";
       if (hcard.n["given-name"]) {
-        vcf += hcard.n["given-name"];
+        vcf += hcard.n["given-name"].join(",");
       }
       vcf += ";";
       if (hcard.n["additional-name"]) {
