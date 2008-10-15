@@ -1,7 +1,7 @@
 var amazon_search_tags = {
   description: "Find products on amazon.com",
   shortDescription: "amazon.com",
-  icon: "http://www.ammazon.com/favicon.ico",
+  icon: "http://www.amazon.com/favicon.ico",
   scope: {
     semantic: {
       "tag" : "tag"
