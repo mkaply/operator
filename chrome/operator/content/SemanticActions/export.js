@@ -59,7 +59,7 @@ var export_vcard = {
                             getService(Components.interfaces.nsIProperties).
                             get("TmpD", Components.interfaces.nsIFile);
   
-      file.append("hCard.vcf");
+      file.append(semanticObject.fn + ".vcf");
   
       var fos = Components.classes["@mozilla.org/network/file-output-stream;1"].
                            createInstance(Components.interfaces.nsIFileOutputStream);
