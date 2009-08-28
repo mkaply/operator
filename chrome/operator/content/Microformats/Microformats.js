@@ -30,7 +30,7 @@ var Microformats = {
   get: function(name, rootElement, options, targetArray) {
     function isAncestor(haystack, needle) {
       var parent = needle;
-      while (parent = parent.parentNode) {
+      while (( parent = parent.parentNode)) {
         /* We need to check parentNode because defaultView.frames[i].frameElement */
         /* isn't a real DOM node */
         if (parent == needle.parentNode) {
@@ -40,7 +40,7 @@ var Microformats = {
       return false;
     }
     if (!Microformats[name] || !rootElement) {
-      return;
+      return undefined;
     }
     targetArray = targetArray || [];
 
@@ -174,8 +174,8 @@ var Microformats = {
             return true;
         }
       } else {
-        var attribute;
-        if (attribute = node.getAttribute(Microformats[i].attributeName)) {
+        var attribute = node.getAttribute(Microformats[i].attributeName);
+        if (attribute) {
           var attributeList = Microformats[i].attributeValues.split(" ");
           for (let j=0; j < attributeList.length; j++) {
             if (attribute.match("(^|\\s)" + attributeList[j] + "(\\s|$)")) {
@@ -236,8 +236,6 @@ var Microformats = {
    */
   getNamesFromNode: function(node) {
     var microformatNames = [];
-    var xpathExpression;
-    var xpathResult;
     for (let i in Microformats)
     {
       if (Microformats[i]) {
@@ -247,8 +245,8 @@ var Microformats = {
             continue;
           }
         } else if (Microformats[i].attributeValues) {
-          var attribute;
-          if (attribute = node.getAttribute(Microformats[i].attributeName)) {
+          var attribute = node.getAttribute(Microformats[i].attributeName);
+          if (attribute) {
             var attributeList = Microformats[i].attributeValues.split(" ");
             for (let j=0; j < attributeList.length; j++) {
               /* If we match any attribute, we've got a microformat */
@@ -333,19 +331,13 @@ var Microformats = {
      */
     defaultGetter: function(propnode, parentnode, datatype) {
       function collapseWhitespace(instring) {
-        /* Remove new lines, carriage returns and tabs */
-        outstring = instring.replace(/[\n\r\t]/gi, ' ');
-        /* Replace any double spaces with single spaces */
-        outstring = outstring.replace(/\s{2,}/gi, ' ');
-        /* Remove any double spaces that are left */
-        outstring = outstring.replace(/\s{2,}/gi, '');
-        /* Remove any spaces at the beginning */
-        outstring = outstring.replace(/^\s+/, '');
-        /* Remove any spaces at the end */
-        outstring = outstring.replace(/\s+$/, '');
-        return outstring;
+		instring = instring.replace(/[\t\n\r ]+/g, " ");
+		if (instring.charAt(0) == " ")
+		  instring = instring.substring(1, instring.length);
+		if (instring.charAt(instring.length - 1) == " ")
+		  instring = instring.substring(0, instring.length - 1);
+		return instring;
       }
-      
       
       if (((((propnode.localName.toLowerCase() == "abbr") || (propnode.localName.toLowerCase() == "html:abbr")) && !propnode.namespaceURI) || 
          ((propnode.localName.toLowerCase() == "abbr") && (propnode.namespaceURI == "http://www.w3.org/1999/xhtml"))) && (propnode.getAttribute("title"))) {
@@ -359,6 +351,9 @@ var Microformats = {
                  (propnode.nodeName.toLowerCase() == "input")) {
         return propnode.value;
       } else {
+		var valueTitle = Microformats.getElementsByClassName(propnode, "value-title");
+		if (valueTitle.length > 0) {
+		}
         var values = Microformats.getElementsByClassName(propnode, "value");
         /* Verify that values are children of the propnode */
         for (let i = values.length-1; i >= 0; i--) {
@@ -392,6 +387,7 @@ var Microformats = {
           return s;
         }
       }
+	  return undefined;
     },
     /**
      * Used to specifically retrieve a date in a microformat node.
@@ -404,6 +400,21 @@ var Microformats = {
      * @return A string with the normalized date.
      */
     dateTimeGetter: function(propnode, parentnode) {
+	  var valueTitles = Microformats.getElementsByClassName(propnode, "value-title");
+	  if (valueTitles.length > 0) {
+        var time = "";
+        var date = "";
+        var value = "";
+        for (let i=0;i<valueTitles.length;i++) {
+          value = valueTitles[i].getAttribute("title");
+          if (value.match(":")) {
+            time = value;
+          } else {
+            date = value;
+          }
+        }
+        return Microformats.parser.normalizeISO8601(date + (time?"T":"") + time);
+	  }
       var values = Microformats.getElementsByClassName(propnode, "value");
       /* Verify that values are children of the propnode */
       for (let i = values.length-1; i >= 0; i--) {
@@ -653,7 +664,7 @@ var Microformats = {
           }
         }
         if (!validType) {
-          return;
+          return undefined;
         }
       }
       return result;
@@ -774,7 +785,7 @@ var Microformats = {
         propobj = Microformats[mfname].properties[propname];
       } else {
         /* If we didn't get a property, bail */
-        return;
+        return undefined;
       }
       /* Query the correct set of nodes (rel or class) based on the setting */
       /* in the property */
@@ -853,7 +864,7 @@ var Microformats = {
                                                          propobj, propname);
         }
       }
-      return;
+      return undefined;
     },
     /**
      * Internal parser API used to resolve includes and headers. Includes are
@@ -923,6 +934,7 @@ var Microformats = {
         }
         return true;
       }
+	  return false;
     },
     /* This function normalizes an ISO8601 date by adding punctuation and */
     /* ensuring that hours and seconds have values */
@@ -933,7 +945,7 @@ var Microformats = {
       var dateString;
       var tzOffset = 0;
       if (!dateArray) {
-        return;
+        return undefined;
       }
       if (dateArray[1]) {
         dateString = dateArray[1];
@@ -1114,7 +1126,7 @@ var Microformats = {
       var xpathResult = (rootNode.ownerDocument || rootNode).evaluate(xpathExpression, rootNode, null, 0, null);
 
       var node;
-      while (node = xpathResult.iterateNext()) {
+      while ((node = xpathResult.iterateNext())) {
         returnElements.push(node);
       }
     } else {
@@ -1161,7 +1173,7 @@ var Microformats = {
       var xpathResult = (rootNode.ownerDocument || rootNode).evaluate(xpathExpression, rootNode, null, 0, null);
 
       var node;
-      while (node = xpathResult.iterateNext()) {
+      while ((node = xpathResult.iterateNext())) {
         returnElements.push(node);
       }
     } else {
@@ -1331,7 +1343,29 @@ var hCard_definition = {
       plural: true   
     },
     "fn" : {
-      required: true
+      required: true,
+      virtual: true,
+      virtualGetter: function(mfnode) {
+		/* Infer fn from n sub properties */
+		var fn = "";
+		var xpathExpression;
+		xpathExpression = ".//*[contains(concat(' ', @class, ' '), ' " + "given-name" + " ') or " +
+							   "contains(concat(' ', @class, ' '), ' " + "family-name" + " ') or " +
+							   "contains(concat(' ', @class, ' '), ' " + "additional-name" + " ')" +
+							   "]";
+		var xpathResult = mfnode.ownerDocument.evaluate(xpathExpression, mfnode, null, 0, null);
+		while ((node = xpathResult.iterateNext())) {
+		  if (fn.length == 0) {
+		    fn += node.textContent;
+		  } else {
+		    fn += " " + node.textContent;
+		  }
+		}
+		if (fn.length > 0) {
+		  return fn;
+		}
+		return undefined;
+	  }
     },
     "geo" : {
       datatype: "microformat",
@@ -1395,6 +1429,7 @@ var hCard_definition = {
             return {"given-name" : given_name, "family-name" : family_name};
           }
         }
+		return undefined;
       }
     },
     "nickname" : {
@@ -1413,7 +1448,7 @@ var hCard_definition = {
             return [fns[0]];
           }
         }
-        return;
+        return undefined;
       }
     },
     "note" : {
@@ -1500,7 +1535,7 @@ hCalendar.prototype.toString = function() {
   if (this.dtstart) {
     return this.summary;
   }
-  return;
+  return undefined;
 }
 
 var hCalendar_definition = {
@@ -1651,6 +1686,7 @@ var hCalendar_definition = {
             return rrule[i].split('=')[1];
           }
         }
+		return undefined;
       }
     }
   }
@@ -1664,14 +1700,23 @@ function geo(node, validate) {
   }
 }
 geo.prototype.toString = function() {
+  function collapseWhitespace(instring) {
+	instring = instring.replace(/[\t\n\r ]+/g, " ");
+	if (instring.charAt(0) == " ")
+	  instring = instring.substring(1, instring.length);
+	if (instring.charAt(instring.length - 1) == " ")
+	  instring = instring.substring(0, instring.length - 1);
+	return instring;
+  }
+
   if (this.latitude != undefined) {
     if (!isFinite(this.latitude) || (this.latitude > 360) || (this.latitude < -360)) {
-      return;
+      return undefined;
     }
   }
   if (this.longitude != undefined) {
     if (!isFinite(this.longitude) || (this.longitude > 360) || (this.longitude < -360)) {
-      return;
+      return undefined;
     }
   }
 
@@ -1682,7 +1727,7 @@ geo.prototype.toString = function() {
     }
 
     if (s) {
-      return s;
+      return collapseWhitespace(s);
     }
 
     /* check if geo is contained in a vcard */
@@ -1709,6 +1754,7 @@ geo.prototype.toString = function() {
       return this.latitude + ", " + this.longitude;
     }
   }
+  return undefined;
 }
 
 var geo_definition = {
@@ -1731,6 +1777,7 @@ var geo_definition = {
             }
           }
         }
+		return undefined;
       }
     },
     "longitude" : {
@@ -1748,6 +1795,7 @@ var geo_definition = {
             }
           }
         }
+		return undefined;
       }
     }
   },
@@ -1796,8 +1844,8 @@ var tag_definition = {
           var url_array = href.split("/");
           for(let i=url_array.length-1; i > 0; i--) {
             if (url_array[i] !== "") {
-              var tag
-              if (tag = Microformats.tag.validTagName(url_array[i].replace(/\+/g, ' '))) {
+              var tag = Microformats.tag.validTagName(url_array[i].replace(/\+/g, ' '));
+              if (tag) {
                 try {
                   return decodeURIComponent(tag);
                 } catch (ex) {

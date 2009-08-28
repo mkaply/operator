@@ -237,7 +237,7 @@ var Operator = {
               }
               postData.addContentLength = true;
               postData.setData(stringStream);
-              openUILink(url, event, undefined, undefined, undefined, postData, undefined);
+              Operator.openLink(url, event, undefined, undefined, undefined, postData, undefined);
             } else {
               if (query.length > 0) {
                 if (!action.match(/\?/)) {
@@ -247,7 +247,7 @@ var Operator = {
                 }
                 url += query;
               }
-              openUILink(url, event);
+              Operator.openLink(url, event);
             }
           }
         };
@@ -271,13 +271,13 @@ var Operator = {
       options = true;
     }
     /* Attempt to use the Microformats module if available (Firefox 3) */
-    if (Components.utils.import) {
-      try {
-        Components.utils.import("resource:///modules/Microformats.js");
-      } catch (ex) {
-        /* Unable to load system Microformats - use builtin */
-      }
-    }
+//    if (Components.utils.import) {
+//      try {
+//        Components.utils.import("resource:///modules/Microformats.js");
+//      } catch (ex) {
+//        /* Unable to load system Microformats - use builtin */
+//      }
+//    }
     var objScriptLoader = Components.classes["@mozilla.org/moz/jssubscript-loader;1"].getService(Components.interfaces.mozIJSSubScriptLoader);
     /* If we didn't get Microformats by import, load our own JS file */
     if (typeof(Microformats) == "undefined") {
@@ -443,6 +443,24 @@ var Operator = {
         } catch (ex) {
         }
       }
+	  /* My idea of having people Component.utils.import Microformats.js was BAD */
+	  function validUserScript(spec) {
+		var ioService=Components.classes["@mozilla.org/network/io-service;1"]
+		  .getService(Components.interfaces.nsIIOService);
+		var scriptableStream=Components
+		  .classes["@mozilla.org/scriptableinputstream;1"]
+		  .getService(Components.interfaces.nsIScriptableInputStream);
+         var channel=ioService.newChannel(spec,null,null);
+		var input=channel.open();
+		scriptableStream.init(input);
+		var str=scriptableStream.read(input.available());
+		scriptableStream.close();
+		input.close();
+		if (str.match("Components.utils.import")) {
+		  return false;
+		}
+		return true;
+	  }
       /* Load user scripts from the operator directory in the profile */
       var e = usdir.directoryEntries;
       var domParser = new DOMParser();
@@ -455,7 +473,9 @@ var Operator = {
                                        getProtocolHandler("file").
                                        QueryInterface(Components.interfaces.nsIFileProtocolHandler);
           try {
-            objScriptLoader.loadSubScript(fileHandler.getURLSpecFromFile(f));
+			if (validUserScript(fileHandler.getURLSpecFromFile(f))) {
+              objScriptLoader.loadSubScript(fileHandler.getURLSpecFromFile(f));
+			}
           } catch (ex) {
             alert("Unable to load " + f.leafName + "\n\n" + "(" + ex.message + ")");
           }
@@ -560,21 +580,58 @@ var Operator = {
       return;
     }
 
+    var i=1;
+	do {
+	  try {
+		action = this.prefBranch.getCharPref("action" + i);
+        Operator.actions[action].enabled = true;
+	  } catch (ex) {
+		break;
+	  }
+	  i++;
+	} while (1);
+
     /* Attach listeners for page load */ 
-    window.addEventListener("load", function(e)   { Operator.startup(); }, false);
-    window.addEventListener("unload", function(e) { Operator.shutdown(); }, false);
-    window.addEventListener("operator-sidebar-load", function(e) { Operator_Sidebar.populate(); }, false);
+    window.addEventListener("load", this.startup, false);
+    window.addEventListener("unload", this.shutdown, false);
+    window.addEventListener("operator-sidebar-load", Operator_Sidebar.populate, false);
     
   },
   /* This function handles the window startup piece, initializing the UI and preferences */
   startup: function startup()
   {
+    window.removeEventListener("load", startup, false);
+	var firstrun = false;
+	try {
+	  firstrun = Operator.prefBranch.getBoolPref("firstrun");
+	} catch(ex) {
+	  firstrun = true;
+	}
+
+	/* get installed version */
+    var em = Cc["@mozilla.org/extensions/manager;1"]
+                       .getService(Ci.nsIExtensionManager);
+
+    var curVersion = em.getItemForID("{95C9A302-8557-4052-91B7-2BB6BA33C885}").version;
+
+	if (firstrun) {
+      gBrowser.selectedTab = gBrowser.addTab("https://addons.mozilla.org/firefox/addon/4106/about");
+	  Operator.prefBranch.setBoolPref("firstrun", false);
+	  Operator.prefBranch.setCharPref("installedVersion", curVersion);
+	} else {
+	  var installedVersion = Operator.prefBranch.getCharPref("installedVersion");
+	  if (curVersion > installedVersion) {
+        gBrowser.selectedTab = gBrowser.addTab("https://addons.mozilla.org/firefox/addon/4106/about");
+  	    Operator.prefBranch.setCharPref("installedVersion", curVersion);
+	  }
+	}
+
     /* Add an observer so we see changes to prefs */
-    this.prefBranch.QueryInterface(Components.interfaces.nsIPrefBranch2);
-    this.prefBranch.addObserver("", this, false);
+    Operator.prefBranch.QueryInterface(Components.interfaces.nsIPrefBranch2);
+    Operator.prefBranch.addObserver("", Operator, false);
 
     /* Display the status bar icon if it is turned on in prefs */
-    if (this.statusbar) {
+    if (Operator.statusbar) {
       Operator_Statusbar.show();
     } else {
       Operator_Statusbar.hide();
@@ -583,10 +640,10 @@ var Operator = {
     /* A user might choose to display the toolbar at anytime and there is no notification */
     Operator_Toolbar.create();
     /* Event listeners for showing and hiding page content */
-    window.document.getElementById("content").addEventListener("pageshow", function(e) { Operator.onPageShow(e); }, true);
-    window.document.getElementById("content").addEventListener("pagehide", function(e) { Operator.onPageHide(e); }, true);
+    window.document.getElementById("content").addEventListener("pageshow", Operator.onPageShow, false);
+    window.document.getElementById("content").addEventListener("pagehide", Operator.onPageHide, false);
     /* Event listener for when you switch tabs */
-    getBrowser().tabContainer.addEventListener("select", function(e) { Operator.onTabChanged(e); }, true);
+    getBrowser().tabContainer.addEventListener("select", Operator.onTabChanged, false);
     /* Event listener so we can modify the page context menu */
     var menu = document.getElementById("contentAreaContextMenu");
     menu.addEventListener("popupshowing", Operator.contextPopupShowing, false);
@@ -595,12 +652,12 @@ var Operator = {
   shutdown: function shutdown()
   {
     /* Remove pref observer */
-    this.prefBranch.removeObserver("", this);
+    Operator.prefBranch.removeObserver("", Operator);
     /* Remove page show and hide observers */
-    getBrowser().removeEventListener("pageshow", function(e) { Operator.onPageShow(e); }, true);
-    getBrowser().removeEventListener("pagehide", function(e) { Operator.onPageHide(e); }, true);
+    getBrowser().removeEventListener("pageshow", Operator.onPageShow, false);
+    getBrowser().removeEventListener("pagehide", Operator.onPageHide, false);
     /* Remove listener for switching tabs */
-    getBrowser().tabContainer.removeEventListener("select", function(e) { Operator.onTabChanged(e); }, true);
+    getBrowser().tabContainer.removeEventListener("select", Operator.onTabChanged, false);
     /* Remove page context menu listener */
     var menu = document.getElementById("contentAreaContextMenu");
     menu.removeEventListener("popupshowing", Operator.contextPopupShowing, false);
@@ -696,6 +753,11 @@ var Operator = {
     }
   },
 
+  openLink: function openLink(url, event) {
+	openUILinkIn(url, "tab");
+//	openUILink(url, event);
+  },
+
   /* This is a closure used to highlight DOM nodes when a microformat is */
   /* selected in the menu */
   highlightCallbackGenerator: function highlightCallbackGenerator(item)
@@ -714,7 +776,7 @@ var Operator = {
       var url;
       url = SemanticActions[semanticAction].doAction(semanticObject, semanticObjectType, propertyIndex, event)
       if ((url) && (url != true)) {
-        openUILink(url, event);
+        Operator.openLink(url, event);
       }
     };
   },
@@ -725,7 +787,7 @@ var Operator = {
       var url;
       url = SemanticActions[semanticAction].doActionAll(semanticArrays, semanticObjectType)
       if ((url) && (url != true)) {
-        openUILink(url, event);
+        Operator.openLink(url, event);
       }
 
     };
@@ -740,7 +802,7 @@ var Operator = {
           var url;
           url = SemanticActions[semanticAction].doAction(semanticObject, semanticObjectType, propertyIndex, event)
           if ((url) && (url != true)) {
-            openUILink(url, event);
+            Operator.openLink(url, event);
           }
           closeMenus(event.target);
         }
@@ -758,7 +820,7 @@ var Operator = {
           var url;
           url = SemanticActions[semanticAction].doActionAll(semanticArrays, semanticObjectType)
           if ((url) && (url != true)) {
-            openUILink(url, event);
+            Operator.openLink(url, event);
           }
           closeMenus(event.target);
         }
@@ -867,7 +929,7 @@ var Operator = {
           tempMenu = document.createElement("menuitem");
         }
         tempMenu.store_onDOMMenuItemActive = this.highlightCallbackGenerator(semanticObjects[j].node);
-        tempMenu.addEventListener("DOMMenuItemActive", tempMenu.store_onDOMMenuItemActive, true);
+        tempMenu.addEventListener("DOMMenuItemActive", tempMenu.store_onDOMMenuItemActive, false);
         if (semanticObjects[j].displayName) {
           tempMenu.label = semanticObjects[j].displayName;
         } else {
@@ -876,7 +938,7 @@ var Operator = {
         tempMenu.setAttribute("label", tempMenu.label);
         if (!semanticObjects[j].displayName) {
           tempMenu.store_oncommand = this.errorCallbackGenerator(semanticObjects[j], semanticObjectType);
-          tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
+          tempMenu.addEventListener("command", tempMenu.store_oncommand, false);
           tempMenu.style.fontWeight = "bold";
           menu.error = true;
         } else {
@@ -928,6 +990,9 @@ var Operator = {
     var required;
     var menupopup;
     for (k in Operator.actions) {
+//      if (!Operator.actions[k].enabled ) {
+//        continue;
+//      }
       if (!Operator.actions[k].doAction ) {
         continue;
       }
@@ -1018,15 +1083,15 @@ var Operator = {
             } else {
               tempMenu.store_oncommand = Operator.actionCallbackGenerator(semanticObject, semanticObjectType, k, m);
             }
-            tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
+            tempMenu.addEventListener("command", tempMenu.store_oncommand, false);
             if (required[m].semanticType) {
               tempMenu.store_onclick = Operator.clickCallbackGenerator(required[m], required[m].semanticType, k);
             } else {
               tempMenu.store_onclick = Operator.clickCallbackGenerator(semanticObject, semanticObjectType, k, m);
             }
-            tempMenu.addEventListener("click", tempMenu.store_onclick, true);
+            tempMenu.addEventListener("click", tempMenu.store_onclick, false);
             tempMenu.store_onDOMMenuItemActive = Operator.highlightCallbackGenerator(semanticObject.node);
-            tempMenu.addEventListener("DOMMenuItemActive", tempMenu.store_onDOMMenuItemActive, true);
+            tempMenu.addEventListener("DOMMenuItemActive", tempMenu.store_onDOMMenuItemActive, false);
             if (popup) {
               submenu.appendChild(tempMenu);
             } else {
@@ -1064,13 +1129,13 @@ var Operator = {
           } else {
             menuitem.store_oncommand = Operator.actionCallbackGenerator(semanticObject, semanticObjectType, k);
           }
-          menuitem.addEventListener("command", menuitem.store_oncommand, true);
+          menuitem.addEventListener("command", menuitem.store_oncommand, false);
           if (required && required[0].semanticType) {
             menuitem.store_onclick = Operator.clickCallbackGenerator(required[0], required[0].semanticType, k);
           } else {
             menuitem.store_onclick = Operator.clickCallbackGenerator(semanticObject, semanticObjectType, k);
           }
-          menuitem.addEventListener("click", menuitem.store_onclick, true);
+          menuitem.addEventListener("click", menuitem.store_onclick, false);
           menuitem.label = label;
           menuitem.setAttribute("label", menuitem.label);
         }
@@ -1091,7 +1156,7 @@ var Operator = {
       menuitem.label = Operator.languageBundle.GetStringFromName("debug.label");
       menuitem.setAttribute("label", menuitem.label);
       menuitem.store_oncommand = this.errorCallbackGenerator(semanticObject, semanticObjectType);
-      menuitem.addEventListener("command", menuitem.store_oncommand, true);
+      menuitem.addEventListener("command", menuitem.store_oncommand, false);
       submenu.appendChild(menuitem);
     }
     if ((!addedAction) && (!this.debug)) {
@@ -1589,11 +1654,11 @@ var Operator = {
                       if (tempMenu.label) {
                         tempMenu.setAttribute("label", tempMenu.label);
                         tempMenu.store_oncommand = Operator.actionCallbackGenerator(objectArray[k], j, action, m);
-                        tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
+                        tempMenu.addEventListener("command", tempMenu.store_oncommand, false);
                         tempMenu.store_onclick = Operator.clickCallbackGenerator(objectArray[k], j, action, m);
-                        tempMenu.addEventListener("click", tempMenu.store_onclick, true);
+                        tempMenu.addEventListener("click", tempMenu.store_onclick, false);
                         tempMenu.store_onDOMMenuItemActive = Operator.highlightCallbackGenerator(objectArray[k].node);
-                        tempMenu.addEventListener("DOMMenuItemActive", tempMenu.store_onDOMMenuItemActive, true);
+                        tempMenu.addEventListener("DOMMenuItemActive", tempMenu.store_onDOMMenuItemActive, false);
                         menu.appendChild(tempMenu);
                         addedAction = true;
                       }
@@ -1616,9 +1681,9 @@ var Operator = {
                       tempMenu.label = label;
                       tempMenu.setAttribute("label", tempMenu.label);
                       tempMenu.store_oncommand = Operator.actionCallbackGenerator(objectArray[k], j, action);
-                      tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
+                      tempMenu.addEventListener("command", tempMenu.store_oncommand, false);
                       tempMenu.store_onclick = Operator.clickCallbackGenerator(objectArray[k], j, action);
-                      tempMenu.addEventListener("click", tempMenu.store_onclick, true);
+                      tempMenu.addEventListener("click", tempMenu.store_onclick, false);
                       addedAction = true;
                     }
                   }
@@ -1628,13 +1693,13 @@ var Operator = {
                   tempMenu.label = Operator.languageBundle.GetStringFromName("invalid.label");;
                   tempMenu.setAttribute("label", tempMenu.label);
                   tempMenu.store_oncommand = Operator.errorCallbackGenerator(objectArray[k], j);
-                  tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
+                  tempMenu.addEventListener("command", tempMenu.store_oncommand, false);
                   tempMenu.style.fontWeight = "bold";
                   menu.error = true;
                 }
                 if (tempMenu) {
                   tempMenu.store_onDOMMenuItemActive = Operator.highlightCallbackGenerator(objectArray[k].node);
-                  tempMenu.addEventListener("DOMMenuItemActive", tempMenu.store_onDOMMenuItemActive, true);
+                  tempMenu.addEventListener("DOMMenuItemActive", tempMenu.store_onDOMMenuItemActive, false);
                   menu.appendChild(tempMenu);
                 }
               }
@@ -1657,9 +1722,9 @@ var Operator = {
             tempMenu.label = Operator.actions[action].descriptionAll;
             tempMenu.setAttribute("label", tempMenu.label);
             tempMenu.store_oncommand = Operator.actionAllCallbackGenerator(semanticArrays, action);
-            tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
+            tempMenu.addEventListener("command", tempMenu.store_oncommand, false);
             tempMenu.store_onclick = Operator.clickAllCallbackGenerator(semanticArrays, action);
-            tempMenu.addEventListener("click", tempMenu.store_onclick, true);
+            tempMenu.addEventListener("click", tempMenu.store_onclick, false);
             if (menu) {
               menu.appendChild(tempMenu);
             } else {
@@ -1725,7 +1790,7 @@ var Operator = {
               tempMenu.label = "View Model";
               tempMenu.setAttribute("label", tempMenu.label);
               tempMenu.store_oncommand = Operator.errorCallbackGenerator(semanticArrays[semanticType][0], semanticType);
-              tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
+              tempMenu.addEventListener("command", tempMenu.store_oncommand, false);
               menu.insertBefore(tempMenu, menu.firstChild);
             }
             var addsep = false;
@@ -1772,9 +1837,9 @@ var Operator = {
                 tempMenu.label = Operator.actions[k].descriptionAll;
                 tempMenu.setAttribute("label", tempMenu.label);
                 tempMenu.store_oncommand = Operator.actionAllCallbackGenerator(semanticArrays, k, semanticType);
-                tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
+                tempMenu.addEventListener("command", tempMenu.store_oncommand, false);
                 tempMenu.store_onclick = Operator.clickAllCallbackGenerator(semanticArrays, k, semanticType);
-                tempMenu.addEventListener("click", tempMenu.store_onclick, true);
+                tempMenu.addEventListener("click", tempMenu.store_onclick, false);
                 menu.appendChild(tempMenu);
               }
             }
@@ -1820,7 +1885,7 @@ var Operator = {
       tempMenu.setAttribute("label", Operator.languageBundle.GetStringFromName("operatorOptions.label"));
       tempMenu.label = action;
       tempMenu.store_oncommand = function() {window.openDialog('chrome://operator/content/operator_options.xul','options','chrome,centerscreen,modal');};
-      tempMenu.addEventListener("command", tempMenu.store_oncommand, true);
+      tempMenu.addEventListener("command", tempMenu.store_oncommand, false);
       popup.appendChild(tempMenu);
 
       /* Add the menu to the various buttons */

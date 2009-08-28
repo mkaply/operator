@@ -1,9 +1,9 @@
-if (Components.utils.import) {
-  try {
-    Components.utils.import("resource:///modules/Microformats.js");
-    var EXPORTED_SYMBOLS = ["xFolk"];
-  } catch (ex) {}
-}
+//if (Components.utils.import) {
+//  try {
+//    Components.utils.import("resource:///modules/Microformats.js");
+//    var EXPORTED_SYMBOLS = ["xFolk"];
+//  } catch (ex) {}
+//}
 
 function xFolk(node) {
   if (node) {
