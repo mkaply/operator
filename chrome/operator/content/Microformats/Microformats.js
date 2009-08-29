@@ -397,9 +397,39 @@ var Microformats = {
      * @param  parentnode The parent node of the property. If it is a subproperty,
      *                    this is the parent property node. If it is not, this is the
      *                    microformat node.
+     * @param  raw        If set, don't call normalizeISO8601, just return text
      * @return A string with the normalized date.
      */
-    dateTimeGetter: function(propnode, parentnode) {
+    dateTimeGetter: function(propnode, parentnode, raw) {
+	  function parseTime(time) {
+        if (time.match("am") || time.match("a.m.")) {
+		  time = time.replace("am", "");
+		  time = time.replace("a.m.", "");
+		  var times = time.split(":");
+		  if (times[0] == "12") {
+			times[0] == "00";
+		  }
+		  if (times.length > 1) {
+		    time = times.join(":");
+		  } else {
+			time = times[0] + ":00";
+		  }
+		}
+		if (time.match("pm") || time.match("p.m.")) {
+		  time = time.replace("pm", "");
+		  time = time.replace("p.m.", "");
+		  var times = time.split(":");
+		  if (times[0] < 12) {
+		    times[0] = parseInt(times[0]) + 12;
+		  }
+		  if (times.length > 1) {
+		    time = times.join(":");
+		  } else {
+			time = times[0] + ":00";
+		  }
+		}
+		return time;
+	  }
 	  var valueTitles = Microformats.getElementsByClassName(propnode, "value-title");
 	  if (valueTitles.length > 0) {
         var time = "";
@@ -407,16 +437,26 @@ var Microformats = {
         var value = "";
         for (let i=0;i<valueTitles.length;i++) {
           value = valueTitles[i].getAttribute("title");
-          if (value.match(":")) {
-            time = value;
-          } else {
+		  if (value.match("T")) {
+			return Microformats.parser.normalizeISO8601(value);
+			break;
+		  }
+          if (value.charAt(4) == "-") {
             date = value;
+          } else {
+            time = value;
           }
         }
-        return Microformats.parser.normalizeISO8601(date + (time?"T":"") + time);
+		time = parseTime(time);
+		if (raw) {
+		  return date + (time?"T": "") + time;
+		} else {
+          return Microformats.parser.normalizeISO8601(date + (time?"T": "") + time);
+		}
 	  }
       var values = Microformats.getElementsByClassName(propnode, "value");
       /* Verify that values are children of the propnode */
+      /* Remove any that aren't */
       for (let i = values.length-1; i >= 0; i--) {
         if (values[i].parentNode != propnode) {
           values.splice(i,1);
@@ -426,19 +466,33 @@ var Microformats = {
         var time = "";
         var date = "";
         var value = "";
-        for (let j=0;j<values.length;j++) {
-          value = Microformats.parser.defaultGetter(values[j], propnode);
-          if (value.match(":")) {
-            time = value;
-          } else {
+        for (let i=0;i<values.length;i++) {
+		  value = Microformats.parser.defaultGetter(values[i], propnode);
+		  if (value.match("T")) {
+			return Microformats.parser.normalizeISO8601(value);
+			break;
+		  }
+          if (value.charAt(4) == "-") {
             date = value;
+          } else {
+            time = value;
           }
         }
-        return Microformats.parser.normalizeISO8601(date + (time?"T":"") + time);
+		time = parseTime(time);
+		if (raw) {
+		  return date + (time?"T": "") + time;
+		} else {
+          return Microformats.parser.normalizeISO8601(date + (time?"T": "") + time);
+		}
       } else {
         var date = Microformats.parser.textGetter(propnode, parentnode);
         if (date) {
-          return Microformats.parser.normalizeISO8601(date);
+		  if (raw) {
+			/* It's just  a time */
+			return parseTime(date);
+		  } else {
+            return Microformats.parser.normalizeISO8601(date);
+		  }
         }
       }
       return undefined;
@@ -765,6 +819,11 @@ var Microformats = {
         }
       } else if (!result) {
         result = Microformats.parser.datatypeHelper(propobj, propnode, parentnode);
+		if (!result && !propobj.subproperties) {
+          if (propobj.virtual && propobj.virtualGetter) {
+            result = propobj.virtualGetter(parentnode);
+		  }
+		}
       }
       return result;
     },
@@ -844,7 +903,8 @@ var Microformats = {
           var subresult = Microformats.parser.getPropertyInternal(propnodes[i],
                                                                   mfnode,
                                                                   propobj,
-                                                                  propname);
+                                                                  propname,
+																  mfnode);
           if (subresult != undefined) {
             resultArray.push(subresult);
             /* If we're not a plural property, don't bother getting more */
@@ -861,7 +921,7 @@ var Microformats = {
         /* is virtual and if so, call getPropertyInternal again */
         if (propobj.virtual) {
           return Microformats.parser.getPropertyInternal(mfnode, null,
-                                                         propobj, propname);
+                                                         propobj, propname, mfnode);
         }
       }
       return undefined;
@@ -947,23 +1007,27 @@ var Microformats = {
       if (!dateArray) {
         return undefined;
       }
+	  /* Year */
       if (dateArray[1]) {
         dateString = dateArray[1];
+		/* Month */
         if (dateArray[2]) {
           dateString += "-" + dateArray[2];
+		  /* Day */
           if (dateArray[3]) {
             dateString += "-" + dateArray[3];
+			/* Hours */
             if (dateArray[4]) {
               dateString += "T" + dateArray[4];
+			  /* Minutes */
               if (dateArray[5]) {
                 dateString += ":" + dateArray[5];
               } else {
                 dateString += ":" + "00";
               }
+			  /* Seconds */
               if (dateArray[6]) {
                 dateString += ":" + dateArray[6];
-              } else {
-                dateString += ":" + "00";
               }
               if (dateArray[7]) {
                 dateString += "." + dateArray[7];
@@ -1559,7 +1623,25 @@ var hCalendar_definition = {
       datatype: "dateTime"
     },
     "dtend" : {
-      datatype: "dateTime"
+      datatype: "dateTime",
+          virtual: true,
+          /* This will only be called in the virtual case */
+          /* If we got here, we have a dtend time without date */
+          virtualGetter: function(mfnode) {
+			var dtends = Microformats.getElementsByClassName(mfnode, "dtend");
+			if (dtends.length == 0) {
+			  return undefined;
+			}
+		    var dtend = Microformats.parser.dateTimeGetter(dtends[0], mfnode, true);
+			var dtstarts = Microformats.getElementsByClassName(mfnode, "dtstart");
+			if (dtstarts.length > 0) {
+              var dtstart = Microformats.parser.dateTimeGetter(dtstarts[0], mfnode);
+			  if (dtstart.match("T")) {
+				return dtstart.split("T")[0] + "T" + dtend;
+			  }
+		    }
+			return undefined;
+          }
     },
     "dtstamp" : {
       datatype: "dateTime"
