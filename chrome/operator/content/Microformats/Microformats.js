@@ -809,7 +809,7 @@ var Microformats = {
           }
         }
       }
-      if (!parentnode || (!result && propobj.subproperties)) {
+      if (!parentnode || ((result == undefined) && propobj.subproperties)) {
         if (propobj.virtual) {
           if (propobj.virtualGetter) {
             result = propobj.virtualGetter(mfnode || propnode);
@@ -817,9 +817,9 @@ var Microformats = {
             result = Microformats.parser.datatypeHelper(propobj, propnode);
           }
         }
-      } else if (!result) {
+      } else if (result == undefined) {
         result = Microformats.parser.datatypeHelper(propobj, propnode, parentnode);
-		if (!result && !propobj.subproperties) {
+		if ((result == undefined) && !propobj.subproperties) {
           if (propobj.virtual && propobj.virtualGetter) {
             result = propobj.virtualGetter(parentnode);
 		  }
