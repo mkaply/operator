@@ -959,7 +959,6 @@ RDFa.SemanticObject = function (_model, _subject) {
     if(objects === undefined || objects.length === 0) {
       var props = this.model.enumProperties(this.subject);
 	  for (var i=0; i < props.length; i++) {
-		alert(props[i]);
 		if (props[i].toString().match("label")) {
 		  objects = this.model.getProperty(this.subject, props[i]);
 		}
