@@ -901,6 +901,12 @@ var Operator = {
       } else {
         semanticObjects[i].displayName = semanticObjects[i].toString();
       }
+	  /* Hide RDF without labels */
+	  if (semanticObjectType == "RDF") {
+		if (semanticObjects[i].displayName.match("_:") && !this.debug) {
+		  semanticObjects[i].duplicate = true;
+		}
+	  }
     }
     
     /* Sort and remove duplicates */
