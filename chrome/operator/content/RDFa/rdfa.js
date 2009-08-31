@@ -37,14 +37,16 @@ var RDFa = {
     foaf:'http://xmlns.com/foaf/0.1/',
     rdfs:'http://www.w3.org/2000/01/rdf-schema#',
     rdf:'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
-    xsd :'http://www.w3.org/2001/XMLSchema#'
+    xsd :'http://www.w3.org/2001/XMLSchema#',
+    stag: 'http://semantictags.org/stag/1.0/'
   },
   ns : {
     rdf : function(name) { return RDFa.DEFAULT_NS.rdf + (name||''); },
     rdfs : function(name) { return RDFa.DEFAULT_NS.rdfs + (name||''); },
     dc : function(name) { return RDFa.DEFAULT_NS.dc + (name||''); },
     foaf : function(name) { return RDFa.DEFAULT_NS.foaf + (name||''); },
-    xsd : function(name) { return RDFa.DEFAULT_NS.xsd + (name||''); }
+    xsd : function(name) { return RDFa.DEFAULT_NS.xsd + (name||''); },
+    stag : function(name) { return RDFa.DEFAULT_NS.stag + (name||''); }
   },
   attributes : [ "about", "content", "datatype", 
     "href", "typeof", "property", "instanceof",
@@ -447,7 +449,7 @@ var RDFa = {
       incomplete : [],
       skip : false,
       newSubject : null,
-      currentObject : null,
+      currentObject : null
     }; 
 
     if(env.contexts.length > 0) {
@@ -711,7 +713,7 @@ RDFa.Model = function() {
   this.getObjects = function() {
     var objects = [];
     for(var i in subjects) { 
-      if(uris_arr[i].indexOf("_:") === 0) { continue; }
+//      if(uris_arr[i].indexOf("_:") === 0) { continue; }
       var newObj = new RDFa.SemanticObject(this, uris_arr[i]);
       objects.push(newObj); 
     } 
@@ -764,6 +766,20 @@ RDFa.Model = function() {
     }
     return false;
   };
+  this.enumProperties = function(s) {
+    if(uris_map[s] !== undefined) {
+      s = uris_map[s];
+    }
+    if(subjects[s] !== undefined && subjects) {
+      var props = [];
+      var ts = subjects[s];
+      for(var x in ts) {
+        props.push(new RDFa.Resource(x, this));
+      }
+      return props;
+    }
+    return [];
+  };
   this.createResource = function(s) {
     var index = this.indexURI(s);
     return new RDFa.Resource(index, this);
@@ -784,8 +800,8 @@ RDFa.Model = function() {
   };
   this.debug = this.dumpTriples;
   this.dumpSubject = function (s, depth, context, anon) {
-    var depth = depth || 0;
-    var context = context || { seen : [], subjects : [] };
+    depth = depth || 0;
+    context = context || { seen : [], subjects : [] };
     if(typeof uris_map[s] != 'undefined') {
       s = uris_map[s];
     }
@@ -930,6 +946,24 @@ RDFa.SemanticObject = function (_model, _subject) {
 
     if(objects === undefined || objects.length === 0) {
       objects = this.model.getProperty(this.subject, RDFa.ns.dc("title"));
+    }
+
+    if(objects === undefined || objects.length === 0) {
+      objects = this.model.getProperty(this.subject, RDFa.ns.stag("label"));
+    }
+
+    if(objects === undefined || objects.length === 0) {
+      objects = this.model.getProperty(this.subject, RDFa.ns.rdf("name"));
+    }
+
+    if(objects === undefined || objects.length === 0) {
+      var props = this.model.enumProperties(this.subject);
+	  for (var i=0; i < props.length; i++) {
+		alert(props[i]);
+		if (props[i].toString().match("label")) {
+		  objects = this.model.getProperty(this.subject, props[i]);
+		}
+	  }
     }
 
     if(objects !== undefined && objects.length > 0) {
