@@ -13,13 +13,19 @@ var SemanticActions = {
   init: function() {
     if (!SemanticActions.inited) {
       SemanticActions.inited = true
-      var ojl = Components.classes["@mozilla.org/moz/jssubscript-loader;1"].
-                           getService(Components.interfaces.mozIJSSubScriptLoader);
-      /* Find the location of the JS file we are in */
-      var stack = (new Error()).stack.split("\n");
-      var end = stack[1].indexOf("SemanticActions.js");
-      var begin = stack[1].lastIndexOf("@", end)+1;
-      var baseurl = stack[1].substring(begin, end);
+	  var baseurl;
+	  try {
+		  
+		var ojl = Components.classes["@mozilla.org/moz/jssubscript-loader;1"].
+							 getService(Components.interfaces.mozIJSSubScriptLoader);
+		/* Find the location of the JS file we are in */
+		var stack = (new Error()).stack.split("\n");
+		var end = stack[1].indexOf("SemanticActions.js");
+		var begin = stack[1].lastIndexOf("@", end)+1;
+		baseurl = stack[1].substring(begin, end);
+	  } catch (ex) {
+		baseurl = "chrome://operator/content/SemanticActions/";
+	  }
 
       try {
         ojl.loadSubScript(baseurl + "export.js");
