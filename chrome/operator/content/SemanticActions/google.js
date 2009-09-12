@@ -7,7 +7,8 @@ var google_maps = {
   scope: {
     semantic: {
       "geo" : "geo",
-      "hCard" : "adr"
+      "hCard" : "adr",
+      "hCard" : "label"
     }
   },
   doAction: function(semanticObject, semanticObjectType, propertyIndex) {
@@ -18,7 +19,12 @@ var google_maps = {
         if (!propertyIndex) {
           propertyIndex = 0;
         }
-        adr = semanticObject.adr[propertyIndex];
+        if (semanticObject.adr) {
+          adr = semanticObject.adr[propertyIndex];
+        } else {
+		  /* label */
+          return "http://maps.google.com/maps?q=" + Microformats.simpleEscape(semanticObject.label[propertyIndex]);  
+        }
       } else {
         adr = semanticObject;
       }
