@@ -3,11 +3,12 @@
 var Operator_Options = {
   dataformats: [],
   prefBranch: null,
+  enabledActions: [],
   saveOptions: function() 
   {
     var i;
     this.prefBranch.setBoolPref("batchPrefChanges", true);
-    this.checkAndSetIntPref("view", document.getElementById("view").value);
+    //this.checkAndSetIntPref("view", document.getElementById("view").value);
     this.checkAndSetBoolPref("useDescriptiveNames", document.getElementById("useDescriptiveNames").checked);
     this.checkAndSetBoolPref("useShortDescriptions", document.getElementById("useShortDescriptions").checked);
     this.checkAndSetBoolPref("debug", document.getElementById("debug").checked);
@@ -37,23 +38,36 @@ var Operator_Options = {
     }
     while (haveMorePrefs);
     
-    var actions = document.getElementById("actions");
-    for (i=0; i < actions.getRowCount(); i++) {
-      this.checkAndSetCharPref("action" + (i+1), actions.getItemAtIndex(i).value);
-    }
-  
-    haveMorePrefs = true;
-    do {
-      try {
-        this.prefBranch.clearUserPref("action" + (i+1));
-      }
-      catch (ex)
-      {
-        haveMorePrefs = false;
-      }
-      i++;
-    }
-    while (haveMorePrefs);
+    //var actions = document.getElementById("actions");
+    //for (i=0; i < actions.getRowCount(); i++) {
+    //  this.checkAndSetCharPref("action" + (i+1), actions.getItemAtIndex(i).value);
+    //}
+    //
+    //haveMorePrefs = true;
+    //do {
+    //  try {
+    //    this.prefBranch.clearUserPref("action" + (i+1));
+    //  }
+    //  catch (ex)
+    //  {
+    //    haveMorePrefs = false;
+    //  }
+    //  i++;
+    //}
+    //while (haveMorePrefs);
+
+
+    var actionsPref = [];
+    var enableactions = document.getElementById("enableactions");
+	var checkboxes = enableactions.getElementsByTagName("checkbox");
+	for (let i =0; i < checkboxes.length; i++) {
+	  if (!checkboxes[i].checked) {
+		actionsPref.push(checkboxes[i].id);
+	  }
+	}
+
+	this.prefBranch.setCharPref("actions.disabled", actionsPref.join(","));
+
     this.prefBranch.setBoolPref("batchPrefChanges", false);
   },
 
@@ -98,13 +112,13 @@ var Operator_Options = {
                                  getBranch("extensions.operator.");
 
 
-    var view = 0;
-    try {
-      view = this.prefBranch.getIntPref("view");
-    } catch (ex) {
-      view = Operator.view;
-    }
-    document.getElementById("view").value = view;
+    //var view = 0;
+    //try {
+    //  view = this.prefBranch.getIntPref("view");
+    //} catch (ex) {
+    //  view = Operator.view;
+    //}
+    //document.getElementById("view").value = view;
 
     var useDescriptiveNames;
     try {
@@ -202,32 +216,32 @@ var Operator_Options = {
     } while (1);
   
     i=1;
-    var actions = document.getElementById("actions");
-    var action;
-    do {
-      try {
-        action = this.prefBranch.getCharPref("action" + i );
-      } catch (ex) {
-        break;
-      }
-      if (Operator.actions[action]) {
-        var listitemText;
-        if (Operator.actions[action].doAction) {
-          if (Operator.actions[action].description) {
-            listitemText = Operator.actions[action].description;
-          }
-        } else if (Operator.actions[action].doActionAll) {
-          if (Operator.actions[action].descriptionAll) {
-            listitemText = Operator.actions[action].descriptionAll;
-          }
-        }
-        if (!listitemText) {
-          listitemText = action;
-        }
-        actions.appendItem(listitemText, action);
-      }
-      i++;
-    } while (1);
+    //var actions = document.getElementById("actions");
+    //var action;
+    //do {
+    //  try {
+    //    action = this.prefBranch.getCharPref("action" + i );
+    //  } catch (ex) {
+    //    break;
+    //  }
+    //  if (Operator.actions[action]) {
+    //    var listitemText;
+    //    if (Operator.actions[action].doAction) {
+    //      if (Operator.actions[action].description) {
+    //        listitemText = Operator.actions[action].description;
+    //      }
+    //    } else if (Operator.actions[action].doActionAll) {
+    //      if (Operator.actions[action].descriptionAll) {
+    //        listitemText = Operator.actions[action].descriptionAll;
+    //      }
+    //    }
+    //    if (!listitemText) {
+    //      listitemText = action;
+    //    }
+    //    actions.appendItem(listitemText, action);
+    //  }
+    //  i++;
+    //} while (1);
 
     var userscripts = document.getElementById("userscripts");
     var file = Components.classes["@mozilla.org/file/directory_service;1"].
@@ -249,6 +263,23 @@ var Operator_Options = {
         }
       }
     }
+    var enableactions = document.getElementById("enableactions");
+    for (i in Operator.actions)
+    {
+	  var richlistitem = document.createElement("richlistitem");
+	  var checkbox = document.createElement("checkbox");
+	  checkbox.setAttribute("id", i);
+	  if (!Operator.actions[i].disabled) {
+		checkbox.setAttribute("checked", "true");
+	  }
+	  richlistitem.appendChild(checkbox);
+	  var label = document.createElement("label");
+	  label.setAttribute("value", Operator.actions[i].description);
+	  richlistitem.appendChild(label);
+	  enableactions.appendChild(richlistitem);
+    }
+
+
     var appInfo = Components.classes["@mozilla.org/xre/app-info;1"]  
                             .getService(Components.interfaces.nsIXULAppInfo);
     if (appInfo.ID == "songbird@songbirdnest.com") {
@@ -256,16 +287,16 @@ var Operator_Options = {
       document.getElementById("autohide").disabled = true;
     }
   },
-  
+
   doDataformatEnabling: function()
   {
-    if (document.getElementById('view').value == "1") {
-      document.getElementById('useDescriptiveNames').setAttribute('disabled', 'true');
-      document.getElementById('useShortDescriptions').setAttribute('disabled', 'false');
-    } else {
-      document.getElementById('useDescriptiveNames').setAttribute('disabled', 'false');
-      document.getElementById('useShortDescriptions').setAttribute('disabled', 'true');
-    }
+    //if (document.getElementById('view').value == "1") {
+    //  document.getElementById('useDescriptiveNames').setAttribute('disabled', 'true');
+    //  document.getElementById('useShortDescriptions').setAttribute('disabled', 'false');
+    //} else {
+    //  document.getElementById('useDescriptiveNames').setAttribute('disabled', 'false');
+    //  document.getElementById('useShortDescriptions').setAttribute('disabled', 'true');
+    //}
   },
   
   onNewDataformat: function()

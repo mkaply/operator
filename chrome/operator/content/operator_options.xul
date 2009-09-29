@@ -29,17 +29,19 @@
 	  <tabpanels>
       <tabpanel>
         <vbox>
-          <groupbox>
-            <caption label="&displayStyle.label;"/>
-            <vbox>
-              <radiogroup id="view" onselect="Operator_Options.doDataformatEnabling();">
-                <radio label="&actions.label;" value="1"/>
-                 <checkbox id="useShortDescriptions" class="indent" label="&useShortDescriptions.label;"/>
-                <radio label="&dataformats.label;" value="0"/>
-                 <checkbox id="useDescriptiveNames" class="indent" label="&useDescriptiveNames.label;"/>
-              </radiogroup>
-            </vbox>
-          </groupbox>
+          <!--<groupbox>-->
+          <!--  <caption label="&displayStyle.label;"/>-->
+          <!--  <vbox>-->
+          <!--    <radiogroup id="view" onselect="Operator_Options.doDataformatEnabling();">-->
+          <!--      <radio label="&actions.label;" value="1"/>-->
+          <!--       <checkbox id="useShortDescriptions" class="indent" label="&useShortDescriptions.label;"/>-->
+                 <checkbox id="useShortDescriptions" label="&useShortDescriptions.label;"/>
+          <!--      <radio label="&dataformats.label;" value="0"/>-->
+                 <!--<checkbox id="useDescriptiveNames" class="indent" label="&useDescriptiveNames.label;"/>-->
+                 <checkbox id="useDescriptiveNames" label="&useDescriptiveNames.label;"/>
+          <!--    </radiogroup>-->
+          <!--  </vbox>-->
+          <!--</groupbox>-->
         <checkbox id="debug" label="&debug.label;"/>
         <checkbox id="statusbar" label="&statusbar.label;"/>
         <checkbox id="urlbar" label="&urlbar.label;"/>
@@ -54,7 +56,8 @@
       <box flex="1" class="ccklist" id="dataformats" disablenew="Operator_Options.disableNewDataformat();" new="Operator_Options.onNewDataformat();" edit="Operator_Options.onEditDataformat();"/>
       </tabpanel>
       <tabpanel>
-      <box flex="1" class="ccklist" id="actions" disablenew="Operator_Options.disableNewAction();" new="Operator_Options.onNewAction();" edit="Operator_Options.onEditAction();"/>
+      <!--<box flex="1" class="ccklist" id="actions" disablenew="Operator_Options.disableNewAction();" new="Operator_Options.onNewAction();" edit="Operator_Options.onEditAction();"/>-->
+      <richlistbox flex="1" style="height: 25em;" id="enableactions"/>
       </tabpanel>
       <tabpanel>
       <box flex="1" class="ccklist" id="userscripts" buttons="new,delete" new="Operator_Options.onNewUserScript();" edit="Operator_Options.onEditUserScript();" ondelete="Operator_Options.onDeleteUserScript();"/>

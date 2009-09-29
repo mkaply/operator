@@ -1,6 +1,7 @@
 var Operator = {
   /* Our own dataformats array for UI purposes - includes Microformats+RDFa */
   dataformats: [],
+  eTLDService: null,
   /* Operator preference branch */
   prefBranch: null,
   /* Variables for preferences */
@@ -324,7 +325,13 @@ var Operator = {
       } catch (ex) {
       }
     }
-    
+    if (Components.interfaces.nsIEffectiveTLDService) {
+      this.eTLDService = Components.classes["@mozilla.org/network/effective-tld-service;1"]
+                                 .getService(Components.interfaces.nsIEffectiveTLDService);
+    } else {
+	  this.eTLDService = function(s) { return s;};
+	}
+
     /* Setup the pref branch */
     this.prefBranch = Components.classes["@mozilla.org/preferences-service;1"].
                                  getService(Components.interfaces.nsIPrefService).
@@ -506,6 +513,16 @@ var Operator = {
       Operator.actions.add(i, SemanticActions[i]);
     }
 
+	try {
+	  var pref = this.prefBranch.getCharPref("actions.disabled");
+	  var disabledActions = pref.split(',');
+	  for (var i=0; i < disabledActions.length; i++) {
+		Operator.actions[disabledActions[i]].disabled = true;
+	  }
+	} catch (ex) {
+	}
+
+
     /* This is to allow translation of actions. Basically we get the default */
     /* locale, and if a description exists for that locale, use it. */
     /* We also support the old way where description is not an array */
@@ -560,9 +577,9 @@ var Operator = {
     try {
       this.upcomingBugFixed = this.prefBranch.getBoolPref("upcomingBugFixed");
     } catch (ex) {}
-    try {
-      this.view = this.prefBranch.getIntPref("view");
-    } catch (ex) {}
+    //try {
+    //  this.view = this.prefBranch.getIntPref("view");
+    //} catch (ex) {}
     try {
       this.statusbar = this.prefBranch.getBoolPref("statusbar");
     } catch (ex) {}
@@ -584,7 +601,6 @@ var Operator = {
 	do {
 	  try {
 		action = this.prefBranch.getCharPref("action" + i);
-        Operator.actions[action].enabled = true;
 	  } catch (ex) {
 		break;
 	  }
@@ -708,9 +724,9 @@ var Operator = {
         this.highlightedElement = null;
       }
     }
-    if (data == "view") {
-      this.view = this.prefBranch.getIntPref("view");
-    }
+    //if (data == "view") {
+    //  this.view = this.prefBranch.getIntPref("view");
+    //}
     if (data == "useShortDescriptions") {
       this.useShortDescriptions = this.prefBranch.getBoolPref("useShortDescriptions");
     }
@@ -719,6 +735,9 @@ var Operator = {
     }
     if (data == "autohide") {
       this.autohide = this.prefBranch.getBoolPref("autohide");
+	  if (this.autohide == false) {
+        Operator_Toolbar.show();
+	  }
     }
     if (data == "statusbar") {
       this.statusbar = this.prefBranch.getBoolPref("statusbar");
@@ -743,6 +762,24 @@ var Operator = {
         }
         i++;
       } while (1);
+    }
+    if (data == "actions.disabled") {
+	  var disabledActions =  this.prefBranch.getCharPref("actions.disabled");
+	  var disabledActionsTemp = disabledActions.split(',');
+var foo = [];
+	  for (var i=0; i < disabledActionsTemp.length; i++) {
+		foo[disabledActionsTemp[i]] = true;
+		
+	  }
+	  
+      for (i in Operator.actions) {
+		if (foo[i]) {
+		  Operator.console_message("disabling" + i);
+		  Operator.actions[i].disabled = true;
+		} else {
+		  Operator.actions[i].disabled = false;
+		}
+	  }
     }
 
     /* If batchPrefChanges is false, recreate the toolbar and reprocess */
@@ -996,9 +1033,9 @@ var Operator = {
     var required;
     var menupopup;
     for (k in Operator.actions) {
-//      if (!Operator.actions[k].enabled ) {
-//        continue;
-//      }
+      if (Operator.actions[k].disabled ) {
+        continue;
+      }
       if (!Operator.actions[k].doAction ) {
         continue;
       }
@@ -1034,7 +1071,8 @@ var Operator = {
         }
       }
       if (Operator.actions[k].scope.url) {
-        if (!(content.document.location.href.match(Operator.actions[k].scope.url))) {
+		var host = Operator.eTLDService.getBaseDomainFromHost(content.document.location.host);
+        if (!(Operator.actions[k].scope.url.match(host))) {
           continue;
         }
       }
@@ -1520,6 +1558,7 @@ var Operator = {
       Operator_URLbarButton.enable();
     }
 
+
 /* check for rel-service link tags */
    var dochead = content.document.getElementsByTagName("head")[0];
    var links = dochead.getElementsByTagName("link");
@@ -1560,9 +1599,7 @@ var Operator = {
 
           var actionObjects = Operator.actionObjectsFromDocument(doc);
           for (let i = 0; i < actionObjects.length; i++) {
-            /* set URL semantic scope */
-            /* need to get host */
-            actionObjects[i].scope.url = content.document.location.href;
+			actionObjects[i].scope.url = "http://" + Operator.eTLDService.getBaseDomainFromHost(content.document.location.host);  
             SemanticActions.add(actionObjects[i].category + "_" + i + "_" + actionObjects[i].host, actionObjects[i]);
             if (!Operator.actions[actionObjects[i].category + "_" + i + "_" + actionObjects[i].host]) {
               Operator.actions.add(actionObjects[i].category + "_" + i + "_" + actionObjects[i].host, actionObjects[i], true);
