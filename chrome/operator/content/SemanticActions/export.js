@@ -535,7 +535,7 @@ var export_icalendar = {
           tzpos = hcalendar.dtstart.lastIndexOf("-");
         }
         if (tzpos > T) {
-          var js_date = Microformats.dateFromISO8601(hcalendar.dtstart.substr(0, tzpos-1));
+          var js_date = Microformats.dateFromISO8601(hcalendar.dtstart.substr(0, tzpos));
           var tzhours = parseInt(hcalendar.dtstart.substr(tzpos+1, 2), 10);
           var tzminutes = parseInt(hcalendar.dtstart.substr(tzpos+3, 2), 10);
           if (hcalendar.dtstart.charAt(tzpos) == "-") {
@@ -573,7 +573,7 @@ var export_icalendar = {
           tzpos = hcalendar.dtend.lastIndexOf("-");
         }
         if (tzpos > T) {
-          var js_date = Microformats.dateFromISO8601(hcalendar.dtend.substr(0, tzpos-1));
+          var js_date = Microformats.dateFromISO8601(hcalendar.dtend.substr(0, tzpos));
           var tzhours = parseInt(hcalendar.dtend.substr(tzpos+1, 2), 10);
           var tzminutes = parseInt(hcalendar.dtend.substr(tzpos+3, 2), 10);
           if (hcalendar.dtend.charAt(tzpos) == "-") {
