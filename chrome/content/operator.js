@@ -685,13 +685,17 @@ var Operator = {
     var curVersion = em.getItemForID("{95C9A302-8557-4052-91B7-2BB6BA33C885}").version;
 
 	if (firstrun) {
-      gBrowser.selectedTab = gBrowser.addTab("https://addons.mozilla.org/firefox/addon/4106/about");
+      window.setTimeout(function(){
+        gBrowser.selectedTab = gBrowser.addTab("http://kaply.com/operator/install/");
+      }, 1000);
 	  Operator.prefBranch.setBoolPref("firstrun", false);
 	  Operator.prefBranch.setCharPref("installedVersion", curVersion);
 	} else {
 	  var installedVersion = Operator.prefBranch.getCharPref("installedVersion");
 	  if (curVersion > installedVersion) {
-        gBrowser.selectedTab = gBrowser.addTab("https://addons.mozilla.org/firefox/addon/4106/about");
+        window.setTimeout(function(){
+          gBrowser.selectedTab = gBrowser.addTab("http://kaply.com/operator/install/upgrade");
+        }, 1000);
   	    Operator.prefBranch.setCharPref("installedVersion", curVersion);
 	  }
 	}
