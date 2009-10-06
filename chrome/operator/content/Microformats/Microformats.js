@@ -409,10 +409,16 @@ var Microformats = {
 		  if (times[0] == "12") {
 			times[0] == "00";
 		  }
+		  if (times[0].length == 1) {
+			times[0] = "0" + times[0];
+		  }
 		  if (times.length > 1) {
 		    time = times.join(":");
 		  } else {
-			time = times[0] + ":00";
+			time = times[0] + ":00:00";
+		  }
+		  if (times.length == 2) {
+			time += ":00";
 		  }
 		}
 		if (time.match("pm") || time.match("p.m.")) {
@@ -422,10 +428,16 @@ var Microformats = {
 		  if (times[0] < 12) {
 		    times[0] = parseInt(times[0]) + 12;
 		  }
+		  if (times[0].length == 1) {
+			times[0] = "0" + times[0];
+		  }
 		  if (times.length > 1) {
 		    time = times.join(":");
 		  } else {
-			time = times[0] + ":00";
+			time = times[0] + ":00:00";
+		  }
+		  if (times.length == 2) {
+			time += ":00";
 		  }
 		}
 		return time;
@@ -435,6 +447,7 @@ var Microformats = {
         var time = "";
         var date = "";
         var value = "";
+        var offset = "";
         for (let i=0;i<valueTitles.length;i++) {
           value = valueTitles[i].getAttribute("title");
 		  if (value.match("T")) {
@@ -443,6 +456,8 @@ var Microformats = {
 		  }
           if (value.charAt(4) == "-") {
             date = value;
+		  } else if ((value.charAt(0) == "-") || (value.charAt(0) == "+")) {
+            offset = value;
           } else {
             time = value;
           }
@@ -450,8 +465,10 @@ var Microformats = {
 		time = parseTime(time);
 		if (raw) {
 		  return date + (time?"T": "") + time;
-		} else {
+		} else if (date && time) {
           return Microformats.parser.normalizeISO8601(date + (time?"T": "") + time);
+		} else {
+		  return undefined;
 		}
 	  }
       var values = Microformats.getElementsByClassName(propnode, "value");
@@ -466,6 +483,7 @@ var Microformats = {
         var time = "";
         var date = "";
         var value = "";
+        var offset = "";
         for (let i=0;i<values.length;i++) {
 		  value = Microformats.parser.defaultGetter(values[i], propnode);
 		  if (value.match("T")) {
@@ -474,6 +492,8 @@ var Microformats = {
 		  }
           if (value.charAt(4) == "-") {
             date = value;
+		  } else if ((value.charAt(0) == "-") || (value.charAt(0) == "+")) {
+            offset = value;
           } else {
             time = value;
           }
@@ -481,8 +501,10 @@ var Microformats = {
 		time = parseTime(time);
 		if (raw) {
 		  return date + (time?"T": "") + time;
-		} else {
+		} else if (date && time) {
           return Microformats.parser.normalizeISO8601(date + (time?"T": "") + time);
+		} else {
+		  return undefined;
 		}
       } else {
         var date = Microformats.parser.textGetter(propnode, parentnode);
@@ -1028,6 +1050,8 @@ var Microformats = {
 			  /* Seconds */
               if (dateArray[6]) {
                 dateString += ":" + dateArray[6];
+              } else {
+                dateString += ":" + "00";
               }
               if (dateArray[7]) {
                 dateString += "." + dateArray[7];
@@ -1637,7 +1661,8 @@ var hCalendar_definition = {
 			if (dtstarts.length > 0) {
               var dtstart = Microformats.parser.dateTimeGetter(dtstarts[0], mfnode);
 			  if (dtstart.match("T")) {
-				return dtstart.split("T")[0] + "T" + dtend;
+//				return dtstart.split("T")[0] + "T" + dtend;
+				return dtstart.split("T")[0] + dtend;
 			  }
 		    }
 			return undefined;
