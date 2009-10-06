@@ -568,9 +568,9 @@ var export_icalendar = {
         ics += "-TIME";
         /* This is some seriously ugly code that accomodates the fact that */
         /* ICS don't support TZ offsets, only UTC (Z) */
-        var tzpos = hcalendar.dtstart.lastIndexOf("+");
+        var tzpos = hcalendar.dtend.lastIndexOf("+");
         if (tzpos == -1) {
-          tzpos = hcalendar.dtstart.lastIndexOf("-");
+          tzpos = hcalendar.dtend.lastIndexOf("-");
         }
         if (tzpos > T) {
           var js_date = Microformats.dateFromISO8601(hcalendar.dtend.substr(0, tzpos-1));
