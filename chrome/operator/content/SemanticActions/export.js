@@ -477,6 +477,10 @@ var export_icalendar = {
             ics += ", ";
             ics += hcalendar.location.adr[0]["street-address"][0];
           }
+          if (hcalendar.location.adr[0]["extended-address"]) {
+            ics += ", ";
+            ics += hcalendar.location.adr[0]["extended-address"];
+          }
           if (hcalendar.location.adr[0].locality) {
             ics += ", ";
             ics += hcalendar.location.adr[0].locality;
