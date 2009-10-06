@@ -456,17 +456,21 @@ var Microformats = {
 		  }
           if (value.charAt(4) == "-") {
             date = value;
-		  } else if ((value.charAt(0) == "-") || (value.charAt(0) == "+")) {
-            offset = value;
+		  } else if ((value.charAt(0) == "-") || (value.charAt(0) == "+") || (value == "Z")) {
+			if (value.length == 2) {
+			  offset = value[0] + "0" + value[1];
+			} else {
+              offset = value;
+			}
           } else {
             time = value;
           }
         }
 		time = parseTime(time);
 		if (raw) {
-		  return date + (time?"T": "") + time;
+		  return date + (time?"T": "") + time + offset;
 		} else if (date && time) {
-          return Microformats.parser.normalizeISO8601(date + (time?"T": "") + time);
+          return Microformats.parser.normalizeISO8601(date + (time?"T": "") + time + offset);
 		} else {
 		  return undefined;
 		}
@@ -492,17 +496,21 @@ var Microformats = {
 		  }
           if (value.charAt(4) == "-") {
             date = value;
-		  } else if ((value.charAt(0) == "-") || (value.charAt(0) == "+")) {
-            offset = value;
+		  } else if ((value.charAt(0) == "-") || (value.charAt(0) == "+") || (value == "Z")) {
+			if (value.length == 2) {
+			  offset = value[0] + "0" + value[1];
+			} else {
+              offset = value;
+			}
           } else {
             time = value;
           }
         }
 		time = parseTime(time);
 		if (raw) {
-		  return date + (time?"T": "") + time;
+		  return date + (time?"T": "") + time + offset;
 		} else if (date && time) {
-          return Microformats.parser.normalizeISO8601(date + (time?"T": "") + time);
+          return Microformats.parser.normalizeISO8601(date + (time?"T": "") + time + offset);
 		} else {
 		  return undefined;
 		}
@@ -1022,7 +1030,8 @@ var Microformats = {
     /* ensuring that hours and seconds have values */
     normalizeISO8601: function normalizeISO8601(string)
     {
-      var dateArray = string.match(/(\d\d\d\d)(?:-?(\d\d)(?:-?(\d\d)(?:[T ](\d\d)(?::?(\d\d)(?::?(\d\d)(?:\.(\d+))?)?)?(?:([-+Z])(?:(\d\d)(?::?(\d\d))?)?)?)?)?)?/);
+      var dateArray = string.match(/(\d\d\d\d)(?:-?(\d\d)(?:-?(\d\d)(?:[T ](\d\d)(?::?(\d\d)(?::?(\d\d)(?:\.(\d+))?)?)?(?:Z|(?:([-+])(\d\d)(?::?(\d\d))?)?)?)?)?)?/);
+	                                
   
       var dateString;
       var tzOffset = 0;
@@ -1060,10 +1069,15 @@ var Microformats = {
                 dateString += dateArray[8];
                 if ((dateArray[8] == "+") || (dateArray[8] == "-")) {
                   if (dateArray[9]) {
+					if (dateArray[9].length == 1) {
+					  dateString += "0";
+					}
                     dateString += dateArray[9];
                     if (dateArray[10]) {
                       dateString += dateArray[10];
-                    }
+                    } else {
+                      dateString += "00";
+					}
                   }
                 }
               }
@@ -1071,6 +1085,9 @@ var Microformats = {
           }
         }
       }
+	  if (string.indexOf("Z") > -1) {
+		dateString += "Z";
+	  }
       return dateString;
     }
   },
@@ -1084,7 +1101,7 @@ var Microformats = {
    * @return JavaScript date object that represents the ISO date. 
    */
   dateFromISO8601: function dateFromISO8601(string) {
-    var dateArray = string.match(/(\d\d\d\d)(?:-?(\d\d)(?:-?(\d\d)(?:[T ](\d\d)(?::?(\d\d)(?::?(\d\d)(?:\.(\d+))?)?)?(?:([-+Z])(?:(\d\d)(?::?(\d\d))?)?)?)?)?)?/);
+    var dateArray = string.match(/(\d\d\d\d)(?:-?(\d\d)(?:-?(\d\d)(?:[T ](\d\d)(?::?(\d\d)(?::?(\d\d)(?:\.(\d+))?)?)?(?:Z|(?:([-+])(\d\d)(?::?(\d\d))?)?)?)?)?)?/);
   
     var date = new Date(dateArray[1], 0, 1);
     date.time = false;
@@ -1661,8 +1678,7 @@ var hCalendar_definition = {
 			if (dtstarts.length > 0) {
               var dtstart = Microformats.parser.dateTimeGetter(dtstarts[0], mfnode);
 			  if (dtstart.match("T")) {
-//				return dtstart.split("T")[0] + "T" + dtend;
-				return dtstart.split("T")[0] + dtend;
+				return Microformats.parser.normalizeISO8601(dtstart.split("T")[0] + dtend);
 			  }
 		    }
 			return undefined;
