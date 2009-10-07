@@ -1030,7 +1030,7 @@ var Microformats = {
     /* ensuring that hours and seconds have values */
     normalizeISO8601: function normalizeISO8601(string)
     {
-      var dateArray = string.match(/(\d\d\d\d)(?:-?(\d\d)(?:-?(\d\d)(?:[T ](\d\d)(?::?(\d\d)(?::?(\d\d)(?:\.(\d+))?)?)?(?:Z|(?:([-+])(\d\d)(?::?(\d\d))?)?)?)?)?)?/);
+      var dateArray = string.match(/(\d\d\d\d)(?:-?(\d\d[\d]*)(?:-?([\d]*)(?:[T ](\d\d)(?::?(\d\d)(?::?(\d\d)(?:\.(\d+))?)?)?(?:Z|(?:([-+])(\d\d)(?::?(\d\d))?)?)?)?)?)?/);
 	                                
   
       var dateString;
@@ -1045,8 +1045,10 @@ var Microformats = {
         if (dateArray[2]) {
           dateString += "-" + dateArray[2];
 		  /* Day */
-          if (dateArray[3]) {
-            dateString += "-" + dateArray[3];
+          if (dateArray[3] || dateArray[4]) {
+			if (dateArray[3]) {
+              dateString += "-" + dateArray[3];
+			}
 			/* Hours */
             if (dateArray[4]) {
               dateString += "T" + dateArray[4];
