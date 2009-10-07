@@ -1103,7 +1103,15 @@ var Microformats = {
    * @return JavaScript date object that represents the ISO date. 
    */
   dateFromISO8601: function dateFromISO8601(string) {
-    var dateArray = string.match(/(\d\d\d\d)(?:-?(\d\d)(?:-?(\d\d)(?:[T ](\d\d)(?::?(\d\d)(?::?(\d\d)(?:\.(\d+))?)?)?(?:Z|(?:([-+])(\d\d)(?::?(\d\d))?)?)?)?)?)?/);
+    var dateArray = string.match(/(\d\d\d\d)(?:-?(\d\d[\d]*)(?:-?([\d]*)(?:[T ](\d\d)(?::?(\d\d)(?::?(\d\d)(?:\.(\d+))?)?)?(?:Z|(?:([-+])(\d\d)(?::?(\d\d))?)?)?)?)?)?/);
+  
+    if (dateArray[2] && !dateArray[3]) {
+	  /* This indicates we have a month only */
+	  var d = new Date("01/01/" + dateArray[1]);
+	  d.setDate(dateArray[2]);
+	  dateArray[2] = d.getMonth() + 1;
+	  dateArray[3] = d.getDate();
+	}
   
     var date = new Date(dateArray[1], 0, 1);
     date.time = false;
