@@ -549,8 +549,13 @@ var export_icalendar = {
           date = dtstart.substr(0, T);
           time = dtstart.substr(T) + "Z";
         } else {
-          date = hcalendar.dtstart.substr(0, T);
-          time = hcalendar.dtstart.substr(T);
+          var js_date = Microformats.dateFromISO8601(hcalendar.dtstart);
+          var dtstart = Microformats.iso8601FromDate(js_date, true);
+          date = dtstart.substr(0, T);
+          time = dtstart.substr(T);
+		  if (hcalendar.dtstart.indexOf('Z') != -1) {
+			time += "Z";
+		  }
         }
       } else {
         date = hcalendar.dtstart;
@@ -587,8 +592,13 @@ var export_icalendar = {
           date = dtend.substr(0, T);
           time = dtend.substr(T) + "Z";
         } else {
-          date = hcalendar.dtend.substr(0, T);
-          time = hcalendar.dtend.substr(T);
+          var js_date = Microformats.dateFromISO8601(hcalendar.dtend);
+          var dtend = Microformats.iso8601FromDate(js_date, true);
+          date = dtend.substr(0, T);
+          time = dtend.substr(T);
+		  if (hcalendar.dtend.indexOf('Z') != -1) {
+			time += "Z";
+		  }
         }
       } else {
         date = hcalendar.dtend;
