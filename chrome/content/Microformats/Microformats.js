@@ -407,7 +407,7 @@ var Microformats = {
 		  time = time.replace("a.m.", "");
 		  var times = time.split(":");
 		  if (times[0] == "12") {
-			times[0] == "00";
+			times[0] = "00";
 		  }
 		  if (times[0].length == 1) {
 			times[0] = "0" + times[0];
