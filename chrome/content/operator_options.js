@@ -267,6 +267,7 @@ var Operator_Options = {
     for (i in Operator.actions)
     {
 	  var richlistitem = document.createElement("richlistitem");
+	  richlistitem.setAttribute("align", "center");
 	  var checkbox = document.createElement("checkbox");
 	  checkbox.setAttribute("id", i);
 	  if (!Operator.actions[i].disabled) {
