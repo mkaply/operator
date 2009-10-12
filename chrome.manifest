@@ -5,15 +5,21 @@ style   chrome://browser/content/browser.xul    chrome://operator/content/operat
 style   chrome://global/content/customizeToolbar.xul    chrome://operator/content/operator.css
 content	operator chrome/content/
 locale  operator en-US chrome/locale/en-US/
+locale  operator ca-AD chrome/locale/ca-AD/
 locale  operator cs-CZ chrome/locale/cs-CZ/
 locale  operator de-DE chrome/locale/de-DE/
+locale  operator eo    chrome/locale/eo/
+locale  operator es-ES chrome/locale/es-ES/
 locale  operator fr-FR chrome/locale/fr-FR/
 locale  operator hr-HR chrome/locale/hr-HR/
 locale  operator it-IT chrome/locale/it-IT/
 locale  operator ja-JP chrome/locale/ja-JP/
 locale  operator nl-NL chrome/locale/nl-NL/
+locale  operator pl-PL chrome/locale/pl-PL/
 locale  operator pt-BR chrome/locale/pt-BR/
 locale  operator ru-RU chrome/locale/ru-RU/
+locale  operator sk-SK chrome/locale/sk-SK/
+locale  operator tr-TR chrome/locale/tr-TR/
 locale  operator zh-CN chrome/locale/zh-CN/
 locale  operator zh-TW chrome/locale/zh-TW/
 
