@@ -1440,7 +1440,7 @@ var foo = [];
   debug_alert: function debug_alert(text)
   {
     if (!Operator.release) {
-      window.openDialog("chrome://operator/content/operator_debug.xul","alert","chrome,centerscreen,modal", "Alert", text);
+      window.openDialog("chrome://operator/content/operator_debug.xul","alert","chrome,centerscreen,modal,resizable", "Alert", text);
     }
   },
   console_message: function console_message(text, line_number)
@@ -1510,7 +1510,7 @@ var foo = [];
       dump = semanticObject.debug(semanticObject);
     }
 
-    window.openDialog("chrome://operator/content/operator_debug.xul","debug","chrome,centerscreen",
+    window.openDialog("chrome://operator/content/operator_debug.xul","debug","chrome,centerscreen,resizable",
                       semanticObjectType,
                       error,
                       dump,

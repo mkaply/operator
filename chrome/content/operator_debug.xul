@@ -7,12 +7,14 @@
 	autostretch="always"
   buttons="accept"
   onload="Operator_Debug.onPageLoad(window.arguments);sizeToContent();"
+  width="640"
+  height="480"
   xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
   <script type="application/x-javascript" src="chrome://operator/content/operator_debug.js"/>
 
 
 
-  <tabbox id="debug.tabs">
+  <tabbox id="debug.tabs" flex="1">
 	  <tabs>
 		  <tab id="error.tab" label="Error"/>
       <tab id="dump.tab" label="Structure"/>
@@ -20,21 +22,21 @@
       <tab id="vcfical.tab" label="vCard/iCalendar"/>
       <tab id="x2v.tab" label="X2V" onclick="Operator_Debug.X2V()"/>
 	  </tabs>
-	  <tabpanels>
+	  <tabpanels flex="1">
       <tabpanel id="error.tabpanel">
-        <textbox id="error" height="480" width="640" multiline="true" readonly="true"/> 
+        <textbox id="error" multiline="true" readonly="true" flex="1"/>
       </tabpanel>
       <tabpanel id="dump.tabpanel">
-        <textbox id="dump" height="480" width="640" multiline="true" readonly="true"/> 
+        <textbox id="dump" multiline="true" readonly="true" flex="1"/> 
       </tabpanel>
       <tabpanel id="source.tabpanel">
-        <textbox id="source" height="480" width="640" multiline="true" readonly="true"/> 
+        <textbox id="source" multiline="true" readonly="true" flex="1"/> 
       </tabpanel>
       <tabpanel id="vcfical.tabpanel">
-        <textbox id="vcfical" height="480" width="640" multiline="true" readonly="true"/> 
+        <textbox id="vcfical" multiline="true" readonly="true" flex="1"/> 
       </tabpanel>
       <tabpanel id="x2v.tabpanel">
-        <textbox id="x2v" height="480" width="640" multiline="true" readonly="true"/> 
+        <textbox id="x2v" multiline="true" readonly="true" flex="1"/> 
       </tabpanel>
     </tabpanels>
   </tabbox>
