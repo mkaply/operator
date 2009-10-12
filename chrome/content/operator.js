@@ -661,7 +661,11 @@ var Operator = {
 			event.target.getElementById("statusbar").checked = Operator.statusbar;
 			event.target.getElementById("toolbar").checked = !document.getElementById("operator-toolbar").collapsed;
 			event.target.getElementById("urlbar").checked = Operator.urlbar;
-			event.target.getElementById("toolbarbutton").checked = Operator_Toolbar.isVisible();
+			event.target.getElementById("toolbarbutton").checked = Operator_ToolbarButton.isVisible();
+			if (Operator_ToolbarButton.isVisible()) {
+			  event.target.getElementById("toolbarbutton").disabled = true;
+			}
+
 		  }
 		}
 	  }
@@ -671,12 +675,7 @@ var Operator = {
   startup: function startup()
   {
     window.removeEventListener("load", startup, false);
-	var firstrun = false;
-	try {
-	  firstrun = Operator.prefBranch.getBoolPref("firstrun");
-	} catch(ex) {
-	  firstrun = true;
-	}
+	firstrun = Operator.prefBranch.getBoolPref("firstrun");
 
 	/* get installed version */
     var em = Cc["@mozilla.org/extensions/manager;1"]
