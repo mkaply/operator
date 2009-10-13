@@ -362,7 +362,7 @@ var Operator = {
     }
     /* If we don't have any preferences, setup the default prefs */
     /* We do this before user scripts so defaults just contain our stuff */
-    if (newcount.value == 0) {
+    if (newcount.value < 3) {
       j = 1;
       for (i in Microformats) {
         if (i != "adr") {
@@ -374,12 +374,12 @@ var Operator = {
         this.prefBranch.setCharPref("dataformat" + (j), "RDF");
       }
 
-      this.prefBranch.setCharPref("action1", "export_vcard");
+/*      this.prefBranch.setCharPref("action1", "export_vcard");
       this.prefBranch.setCharPref("action2", "google_calendar");
       this.prefBranch.setCharPref("action3", "google_maps");
       this.prefBranch.setCharPref("action4", "flickr_search_tags");
       this.prefBranch.setCharPref("action5", "delicious_search_tags");
-      this.prefBranch.setCharPref("action6", "technorati_search_tags");
+      this.prefBranch.setCharPref("action6", "technorati_search_tags"); */
     }
     
     var i=1;

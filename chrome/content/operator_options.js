@@ -322,7 +322,11 @@ var Operator_Options = {
   
   disableNewDataformat: function()
   {
-    return (document.getElementById("dataformats").getRowCount() == Operator_Options.dataformats.length);
+	var rowCount = document.getElementById("dataformats").getRowCount();
+	if ((rowCount !=0) && (rowCount == Operator_Options.dataformats.length)) {
+	  return true;
+	}
+	return false;
   },
   
   disableNewAction: function()
