@@ -693,7 +693,7 @@ var Operator = {
 	  var installedVersion = Operator.prefBranch.getCharPref("installedVersion");
 	  if (curVersion > installedVersion) {
         window.setTimeout(function(){
-          gBrowser.selectedTab = gBrowser.addTab("http://kaply.com/operator/install/upgrade");
+          gBrowser.selectedTab = gBrowser.addTab("http://kaply.com/operator/upgrade");
         }, 1000);
   	    Operator.prefBranch.setCharPref("installedVersion", curVersion);
 	  }
@@ -823,7 +823,7 @@ var Operator = {
     if (data == "actions.disabled") {
 	  var disabledActions =  this.prefBranch.getCharPref("actions.disabled");
 	  var disabledActionsTemp = disabledActions.split(',');
-var foo = [];
+      var foo = []; 
 	  for (var i=0; i < disabledActionsTemp.length; i++) {
 		foo[disabledActionsTemp[i]] = true;
 		
@@ -848,8 +848,12 @@ var foo = [];
   },
 
   openLink: function openLink(url, event) {
-	openUILinkIn(url, "tab");
-//	openUILink(url, event);
+	if (url.indexOf("file://") == 0) {
+	  	openUILink(url, event);
+	} else {
+	  openUILinkIn(url, "tab");
+	}
+
   },
 
   /* This is a closure used to highlight DOM nodes when a microformat is */
