@@ -469,7 +469,7 @@ var Microformats = {
 		time = parseTime(time);
 		if (raw) {
 		  return date + (time?"T": "") + time + offset;
-		} else if (date && time) {
+		} else if (date) {
           return Microformats.parser.normalizeISO8601(date + (time?"T": "") + time + offset);
 		} else {
 		  return undefined;
@@ -509,7 +509,7 @@ var Microformats = {
 		time = parseTime(time);
 		if (raw) {
 		  return date + (time?"T": "") + time + offset;
-		} else if (date && time) {
+		} else if (date) {
           return Microformats.parser.normalizeISO8601(date + (time?"T": "") + time + offset);
 		} else {
 		  return undefined;
