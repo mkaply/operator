@@ -27,13 +27,14 @@ var Operator_Options = {
     
     var haveMorePrefs = true;
     do {
-      try {
-        this.prefBranch.clearUserPref("dataformat" + (i+1));
-      }
-      catch (ex)
-      {
-        haveMorePrefs = false;
-      }
+	  if (this.prefBranch.prefHasUserValue("dataformat" + (i+1))) {
+        try {
+          this.prefBranch.clearUserPref("dataformat" + (i+1));
+        }
+        catch (ex) {}
+	  } else {
+		haveMorePrefs = false;
+	  }
       i++;
     }
     while (haveMorePrefs);
