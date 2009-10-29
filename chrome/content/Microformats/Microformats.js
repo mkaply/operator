@@ -1902,7 +1902,7 @@ var geo_definition = {
       virtualGetter: function(mfnode) {
         var value = Microformats.parser.textGetter(mfnode);
         var latlong;
-        if (value.match(';')) {
+		if (value && value.match(';')) {
           latlong = value.split(';');
           if (latlong[0]) {
             if (!isNaN(latlong[0])) {
@@ -1920,7 +1920,7 @@ var geo_definition = {
       virtualGetter: function(mfnode) {
         var value = Microformats.parser.textGetter(mfnode);
         var latlong;
-        if (value.match(';')) {
+        if (value && value.match(';')) {
           latlong = value.split(';');
           if (latlong[1]) {
             if (!isNaN(latlong[1])) {
