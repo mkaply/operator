@@ -351,8 +351,18 @@ var Microformats = {
                  (propnode.nodeName.toLowerCase() == "input")) {
         return propnode.value;
       } else {
-		var valueTitle = Microformats.getElementsByClassName(propnode, "value-title");
-		if (valueTitle.length > 0) {
+		var valueTitles = Microformats.getElementsByClassName(propnode, "value-title");
+        for (let i = valueTitles.length-1; i >= 0; i--) {
+          if (valueTitles[i].parentNode != propnode) {
+            valueTitles.splice(i,1);
+          }
+        }
+        if (valueTitles.length > 0) {
+          var valueTitle = "";
+          for (let j=0;j<valueTitles.length;j++) {
+            valueTitle += valueTitles[j].getAttribute("title");
+          }
+          return collapseWhitespace(valueTitle);
 		}
         var values = Microformats.getElementsByClassName(propnode, "value");
         /* Verify that values are children of the propnode */
