@@ -1228,15 +1228,21 @@ var Operator = {
           label = description;
         }
         if (label) {
+		  var req;
+		  if (plural && required) {
+			req = required[0];
+		  } else {
+			req = required;
+		  }
           menuitem = parentmenu.ownerDocument.createElement("menuitem");
-          if (required && required[0].semanticType) {
-            menuitem.store_oncommand = Operator.actionCallbackGenerator(required[0], required[0].semanticType, k);
+          if (req && req.semanticType) {
+            menuitem.store_oncommand = Operator.actionCallbackGenerator(req, req.semanticType, k);
           } else {
             menuitem.store_oncommand = Operator.actionCallbackGenerator(semanticObject, semanticObjectType, k);
           }
           menuitem.addEventListener("command", menuitem.store_oncommand, false);
-          if (required && required[0].semanticType) {
-            menuitem.store_onclick = Operator.clickCallbackGenerator(required[0], required[0].semanticType, k);
+          if (req && req.semanticType) {
+            menuitem.store_onclick = Operator.clickCallbackGenerator(req, req.semanticType, k);
           } else {
             menuitem.store_onclick = Operator.clickCallbackGenerator(semanticObject, semanticObjectType, k);
           }
