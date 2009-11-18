@@ -1865,7 +1865,10 @@ geo.prototype.toString = function() {
 
   if ((this.latitude != undefined) && (this.longitude != undefined)) {
     var s;
-    if ((this.node.localName.toLowerCase() == "abbr") || (this.node.localName.toLowerCase() == "html:abbr")) {
+	var valueTitles = Microformats.getElementsByClassName(this.node, "value-title");
+    if ((this.node.localName.toLowerCase() == "abbr") ||
+		(this.node.localName.toLowerCase() == "html:abbr") ||
+		(valueTitles.length > 0)) {
       s = this.node.textContent;
     }
 
