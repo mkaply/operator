@@ -6,6 +6,7 @@ var yahoo_maps = {
   icon: "http://www.yahoo.com/favicon.ico",
   scope: {
     semantic: {
+      "hCard" : "geo",
       "hCard" : "adr",
       "geo" : "geo"
     }

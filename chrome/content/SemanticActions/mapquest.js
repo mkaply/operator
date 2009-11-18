@@ -7,6 +7,7 @@ description: "Find with MapQuest",
   scope: {
     semantic: {
       "geo" : "geo",
+      "hCard" : "geo",
       "hCard" : "adr"
     }
   },

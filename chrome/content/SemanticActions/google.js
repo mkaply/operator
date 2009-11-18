@@ -7,8 +7,9 @@ var google_maps = {
   scope: {
     semantic: {
       "geo" : "geo",
-      "hCard" : "adr",
-      "hCard" : "label"
+      "hCard" : "label",
+      "hCard" : "geo",
+      "hCard" : "adr"
     }
   },
   doAction: function(semanticObject, semanticObjectType, propertyIndex) {
