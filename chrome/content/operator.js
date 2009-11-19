@@ -678,8 +678,8 @@ var Operator = {
 	firstrun = Operator.prefBranch.getBoolPref("firstrun");
 
 	/* get installed version */
-    var em = Cc["@mozilla.org/extensions/manager;1"]
-                       .getService(Ci.nsIExtensionManager);
+    var em = Components.classes["@mozilla.org/extensions/manager;1"]
+                       .getService(Components.interfaces.nsIExtensionManager);
 
     var curVersion = em.getItemForID("{95C9A302-8557-4052-91B7-2BB6BA33C885}").version;
 
@@ -713,8 +713,8 @@ var Operator = {
     /* A user might choose to display the toolbar at anytime and there is no notification */
     Operator_Toolbar.create();
     /* Event listeners for showing and hiding page content */
-    window.document.getElementById("content").addEventListener("pageshow", Operator.onPageShow, false);
-    window.document.getElementById("content").addEventListener("pagehide", Operator.onPageHide, false);
+    window.addEventListener("pageshow", Operator.onPageShow, false);
+    window.addEventListener("pagehide", Operator.onPageHide, false);
     /* Event listener for when you switch tabs */
     getBrowser().tabContainer.addEventListener("select", Operator.onTabChanged, false);
     /* Event listener so we can modify the page context menu */
@@ -727,8 +727,8 @@ var Operator = {
     /* Remove pref observer */
     Operator.prefBranch.removeObserver("", Operator);
     /* Remove page show and hide observers */
-    getBrowser().removeEventListener("pageshow", Operator.onPageShow, false);
-    getBrowser().removeEventListener("pagehide", Operator.onPageHide, false);
+    window.removeEventListener("pageshow", Operator.onPageShow, false);
+    window.removeEventListener("pagehide", Operator.onPageHide, false);
     /* Remove listener for switching tabs */
     getBrowser().tabContainer.removeEventListener("select", Operator.onTabChanged, false);
     /* Remove page context menu listener */
