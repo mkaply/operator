@@ -1869,11 +1869,11 @@ geo.prototype.toString = function() {
     if ((this.node.localName.toLowerCase() == "abbr") ||
 		(this.node.localName.toLowerCase() == "html:abbr") ||
 		(valueTitles.length > 0)) {
-      s = this.node.textContent;
+      s = collapseWhitespace(this.node.textContent);
     }
 
     if (s) {
-      return collapseWhitespace(s);
+      return s;
     }
 
     /* check if geo is contained in a vcard */
