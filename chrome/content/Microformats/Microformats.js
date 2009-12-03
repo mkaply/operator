@@ -1877,7 +1877,7 @@ geo.prototype.toString = function() {
     }
 
     /* check if geo is contained in a vcard */
-    var xpathExpression = "ancestor::*[contains(concat(' ', @class, ' '), ' vcard ')]";
+    var xpathExpression = "ancestor::*[contains(concat(' ', @class, ' '), ' vcard ')][1]";
     var xpathResult = this.node.ownerDocument.evaluate(xpathExpression, this.node, null,  Components.interfaces.nsIDOMXPathResult.FIRST_ORDERED_NODE_TYPE, null);
     if (xpathResult.singleNodeValue) {
       var hcard = new hCard(xpathResult.singleNodeValue);
@@ -1886,7 +1886,7 @@ geo.prototype.toString = function() {
       }
     }
     /* check if geo is contained in a vevent */
-    xpathExpression = "ancestor::*[contains(concat(' ', @class, ' '), ' vevent ')]";
+    xpathExpression = "ancestor::*[contains(concat(' ', @class, ' '), ' vevent ')][1]";
     xpathResult = this.node.ownerDocument.evaluate(xpathExpression, this.node, null,  Components.interfaces.nsIDOMXPathResult.FIRST_ORDERED_NODE_TYPE, xpathResult);
     if (xpathResult.singleNodeValue) {
       var hcal = new hCalendar(xpathResult.singleNodeValue);
