@@ -612,6 +612,27 @@ var Operator = {
     window.addEventListener("unload", this.shutdown, false);
     window.addEventListener("operator-sidebar-load", Operator_Sidebar.populate, false);
 	  function operatorEvent(event) {
+    function insertTBButton(buttonID, beforeID) {
+	  var navBar = document.getElementById("nav-bar");
+	  var before = document.getElementById(beforeID);
+	  var newSet;
+	  if (navBar && before) {
+		var newButton = navBar.insertItem(buttonID, before);
+		if (navBar.hasAttribute("currentset") && 
+		    (navBar.getAttribute("currentset").indexOf(buttonID) == -1)) {
+		  newSet = navBar.getAttribute("currentset");
+		} else {
+		  newSet = navBar.getAttribute('defaultset');
+		}
+		newSet = newSet.replace("," + beforeID, "," + buttonID + "," + beforeID);
+		navBar.setAttribute('currentset', newSet);
+		document.persist('nav-bar', 'currentset');
+	  }
+	  if (!newButton || !navBar || !before) {
+	    window.setTimeout(insertTBButton, 500, buttonID, beforeID);
+	  }
+	}
+
 		var href;
 		if (event.target.ownerDocument) {
 		  href = event.target.ownerDocument.location.href;
@@ -629,13 +650,8 @@ var Operator = {
 				}
 				break;
 			  case "toolbarbutton":
-				var navBar = document.getElementById("nav-bar");
-	            var urlbarContainer = document.getElementById("urlbar-container");
-				if (!urlbarContainer) {
-				  return;
-				}
 				if (event.target.checked) {
-				  navBar.insertItem("operator-toolbar-button", urlbarContainer);
+				  insertTBButton("operator-toolbar-button", "urlbar-container");
 				  event.target.disabled = true;
 				}
 			  case "urlbar":
