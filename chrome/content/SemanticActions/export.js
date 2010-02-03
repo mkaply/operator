@@ -602,12 +602,12 @@ var export_icalendar = {
         }
       } else {
         date = hcalendar.dtend;
-        if (!Operator.upcomingBugFixed) {
-          if (content.document.location.href.indexOf("http://upcoming.yahoo.com") == 0) {
+//        if (!Operator.upcomingBugFixed) {
+//          if (content.document.location.href.indexOf("http://upcoming.yahoo.com") == 0) {
             date = date.replace(/-/g, "");
             date = (parseInt(date, 10)+1).toString();
-          }
-        }
+//          }
+//        }
       }
       ics += ":" + date.replace(/-/g,"");
       if (time) {

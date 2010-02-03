@@ -170,13 +170,13 @@ var google_calendar = {
             }
             dtend = date + time;
           } else {
-            if ((!Operator.upcomingBugFixed) &&
-                ((content.document.location.href.indexOf("http://upcoming.yahoo.com") == 0))) {
+//            if ((!Operator.upcomingBugFixed) &&
+//                ((content.document.location.href.indexOf("http://upcoming.yahoo.com") == 0))) {
                 dtend = hcalendar.dtend.replace(/-/g, "");
                 dtend = (parseInt(dtend, 10)+1).toString();
-            } else {
-              dtend = hcalendar.dtend;
-            }
+//            } else {
+//              dtend = hcalendar.dtend;
+//            }
             /* if dtstart had a time, dtend must have a time - google bug? */
             if (dtstart.indexOf("T") > -1) {
               dtend += dtstart.substr(dtstart.indexOf("T"));
