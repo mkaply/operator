@@ -525,7 +525,15 @@ var Microformats = {
 		  return undefined;
 		}
       } else {
-        var date = Microformats.parser.textGetter(propnode, parentnode);
+        var date;
+        var testDate;
+        if (propnode.hasAttribute("title")) {
+          date = propnode.getAttribute("title");
+          testDate = Microformats.parser.normalizeISO8601(date);
+        }
+        if (!testDate) {
+          date = Microformats.parser.textGetter(propnode, parentnode);
+        }
         if (date) {
 		  if (raw) {
 			/* It's just  a time */
