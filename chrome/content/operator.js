@@ -701,7 +701,7 @@ var Operator = {
 
 	if (firstrun) {
       window.setTimeout(function(){
-        gBrowser.selectedTab = gBrowser.addTab("http://kaply.com/operator/install/");
+        gBrowser.selectedTab = gBrowser.addTab("http://kaply.com/addons/operator/install/");
       }, 1000);
 	  Operator.prefBranch.setBoolPref("firstrun", false);
 	  Operator.prefBranch.setCharPref("installedVersion", curVersion);
@@ -709,7 +709,7 @@ var Operator = {
 	  var installedVersion = Operator.prefBranch.getCharPref("installedVersion");
 	  if (curVersion > installedVersion) {
         window.setTimeout(function(){
-          gBrowser.selectedTab = gBrowser.addTab("http://kaply.com/operator/upgrade");
+          gBrowser.selectedTab = gBrowser.addTab("http://kaply.com/addons/operator/upgrade");
         }, 1000);
   	    Operator.prefBranch.setCharPref("installedVersion", curVersion);
 	  }
