@@ -639,7 +639,7 @@ var Operator = {
 		} else {
 		  href = event.target.location.href;
 		}
-		if (href == "http://kaply.com/operator/install/") {
+		if (href == "http://kaply.com/addons/operator/install/") {
 		  if (event.target.id) {
 			switch (event.target.id) {
 			  case "toolbar":
