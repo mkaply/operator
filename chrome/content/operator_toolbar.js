@@ -236,11 +236,11 @@ var Operator_Toolbar = {
   },
   hide: function()
   {
-    document.getElementById("operator-toolbar").collapsed = true;
+    document.getElementById("operator-toolbar").hidden = true;
   },
   show: function()
   {
-    document.getElementById("operator-toolbar").collapsed = false;
+    document.getElementById("operator-toolbar").hidden = false;
   }
 };
 

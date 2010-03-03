@@ -21,7 +21,7 @@
      context="toolbar-context-menu"
      grippytooltiptext="&operatorToolbar.name;" hidden="false" iconsize="small"
      id="operator-toolbar" inherits="collapsed,hidden" mode="full"
-     persist="collapsed,hidden" toolbarname="&operatorToolbar.name;">
+     persist="collapsed" toolbarname="&operatorToolbar.name;">
      <spring id="operator-spring" flex="1"/>
      <toolbarbutton label="&operatorOptions.label;" id="operator-options"
      oncommand="window.openDialog('chrome://operator/content/operator_options.xul','options','chrome,centerscreen,modal');"
