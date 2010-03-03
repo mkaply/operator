@@ -33,7 +33,7 @@ var Microformats = {
       while (( parent = parent.parentNode)) {
         /* We need to check parentNode because defaultView.frames[i].frameElement */
         /* isn't a real DOM node */
-        if (parent == needle.parentNode) {
+        if (parent == haystack.parentNode) {
           return true;
         }
       }
