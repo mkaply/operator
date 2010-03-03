@@ -65,7 +65,7 @@
       <tabpanel>
         <vbox id="clientBox" flex="1">
           <label id="extensionName" crop="right">Operator</label>
-          <label id="extensionVersion" crop="right">0.9.5.2</label>
+          <label id="extensionVersion" crop="right">0.9.5.5</label>
           <description id="extensionDescription">&extension.description;</description>
       
           <label id="extensionCreatorLabel" class="sectionTitle">&creator.label;</label>
