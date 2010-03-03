@@ -1902,11 +1902,7 @@ geo.prototype.toString = function() {
         return hcal.summary;
       }
     }
-    if (s) {
-      return s;
-    } else {
-      return this.latitude + ", " + this.longitude;
-    }
+    return this.latitude + ", " + this.longitude;
   }
   return undefined;
 }
