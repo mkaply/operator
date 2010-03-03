@@ -175,6 +175,15 @@ var export_vcard = {
     }
     if (hcard.url) {
       for (i=0;i<hcard.url.length;i++) {
+        if (/^aim:/.test(hcard.url[i])) {
+          vcf += "X-AIM:" + hcard.url[i].split('=')[1] + crlf;          
+        } else if (/^ymsgr:/.test(hcard.url[i])) {
+          vcf += "X-YAHOO:" + hcard.url[i].split('?')[1] + crlf;          
+        } else if (/^msnim:/.test(hcard.url[i])) {
+          vcf += "X-MSN:" + hcard.url[i].split('=')[1] + crlf;          
+        } else if (/^skype/.test(hcard.url[i])) {
+          vcf += "X-SKYPE:" + hcard.url[i].split(':')[1].split('?')[0] + crlf;          
+        }
         vcf += "URL:" + hcard.url[i] + crlf;
       }
     }
