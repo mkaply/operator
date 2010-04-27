@@ -1706,7 +1706,7 @@ var hCalendar_definition = {
 			if (dtstarts.length > 0) {
               var dtstart = Microformats.parser.dateTimeGetter(dtstarts[0], mfnode);
 			  if (dtstart.match("T")) {
-				return Microformats.parser.normalizeISO8601(dtstart.split("T")[0] + dtend);
+				return Microformats.parser.normalizeISO8601(dtstart.split("T")[0] + "T" + dtend);
 			  }
 		    }
 			return undefined;
