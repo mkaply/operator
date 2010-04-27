@@ -1644,6 +1644,7 @@ var Operator = {
 
 /* check for rel-service link tags */
    var dochead = content.document.getElementsByTagName("head")[0];
+   if (dochead) {
    var links = dochead.getElementsByTagName("link");
    for (let i=0; i < links.length; i++) {
      if ((links[i].getAttribute("rel") == "service") &&
@@ -1694,7 +1695,8 @@ var Operator = {
       channel.asyncOpen(downloader, null);
     }
    }
-
+   }
+ 
     var i, j, k, m;
     var popup, menu, tempMenu, action;
 
