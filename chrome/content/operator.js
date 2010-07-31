@@ -403,7 +403,8 @@ var Operator = {
     if (!usdir.exists()) {
       usdir.create(Components.interfaces.nsIFile.DIRECTORY_TYPE, 0755);
     }
-    if (usdir.isDirectory()) {
+    /* Not going to support autocopying user scripts in Firefox 4 */
+    if (usdir.isDirectory() && Components.classes["@mozilla.org/extensions/manager;1"]) {
       /* If we have user scripts, copy them over */
       var extman = Components.classes["@mozilla.org/extensions/manager;1"]
                                       .getService(Components.interfaces.nsIExtensionManager);
@@ -694,10 +695,10 @@ var Operator = {
 	firstrun = Operator.prefBranch.getBoolPref("firstrun");
 
 	/* get installed version */
-    var em = Components.classes["@mozilla.org/extensions/manager;1"]
-                       .getService(Components.interfaces.nsIExtensionManager);
+//    var em = Components.classes["@mozilla.org/extensions/manager;1"]
+//                       .getService(Components.interfaces.nsIExtensionManager);
 
-    var curVersion = em.getItemForID("{95C9A302-8557-4052-91B7-2BB6BA33C885}").version;
+    var curVersion = "0.0.0";
 
 	if (firstrun) {
       window.setTimeout(function(){
