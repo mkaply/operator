@@ -6,8 +6,8 @@
 	orient="vertical"
 	autostretch="always"
   buttons="accept,cancel"
-  ondialogaccept="return Operator_Options.onDataformatOK()"
-  onload="sizeToContent();Operator_Options.onDataformatLoad();"
+  ondialogaccept="return onDataformatOK()"
+  onload="sizeToContent();onDataformatLoad();"
   xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
   <script type="application/x-javascript;version=1.7" src="chrome://operator/content/operator.js"/>
   <script type="application/x-javascript" src="chrome://operator/content/operator_options.js"/>

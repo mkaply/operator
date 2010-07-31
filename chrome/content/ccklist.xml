@@ -97,7 +97,7 @@
               document.getAnonymousElementByAttribute(this, "anonid", "movedown").disabled = true;
             }
             if (this.getAttribute("disablenew")) {
-              document.getAnonymousElementByAttribute(this, "anonid", "new").disabled = eval(this.getAttribute("disablenew"));
+              document.getAnonymousElementByAttribute(this, "anonid", "new").disabled = window[this.getAttribute("disablenew")]();
             }
           ]]>
         </body>
@@ -112,13 +112,13 @@
       </handler>
       <handler event="dblclick">
         if (event.originalTarget.tagName == "listitem")
-          eval(this.getAttribute("edit"));	
+          window[this.getAttribute("edit")]();
       </handler>
       <handler event="command">
         if (event.originalTarget.type == "delete") {
             var dodelete = true;
             if (this.getAttribute("ondelete")) {
-              dodelete = eval(this.getAttribute("ondelete"));
+              dodelete = window[this.getAttribute("ondelete")]();
             }
             if (dodelete) {
               var listbox = document.getAnonymousElementByAttribute(this, 'anonid', 'listbox');
@@ -145,10 +145,10 @@
           }
           listbox.removeItemAt(listbox.selectedIndex);
           listbox.selectItem(newlistitem);
-          eval(this.getAttribute("on" + event.originalTarget.type));	
+          window[this.getAttribute("on" + event.originalTarget.type)]();
         } else {
-          eval(this.getAttribute(event.originalTarget.type));
-          eval(this.getAttribute("on" + event.originalTarget.type));	
+          window[this.getAttribute(event.originalTarget.type)]();
+          window[this.getAttribute("on" + event.originalTarget.type)]();
         }
         this._enableDisableButtons();
       </handler>
@@ -156,7 +156,7 @@
         if (event.originalTarget.tagName == "xul:listbox") {
           var dodelete = true;
           if (this.getAttribute("ondelete")) {
-            dodelete = eval(this.getAttribute("ondelete"));
+            dodelete = window[this.getAttribute("ondelete")]();
           }
           if (dodelete) {
             var listbox=document.getAnonymousNodes(this)[0].childNodes[0].childNodes[0];

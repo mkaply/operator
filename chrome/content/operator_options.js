@@ -1,10 +1,9 @@
 /*extern Components, sizeToContent, Operator, ufJSActions */
 
-var Operator_Options = {
-  dataformats: [],
-  prefBranch: null,
-  enabledActions: [],
-  saveOptions: function() 
+  var dataformats = [];
+  var prefBranch = null;
+  var enabledActions = [];
+  function saveOptions() 
   {
     var i;
     this.prefBranch.setBoolPref("batchPrefChanges", true);
@@ -19,9 +18,9 @@ var Operator_Options = {
     this.checkAndSetBoolPref("removeDuplicates", document.getElementById("removeDuplicates").checked);
     this.checkAndSetBoolPref("showHidden", document.getElementById("showHidden").checked);
     this.checkAndSetBoolPref("observeDOMAttrModified", document.getElementById("observeDOMAttrModified").checked);
-    var dataformats = document.getElementById("dataformats");
-    for (i=0; i < dataformats.getRowCount(); i++) {
-      var label = dataformats.getItemAtIndex(i).label;
+    var dataformats_lb = document.getElementById("dataformats");
+    for (i=0; i < dataformats_lb.getRowCount(); i++) {
+      var label = dataformats_lb.getItemAtIndex(i).label;
       this.checkAndSetCharPref("dataformat" + (i+1), label); 
     }
     
@@ -70,21 +69,21 @@ var Operator_Options = {
 	this.prefBranch.setCharPref("actions.disabled", actionsPref.join(","));
 
     this.prefBranch.setBoolPref("batchPrefChanges", false);
-  },
+  }
 
-  checkAndSetIntPref: function(pref, value)
+  function checkAndSetIntPref(pref, value)
   {
     if (Operator[pref] != value) {
       this.prefBranch.setIntPref(pref, value);
     }
-  },
-  checkAndSetBoolPref: function(pref, value)
+  }
+  function checkAndSetBoolPref(pref, value)
   {
     if (Operator[pref] != value) {
       this.prefBranch.setBoolPref(pref, value);
     }
-  },
-  checkAndSetCharPref: function(pref, value)
+  }
+  function checkAndSetCharPref(pref, value)
   {
     var prefValue;
     try {
@@ -96,15 +95,15 @@ var Operator_Options = {
     if (prefValue != value) {
       this.prefBranch.setCharPref(pref, value);
     }
-  },
+  }
 
-  onPageLoad: function() 
+  function onPageLoad()
   {
     for (i in Microformats) {
-      Operator_Options.dataformats.push(i);
+      dataformats.push(i);
     }
     if ((typeof(RDFa) != "undefined") || (typeof(eRDF) != "undefined")) {
-      Operator_Options.dataformats.push("RDF");
+      dataformats.push("RDF");
     }
 
 
@@ -202,7 +201,7 @@ var Operator_Options = {
     document.getElementById("observeDOMAttrModified").checked = observeDOMAttrModified;
   
     var i=1;
-    var dataformats = document.getElementById("dataformats");
+    var dataformats_lb = document.getElementById("dataformats");
     var dataformat, handler;
     do {
       try {
@@ -211,7 +210,7 @@ var Operator_Options = {
         break;
       }
       if (dataformat) {
-        dataformats.appendItem(dataformat);
+        dataformats_lb.appendItem(dataformat);
       }
       i++;
     } while (1);
@@ -288,9 +287,9 @@ var Operator_Options = {
       document.getElementById("urlbar").disabled = true;
       document.getElementById("autohide").disabled = true;
     }
-  },
+  }
 
-  doDataformatEnabling: function()
+  function doDataformatEnabling()
   {
     //if (document.getElementById('view').value == "1") {
     //  document.getElementById('useDescriptiveNames').setAttribute('disabled', 'true');
@@ -299,54 +298,54 @@ var Operator_Options = {
     //  document.getElementById('useDescriptiveNames').setAttribute('disabled', 'false');
     //  document.getElementById('useShortDescriptions').setAttribute('disabled', 'true');
     //}
-  },
+  }
   
-  onNewDataformat: function()
+  function onNewDataformat()
   {
     window.openDialog("chrome://operator/content/operator_options_dataformat.xul","newdataformat","chrome,centerscreen,modal");
-  },
+  }
   
-  onEditDataformat: function()
+  function onEditDataformat()
   {
     window.openDialog("chrome://operator/content/operator_options_dataformat.xul","editdataformat","chrome,centerscreen,modal");
-  },
+  }
   
-  onNewAction: function()
+  function onNewAction()
   {
     window.openDialog("chrome://operator/content/operator_options_action.xul","newaction","chrome,centerscreen,modal");
-  },
+  }
   
-  onEditAction: function()
+  function onEditAction()
   {
     window.openDialog("chrome://operator/content/operator_options_action.xul","editaction","chrome,centerscreen,modal");
-  },
+  }
   
-  disableNewDataformat: function()
+  function disableNewDataformat()
   {
 	var rowCount = document.getElementById("dataformats").getRowCount();
-	if ((rowCount !=0) && (rowCount == Operator_Options.dataformats.length)) {
+	if ((rowCount !=0) && (rowCount == dataformats.length)) {
 	  return true;
 	}
 	return false;
-  },
+  }
   
-  disableNewAction: function()
+  function disableNewAction()
   {
     return (document.getElementById("actions").getRowCount() == Operator.actions.length);
-  },
+  }
   
   /* dataformat dialog */
   
   
-  onDataformatLoad: function()
+  function onDataformatLoad()
   {
     var dataformat = null;
     var selectedItem = null;
     var edit = false;
-    var dataformats = window.opener.document.getElementById("dataformats");
+    var dataformats_lb = window.opener.document.getElementById("dataformats");
     if (window.name == 'editdataformat') {
       edit = true;
-      dataformat = dataformats.selectedItem.label;
+      dataformat = dataformats_lb.selectedItem.label;
     }
   
     var dataformatmenu = document.getElementById("dataformats");
@@ -354,28 +353,28 @@ var Operator_Options = {
     var add;
     
     for (i in Microformats) {
-      Operator_Options.dataformats.push(i);
+      dataformats.push(i);
     }
     if ((typeof(RDFa) != "undefined") || (typeof(eRDF) != "undefined")) {
-      Operator_Options.dataformats.push("RDF");
+      dataformats.push("RDF");
     }
 
     
     
-    for (i=0; i< Operator_Options.dataformats.length; i++) {
+    for (i=0; i< dataformats.length; i++) {
       add = true;
       /* if it is not already in the list */
-      for (j=0; j < dataformats.getRowCount(); j++) {
-        var item = dataformats.getItemAtIndex(j);
-        if (item.label == Operator_Options.dataformats[i]) {
+      for (j=0; j < dataformats_lb.getRowCount(); j++) {
+        var item = dataformats_lb.getItemAtIndex(j);
+        if (item.label == dataformats[i]) {
           add = false;
           break;
         }
       }
-      if ((add) || ((Operator_Options.dataformats[i] == dataformat) && (edit))) {
-        var menulistitem = dataformatmenu.appendItem(Operator_Options.dataformats[i]);
+      if ((add) || ((dataformats[i] == dataformat) && (edit))) {
+        var menulistitem = dataformatmenu.appendItem(dataformats[i]);
         menulistitem.minWidth=dataformatmenu.width;
-        if (Operator_Options.dataformats[i] == dataformat) {
+        if (dataformats[i] == dataformat) {
           selectedItem = menulistitem;
         }
       }
@@ -388,25 +387,25 @@ var Operator_Options = {
       dataformatmenu.selectedIndex = 0;
     }
     sizeToContent();
-  },
+  }
   
-  onDataformatOK: function()
+  function onDataformatOK()
   {
-    var dataformats = window.opener.document.getElementById("dataformats");
+    var dataformats_lb = window.opener.document.getElementById("dataformats");
     var dataformat = document.getElementById("dataformats").selectedItem.label;
   
     if (window.name == 'newdataformat') {
-      var listitem = dataformats.appendItem(dataformat);
+      var listitem = dataformats_lb.appendItem(dataformat);
     } else {
-      var selectedItem = dataformats.selectedItem;
+      var selectedItem = dataformats_lb.selectedItem;
       selectedItem.label = dataformat;
     }
-  },
+  }
   
   
   /* Action dialog */
   
-  onActionLoad: function()
+  function onActionLoad()
   {
     var action = null;
     var selectedItem = null;
@@ -459,9 +458,9 @@ var Operator_Options = {
       actionmenu.selectedIndex = 0;
     }
     sizeToContent();
-  },
+  }
   
-  onActionOK: function()
+  function onActionOK()
   {
     var actions = window.opener.document.getElementById("actions");
   
@@ -472,9 +471,9 @@ var Operator_Options = {
       selectedItem.label = document.getElementById("actions").selectedItem.label;
       selectedItem.value = document.getElementById("actions").selectedItem.value;
     }
-  },
+  }
   
-  onNewUserScript: function()
+  function onNewUserScript()
   {
     try {
       var nsIFilePicker = Components.interfaces.nsIFilePicker;
@@ -511,9 +510,9 @@ var Operator_Options = {
     }
     catch(ex) {
     }
-  },
+  }
   
-  onDeleteUserScript: function()
+  function onDeleteUserScript()
   {
     var listbox = document.getElementById('userscripts');
     var promptService = Components.classes["@mozilla.org/embedcomp/prompt-service;1"].
@@ -532,6 +531,3 @@ var Operator_Options = {
     }
     return false;
   }
-};
-
-
