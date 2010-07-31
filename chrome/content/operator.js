@@ -403,52 +403,54 @@ var Operator = {
     if (!usdir.exists()) {
       usdir.create(Components.interfaces.nsIFile.DIRECTORY_TYPE, 0755);
     }
-    /* Not going to support autocopying user scripts in Firefox 4 */
-    if (usdir.isDirectory() && Components.classes["@mozilla.org/extensions/manager;1"]) {
-      /* If we have user scripts, copy them over */
-      var extman = Components.classes["@mozilla.org/extensions/manager;1"]
-                                      .getService(Components.interfaces.nsIExtensionManager);
-      var appdir = extman.getInstallLocation("{95C9A302-8557-4052-91B7-2BB6BA33C885}")
-                         .getItemLocation("{95C9A302-8557-4052-91B7-2BB6BA33C885}");
-      appdir.append("userscripts");
-      
-      if (appdir.exists() && appdir.isDirectory()) {
-        var e = appdir.directoryEntries;
-        while (e.hasMoreElements()) {
-          var f = e.getNext().QueryInterface(Components.interfaces.nsIFile);
-          var splitpath = f.path.split(".");
-          /* Only load JS files */
-          if (splitpath[splitpath.length-1] == "js") {
-            var oldfile = usdir.clone();
-            oldfile.append(f.leafName);
-            if (!oldfile.exists()) {
-              f.copyTo(usdir, null);
-            } else {
-              /* If the files don't have the same size and date, ask about */
-              /* overwriting */
-              if ((f.fileSize != oldfile.fileSize) || (f.lastModifiedTime != oldfile.lastModifiedTime)) {
-                if (f.lastModifiedTime > oldfile.lastModifiedTime) {
-                  var promptService = Components.classes["@mozilla.org/embedcomp/prompt-service;1"].
-                                                 getService(Components.interfaces.nsIPromptService);
-                  var button = promptService.confirmEx(window, "",
-                                                       this.languageBundle.formatStringFromName("overwriteUserScript.confirm", [f.leafName], 1),
-                                                       promptService.BUTTON_TITLE_YES * promptService.BUTTON_POS_0 +
-                                                       promptService.BUTTON_TITLE_NO * promptService.BUTTON_POS_1,
-                                                       null, null, null, null, {});
-  
-                  if (button == 0) {
-                    oldfile.remove(false);
-                    f.copyTo(usdir, null);
+    if (usdir.isDirectory()) {
+      /* Not going to support autocopying user scripts in Firefox 4 */
+      if (Components.classes["@mozilla.org/extensions/manager;1"]) {
+        /* If we have user scripts, copy them over */
+        var extman = Components.classes["@mozilla.org/extensions/manager;1"]
+                                        .getService(Components.interfaces.nsIExtensionManager);
+        var appdir = extman.getInstallLocation("{95C9A302-8557-4052-91B7-2BB6BA33C885}")
+                           .getItemLocation("{95C9A302-8557-4052-91B7-2BB6BA33C885}");
+        appdir.append("userscripts");
+        
+        if (appdir.exists() && appdir.isDirectory()) {
+          var e = appdir.directoryEntries;
+          while (e.hasMoreElements()) {
+            var f = e.getNext().QueryInterface(Components.interfaces.nsIFile);
+            var splitpath = f.path.split(".");
+            /* Only load JS files */
+            if (splitpath[splitpath.length-1] == "js") {
+              var oldfile = usdir.clone();
+              oldfile.append(f.leafName);
+              if (!oldfile.exists()) {
+                f.copyTo(usdir, null);
+              } else {
+                /* If the files don't have the same size and date, ask about */
+                /* overwriting */
+                if ((f.fileSize != oldfile.fileSize) || (f.lastModifiedTime != oldfile.lastModifiedTime)) {
+                  if (f.lastModifiedTime > oldfile.lastModifiedTime) {
+                    var promptService = Components.classes["@mozilla.org/embedcomp/prompt-service;1"].
+                                                   getService(Components.interfaces.nsIPromptService);
+                    var button = promptService.confirmEx(window, "",
+                                                         this.languageBundle.formatStringFromName("overwriteUserScript.confirm", [f.leafName], 1),
+                                                         promptService.BUTTON_TITLE_YES * promptService.BUTTON_POS_0 +
+                                                         promptService.BUTTON_TITLE_NO * promptService.BUTTON_POS_1,
+                                                         null, null, null, null, {});
+    
+                    if (button == 0) {
+                      oldfile.remove(false);
+                      f.copyTo(usdir, null);
+                    }
                   }
                 }
               }
             }
           }
-        }
-        /* Remove the user scripts directory completely so they aren't asked again */
-        try {
-          appdir.remove(true);
-        } catch (ex) {
+          /* Remove the user scripts directory completely so they aren't asked again */
+          try {
+            appdir.remove(true);
+          } catch (ex) {
+          }
         }
       }
 	  /* My idea of having people Component.utils.import Microformats.js was BAD */
