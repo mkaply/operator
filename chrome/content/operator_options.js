@@ -60,7 +60,7 @@
     var actionsPref = [];
     var enableactions = document.getElementById("enableactions");
 	var checkboxes = enableactions.getElementsByTagName("checkbox");
-	for (let i =0; i < checkboxes.length; i++) {
+	for (var i =0; i < checkboxes.length; i++) {
 	  if (!checkboxes[i].checked) {
 		actionsPref.push(checkboxes[i].id);
 	  }
