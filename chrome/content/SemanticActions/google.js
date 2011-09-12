@@ -198,7 +198,8 @@ var google_calendar = {
           if (hcalendar.location.fn) {
             url += encodeURIComponent(hcalendar.location.fn);
           }
-		  if (hcalendar.location.adr[j]) {
+
+		      if (hcalendar.location.adr[j]) {
             if (hcalendar.location.adr[j]["street-address"]) {
               if (hcalendar.location.fn) {
                 url += ", ";
@@ -221,7 +222,7 @@ var google_calendar = {
               url += ",";
               url += encodeURIComponent(hcalendar.location.adr[j]["country-name"]);
             }
-		  }
+		      }
         } else {
           url += "&";
           url += "location=" + encodeURIComponent(hcalendar.location);
@@ -500,13 +501,15 @@ var add_google_contact = {
     var url;
     var xml = "";
 
-    xml += "<atom:entry xmlns:atom='http://www.w3.org/2005/Atom' xmlns:gd='http://schemas.google.com/g/2005'>" + "\n";
+    xml += "<atom:entry xmlns:atom='http://www.w3.org/2005/Atom' xmlns:gd='http://schemas.google.com/g/2005' xmlns:gContact='http://schemas.google.com/contact/2008'>" + "\n";
     xml += "  <atom:category scheme='http://schemas.google.com/g/2005#kind' term='http://schemas.google.com/contact/2008#contact' />" + "\n";
 
     //Parse name
     xml += "  <atom:title type='text'>" + hcard.fn + "</atom:title> " + "\n";
+    xml += "  <gContact:name><gContact:fullName>" + hcard.fn + "</gContact:fullName></gContact:name> " + "\n";
 
-    xml += "  <atom:content type='text'>Notes</atom:content>" + "\n";
+    // Any applicable Notes
+    xml += "  <atom:content type='text'>Data from " + content.document.location.href + "</atom:content>" + "\n";
 
     if (hcard.email) {
       for (i = 0; i < hcard.email.length; i++) {
@@ -534,16 +537,16 @@ var add_google_contact = {
       }
     }
 
-    // Not yet implemented :(
     if (hcard.url) {
       for (i = 0; i < hcard.url.length; i++) {
-        /*
         url = hcard.url[i];
+        // IMs
         if ('xmpp:' == url.substring(0, 5)) {
-            xml += "     <gd:im address='" + url.substring(5) + "' protocol='http://schemas.google.com/g/2005#GOOGLE_TALK' rel='http://schemas.google.com/g/2005#home' />" + "\n";
+            xml += "     <gd:im address='" + url.substring(5) + "' protocol='http://schemas.google.com/g/2005#JABBER' rel='http://schemas.google.com/g/2005#home' />" + "\n";
         }
-        */
-
+        if ('http' == url.substring(0, 4)) {
+            xml += "     <gContact:website rel='home-page' href='" + String(url) + "' />" + "\n";
+        }
 
         /** @todo    If I ever find the way to tell google about the right bit of api */
         /*
@@ -557,6 +560,9 @@ var add_google_contact = {
       }
     }
 
+    xml += "     <gContact:website rel='other' href='" + content.document.location.href + "' />";
+
+    /** @todo gd:structuredPostalAddress support? */
     if (hcard.adr) {
       for (i = 0; i < hcard.adr.length; i++) {
         adr = hcard.adr[i];
@@ -601,27 +607,30 @@ var add_google_contact = {
       request.open(method, url, false);
 
       if (auth) {
-          request.setRequestHeader("Authorization", "GoogleLogin auth=" + auth);
+        request.setRequestHeader("Authorization", "GoogleLogin auth=" + auth);
       }
 
       if (content_type) {
-          request.setRequestHeader("Content-type", content_type);
+        request.setRequestHeader("Content-type", content_type);
       }
 
       try {
-          request.send(content);
+        request.send(content);
 
-          if (request.status == 200 || request.status == 201 || request.status == 409) {
-              return request.responseText;
-          }
+        if (request.status == 200 || request.status == 201 || request.status == 409) {
+            return request.responseText;
+        }
+
+        throw "Unexpected status: " + request.status + "; " + request.responseText;
+
       } catch (ex) {
-          dump(ex);
+        dump(ex);
 
-          if (Operator.debug) {
-              alert(ex);
-          }
+        if (Operator.debug) {
+            alert(ex);
+        }
 
-                  throw ex;
+        throw ex;
       }
   }
 };
