@@ -54,13 +54,13 @@ var google_maps = {
           url = url.substring(0, url.lastIndexOf(", "));
         }
       }
-	  if (semanticObjectType == "hCard") {
-		url += " (" + semanticObject.toString().replace("(", "[").replace(")", "]") + ")";
-	  }
+      if (semanticObjectType == "hCard") {
+        url += " (" + semanticObject.toString().replace("(", "[").replace(")", "]") + ")";
+      }
     } else if (semanticObjectType == "geo") {
       if (semanticObject.latitude && semanticObject.longitude) {
         url = "http://maps.google.com/maps?ll=" + semanticObject.latitude + "," + semanticObject.longitude + "&q=" + semanticObject.latitude + "," + semanticObject.longitude;
-		url += " (" + semanticObject.toString().replace("(", "[").replace(")", "]") + ")";
+		    url += " (" + semanticObject.toString().replace("(", "[").replace(")", "]") + ")";
       }
     }
     return url
