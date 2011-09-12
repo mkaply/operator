@@ -65,25 +65,27 @@ var thirty_boxes_calendar = {
         url += "[";
         if (typeof hcalendar.location == "object") {
           var j = 0;
-          if (hcalendar.location.adr[j]["street-address"]) {
-            url += hcalendar.location.adr[j]["street-address"][0];
-          }
-          if (hcalendar.location.adr[j].locality) {
-            url += ", ";
-            url += hcalendar.location.adr[j].locality;
-          }
-          if (hcalendar.location.adr[j].region) {
-            url += ", ";
-            url += hcalendar.location.adr[j].region;
-          }
-          if (hcalendar.location.adr[j]["postal-code"]) {
-            url += " ";
-            url += hcalendar.location.adr[j]["postal-code"];
-          }
-          if (hcalendar.location.adr[j]["country-name"]) {
-            url += ",";
-            url += hcalendar.location.adr[j]["country-name"];
-          }
+		  if (hcalendar.location.adr[j]) {
+            if (hcalendar.location.adr[j]["street-address"]) {
+              url += hcalendar.location.adr[j]["street-address"][0];
+            }
+            if (hcalendar.location.adr[j].locality) {
+              url += ", ";
+              url += hcalendar.location.adr[j].locality;
+            }
+            if (hcalendar.location.adr[j].region) {
+              url += ", ";
+              url += hcalendar.location.adr[j].region;
+            }
+            if (hcalendar.location.adr[j]["postal-code"]) {
+              url += " ";
+              url += hcalendar.location.adr[j]["postal-code"];
+            }
+            if (hcalendar.location.adr[j]["country-name"]) {
+              url += ",";
+              url += hcalendar.location.adr[j]["country-name"];
+            }
+		  }
         } else {
           url += hcalendar.location;
         }
