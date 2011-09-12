@@ -198,28 +198,30 @@ var google_calendar = {
           if (hcalendar.location.fn) {
             url += encodeURIComponent(hcalendar.location.fn);
           }
-          if (hcalendar.location.adr[j]["street-address"]) {
-            if (hcalendar.location.fn) {
-              url += ", ";
+		  if (hcalendar.location.adr[j]) {
+            if (hcalendar.location.adr[j]["street-address"]) {
+              if (hcalendar.location.fn) {
+                url += ", ";
+              }
+              url += encodeURIComponent(hcalendar.location.adr[j]["street-address"][0]);
             }
-            url += encodeURIComponent(hcalendar.location.adr[j]["street-address"][0]);
-          }
-          if (hcalendar.location.adr[j].locality) {
-            url += ", ";
-            url += encodeURIComponent(hcalendar.location.adr[j].locality);
-          }
-          if (hcalendar.location.adr[j].region) {
-            url += ", ";
-            url += encodeURIComponent(hcalendar.location.adr[j].region);
-          }
-          if (hcalendar.location.adr[j]["postal-code"]) {
-            url += " ";
-            url += hcalendar.location.adr[j]["postal-code"];
-          }
-          if (hcalendar.location.adr[j]["country-name"]) {
-            url += ",";
-            url += encodeURIComponent(hcalendar.location.adr[j]["country-name"]);
-          }
+            if (hcalendar.location.adr[j].locality) {
+              url += ", ";
+              url += encodeURIComponent(hcalendar.location.adr[j].locality);
+            }
+            if (hcalendar.location.adr[j].region) {
+              url += ", ";
+              url += encodeURIComponent(hcalendar.location.adr[j].region);
+            }
+            if (hcalendar.location.adr[j]["postal-code"]) {
+              url += " ";
+              url += hcalendar.location.adr[j]["postal-code"];
+            }
+            if (hcalendar.location.adr[j]["country-name"]) {
+              url += ",";
+              url += encodeURIComponent(hcalendar.location.adr[j]["country-name"]);
+            }
+		  }
         } else {
           url += "&";
           url += "location=" + encodeURIComponent(hcalendar.location);
