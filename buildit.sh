@@ -1,3 +1,19 @@
+if [ ! `which rsync` ] ; then
+   echo "Requires rsync"
+   exit 1
+fi
+
+if [ ! `which zip ] ; then
+   echo "Requires zip"
+   exit 1
+fi
+
+if [ ! `which perl ] ; then
+   echo "Requires perl"
+   exit 1
+fi
+
+
 EXTENSION=operator
 rm  *.xpi
 rm -rf $EXTENSION

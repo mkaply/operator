@@ -35,6 +35,7 @@ var SemanticActions = {
         ojl.loadSubScript(baseurl + "firefox.js");
         ojl.loadSubScript(baseurl + "flickr.js");
         ojl.loadSubScript(baseurl + "google.js");
+        ojl.loadSubScript(baseurl + "openstreetmap.js");
         ojl.loadSubScript(baseurl + "magnolia.js");
         ojl.loadSubScript(baseurl + "mapquest.js");
         ojl.loadSubScript(baseurl + "technorati.js");
@@ -42,6 +43,9 @@ var SemanticActions = {
         ojl.loadSubScript(baseurl + "yahoo.js");
         ojl.loadSubScript(baseurl + "yedda.js");
         ojl.loadSubScript(baseurl + "youtube.js");
+        ojl.loadSubScript(baseurl + "isbn.js");
+        ojl.loadSubScript(baseurl + "sioc_delicious.js");
+        ojl.loadSubScript(baseurl + "good_relations.js");
 
       } catch (ex) {
         alert(ex)
