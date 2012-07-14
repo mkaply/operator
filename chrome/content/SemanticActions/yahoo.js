@@ -216,24 +216,26 @@ var yahoo_calendar = {
           if (hcalendar.location.fn) {
             url += "in_loc=" + hcalendar.location.fn;
           }
-		  if (hcalendar.location.adr[j]) {
-             if (hcalendar.location.adr[j]["street-address"]) {
-               url += "&";
-               url += "in_st=" + encodeURIComponent(hcalendar.location.adr[j]["street-address"][0]);
-             }
-             if (hcalendar.location.adr[j].locality) {
-               url += "&";
-               url += "in_csz=" + hcalendar.location.adr[j].locality;
-               if (hcalendar.location.adr[j].region) {
-                 url += ", ";
-                 url += hcalendar.location.adr[j].region;
-               }
-               if (hcalendar.location.adr[j]["postal-code"]) {
-                 url += " ";
-                 url += hcalendar.location.adr[j]["postal-code"];
-               }
-             }
-		  }
+          if (hcalendar.location.adr) {
+            if (hcalendar.location.adr[j]) {
+              if (hcalendar.location.adr[j]["street-address"]) {
+                url += "&";
+                url += "in_st=" + encodeURIComponent(hcalendar.location.adr[j]["street-address"][0]);
+              }
+              if (hcalendar.location.adr[j].locality) {
+                url += "&";
+                url += "in_csz=" + hcalendar.location.adr[j].locality;
+                if (hcalendar.location.adr[j].region) {
+                  url += ", ";
+                  url += hcalendar.location.adr[j].region;
+                }
+                if (hcalendar.location.adr[j]["postal-code"]) {
+                  url += " ";
+                  url += hcalendar.location.adr[j]["postal-code"];
+                }
+              }
+            }
+          }
         } else {
           url += "&";
           url += "in_loc=" + hcalendar.location;
