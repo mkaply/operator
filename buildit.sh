@@ -3,12 +3,12 @@ if [ ! `which rsync` ] ; then
    exit 1
 fi
 
-if [ ! `which zip ] ; then
+if [ ! `which zip` ] ; then
    echo "Requires zip"
    exit 1
 fi
 
-if [ ! `which perl ] ; then
+if [ ! `which perl` ] ; then
    echo "Requires perl"
    exit 1
 fi

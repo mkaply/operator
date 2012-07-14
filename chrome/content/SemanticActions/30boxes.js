@@ -63,9 +63,9 @@ var thirty_boxes_calendar = {
       }
       if (hcalendar.location) {
         url += "[";
-        if (typeof hcalendar.location == "object") {
+        if (typeof hcalendar.location == "object" && typeof hcalendar.location.adr == "object") {
           var j = 0;
-		  if (hcalendar.location.adr[j]) {
+          if (hcalendar.location.adr[j]) {
             if (hcalendar.location.adr[j]["street-address"]) {
               url += hcalendar.location.adr[j]["street-address"][0];
             }
@@ -85,7 +85,7 @@ var thirty_boxes_calendar = {
               url += ",";
               url += hcalendar.location.adr[j]["country-name"];
             }
-		  }
+          }
         } else {
           url += hcalendar.location;
         }
