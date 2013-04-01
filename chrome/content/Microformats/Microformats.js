@@ -860,7 +860,7 @@ var Microformats = {
       if (!parentnode || ((result == undefined) && propobj.subproperties)) {
         if (propobj.virtual) {
           if (propobj.virtualGetter) {
-            result = propobj.virtualGetter(mfnode || propnode);
+            result = propobj.virtualGetter(propnode || mfnode);
           } else {
             result = Microformats.parser.datatypeHelper(propobj, propnode);
           }
