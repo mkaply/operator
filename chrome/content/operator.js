@@ -1426,9 +1426,9 @@ var Operator = {
       /* Add listeners in the page show case. We don't need them in the */
       /* DOMContentLoaded case */
       target.addEventListener("mouseover", Operator.mouseOver, false);
-      target.addEventListener("DOMNodeInserted", Operator.preprocessEvent, false);
-      target.addEventListener("DOMNodeRemoved", Operator.preprocessEvent, false);
       if (Operator.observeDOMAttrModified) {
+        target.addEventListener("DOMNodeInserted", Operator.preprocessEvent, false);
+        target.addEventListener("DOMNodeRemoved", Operator.preprocessEvent, false);
         target.addEventListener("DOMAttrModified", Operator.preprocessEvent, false);
       }
       /* Cannot do this check because it breaks frame navigation! */
